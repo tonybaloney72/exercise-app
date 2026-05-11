@@ -61,36 +61,35 @@ export default function RestTimer() {
   const progress = restBetweenRounds > 0 ? secondsLeft / restBetweenRounds : 0;
 
   return (
-    <div className="flex items-center justify-center min-h-[44px]">
+    <div className="fixed top-4 right-4 z-40">
       <AnimatePresence mode="wait" initial={false}>
         {isIdle ? (
           <motion.button
             key="idle"
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+            exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.15 }}
             onClick={startTimer}
-            className="flex items-center gap-2 rounded-full bg-accent/20 px-4 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent/30 active:bg-accent/40"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-accent shadow-lg shadow-accent/30 text-white active:scale-95 transition-transform"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
             </svg>
-            Rest Timer ({restBetweenRounds}s)
           </motion.button>
         ) : (
           <motion.div
             key="active"
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+            exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.15 }}
-            className="flex items-center gap-3 rounded-full bg-accent/20 px-4 py-2"
+            className="flex items-center gap-2.5 rounded-full bg-surface border border-border shadow-lg pl-3 pr-2 py-2"
           >
-            <div className="relative h-5 w-5">
-              <svg className="h-5 w-5 -rotate-90" viewBox="0 0 36 36">
-                <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeOpacity="0.2" strokeWidth="3" />
+            <div className="relative h-8 w-8 shrink-0">
+              <svg className="h-8 w-8 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="3" />
                 <circle
                   cx="18"
                   cy="18"
@@ -104,14 +103,14 @@ export default function RestTimer() {
                 />
               </svg>
             </div>
-            <span className="text-sm font-bold tabular-nums text-accent">
+            <span className="text-sm font-bold tabular-nums text-foreground">
               {formatTime(secondsLeft)}
             </span>
             <button
               onClick={stopTimer}
-              className="ml-1 rounded-full p-1 text-muted hover:text-foreground"
+              className="rounded-full p-1.5 text-muted hover:text-foreground hover:bg-surface-hover transition-colors"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>

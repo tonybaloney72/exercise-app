@@ -3,16 +3,14 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ExerciseRow from "./ExerciseRow";
-import RestTimer from "@/components/common/RestTimer";
 import type { Round, RoundLog } from "@/types";
 
 interface RoundCardProps {
   round: Round;
   roundLog: RoundLog;
-  isLast: boolean;
 }
 
-export default function RoundCard({ round, roundLog, isLast }: RoundCardProps) {
+export default function RoundCard({ round, roundLog }: RoundCardProps) {
   const [isOpen, setIsOpen] = useState(true);
 
   const completedCount = roundLog.exercises.filter(
@@ -99,13 +97,6 @@ export default function RoundCard({ round, roundLog, isLast }: RoundCardProps) {
                 );
               })}
             </div>
-
-            {/* Rest timer between rounds */}
-            {!isLast && (
-              <div className="flex justify-center border-t border-border px-4 py-3">
-                <RestTimer />
-              </div>
-            )}
           </motion.div>
         )}
       </AnimatePresence>
