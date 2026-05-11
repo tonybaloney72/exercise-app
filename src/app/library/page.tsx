@@ -1,0 +1,186 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { exercises } from "@/data/exercises";
+import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
+import CategoryBadge from "@/components/common/CategoryBadge";
+import type { ExerciseCategory } from "@/types";
+
+export default function LibraryPage() {
+  const [search, setSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState<ExerciseCategory | "all">("all");
+
+  const filtered = useMemo(() => {
+    return exercises.filter((ex) => {
+      const matchesSearch =
+        search === "" ||
+        ex.name.toLowerCase().includes(search.toLowerCase()) ||
+        ex.id.toLowerCase().includes(search.toLowerCase()) ||
+        ex.notes.toLowerCase().includes(search.toLowerCase());
+
+      const matchesCategory =
+        activeFilter === "all" || ex.category === activeFilter;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [search, activeFilter]);
+
+  const grouped = useMemo(() => {
+    const groups: Record<string, typeof exercises> = {};
+    for (const ex of filtered) {
+      if (!groups[ex.category]) groups[ex.category] = [];
+      groups[ex.category].push(ex);
+    }
+    return groups;
+  }, [filtered]);
+
+  return (
+    <div className="py-6 space-y-5">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Exercise Library</h1>
+        <p className="text-sm text-muted mt-1">{exercises.length} exercises</p>
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <svg
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search exercises..."
+          className="w-full rounded-xl border border-border bg-surface py-3 pl-10 pr-4 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted"
+        />
+      </div>
+
+      {/* Category filter chips */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+        <button
+          onClick={() => setActiveFilter("all")}
+          className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeFilter === "all"
+              ? "bg-accent text-white"
+              : "bg-surface text-muted hover:text-foreground border border-border"
+          }`}
+        >
+          All
+        </button>
+        {CATEGORY_ORDER.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setActiveFilter(cat === activeFilter ? "all" : cat)}
+            className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+              activeFilter === cat
+                ? `${CATEGORIES[cat].bgColor} ${CATEGORIES[cat].textColor}`
+                : "bg-surface text-muted hover:text-foreground border border-border"
+            }`}
+          >
+            {CATEGORIES[cat].shortName}
+          </button>
+        ))}
+      </div>
+
+      {/* Exercise list */}
+      <div className="space-y-6">
+        <AnimatePresence mode="popLayout">
+          {CATEGORY_ORDER.filter((cat) => grouped[cat]?.length).map((cat) => (
+            <motion.div
+              key={cat}
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-2"
+            >
+              <div className="flex items-center gap-2">
+                <div
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: CATEGORIES[cat].color }}
+                />
+                <h2 className="text-sm font-semibold text-foreground">
+                  {CATEGORIES[cat].name}
+                </h2>
+                <span className="text-xs text-muted">({grouped[cat].length})</span>
+              </div>
+
+              <div className="space-y-1">
+                {grouped[cat].map((ex) => (
+                  <ExerciseCard key={ex.id} exercise={ex} />
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {filtered.length === 0 && (
+          <div className="py-12 text-center text-sm text-muted">
+            No exercises match your search.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ExerciseCard({ exercise }: { exercise: typeof exercises[number] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="rounded-lg border border-border bg-surface overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center gap-3 min-h-[48px] px-3 py-2 text-left"
+      >
+        <span className="text-[10px] font-mono text-muted w-8 shrink-0">{exercise.id}</span>
+        <span className="flex-1 text-sm font-medium text-foreground">{exercise.name}</span>
+        <span className="text-xs text-muted">{exercise.defaultReps}</span>
+        <CategoryBadge category={exercise.category} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="border-t border-border px-3 py-3 space-y-2">
+              <p className="text-xs text-muted">{exercise.notes}</p>
+              {exercise.source && (
+                <p className="text-[10px] text-muted">Source: {exercise.source}</p>
+              )}
+              {exercise.secondaryCategory && (
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] text-muted">Also:</span>
+                  <CategoryBadge category={exercise.secondaryCategory} />
+                </div>
+              )}
+              {exercise.videoUrl && (
+                <a
+                  href={exercise.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                  Watch video
+                </a>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

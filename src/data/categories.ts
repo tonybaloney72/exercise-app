@@ -1,0 +1,80 @@
+import type { CategoryMeta, ExerciseCategory } from "@/types";
+
+export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
+  CF: {
+    id: "CF",
+    name: "Core – Front/Flexion",
+    shortName: "Core Front",
+    color: "#3b82f6",
+    bgColor: "bg-blue-500/20",
+    textColor: "text-blue-400",
+    description: "Rectus abdominis (the 'six-pack' muscles), hip flexors",
+  },
+  CL: {
+    id: "CL",
+    name: "Core – Lower Abs",
+    shortName: "Core Lower",
+    color: "#6366f1",
+    bgColor: "bg-indigo-500/20",
+    textColor: "text-indigo-400",
+    description: "Lower portion of rectus abdominis, deep hip flexors",
+  },
+  CR: {
+    id: "CR",
+    name: "Core – Rotational/Obliques",
+    shortName: "Obliques",
+    color: "#a855f7",
+    bgColor: "bg-purple-500/20",
+    textColor: "text-purple-400",
+    description: "Internal and external obliques, rotational stability",
+  },
+  CS: {
+    id: "CS",
+    name: "Core – Stability/Anti-Extension",
+    shortName: "Core Stability",
+    color: "#14b8a6",
+    bgColor: "bg-teal-500/20",
+    textColor: "text-teal-400",
+    description: "Deep core stabilizers (transverse abdominis), anti-extension strength",
+  },
+  UP: {
+    id: "UP",
+    name: "Upper Body – Push",
+    shortName: "Upper Push",
+    color: "#f43f5e",
+    bgColor: "bg-rose-500/20",
+    textColor: "text-rose-400",
+    description: "Chest (pectorals), shoulders (deltoids), triceps",
+  },
+  UPL: {
+    id: "UPL",
+    name: "Upper Body – Pull",
+    shortName: "Upper Pull",
+    color: "#f97316",
+    bgColor: "bg-orange-500/20",
+    textColor: "text-orange-400",
+    description: "Back (lats, rhomboids, traps), biceps, rear deltoids",
+  },
+  LB: {
+    id: "LB",
+    name: "Lower Body",
+    shortName: "Lower Body",
+    color: "#22c55e",
+    bgColor: "bg-green-500/20",
+    textColor: "text-green-400",
+    description: "Quadriceps, hamstrings, glutes, calves",
+  },
+  CP: {
+    id: "CP",
+    name: "Cardio/Plyometric",
+    shortName: "Cardio",
+    color: "#eab308",
+    bgColor: "bg-amber-500/20",
+    textColor: "text-amber-400",
+    description: "Heart rate elevation, conditioning, explosive power",
+  },
+};
+
+export const CATEGORY_ORDER: ExerciseCategory[] = [
+  "CF", "CL", "CR", "CS", "UP", "UPL", "LB", "CP",
+];
