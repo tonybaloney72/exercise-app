@@ -36,9 +36,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   updateSettings: (partial) => {
     const current = get();
     const updated: UserSettings = {
-      currentPushUpMax: partial.currentPushUpMax ?? current.currentPushUpMax,
-      currentJogDistance: partial.currentJogDistance ?? current.currentJogDistance,
-      currentJogBestTime: partial.currentJogBestTime ?? current.currentJogBestTime,
+      currentPushUpMax: "currentPushUpMax" in partial ? partial.currentPushUpMax : current.currentPushUpMax,
+      currentJogDistance: "currentJogDistance" in partial ? partial.currentJogDistance : current.currentJogDistance,
+      currentJogBestTimeSeconds: "currentJogBestTimeSeconds" in partial ? partial.currentJogBestTimeSeconds : current.currentJogBestTimeSeconds,
       restBetweenRounds: partial.restBetweenRounds ?? current.restBetweenRounds,
       weekStartDate: partial.weekStartDate ?? current.weekStartDate,
       darkMode: partial.darkMode ?? current.darkMode,

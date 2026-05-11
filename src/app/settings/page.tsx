@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
 import { motion } from "framer-motion";
 
 export default function SettingsPage() {
   const settings = useSettingsStore();
   const { workoutHistory, loadHistory } = useWorkoutStore();
+
+  const [pushUpInput, setPushUpInput] = useState("");
+  const [jogDistInput, setJogDistInput] = useState("");
+  const [jogTimeInput, setJogTimeInput] = useState("");
 
   useEffect(() => {
     settings.loadSettings();
@@ -19,7 +24,7 @@ export default function SettingsPage() {
       settings: {
         currentPushUpMax: settings.currentPushUpMax,
         currentJogDistance: settings.currentJogDistance,
-        currentJogBestTime: settings.currentJogBestTime,
+        currentJogBestTimeSeconds: settings.currentJogBestTimeSeconds,
         restBetweenRounds: settings.restBetweenRounds,
         weekStartDate: settings.weekStartDate,
         darkMode: settings.darkMode,
@@ -55,41 +60,61 @@ export default function SettingsPage() {
             <div>
               <label className="text-xs text-muted">Push-Up Max (knee)</label>
               <input
-                type="number"
-                min="0"
-                value={settings.currentPushUpMax}
-                onChange={(e) =>
-                  settings.updateSettings({ currentPushUpMax: parseInt(e.target.value) || 0 })
-                }
+                type="text"
+                inputMode="numeric"
+                value={pushUpInput || (settings.currentPushUpMax != null ? String(settings.currentPushUpMax) : "")}
+                onChange={(e) => setPushUpInput(e.target.value)}
+                onBlur={() => {
+                  const val = pushUpInput.trim();
+                  if (val === "") {
+                    settings.updateSettings({ currentPushUpMax: undefined });
+                  } else {
+                    const num = parseInt(val, 10);
+                    if (!isNaN(num)) settings.updateSettings({ currentPushUpMax: num });
+                  }
+                  setPushUpInput("");
+                }}
                 className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent"
+                placeholder="13"
               />
             </div>
 
             <div>
               <label className="text-xs text-muted">Current Jog Distance (miles)</label>
               <input
-                type="number"
-                step="0.1"
-                min="0"
-                value={settings.currentJogDistance}
-                onChange={(e) =>
-                  settings.updateSettings({ currentJogDistance: parseFloat(e.target.value) || 0 })
-                }
+                type="text"
+                inputMode="decimal"
+                value={jogDistInput || (settings.currentJogDistance != null ? String(settings.currentJogDistance) : "")}
+                onChange={(e) => setJogDistInput(e.target.value)}
+                onBlur={() => {
+                  const val = jogDistInput.trim();
+                  if (val === "") {
+                    settings.updateSettings({ currentJogDistance: undefined });
+                  } else {
+                    const num = parseFloat(val);
+                    if (!isNaN(num)) settings.updateSettings({ currentJogDistance: num });
+                  }
+                  setJogDistInput("");
+                }}
                 className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent"
+                placeholder="1.3"
               />
             </div>
 
             <div>
-              <label className="text-xs text-muted">Best Jog Time (minutes)</label>
+              <label className="text-xs text-muted">Best Jog Time (MM:SS)</label>
               <input
-                type="number"
-                min="0"
-                value={settings.currentJogBestTime ?? ""}
-                onChange={(e) =>
-                  settings.updateSettings({ currentJogBestTime: parseInt(e.target.value) || undefined })
-                }
+                type="text"
+                inputMode="numeric"
+                value={jogTimeInput || formatSecondsToMMSS(settings.currentJogBestTimeSeconds)}
+                onChange={(e) => setJogTimeInput(e.target.value)}
+                onBlur={() => {
+                  const parsed = parseTimeInput(jogTimeInput);
+                  settings.updateSettings({ currentJogBestTimeSeconds: parsed });
+                  setJogTimeInput("");
+                }}
                 className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent"
-                placeholder="Not set"
+                placeholder="17:35"
               />
             </div>
           </div>

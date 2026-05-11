@@ -87,19 +87,19 @@ export default function ProgressPage() {
         <h2 className="text-sm font-semibold text-foreground">Push-Up Progression</h2>
         <div className="flex items-end gap-3">
           <div>
-            <p className="text-3xl font-bold text-rose-400">{currentPushUpMax}</p>
+            <p className="text-3xl font-bold text-rose-400">{currentPushUpMax ?? "—"}</p>
             <p className="text-[10px] text-muted">Current max (knee)</p>
           </div>
           <div className="flex-1">
             <div className="flex items-center justify-between text-[10px] text-muted mb-1">
               <span>Progress to full push-ups</span>
-              <span>{Math.round((currentPushUpMax / 15) * 100)}%</span>
+              <span>{Math.round(((currentPushUpMax ?? 0) / 15) * 100)}%</span>
             </div>
             <div className="h-2 rounded-full bg-border overflow-hidden">
               <motion.div
                 className="h-full rounded-full bg-gradient-to-r from-rose-500 to-rose-400"
                 initial={{ width: 0 }}
-                animate={{ width: `${Math.min((currentPushUpMax / 15) * 100, 100)}%` }}
+                animate={{ width: `${Math.min(((currentPushUpMax ?? 0) / 15) * 100, 100)}%` }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               />
             </div>
@@ -113,19 +113,19 @@ export default function ProgressPage() {
         <h2 className="text-sm font-semibold text-foreground">Jog Distance</h2>
         <div className="flex items-end gap-3">
           <div>
-            <p className="text-3xl font-bold text-sky-400">{currentJogDistance}</p>
+            <p className="text-3xl font-bold text-sky-400">{currentJogDistance ?? "—"}</p>
             <p className="text-[10px] text-muted">Miles (current)</p>
           </div>
           <div className="flex-1">
             <div className="flex items-center justify-between text-[10px] text-muted mb-1">
               <span>Distance progress</span>
-              <span>{currentJogDistance} / 2.0 mi</span>
+              <span>{currentJogDistance ?? 0} / 2.0 mi</span>
             </div>
             <div className="h-2 rounded-full bg-border overflow-hidden">
               <motion.div
                 className="h-full rounded-full bg-gradient-to-r from-sky-500 to-sky-400"
                 initial={{ width: 0 }}
-                animate={{ width: `${Math.min((currentJogDistance / 2.0) * 100, 100)}%` }}
+                animate={{ width: `${Math.min(((currentJogDistance ?? 0) / 2.0) * 100, 100)}%` }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               />
             </div>

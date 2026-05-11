@@ -12,12 +12,12 @@ interface WorkoutState {
 
   startWorkout: (plan: DayPlan) => void;
   toggleJog: () => void;
-  setJogDistance: (distance: number) => void;
-  setJogDuration: (duration: number) => void;
+  setJogDistance: (distance: number | undefined) => void;
+  setJogDurationSeconds: (seconds: number | undefined) => void;
   toggleWarmUp: () => void;
   toggleCoolDown: () => void;
   toggleExercise: (roundNumber: number, exerciseId: string) => void;
-  setActualReps: (roundNumber: number, exerciseId: string, reps: number) => void;
+  setActualReps: (roundNumber: number, exerciseId: string, reps: number | undefined) => void;
   skipExercise: (roundNumber: number, exerciseId: string) => void;
   setWorkoutNotes: (notes: string) => void;
   completeWorkout: () => WorkoutLog | null;
@@ -97,11 +97,11 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       };
     }),
 
-  setJogDuration: (duration) =>
+  setJogDurationSeconds: (seconds) =>
     set((state) => {
       if (!state.activeWorkout) return state;
       return {
-        activeWorkout: { ...state.activeWorkout, jogDuration: duration },
+        activeWorkout: { ...state.activeWorkout, jogDurationSeconds: seconds },
       };
     }),
 
@@ -152,7 +152,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
           ...r,
           exercises: r.exercises.map((ex) => {
             if (ex.exerciseId !== exerciseId) return ex;
-            return { ...ex, actualReps: reps };
+            return { ...ex, actualReps: reps ?? undefined };
           }),
         };
       });

@@ -73,7 +73,7 @@ export interface WorkoutLog {
   dayOfWeek: number;
   jogCompleted: boolean;
   jogDistance?: number;
-  jogDuration?: number;
+  jogDurationSeconds?: number; // stored as total seconds for MM:SS support
   warmUpCompleted: boolean;
   coolDownCompleted: boolean;
   rounds: RoundLog[];
@@ -83,9 +83,9 @@ export interface WorkoutLog {
 }
 
 export interface UserSettings {
-  currentPushUpMax: number;
-  currentJogDistance: number;
-  currentJogBestTime?: number;
+  currentPushUpMax?: number;
+  currentJogDistance?: number;
+  currentJogBestTimeSeconds?: number; // stored as total seconds for MM:SS support
   restBetweenRounds: number;
   weekStartDate?: string;
   darkMode: boolean;

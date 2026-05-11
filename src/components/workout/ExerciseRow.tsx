@@ -110,12 +110,20 @@ export default function ExerciseRow({
                 <div className="flex items-center gap-2">
                   <label className="text-xs text-muted">Actual reps:</label>
                   <input
-                    type="number"
-                    min="0"
-                    value={actualReps ?? ""}
-                    onChange={(e) =>
-                      setActualReps(roundNumber, exerciseId, parseInt(e.target.value) || 0)
-                    }
+                    type="text"
+                    inputMode="numeric"
+                    value={actualReps != null ? String(actualReps) : ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "") {
+                        setActualReps(roundNumber, exerciseId, undefined);
+                      } else {
+                        const num = parseInt(val, 10);
+                        if (!isNaN(num)) {
+                          setActualReps(roundNumber, exerciseId, num);
+                        }
+                      }
+                    }}
                     className="w-16 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground outline-none focus:border-accent"
                     placeholder="—"
                   />

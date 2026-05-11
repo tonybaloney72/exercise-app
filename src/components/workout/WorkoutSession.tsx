@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import RoundCard from "./RoundCard";
 import Checkbox from "@/components/common/Checkbox";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
 import type { DayPlan } from "@/types";
 
 interface WorkoutSessionProps {
@@ -15,13 +17,16 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
     activeWorkout,
     toggleJog,
     setJogDistance,
-    setJogDuration,
+    setJogDurationSeconds,
     toggleWarmUp,
     toggleCoolDown,
     setWorkoutNotes,
     completeWorkout,
     discardWorkout,
   } = useWorkoutStore();
+
+  const [distanceInput, setDistanceInput] = useState("");
+  const [durationInput, setDurationInput] = useState("");
 
   if (!activeWorkout) return null;
 
@@ -87,24 +92,38 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
               <div className="flex-1">
                 <label className="text-[10px] text-muted uppercase tracking-wider">Miles</label>
                 <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  value={activeWorkout.jogDistance ?? ""}
-                  onChange={(e) => setJogDistance(parseFloat(e.target.value) || 0)}
+                  type="text"
+                  inputMode="decimal"
+                  value={distanceInput || (activeWorkout.jogDistance != null ? String(activeWorkout.jogDistance) : "")}
+                  onChange={(e) => setDistanceInput(e.target.value)}
+                  onBlur={() => {
+                    const val = distanceInput.trim();
+                    if (val === "") {
+                      setJogDistance(undefined);
+                    } else {
+                      const num = parseFloat(val);
+                      setJogDistance(isNaN(num) ? undefined : num);
+                    }
+                    setDistanceInput("");
+                  }}
                   className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
                   placeholder="1.3"
                 />
               </div>
               <div className="flex-1">
-                <label className="text-[10px] text-muted uppercase tracking-wider">Minutes</label>
+                <label className="text-[10px] text-muted uppercase tracking-wider">Time (MM:SS)</label>
                 <input
-                  type="number"
-                  min="0"
-                  value={activeWorkout.jogDuration ?? ""}
-                  onChange={(e) => setJogDuration(parseInt(e.target.value) || 0)}
+                  type="text"
+                  inputMode="numeric"
+                  value={durationInput || formatSecondsToMMSS(activeWorkout.jogDurationSeconds)}
+                  onChange={(e) => setDurationInput(e.target.value)}
+                  onBlur={() => {
+                    const parsed = parseTimeInput(durationInput);
+                    setJogDurationSeconds(parsed);
+                    setDurationInput("");
+                  }}
                   className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-                  placeholder="15"
+                  placeholder="17:35"
                 />
               </div>
             </motion.div>
