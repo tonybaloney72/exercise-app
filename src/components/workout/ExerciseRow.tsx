@@ -27,7 +27,7 @@ export default function ExerciseRow({
   actualReps,
 }: ExerciseRowProps) {
   const [expanded, setExpanded] = useState(false);
-  const { toggleExercise, skipExercise, setActualReps } = useWorkoutStore();
+  const { toggleExercise, skipExercise, unskipExercise, setActualReps } = useWorkoutStore();
   const exercise = exerciseMap[exerciseId];
 
   if (!exercise) return null;
@@ -77,7 +77,7 @@ export default function ExerciseRow({
           <CategoryBadge category={category} />
         </button>
 
-        {/* Skip button */}
+        {/* Skip / Un-skip button */}
         {!completed && !skipped && (
           <button
             type="button"
@@ -88,6 +88,19 @@ export default function ExerciseRow({
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="5 4 15 12 5 20 5 4" />
               <line x1="19" y1="5" x2="19" y2="19" />
+            </svg>
+          </button>
+        )}
+        {skipped && (
+          <button
+            type="button"
+            onClick={() => unskipExercise(roundNumber, exerciseId)}
+            className="p-1.5 text-muted hover:text-foreground transition-colors"
+            title="Undo skip"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
             </svg>
           </button>
         )}

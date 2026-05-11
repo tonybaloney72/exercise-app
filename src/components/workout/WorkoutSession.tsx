@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import RoundCard from "./RoundCard";
-import Checkbox from "@/components/common/Checkbox";
+import StretchSection from "./StretchSection";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+
 import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
+import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
 import type { DayPlan } from "@/types";
 
 interface WorkoutSessionProps {
@@ -18,8 +20,12 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 		toggleJog,
 		setJogDistance,
 		setJogDurationSeconds,
-		toggleWarmUp,
-		toggleCoolDown,
+		toggleWarmUpStretch,
+		toggleCoolDownStretch,
+		skipWarmUpStretch,
+		unskipWarmUpStretch,
+		skipCoolDownStretch,
+		unskipCoolDownStretch,
 		setWorkoutNotes,
 		completeWorkout,
 		discardWorkout,
@@ -68,14 +74,14 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 			</div>
 
 			{/* Warm-up */}
-			<div className='rounded-xl border border-border bg-surface overflow-hidden'>
-				<Checkbox
-					checked={activeWorkout.warmUpCompleted}
-					onChange={toggleWarmUp}
-					label='Warm-up Stretches'
-					sublabel='5–10 minutes'
-				/>
-			</div>
+			<StretchSection
+				title="Warm-Up Stretches"
+				stretches={DEFAULT_WARM_UP}
+				exerciseLogs={activeWorkout.warmUpExercises}
+				onToggle={toggleWarmUpStretch}
+				onSkip={skipWarmUpStretch}
+				onUnskip={unskipWarmUpStretch}
+			/>
 
 			{/* Jog section */}
 			{plan.hasJog && (
@@ -217,14 +223,14 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 			))}
 
 			{/* Cool-down */}
-			<div className='rounded-xl border border-border bg-surface overflow-hidden'>
-				<Checkbox
-					checked={activeWorkout.coolDownCompleted}
-					onChange={toggleCoolDown}
-					label='Cool-down Stretches'
-					sublabel='5–10 minutes'
-				/>
-			</div>
+			<StretchSection
+				title="Cool-Down Stretches"
+				stretches={DEFAULT_COOL_DOWN}
+				exerciseLogs={activeWorkout.coolDownExercises}
+				onToggle={toggleCoolDownStretch}
+				onSkip={skipCoolDownStretch}
+				onUnskip={unskipCoolDownStretch}
+			/>
 
 			{/* Notes */}
 			<div className='rounded-xl border border-border bg-surface p-4'>

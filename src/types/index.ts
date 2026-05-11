@@ -6,7 +6,9 @@ export type ExerciseCategory =
   | "UP"   // Upper Push
   | "UPL"  // Upper Pull
   | "LB"   // Lower Body
-  | "CP";  // Cardio/Plyometric
+  | "CP"   // Cardio/Plyometric
+  | "SW"   // Stretch – Warm-Up (Dynamic)
+  | "SC";  // Stretch – Cool-Down (Static)
 
 export interface Exercise {
   id: string;
@@ -67,6 +69,11 @@ export interface RoundLog {
   restAfter?: number;
 }
 
+export interface StretchEntry {
+  exerciseId: string;
+  targetReps: string;
+}
+
 export interface WorkoutLog {
   id: string;
   date: string; // YYYY-MM-DD
@@ -75,7 +82,9 @@ export interface WorkoutLog {
   jogDistance?: number;
   jogDurationSeconds?: number; // stored as total seconds for MM:SS support
   warmUpCompleted: boolean;
+  warmUpExercises: ExerciseLog[];
   coolDownCompleted: boolean;
+  coolDownExercises: ExerciseLog[];
   rounds: RoundLog[];
   notes?: string;
   startTime?: string;

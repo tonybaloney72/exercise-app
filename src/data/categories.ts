@@ -73,8 +73,26 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
     textColor: "text-amber-400",
     description: "Heart rate elevation, conditioning, explosive power",
   },
+  SW: {
+    id: "SW",
+    name: "Stretch – Warm-Up",
+    shortName: "Warm-Up",
+    color: "#f59e0b",
+    bgColor: "bg-yellow-500/20",
+    textColor: "text-yellow-400",
+    description: "Dynamic stretches to prepare muscles and joints for exercise",
+  },
+  SC: {
+    id: "SC",
+    name: "Stretch – Cool-Down",
+    shortName: "Cool-Down",
+    color: "#06b6d4",
+    bgColor: "bg-cyan-500/20",
+    textColor: "text-cyan-400",
+    description: "Static stretches to improve flexibility and aid recovery",
+  },
 };
 
 export const CATEGORY_ORDER: ExerciseCategory[] = [
-  "CF", "CL", "CR", "CS", "UP", "UPL", "LB", "CP",
+  "CF", "CL", "CR", "CS", "UP", "UPL", "LB", "CP", "SW", "SC",
 ];
