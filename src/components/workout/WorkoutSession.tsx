@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import RoundCard from "./RoundCard";
 import Checkbox from "@/components/common/Checkbox";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
@@ -25,6 +25,7 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
     discardWorkout,
   } = useWorkoutStore();
 
+  const [isJogOpen, setIsJogOpen] = useState(false);
   const [distanceInput, setDistanceInput] = useState("");
   const [durationInput, setDurationInput] = useState("");
 
@@ -77,57 +78,124 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
       {/* Jog section */}
       {plan.hasJog && (
         <div className="rounded-xl border border-border bg-surface overflow-hidden">
-          <Checkbox
-            checked={activeWorkout.jogCompleted}
-            onChange={toggleJog}
-            label="Jog"
-            sublabel="1.1–1.5+ miles"
-          />
-          {activeWorkout.jogCompleted && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              className="border-t border-border px-4 py-3 flex gap-3"
+          <button
+            type="button"
+            onClick={() => setIsJogOpen(!isJogOpen)}
+            className="flex w-full items-center gap-3 px-3 py-2 min-h-[44px] text-left transition-colors hover:bg-surface-hover active:bg-surface-hover"
+          >
+            <div
+              role="checkbox"
+              aria-checked={activeWorkout.jogCompleted}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleJog();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === " " || e.key === "Enter") {
+                  e.stopPropagation();
+                  toggleJog();
+                }
+              }}
+              tabIndex={0}
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-all cursor-pointer ${
+                activeWorkout.jogCompleted
+                  ? "border-accent bg-accent"
+                  : "border-border bg-transparent"
+              }`}
             >
-              <div className="flex-1">
-                <label className="text-[10px] text-muted uppercase tracking-wider">Miles</label>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={distanceInput || (activeWorkout.jogDistance != null ? String(activeWorkout.jogDistance) : "")}
-                  onChange={(e) => setDistanceInput(e.target.value)}
-                  onBlur={() => {
-                    const val = distanceInput.trim();
-                    if (val === "") {
-                      setJogDistance(undefined);
-                    } else {
-                      const num = parseFloat(val);
-                      setJogDistance(isNaN(num) ? undefined : num);
-                    }
-                    setDistanceInput("");
-                  }}
-                  className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-                  placeholder="1.3"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="text-[10px] text-muted uppercase tracking-wider">Time (MM:SS)</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={durationInput || formatSecondsToMMSS(activeWorkout.jogDurationSeconds)}
-                  onChange={(e) => setDurationInput(e.target.value)}
-                  onBlur={() => {
-                    const parsed = parseTimeInput(durationInput);
-                    setJogDurationSeconds(parsed);
-                    setDurationInput("");
-                  }}
-                  className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-                  placeholder="17:35"
-                />
-              </div>
-            </motion.div>
-          )}
+              {activeWorkout.jogCompleted && (
+                <motion.svg
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M2.5 7.5L5.5 10.5L11.5 3.5" />
+                </motion.svg>
+              )}
+            </div>
+            <span
+              className={`flex-1 text-sm font-medium transition-all ${
+                activeWorkout.jogCompleted
+                  ? "text-muted line-through"
+                  : "text-foreground"
+              }`}
+            >
+              Jog
+            </span>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`text-muted transition-transform ${isJogOpen ? "rotate-180" : ""}`}
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          <AnimatePresence initial={false}>
+            {isJogOpen && (
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: "auto" }}
+                exit={{ height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="border-t border-border px-4 py-3 flex gap-3">
+                  <div className="flex-1">
+                    <label className="text-[10px] text-muted uppercase tracking-wider">Distance (mi)</label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={distanceInput || (activeWorkout.jogDistance != null ? String(activeWorkout.jogDistance) : "")}
+                      onChange={(e) => setDistanceInput(e.target.value)}
+                      onBlur={() => {
+                        const val = distanceInput.trim();
+                        if (val === "") {
+                          setJogDistance(undefined);
+                        } else {
+                          const num = parseFloat(val);
+                          setJogDistance(isNaN(num) ? undefined : num);
+                        }
+                        setDistanceInput("");
+                      }}
+                      className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+                      placeholder="1.3"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] text-muted uppercase tracking-wider">Time (MM:SS)</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={durationInput || formatSecondsToMMSS(activeWorkout.jogDurationSeconds)}
+                      onChange={(e) => setDurationInput(e.target.value)}
+                      onBlur={() => {
+                        const parsed = parseTimeInput(durationInput);
+                        setJogDurationSeconds(parsed);
+                        setDurationInput("");
+                      }}
+                      className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+                      placeholder="17:35"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
 

@@ -81,7 +81,7 @@ export default function TodayPage() {
               {plan.hasJog && (
                 <div className="flex items-center gap-2">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500/20 text-xs">2</span>
-                  <span>Jog (1.1–1.5+ miles)</span>
+                  <span>Jog</span>
                 </div>
               )}
               <div className="flex items-center gap-2">

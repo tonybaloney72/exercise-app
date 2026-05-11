@@ -7,9 +7,6 @@ import type { WorkoutLog, RoundLog, ExerciseLog, DayPlan } from "@/types";
 interface WorkoutState {
   activeWorkout: WorkoutLog | null;
   workoutHistory: WorkoutLog[];
-  isTimerRunning: boolean;
-  timerSeconds: number;
-
   startWorkout: (plan: DayPlan) => void;
   toggleJog: () => void;
   setJogDistance: (distance: number | undefined) => void;
@@ -22,10 +19,6 @@ interface WorkoutState {
   setWorkoutNotes: (notes: string) => void;
   completeWorkout: () => WorkoutLog | null;
   discardWorkout: () => void;
-
-  startTimer: (seconds: number) => void;
-  tickTimer: () => void;
-  stopTimer: () => void;
 
   loadHistory: () => void;
 }
@@ -59,9 +52,6 @@ function saveHistoryToStorage(history: WorkoutLog[]) {
 export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   activeWorkout: null,
   workoutHistory: [],
-  isTimerRunning: false,
-  timerSeconds: 0,
-
   startWorkout: (plan) => {
     const now = new Date();
     set({
@@ -198,16 +188,6 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   },
 
   discardWorkout: () => set({ activeWorkout: null }),
-
-  startTimer: (seconds) => set({ isTimerRunning: true, timerSeconds: seconds }),
-  tickTimer: () =>
-    set((state) => {
-      if (state.timerSeconds <= 1) {
-        return { isTimerRunning: false, timerSeconds: 0 };
-      }
-      return { timerSeconds: state.timerSeconds - 1 };
-    }),
-  stopTimer: () => set({ isTimerRunning: false, timerSeconds: 0 }),
 
   loadHistory: () => {
     set({ workoutHistory: loadHistoryFromStorage() });
