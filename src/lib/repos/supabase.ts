@@ -16,6 +16,7 @@ interface WorkoutRow {
   date: string;
   day_of_week: number;
   jog_completed: boolean;
+  jog_skipped: boolean;
   jog_distance: number | null;
   jog_duration_seconds: number | null;
   warm_up_completed: boolean;
@@ -100,6 +101,7 @@ function rowToWorkout(row: WorkoutRow): WorkoutLog {
     date: row.date,
     dayOfWeek: row.day_of_week,
     jogCompleted: row.jog_completed,
+    jogSkipped: row.jog_skipped ?? false,
     jogDistance: row.jog_distance ?? undefined,
     jogDurationSeconds: row.jog_duration_seconds ?? undefined,
     warmUpCompleted: row.warm_up_completed,
@@ -123,6 +125,7 @@ function workoutToSavePayload(log: WorkoutLog) {
     date: log.date,
     day_of_week: log.dayOfWeek,
     jog_completed: log.jogCompleted,
+    jog_skipped: log.jogSkipped ?? false,
     jog_distance: log.jogDistance ?? null,
     jog_duration_seconds: log.jogDurationSeconds ?? null,
     warm_up_completed: log.warmUpCompleted,

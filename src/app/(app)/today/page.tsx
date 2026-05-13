@@ -6,7 +6,7 @@ import { getTodaysPlan } from "@/data/dailyPlans";
 import { CATEGORIES } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutSession from "@/components/workout/WorkoutSession";
-import RestTimer from "@/components/common/RestTimer";
+import FloatingTimer from "@/components/common/FloatingTimer";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -136,7 +136,7 @@ export default function TodayPage() {
 
       {/* Active workout session */}
       {activeWorkout && <WorkoutSession plan={plan} />}
-      {activeWorkout && <RestTimer />}
+      {activeWorkout && <FloatingTimer />}
     </div>
   );
 }

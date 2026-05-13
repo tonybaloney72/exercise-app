@@ -12,6 +12,8 @@ interface WorkoutState {
   workoutHistory: WorkoutLog[];
   startWorkout: (plan: DayPlan) => void;
   toggleJog: () => void;
+  skipJog: () => void;
+  unskipJog: () => void;
   setJogDistance: (distance: number | undefined) => void;
   setJogDurationSeconds: (seconds: number | undefined) => void;
   toggleWarmUpStretch: (exerciseId: string) => void;
@@ -63,6 +65,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         date: now.toISOString().split("T")[0],
         dayOfWeek: now.getDay(),
         jogCompleted: false,
+        jogSkipped: false,
         warmUpCompleted: false,
         warmUpExercises,
         coolDownCompleted: false,
@@ -80,7 +83,28 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         activeWorkout: {
           ...state.activeWorkout,
           jogCompleted: !state.activeWorkout.jogCompleted,
+          jogSkipped: false,
         },
+      };
+    }),
+
+  skipJog: () =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: {
+          ...state.activeWorkout,
+          jogSkipped: true,
+          jogCompleted: false,
+        },
+      };
+    }),
+
+  unskipJog: () =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: { ...state.activeWorkout, jogSkipped: false },
       };
     }),
 

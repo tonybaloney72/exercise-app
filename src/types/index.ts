@@ -79,6 +79,7 @@ export interface WorkoutLog {
   date: string; // YYYY-MM-DD
   dayOfWeek: number;
   jogCompleted: boolean;
+  jogSkipped: boolean;
   jogDistance?: number;
   jogDurationSeconds?: number; // stored as total seconds for MM:SS support
   warmUpCompleted: boolean;

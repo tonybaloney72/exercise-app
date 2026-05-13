@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ExerciseRow from "./ExerciseRow";
 import type { Round, RoundLog } from "@/types";
+import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 
 interface RoundCardProps {
   round: Round;
@@ -17,7 +19,20 @@ export default function RoundCard({ round, roundLog }: RoundCardProps) {
     (e) => e.completed || e.skipped
   ).length;
   const total = roundLog.exercises.length;
-  const allDone = completedCount === total;
+  const allDone = total > 0 && completedCount === total;
+
+  // On the false→true transition for `allDone`, collapse the round and
+  // kick off the rest timer. Cool-down still happens after the final round,
+  // so we trigger regardless of whether this is the last round.
+  const wasDoneRef = useRef(allDone);
+  useEffect(() => {
+    if (!wasDoneRef.current && allDone) {
+      setIsOpen(false);
+      const restSeconds = useSettingsStore.getState().restBetweenRounds;
+      useFloatingTimerStore.getState().startRest(restSeconds);
+    }
+    wasDoneRef.current = allDone;
+  }, [allDone]);
 
   return (
     <div className="rounded-xl border border-border bg-surface overflow-hidden">
