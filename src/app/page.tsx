@@ -1,139 +1,97 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { getTodaysPlan } from "@/data/dailyPlans";
-import { CATEGORIES } from "@/data/categories";
-import CategoryBadge from "@/components/common/CategoryBadge";
-import WorkoutSession from "@/components/workout/WorkoutSession";
-import RestTimer from "@/components/common/RestTimer";
-import { useWorkoutStore } from "@/stores/useWorkoutStore";
-import { useSettingsStore } from "@/stores/useSettingsStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 
-export default function TodayPage() {
-  const { activeWorkout, startWorkout, loadHistory } = useWorkoutStore();
-  const { loadSettings } = useSettingsStore();
-  const plan = useMemo(() => getTodaysPlan(), []);
+export default function LandingPage() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const setGuest = useAuthStore((s) => s.setGuest);
 
-  useEffect(() => {
-    loadHistory();
-    loadSettings();
-  }, [loadHistory, loadSettings]);
-
-  const allCategories = [
-    ...plan.strengthFocus,
-    ...plan.coreGroups,
-  ];
+  async function continueAsGuest() {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/auth/guest", { method: "POST" });
+      if (!res.ok) throw new Error("Failed to start guest session.");
+      setGuest(true);
+      router.refresh();
+      router.push("/today");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong.");
+      setBusy(false);
+    }
+  }
 
   return (
-    <div className="py-6 space-y-5">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-1"
-      >
-        <p className="text-xs font-medium uppercase tracking-wider text-accent">
-          {plan.name}
-        </p>
-        <h1 className="text-2xl font-bold text-foreground">
-          Today&apos;s Workout
-        </h1>
-        <p className="text-sm text-muted">{plan.theme}</p>
-      </motion.div>
-
-      {/* Category chips */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="flex flex-wrap gap-2"
-      >
-        {allCategories.map((cat) => (
-          <CategoryBadge key={cat} category={cat} size="md" />
-        ))}
-        {plan.hasJog && (
-          <span className="inline-flex items-center rounded-full bg-sky-500/20 px-2.5 py-1 text-xs font-medium text-sky-400">
-            🏃 Jog
-          </span>
-        )}
-      </motion.div>
-
-      {/* Day info card (when no active workout) */}
-      {!activeWorkout && (
+    <main className="flex-1">
+      <div className="mx-auto flex min-h-[100dvh] max-w-lg flex-col justify-center px-4 py-10">
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="space-y-4"
+          className="space-y-2"
         >
-          {/* Day structure overview */}
-          <div className="rounded-xl border border-border bg-surface p-4 space-y-3">
-            <h2 className="text-sm font-semibold text-foreground">
-              Workout Structure
-            </h2>
-            <div className="space-y-2 text-sm text-muted">
-              {plan.hasJog && (
-                <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500/20 text-xs">1</span>
-                  <span>Warm-up stretches (5–10 min)</span>
-                </div>
-              )}
-              {plan.hasJog && (
-                <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500/20 text-xs">2</span>
-                  <span>Jog</span>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent/20 text-xs">
-                  {plan.hasJog ? "3" : "1"}
-                </span>
-                <span>{plan.rounds.length} round{plan.rounds.length > 1 ? "s" : ""} of exercises</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20 text-xs">
-                  {plan.hasJog ? "4" : "2"}
-                </span>
-                <span>Cool-down stretches (5–10 min)</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Target muscles */}
-          <div className="rounded-xl border border-border bg-surface p-4 space-y-3">
-            <h2 className="text-sm font-semibold text-foreground">
-              Target Muscles
-            </h2>
-            <div className="space-y-1.5">
-              {allCategories.map((cat) => (
-                <div key={cat} className="flex items-start gap-2">
-                  <div
-                    className="mt-1 h-2 w-2 rounded-full shrink-0"
-                    style={{ backgroundColor: CATEGORIES[cat].color }}
-                  />
-                  <div>
-                    <span className="text-sm text-foreground">{CATEGORIES[cat].name}</span>
-                    <p className="text-xs text-muted">{CATEGORIES[cat].description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Start button */}
-          <button
-            onClick={() => startWorkout(plan)}
-            className="w-full rounded-xl bg-accent py-4 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
-          >
-            Start Workout
-          </button>
+          <p className="text-xs font-medium uppercase tracking-wider text-accent">
+            Exercise App
+          </p>
+          <h1 className="text-3xl font-bold text-foreground">
+            Train every day, build the habit.
+          </h1>
+          <p className="text-sm text-muted">
+            A pocket coach for daily strength, cardio, and recovery — built for
+            consistency over intensity.
+          </p>
         </motion.div>
-      )}
 
-      {/* Active workout session */}
-      {activeWorkout && <WorkoutSession plan={plan} />}
-      {activeWorkout && <RestTimer />}
-    </div>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="mt-8 space-y-3"
+        >
+          <button
+            onClick={continueAsGuest}
+            disabled={busy}
+            className="w-full rounded-xl bg-accent py-4 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] disabled:opacity-60"
+          >
+            {busy ? "Loading…" : "Continue as guest"}
+          </button>
+          <p className="text-center text-[11px] text-muted">
+            Guest mode keeps everything on this device — no account, no sync.
+          </p>
+
+          <div className="my-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-[10px] uppercase tracking-wider text-muted">
+              or
+            </span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          <Link
+            href="/login"
+            className="block w-full rounded-xl border border-border bg-surface py-3.5 text-center text-sm font-semibold text-foreground transition-colors hover:bg-surface-hover"
+          >
+            Log in
+          </Link>
+          <Link
+            href="/signup"
+            className="block w-full rounded-xl border border-transparent py-3.5 text-center text-sm font-semibold text-accent transition-colors hover:bg-accent/10"
+          >
+            Create account
+          </Link>
+
+          {error && (
+            <p className="text-center text-xs text-red-400" role="alert">
+              {error}
+            </p>
+          )}
+        </motion.div>
+      </div>
+    </main>
   );
 }

@@ -1,0 +1,9 @@
+# Supabase
+.branches
+.temp
+schema.remote.sql
+
+# dotenvx
+.env.keys
+.env.local
+.env.*.local

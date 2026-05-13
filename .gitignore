@@ -42,3 +42,4 @@ next-env.d.ts
 
 # project docs (local only)
 ROADMAP.md
+AUTH_IMPLEMENTATION_NOTES.md

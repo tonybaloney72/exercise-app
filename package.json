@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "supabase": "supabase",
+    "db:push": "supabase db push",
+    "db:push:dry": "supabase db push --dry-run",
+    "db:dump": "supabase db dump --linked -f supabase/schema.remote.sql"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
@@ -20,6 +24,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "supabase": "2.98.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/", label: "Today", icon: TodayIcon },
+  { href: "/today", label: "Today", icon: TodayIcon },
   { href: "/weekly", label: "Week", icon: WeekIcon },
   { href: "/progress", label: "Progress", icon: ProgressIcon },
   { href: "/library", label: "Library", icon: LibraryIcon },
@@ -18,7 +18,7 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-surface/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-lg items-center justify-around">
         {navItems.map(({ href, label, icon: Icon }) => {
-          const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const isActive = pathname === href || pathname.startsWith(href + "/");
           return (
             <Link
               key={href}
