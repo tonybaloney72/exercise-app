@@ -92,9 +92,6 @@ export interface WorkoutLog {
 }
 
 export interface UserSettings {
-  currentPushUpMax?: number;
-  currentJogDistance?: number;
-  currentJogBestTimeSeconds?: number; // stored as total seconds for MM:SS support
   restBetweenRounds: number;
   weekStartDate?: string;
   darkMode: boolean;

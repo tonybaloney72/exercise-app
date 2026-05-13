@@ -27,9 +27,6 @@ export default function SettingsPage() {
   const handleExport = () => {
     const data = {
       settings: {
-        currentPushUpMax: settings.currentPushUpMax,
-        currentJogDistance: settings.currentJogDistance,
-        currentJogBestTimeSeconds: settings.currentJogBestTimeSeconds,
         restBetweenRounds: settings.restBetweenRounds,
         weekStartDate: settings.weekStartDate,
         darkMode: settings.darkMode,

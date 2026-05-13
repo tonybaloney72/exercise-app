@@ -12,8 +12,6 @@ export interface SettingsRepo {
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
-  currentPushUpMax: 13,
-  currentJogDistance: 1.3,
   restBetweenRounds: 90,
   darkMode: true,
 };

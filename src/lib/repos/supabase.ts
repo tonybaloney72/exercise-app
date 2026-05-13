@@ -44,9 +44,6 @@ interface ExerciseRow {
 interface SettingsRow {
   user_id: string;
   rest_between_rounds: number;
-  current_push_up_max: number | null;
-  current_jog_distance: number | null;
-  current_jog_best_time_seconds: number | null;
   week_start_date: string | null;
   dark_mode: boolean;
 }
@@ -201,9 +198,6 @@ function workoutToSavePayload(log: WorkoutLog) {
 function rowToSettings(row: SettingsRow): UserSettings {
   return {
     restBetweenRounds: row.rest_between_rounds,
-    currentPushUpMax: row.current_push_up_max ?? undefined,
-    currentJogDistance: row.current_jog_distance ?? undefined,
-    currentJogBestTimeSeconds: row.current_jog_best_time_seconds ?? undefined,
     weekStartDate: row.week_start_date ?? undefined,
     darkMode: row.dark_mode,
   };
@@ -213,9 +207,6 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
   return {
     user_id: userId,
     rest_between_rounds: s.restBetweenRounds,
-    current_push_up_max: s.currentPushUpMax ?? null,
-    current_jog_distance: s.currentJogDistance ?? null,
-    current_jog_best_time_seconds: s.currentJogBestTimeSeconds ?? null,
     week_start_date: s.weekStartDate ?? null,
     dark_mode: s.darkMode,
   };
