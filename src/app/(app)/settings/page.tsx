@@ -16,11 +16,13 @@ export default function SettingsPage() {
   const mode = useAuthStore((s) => s.mode);
   const user = useAuthStore((s) => s.user);
   const setGuest = useAuthStore((s) => s.setGuest);
+  const loadSettings = settings.loadSettings;
 
   useEffect(() => {
-    settings.loadSettings();
+    if (mode === "loading") return;
+    loadSettings();
     loadHistory();
-  }, [settings.loadSettings, loadHistory]);
+  }, [mode, loadSettings, loadHistory]);
 
   const handleExport = () => {
     const data = {

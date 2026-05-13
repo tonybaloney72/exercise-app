@@ -9,16 +9,19 @@ import WorkoutSession from "@/components/workout/WorkoutSession";
 import RestTimer from "@/components/common/RestTimer";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function TodayPage() {
   const { activeWorkout, startWorkout, loadHistory } = useWorkoutStore();
   const { loadSettings } = useSettingsStore();
+  const mode = useAuthStore((s) => s.mode);
   const plan = useMemo(() => getTodaysPlan(), []);
 
   useEffect(() => {
+    if (mode === "loading") return;
     loadHistory();
     loadSettings();
-  }, [loadHistory, loadSettings]);
+  }, [mode, loadHistory, loadSettings]);
 
   const allCategories = [
     ...plan.strengthFocus,

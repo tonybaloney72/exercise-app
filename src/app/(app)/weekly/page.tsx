@@ -6,15 +6,18 @@ import { dailyPlans, getPlanForDay } from "@/data/dailyPlans";
 import { CATEGORIES } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function WeeklyPage() {
   const { workoutHistory, loadHistory } = useWorkoutStore();
+  const mode = useAuthStore((s) => s.mode);
 
   useEffect(() => {
+    if (mode === "loading") return;
     loadHistory();
-  }, [loadHistory]);
+  }, [mode, loadHistory]);
 
   const today = new Date().getDay();
 

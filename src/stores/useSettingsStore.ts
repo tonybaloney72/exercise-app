@@ -2,52 +2,45 @@
 
 import { create } from "zustand";
 import type { UserSettings } from "@/types";
+import { DEFAULT_SETTINGS, getSettingsRepo } from "@/lib/repos";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 interface SettingsState extends UserSettings {
-  updateSettings: (partial: Partial<UserSettings>) => void;
-  loadSettings: () => void;
-}
-
-const DEFAULTS: UserSettings = {
-  currentPushUpMax: 13,
-  currentJogDistance: 1.3,
-  restBetweenRounds: 90,
-  darkMode: true,
-};
-
-function loadFromStorage(): UserSettings {
-  if (typeof window === "undefined") return DEFAULTS;
-  try {
-    const raw = localStorage.getItem("exercise-app-settings");
-    return raw ? { ...DEFAULTS, ...JSON.parse(raw) } : DEFAULTS;
-  } catch {
-    return DEFAULTS;
-  }
-}
-
-function saveToStorage(settings: UserSettings) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem("exercise-app-settings", JSON.stringify(settings));
+  updateSettings: (partial: Partial<UserSettings>) => Promise<void>;
+  loadSettings: () => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
-  ...DEFAULTS,
+  ...DEFAULT_SETTINGS,
 
-  updateSettings: (partial) => {
+  updateSettings: async (partial) => {
     const current = get();
     const updated: UserSettings = {
-      currentPushUpMax: "currentPushUpMax" in partial ? partial.currentPushUpMax : current.currentPushUpMax,
-      currentJogDistance: "currentJogDistance" in partial ? partial.currentJogDistance : current.currentJogDistance,
-      currentJogBestTimeSeconds: "currentJogBestTimeSeconds" in partial ? partial.currentJogBestTimeSeconds : current.currentJogBestTimeSeconds,
+      currentPushUpMax:
+        "currentPushUpMax" in partial ? partial.currentPushUpMax : current.currentPushUpMax,
+      currentJogDistance:
+        "currentJogDistance" in partial ? partial.currentJogDistance : current.currentJogDistance,
+      currentJogBestTimeSeconds:
+        "currentJogBestTimeSeconds" in partial
+          ? partial.currentJogBestTimeSeconds
+          : current.currentJogBestTimeSeconds,
       restBetweenRounds: partial.restBetweenRounds ?? current.restBetweenRounds,
       weekStartDate: partial.weekStartDate ?? current.weekStartDate,
       darkMode: partial.darkMode ?? current.darkMode,
     };
-    saveToStorage(updated);
+    // Optimistic UI: update store first.
     set(updated);
+    try {
+      await getSettingsRepo().save(updated);
+    } catch (err) {
+      console.error("[useSettingsStore.updateSettings]", err);
+    }
   },
 
-  loadSettings: () => {
-    set(loadFromStorage());
+  loadSettings: async () => {
+    const mode = useAuthStore.getState().mode;
+    if (mode === "loading") return; // Wait until AuthInitializer settles.
+    const loaded = await getSettingsRepo(mode).load();
+    set(loaded);
   },
 }));

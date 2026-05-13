@@ -2,14 +2,17 @@
 
 import { useEffect, useMemo } from "react";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { motion } from "framer-motion";
 
 export default function ProgressPage() {
   const { workoutHistory, loadHistory } = useWorkoutStore();
+  const mode = useAuthStore((s) => s.mode);
 
   useEffect(() => {
+    if (mode === "loading") return;
     loadHistory();
-  }, [loadHistory]);
+  }, [mode, loadHistory]);
 
   const stats = useMemo(() => {
     const totalWorkouts = workoutHistory.length;

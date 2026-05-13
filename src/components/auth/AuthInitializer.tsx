@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore, type AuthUser } from "@/stores/useAuthStore";
 import { GUEST_COOKIE_NAME } from "@/lib/auth/constants";
+import { migrateLocalDataIfNeeded } from "@/lib/auth/migration";
 
 function readGuestCookie(): boolean {
   if (typeof document === "undefined") return false;
@@ -20,8 +21,9 @@ interface Props {
 
 /**
  * Mounted inside the (app) layout. Pushes the server-resolved auth state
- * into the Zustand store on first paint and then keeps it in sync with
- * Supabase's auth state changes for the lifetime of the session.
+ * into the Zustand store on first paint, runs the first-login migration
+ * if applicable, and keeps the store in sync with Supabase's auth state
+ * changes for the lifetime of the session.
  */
 export default function AuthInitializer({ initialUser, initialGuest }: Props) {
   useEffect(() => {
@@ -29,14 +31,23 @@ export default function AuthInitializer({ initialUser, initialGuest }: Props) {
     setGuest(initialGuest);
     setUser(initialUser);
 
+    if (initialUser) {
+      void migrateLocalDataIfNeeded(initialUser.id);
+    }
+
     const supabase = createClient();
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       const u = session?.user;
       setUser(u ? { id: u.id, email: u.email ?? null } : null);
       // Re-read the cookie in case it changed (e.g. exit guest in another tab).
       setGuest(readGuestCookie());
+
+      // Fresh login on this device — migrate any local data.
+      if (event === "SIGNED_IN" && u) {
+        void migrateLocalDataIfNeeded(u.id);
+      }
     });
 
     return () => subscription.unsubscribe();

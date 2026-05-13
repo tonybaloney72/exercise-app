@@ -4,6 +4,8 @@ import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import type { WorkoutLog, RoundLog, ExerciseLog, DayPlan } from "@/types";
 import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
+import { getWorkoutRepo } from "@/lib/repos";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 interface WorkoutState {
   activeWorkout: WorkoutLog | null;
@@ -23,10 +25,10 @@ interface WorkoutState {
   skipCoolDownStretch: (exerciseId: string) => void;
   unskipCoolDownStretch: (exerciseId: string) => void;
   setWorkoutNotes: (notes: string) => void;
-  completeWorkout: () => WorkoutLog | null;
+  completeWorkout: () => Promise<WorkoutLog | null>;
   discardWorkout: () => void;
 
-  loadHistory: () => void;
+  loadHistory: () => Promise<void>;
 }
 
 function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
@@ -38,21 +40,6 @@ function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
       skipped: false,
     })),
   }));
-}
-
-function loadHistoryFromStorage(): WorkoutLog[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem("exercise-app-history");
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveHistoryToStorage(history: WorkoutLog[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem("exercise-app-history", JSON.stringify(history));
 }
 
 export const useWorkoutStore = create<WorkoutState>((set, get) => ({
@@ -261,7 +248,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       return { activeWorkout: { ...state.activeWorkout, notes } };
     }),
 
-  completeWorkout: () => {
+  completeWorkout: async () => {
     const state = get();
     if (!state.activeWorkout) return null;
 
@@ -270,16 +257,28 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       endTime: new Date().toISOString(),
     };
 
-    const newHistory = [completed, ...state.workoutHistory];
-    saveHistoryToStorage(newHistory);
+    // Optimistic UI: update store first so the user gets immediate feedback.
+    set((s) => ({
+      activeWorkout: null,
+      workoutHistory: [completed, ...s.workoutHistory],
+    }));
 
-    set({ activeWorkout: null, workoutHistory: newHistory });
+    try {
+      await getWorkoutRepo().saveWorkout(completed);
+    } catch (err) {
+      console.error("[useWorkoutStore.completeWorkout]", err);
+      // The optimistic state stays — surface errors via a toast in a later slice.
+    }
+
     return completed;
   },
 
   discardWorkout: () => set({ activeWorkout: null }),
 
-  loadHistory: () => {
-    set({ workoutHistory: loadHistoryFromStorage() });
+  loadHistory: async () => {
+    const mode = useAuthStore.getState().mode;
+    if (mode === "loading") return; // Wait until AuthInitializer settles.
+    const history = await getWorkoutRepo(mode).loadHistory();
+    set({ workoutHistory: history });
   },
 }));
