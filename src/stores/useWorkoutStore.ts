@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { WorkoutLog, RoundLog, ExerciseLog, DayPlan } from "@/types";
 import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
 import { getWorkoutRepo } from "@/lib/repos";
+import { formatLocalDateKey } from "@/utils/localDateKey";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 interface WorkoutState {
@@ -29,6 +30,11 @@ interface WorkoutState {
   setWorkoutNotes: (notes: string) => void;
   completeWorkout: () => Promise<WorkoutLog | null>;
   discardWorkout: () => void;
+  /** Update notes on a finished workout (same id upsert via repo). */
+  updateCompletedWorkoutNotes: (
+    workoutId: string,
+    notes: string,
+  ) => Promise<void>;
 
   loadHistory: () => Promise<void>;
 }
@@ -62,7 +68,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     set({
       activeWorkout: {
         id: uuidv4(),
-        date: now.toISOString().split("T")[0],
+        date: formatLocalDateKey(now),
         dayOfWeek: now.getDay(),
         jogCompleted: false,
         jogSkipped: false,
@@ -298,6 +304,23 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   },
 
   discardWorkout: () => set({ activeWorkout: null }),
+
+  updateCompletedWorkoutNotes: async (workoutId, notes) => {
+    const state = get();
+    const existing = state.workoutHistory.find((w) => w.id === workoutId);
+    if (!existing) return;
+    const updated: WorkoutLog = { ...existing, notes };
+    set({
+      workoutHistory: state.workoutHistory.map((w) =>
+        w.id === workoutId ? updated : w,
+      ),
+    });
+    try {
+      await getWorkoutRepo().saveWorkout(updated);
+    } catch (err) {
+      console.error("[useWorkoutStore.updateCompletedWorkoutNotes]", err);
+    }
+  },
 
   loadHistory: async () => {
     const mode = useAuthStore.getState().mode;

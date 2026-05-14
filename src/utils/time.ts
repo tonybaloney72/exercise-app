@@ -1,6 +1,7 @@
 /**
  * Parse a MM:SS or M:SS string into total seconds.
- * Also handles plain numbers (treated as minutes).
+ * Also handles four digits without a colon as `MMSS` (e.g. `1735` → 17 min 35 sec)
+ * for numeric mobile keyboards that omit `:`.
  * Returns undefined if the input is empty or invalid.
  */
 export function parseTimeInput(value: string): number | undefined {
@@ -13,6 +14,14 @@ export function parseTimeInput(value: string): number | undefined {
     const secs = parseInt(secStr, 10);
     if (isNaN(mins) || isNaN(secs)) return undefined;
     return mins * 60 + Math.min(secs, 59);
+  }
+
+  // Mobile-friendly: full numeric keypad without ":" — e.g. 1735 → 17:35
+  if (/^\d{4}$/.test(trimmed)) {
+    const mins = parseInt(trimmed.slice(0, 2), 10);
+    const secs = parseInt(trimmed.slice(2, 4), 10);
+    if (secs > 59) return undefined;
+    return mins * 60 + secs;
   }
 
   const num = parseFloat(trimmed);

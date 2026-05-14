@@ -8,6 +8,7 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { createClient } from "@/lib/supabase/client";
+import { formatLocalDateKey } from "@/utils/localDateKey";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -37,7 +38,7 @@ export default function SettingsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `exercise-app-backup-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `exercise-app-backup-${formatLocalDateKey()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

@@ -7,6 +7,7 @@ import { CATEGORIES } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { formatLocalDateKey } from "@/utils/localDateKey";
 
 const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -49,7 +50,7 @@ export default function WeeklyPage() {
       {/* Week strip */}
       <div className="flex gap-2">
         {weekDates.map((date, i) => {
-          const dateStr = date.toISOString().split("T")[0];
+          const dateStr = formatLocalDateKey(date);
           const isToday = i === today;
           const isCompleted = completedDates.has(dateStr);
           const isPast = i < today;
@@ -97,7 +98,9 @@ export default function WeeklyPage() {
           })
           .map((plan) => {
             const isToday = plan.dayOfWeek === today;
-            const dateStr = weekDates[plan.dayOfWeek]?.toISOString().split("T")[0];
+            const dateStr = weekDates[plan.dayOfWeek]
+              ? formatLocalDateKey(weekDates[plan.dayOfWeek])
+              : undefined;
             const isCompleted = dateStr ? completedDates.has(dateStr) : false;
 
             return (

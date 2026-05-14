@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { motion } from "framer-motion";
+import { formatLocalDateKey } from "@/utils/localDateKey";
 
 export default function ProgressPage() {
   const { workoutHistory, loadHistory } = useWorkoutStore();
@@ -25,7 +26,7 @@ export default function ProgressPage() {
     for (let i = 0; i < sortedDates.length; i++) {
       const expected = new Date(today);
       expected.setDate(today.getDate() - i);
-      const expectedStr = expected.toISOString().split("T")[0];
+      const expectedStr = formatLocalDateKey(expected);
       if (sortedDates[i] === expectedStr) {
         currentStreak++;
       } else {

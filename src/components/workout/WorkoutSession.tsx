@@ -271,19 +271,26 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 													</label>
 													<input
 														type='text'
-														inputMode='numeric'
+														inputMode='text'
+														autoComplete='off'
+														enterKeyHint='done'
 														value={
 															durationInput ||
 															formatSecondsToMMSS(activeWorkout.jogDurationSeconds)
 														}
 														onChange={e => setDurationInput(e.target.value)}
 														onBlur={() => {
-															const parsed = parseTimeInput(durationInput);
+															const raw = durationInput.trim();
+															if (raw === "") {
+																setDurationInput("");
+																return;
+															}
+															const parsed = parseTimeInput(raw);
 															setJogDurationSeconds(parsed);
 															setDurationInput("");
 														}}
 														className='mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent'
-														placeholder='17:35'
+														placeholder='17:35 or 1735'
 													/>
 												</div>
 											</div>
@@ -327,6 +334,9 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 					placeholder='How did it feel today?'
 					className='mt-2 w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted'
 				/>
+				<p className='mt-2 text-[11px] text-muted'>
+					These notes are saved when you tap <span className='font-medium text-foreground'>Complete Workout</span> below.
+				</p>
 			</div>
 
 			{/* Actions */}

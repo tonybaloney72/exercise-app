@@ -1,21 +1,35 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { Suspense, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { getTodaysPlan } from "@/data/dailyPlans";
 import { CATEGORIES } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutSession from "@/components/workout/WorkoutSession";
+import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { formatLocalDateKey } from "@/utils/localDateKey";
 
-export default function TodayPage() {
-  const { activeWorkout, startWorkout, loadHistory } = useWorkoutStore();
+function TodayPageInner() {
+  const searchParams = useSearchParams();
+  const {
+    activeWorkout,
+    workoutHistory,
+    startWorkout,
+    loadHistory,
+    updateCompletedWorkoutNotes,
+  } = useWorkoutStore();
   const { loadSettings } = useSettingsStore();
   const mode = useAuthStore((s) => s.mode);
   const plan = useMemo(() => getTodaysPlan(), []);
+
+  const devForcePreWorkout =
+    process.env.NODE_ENV === "development" &&
+    searchParams.get("dev") === "start";
 
   useEffect(() => {
     if (mode === "loading") return;
@@ -23,13 +37,32 @@ export default function TodayPage() {
     loadSettings();
   }, [mode, loadHistory, loadSettings]);
 
-  const allCategories = [
-    ...plan.strengthFocus,
-    ...plan.coreGroups,
-  ];
+  const todaysCompletedLog = useMemo(() => {
+    const todayKey = formatLocalDateKey();
+    const byStoredDate = workoutHistory.find((w) => w.date === todayKey);
+    if (byStoredDate) return byStoredDate;
+    return (
+      workoutHistory.find(
+        (w) =>
+          w.endTime &&
+          formatLocalDateKey(new Date(w.endTime)) === todayKey,
+      ) ?? null
+    );
+  }, [workoutHistory]);
+
+  const completedLogForUi = devForcePreWorkout ? null : todaysCompletedLog;
+
+  const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
 
   return (
     <div className="py-6 space-y-5">
+      {devForcePreWorkout && (
+        <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+          Dev: pre-workout view forced (<code className="font-mono">?dev=start</code>
+          ). Remove the query to see today&apos;s review again.
+        </p>
+      )}
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -62,48 +95,29 @@ export default function TodayPage() {
         )}
       </motion.div>
 
-      {/* Day info card (when no active workout) */}
-      {!activeWorkout && (
+      {/* Active workout session */}
+      {activeWorkout && <WorkoutSession plan={plan} />}
+      {activeWorkout && <FloatingTimer />}
+
+      {/* Completed today — read-only summary + editable notes */}
+      {!activeWorkout && completedLogForUi && (
+        <WorkoutDayReview
+          plan={plan}
+          log={completedLogForUi}
+          onNotesChange={(notes) =>
+            updateCompletedWorkoutNotes(completedLogForUi.id, notes)
+          }
+        />
+      )}
+
+      {/* Pre-workout: plan context + start */}
+      {!activeWorkout && !completedLogForUi && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
           className="space-y-4"
         >
-          {/* Day structure overview */}
-          <div className="rounded-xl border border-border bg-surface p-4 space-y-3">
-            <h2 className="text-sm font-semibold text-foreground">
-              Workout Structure
-            </h2>
-            <div className="space-y-2 text-sm text-muted">
-              {plan.hasJog && (
-                <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500/20 text-xs">1</span>
-                  <span>Warm-up stretches (5–10 min)</span>
-                </div>
-              )}
-              {plan.hasJog && (
-                <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500/20 text-xs">2</span>
-                  <span>Jog</span>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent/20 text-xs">
-                  {plan.hasJog ? "3" : "1"}
-                </span>
-                <span>{plan.rounds.length} round{plan.rounds.length > 1 ? "s" : ""} of exercises</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20 text-xs">
-                  {plan.hasJog ? "4" : "2"}
-                </span>
-                <span>Cool-down stretches (5–10 min)</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Target muscles */}
           <div className="rounded-xl border border-border bg-surface p-4 space-y-3">
             <h2 className="text-sm font-semibold text-foreground">
               Target Muscles
@@ -116,16 +130,20 @@ export default function TodayPage() {
                     style={{ backgroundColor: CATEGORIES[cat].color }}
                   />
                   <div>
-                    <span className="text-sm text-foreground">{CATEGORIES[cat].name}</span>
-                    <p className="text-xs text-muted">{CATEGORIES[cat].description}</p>
+                    <span className="text-sm text-foreground">
+                      {CATEGORIES[cat].name}
+                    </span>
+                    <p className="text-xs text-muted">
+                      {CATEGORIES[cat].description}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Start button */}
           <button
+            type="button"
             onClick={() => startWorkout(plan)}
             className="w-full rounded-xl bg-accent py-4 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
           >
@@ -133,10 +151,14 @@ export default function TodayPage() {
           </button>
         </motion.div>
       )}
-
-      {/* Active workout session */}
-      {activeWorkout && <WorkoutSession plan={plan} />}
-      {activeWorkout && <FloatingTimer />}
     </div>
+  );
+}
+
+export default function TodayPage() {
+  return (
+    <Suspense fallback={null}>
+      <TodayPageInner />
+    </Suspense>
   );
 }
