@@ -1,9 +1,19 @@
-import type { UserSettings, WorkoutLog } from "@/types";
-import type { SettingsRepo, WorkoutRepo } from "./types";
+import type {
+  UserSettings,
+  WorkoutLog,
+  ExerciseSettingsValues,
+} from "@/types";
+import type {
+  ExerciseSettingsMap,
+  ExerciseSettingsRepo,
+  SettingsRepo,
+  WorkoutRepo,
+} from "./types";
 import { DEFAULT_SETTINGS } from "./types";
 
 export const LOCAL_HISTORY_KEY = "exercise-app-history";
 export const LOCAL_SETTINGS_KEY = "exercise-app-settings";
+export const LOCAL_EXERCISE_SETTINGS_KEY = "exercise-app-exercise-settings";
 
 function isBrowser(): boolean {
   return typeof window !== "undefined";
@@ -55,8 +65,48 @@ export const localSettingsRepo: SettingsRepo = {
   },
 };
 
+function sanitizeExerciseSettingsMap(raw: unknown): ExerciseSettingsMap {
+  if (!raw || typeof raw !== "object") return {};
+  const out: ExerciseSettingsMap = {};
+  for (const [exerciseId, v] of Object.entries(raw as Record<string, unknown>)) {
+    if (!v || typeof v !== "object") continue;
+    const o = v as Record<string, unknown>;
+    if (o.defaultSetMode !== "reps" && o.defaultSetMode !== "timer") continue;
+    const ts = o.defaultTimerSeconds;
+    out[exerciseId] = {
+      defaultSetMode: o.defaultSetMode,
+      defaultTimerSeconds:
+        typeof ts === "number" && ts > 0 ? ts : ts === null ? null : undefined,
+    };
+  }
+  return out;
+}
+
+export const localExerciseSettingsRepo: ExerciseSettingsRepo = {
+  async loadAll(): Promise<ExerciseSettingsMap> {
+    if (!isBrowser()) return {};
+    try {
+      const raw = localStorage.getItem(LOCAL_EXERCISE_SETTINGS_KEY);
+      return raw ? sanitizeExerciseSettingsMap(JSON.parse(raw)) : {};
+    } catch {
+      return {};
+    }
+  },
+
+  async upsert(exerciseId: string, values: ExerciseSettingsValues): Promise<void> {
+    if (!isBrowser()) return;
+    const current = await this.loadAll();
+    const next: ExerciseSettingsMap = { ...current, [exerciseId]: values };
+    localStorage.setItem(
+      LOCAL_EXERCISE_SETTINGS_KEY,
+      JSON.stringify(next),
+    );
+  },
+};
+
 export function clearLocalData(): void {
   if (!isBrowser()) return;
   localStorage.removeItem(LOCAL_HISTORY_KEY);
   localStorage.removeItem(LOCAL_SETTINGS_KEY);
+  localStorage.removeItem(LOCAL_EXERCISE_SETTINGS_KEY);
 }

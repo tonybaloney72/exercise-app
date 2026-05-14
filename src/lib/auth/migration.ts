@@ -1,5 +1,9 @@
-import { clearLocalData, localSettingsRepo, localWorkoutRepo } from "@/lib/repos/local";
-import { supabaseSettingsRepo, supabaseWorkoutRepo } from "@/lib/repos/supabase";
+import { clearLocalData, localExerciseSettingsRepo, localSettingsRepo, localWorkoutRepo } from "@/lib/repos/local";
+import {
+  supabaseExerciseSettingsRepo,
+  supabaseSettingsRepo,
+  supabaseWorkoutRepo,
+} from "@/lib/repos/supabase";
 import { hydrateWorkoutLog } from "@/utils/exerciseLogDefaults";
 
 const MIGRATION_FLAG_PREFIX = "exercise-app-migrated-";
@@ -22,13 +26,27 @@ export async function migrateLocalDataIfNeeded(userId: string): Promise<void> {
   if (localStorage.getItem(flagKey(userId)) === "1") return;
 
   try {
-    const [localHistory, localSettings] = await Promise.all([
-      localWorkoutRepo.loadHistory(),
-      localSettingsRepo.load(),
-    ]);
+    const [localHistory, localSettings, localExerciseSettings] =
+      await Promise.all([
+        localWorkoutRepo.loadHistory(),
+        localSettingsRepo.load(),
+        localExerciseSettingsRepo.loadAll(),
+      ]);
 
     // Always upsert settings (defaults are harmless if the user never customized).
     await supabaseSettingsRepo.save(localSettings);
+
+    for (const [exerciseId, values] of Object.entries(localExerciseSettings)) {
+      try {
+        await supabaseExerciseSettingsRepo.upsert(exerciseId, values);
+      } catch (err) {
+        console.error(
+          "[migrateLocalDataIfNeeded] failed exercise_settings",
+          exerciseId,
+          err,
+        );
+      }
+    }
 
     for (const log of localHistory) {
       try {

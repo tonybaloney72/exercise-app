@@ -5,11 +5,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { exercises } from "@/data/exercises";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
-import type { ExerciseCategory } from "@/types";
+import type { Exercise, ExerciseCategory } from "@/types";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import {
+  DEFAULT_TIMER_SECONDS_FALLBACK,
+  resolveExerciseSettings,
+} from "@/utils/effectiveExerciseSettings";
 
 export default function LibraryPage() {
   const [search, setSearch] = useState("");
-  const [activeFilter, setActiveFilter] = useState<ExerciseCategory | "all">("all");
+  const [activeFilter, setActiveFilter] = useState<ExerciseCategory | "all">(
+    "all",
+  );
 
   const filtered = useMemo(() => {
     return exercises.filter((ex) => {
@@ -46,7 +53,14 @@ export default function LibraryPage() {
       <div className="relative">
         <svg
           className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -107,7 +121,9 @@ export default function LibraryPage() {
                 <h2 className="text-sm font-semibold text-foreground">
                   {CATEGORIES[cat].name}
                 </h2>
-                <span className="text-xs text-muted">({grouped[cat].length})</span>
+                <span className="text-xs text-muted">
+                  ({grouped[cat].length})
+                </span>
               </div>
 
               <div className="space-y-1">
@@ -129,8 +145,54 @@ export default function LibraryPage() {
   );
 }
 
-function ExerciseCard({ exercise }: { exercise: typeof exercises[number] }) {
+function ExerciseCard({ exercise }: { exercise: Exercise }) {
   const [open, setOpen] = useState(false);
+  const stored = useExerciseSettingsStore((s) => s.byExerciseId[exercise.id]);
+  const upsert = useExerciseSettingsStore((s) => s.upsert);
+
+  const resolved = useMemo(
+    () => resolveExerciseSettings(exercise, stored),
+    [exercise, stored],
+  );
+
+  async function setMode(mode: "reps" | "timer") {
+    if (mode === "reps") {
+      await upsert(exercise.id, {
+        defaultSetMode: "reps",
+        defaultTimerSeconds: null,
+      });
+      return;
+    }
+    await upsert(exercise.id, {
+      defaultSetMode: "timer",
+      defaultTimerSeconds:
+        stored?.defaultSetMode === "timer" &&
+        stored.defaultTimerSeconds != null &&
+        stored.defaultTimerSeconds > 0
+          ? stored.defaultTimerSeconds
+          : DEFAULT_TIMER_SECONDS_FALLBACK,
+    });
+  }
+
+  async function saveTimerSeconds(input: HTMLInputElement) {
+    const sec = Math.min(
+      999,
+      Math.max(
+        5,
+        Math.round(Number(input.value)) || DEFAULT_TIMER_SECONDS_FALLBACK,
+      ),
+    );
+    input.value = String(sec);
+    await upsert(exercise.id, {
+      defaultSetMode: "timer",
+      defaultTimerSeconds: sec,
+    });
+  }
+
+  const modeBtn =
+    "rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors border";
+
+  const timerFieldKey = `timer-${exercise.id}-${stored?.defaultSetMode ?? "x"}-${stored?.defaultTimerSeconds ?? "n"}`;
 
   return (
     <div className="rounded-lg border border-border bg-surface overflow-hidden">
@@ -139,8 +201,12 @@ function ExerciseCard({ exercise }: { exercise: typeof exercises[number] }) {
         onClick={() => setOpen(!open)}
         className="flex w-full items-center gap-3 min-h-[48px] px-3 py-2 text-left"
       >
-        <span className="text-[10px] font-mono text-muted w-8 shrink-0">{exercise.id}</span>
-        <span className="flex-1 text-sm font-medium text-foreground">{exercise.name}</span>
+        <span className="text-[10px] font-mono text-muted w-8 shrink-0">
+          {exercise.id}
+        </span>
+        <span className="flex-1 text-sm font-medium text-foreground">
+          {exercise.name}
+        </span>
         <span className="text-xs text-muted">{exercise.defaultReps}</span>
         <CategoryBadge category={exercise.category} />
       </button>
@@ -156,7 +222,9 @@ function ExerciseCard({ exercise }: { exercise: typeof exercises[number] }) {
             <div className="border-t border-border px-3 py-3 space-y-2">
               <p className="text-xs text-muted">{exercise.notes}</p>
               {exercise.source && (
-                <p className="text-[10px] text-muted">Source: {exercise.source}</p>
+                <p className="text-[10px] text-muted">
+                  Source: {exercise.source}
+                </p>
               )}
               {exercise.secondaryCategory && (
                 <div className="flex items-center gap-1">
@@ -171,12 +239,64 @@ function ExerciseCard({ exercise }: { exercise: typeof exercises[number] }) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
                 >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
                   Watch video
                 </a>
               )}
+
+              <div className="mt-3 space-y-2 border-t border-border pt-3">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                  Default logging
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void setMode("reps")}
+                    className={`${modeBtn} ${
+                      resolved.defaultSetMode === "reps"
+                        ? "border-accent bg-accent/15 text-accent"
+                        : "border-border bg-surface-hover text-muted hover:text-foreground"
+                    }`}
+                  >
+                    Reps
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void setMode("timer")}
+                    className={`${modeBtn} ${
+                      resolved.defaultSetMode === "timer"
+                        ? "border-accent bg-accent/15 text-accent"
+                        : "border-border bg-surface-hover text-muted hover:text-foreground"
+                    }`}
+                  >
+                    Timer
+                  </button>
+                </div>
+                {resolved.defaultSetMode === "timer" && (
+                  <label className="flex items-center gap-2 text-xs text-foreground">
+                    <span className="text-muted shrink-0">Seconds</span>
+                    <input
+                      key={timerFieldKey}
+                      type="number"
+                      inputMode="numeric"
+                      min={5}
+                      max={999}
+                      defaultValue={resolved.defaultTimerSeconds ?? 45}
+                      onBlur={(e) => void saveTimerSeconds(e.currentTarget)}
+                      className="w-20 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
+                    />
+                  </label>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

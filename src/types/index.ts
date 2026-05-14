@@ -10,6 +10,9 @@ export type ExerciseCategory =
   | "SW"   // Stretch – Warm-Up (Dynamic)
   | "SC";  // Stretch – Cool-Down (Static)
 
+/** How the user prefers to log a given exercise by default (timer mode is roadmap-backed). */
+export type ExerciseSetMode = "reps" | "timer";
+
 export interface Exercise {
   id: string;
   name: string;
@@ -20,6 +23,13 @@ export interface Exercise {
   videoUrl?: string;
   isTimeBased: boolean;
   secondaryCategory?: ExerciseCategory;
+}
+
+/** Persisted row for `exercise_settings` (and local guest mirror). */
+export interface ExerciseSettingsValues {
+  defaultSetMode: ExerciseSetMode;
+  /** Seconds for timer mode; omit or null when mode is reps. */
+  defaultTimerSeconds?: number | null;
 }
 
 export interface CategoryMeta {

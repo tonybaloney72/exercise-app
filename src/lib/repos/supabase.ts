@@ -1,11 +1,19 @@
 import type {
   ExerciseLog,
+  ExerciseSettingsValues,
+  ExerciseSetMode,
   RoundLog,
   UserSettings,
   WorkoutLog,
 } from "@/types";
 import { createClient } from "@/lib/supabase/client";
-import type { SettingsRepo, WorkoutRepo } from "./types";
+import { DEFAULT_TIMER_SECONDS_FALLBACK } from "@/utils/effectiveExerciseSettings";
+import type {
+  ExerciseSettingsMap,
+  ExerciseSettingsRepo,
+  SettingsRepo,
+  WorkoutRepo,
+} from "./types";
 import { DEFAULT_SETTINGS } from "./types";
 
 type Section = "warm_up" | "round" | "cool_down";
@@ -287,6 +295,87 @@ export const supabaseSettingsRepo: SettingsRepo = {
       .upsert(settingsToRow(settings, user.id), { onConflict: "user_id" });
     if (error) {
       console.error("[supabaseSettingsRepo.save]", error);
+      throw error;
+    }
+  },
+};
+
+interface ExerciseSettingsRow {
+  exercise_id: string;
+  default_set_mode: string;
+  default_timer_seconds: number | null;
+}
+
+function rowToExerciseSettingsValues(
+  row: ExerciseSettingsRow,
+): ExerciseSettingsValues | null {
+  if (row.default_set_mode !== "reps" && row.default_set_mode !== "timer") {
+    return null;
+  }
+  return {
+    defaultSetMode: row.default_set_mode as ExerciseSetMode,
+    defaultTimerSeconds: row.default_timer_seconds ?? undefined,
+  };
+}
+
+export const supabaseExerciseSettingsRepo: ExerciseSettingsRepo = {
+  async loadAll(): Promise<ExerciseSettingsMap> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return {};
+
+    const { data, error } = await supabase
+      .from("exercise_settings")
+      .select("exercise_id, default_set_mode, default_timer_seconds")
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error("[supabaseExerciseSettingsRepo.loadAll]", error);
+      return {};
+    }
+
+    const map: ExerciseSettingsMap = {};
+    for (const row of data ?? []) {
+      const r = row as ExerciseSettingsRow;
+      const v = rowToExerciseSettingsValues(r);
+      if (v) map[r.exercise_id] = v;
+    }
+    return map;
+  },
+
+  async upsert(
+    exerciseId: string,
+    values: ExerciseSettingsValues,
+  ): Promise<void> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    const default_timer_seconds =
+      values.defaultSetMode === "timer"
+        ? values.defaultTimerSeconds != null &&
+            values.defaultTimerSeconds > 0
+          ? values.defaultTimerSeconds
+          : DEFAULT_TIMER_SECONDS_FALLBACK
+        : null;
+
+    const { error } = await supabase.from("exercise_settings").upsert(
+      {
+        user_id: user.id,
+        exercise_id: exerciseId,
+        default_set_mode: values.defaultSetMode,
+        default_timer_seconds,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,exercise_id" },
+    );
+
+    if (error) {
+      console.error("[supabaseExerciseSettingsRepo.upsert]", error);
       throw error;
     }
   },
