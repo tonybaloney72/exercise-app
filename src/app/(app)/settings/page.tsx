@@ -17,13 +17,10 @@ export default function SettingsPage() {
   const mode = useAuthStore((s) => s.mode);
   const user = useAuthStore((s) => s.user);
   const setGuest = useAuthStore((s) => s.setGuest);
-  const loadSettings = settings.loadSettings;
-
   useEffect(() => {
     if (mode === "loading") return;
-    loadSettings();
     loadHistory();
-  }, [mode, loadSettings, loadHistory]);
+  }, [mode, loadHistory]);
 
   const handleExport = () => {
     const data = {
@@ -123,6 +120,40 @@ export default function SettingsPage() {
         {(mode === "loading" || mode === "anonymous") && (
           <p className="text-xs text-muted">Loading account…</p>
         )}
+      </motion.div>
+
+      {/* Appearance */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.04 }}
+        className="rounded-xl border border-border bg-surface p-4"
+      >
+        <h2 className="text-sm font-semibold text-foreground mb-3">Appearance</h2>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-foreground">Dark mode</p>
+            <p className="text-xs text-muted mt-0.5">
+              Turn off for a light background across the app
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={settings.darkMode}
+            onClick={() => settings.updateSettings({ darkMode: !settings.darkMode })}
+            className={`relative h-8 w-14 shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+              settings.darkMode ? "bg-accent" : "bg-border"
+            }`}
+          >
+            <span
+              className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                settings.darkMode ? "translate-x-6" : "translate-x-0"
+              }`}
+            />
+            <span className="sr-only">{settings.darkMode ? "On" : "Off"}</span>
+          </button>
+        </div>
       </motion.div>
 
       {/* Workout preferences */}

@@ -10,7 +10,6 @@ import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
-import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
@@ -23,7 +22,6 @@ function TodayPageInner() {
     loadHistory,
     updateCompletedWorkoutNotes,
   } = useWorkoutStore();
-  const { loadSettings } = useSettingsStore();
   const mode = useAuthStore((s) => s.mode);
   const plan = useMemo(() => getTodaysPlan(), []);
 
@@ -34,8 +32,7 @@ function TodayPageInner() {
   useEffect(() => {
     if (mode === "loading") return;
     loadHistory();
-    loadSettings();
-  }, [mode, loadHistory, loadSettings]);
+  }, [mode, loadHistory]);
 
   const todaysCompletedLog = useMemo(() => {
     const todayKey = formatLocalDateKey();
