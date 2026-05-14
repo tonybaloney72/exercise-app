@@ -106,7 +106,7 @@ export default function FloatingTimer() {
                 exit={{ opacity: 0, y: -4, scale: 0.96 }}
                 transition={{ duration: 0.14 }}
                 role="menu"
-                className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-border bg-surface shadow-xl"
+                className="absolute right-0 mt-2 flex w-55 flex-col gap-2"
               >
                 <button
                   type="button"
@@ -115,14 +115,30 @@ export default function FloatingTimer() {
                     setOpen(false);
                     startRest(restBetweenRounds, false);
                   }}
-                  className="flex w-full items-center justify-between px-4 py-3 text-left text-sm text-foreground hover:bg-surface-hover transition-colors"
+                  className="flex w-full items-center justify-between gap-3 rounded-full bg-accent px-4 py-2.5 text-left text-sm font-semibold text-white shadow-lg shadow-accent/30 transition-colors hover:bg-accent/90 active:scale-[0.98]"
                 >
-                  <span className="font-medium">Rest</span>
-                  <span className="text-xs tabular-nums text-muted">
+                  <span className="flex items-center gap-2">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="shrink-0 opacity-90"
+                      aria-hidden
+                    >
+                      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                      <path d="M12 6v6l4 2" />
+                    </svg>
+                    Rest timer
+                  </span>
+                  <span className="tabular-nums text-xs font-semibold text-white/85">
                     {formatTime(restBetweenRounds)}
                   </span>
                 </button>
-                <div className="h-px bg-border" />
                 <button
                   type="button"
                   role="menuitem"
@@ -130,13 +146,35 @@ export default function FloatingTimer() {
                     setOpen(false);
                     startStopwatch(false);
                   }}
-                  className="flex w-full items-center justify-between px-4 py-3 text-left text-sm text-foreground hover:bg-surface-hover transition-colors"
+                  className="flex w-full items-center justify-between gap-3 rounded-full bg-accent px-4 py-2.5 text-left text-sm font-semibold text-white shadow-lg shadow-accent/30 transition-colors hover:bg-accent/90 active:scale-[0.98]"
                 >
-                  <span className="font-medium">Stopwatch</span>
-                  {hasLast && (
-                    <span className="text-xs tabular-nums text-muted">
-                      resume {formatTime(lastStopwatchSeconds!)}
+                  <span className="flex items-center gap-2">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="shrink-0 opacity-90"
+                      aria-hidden
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <polyline points="12 7 12 12 15 14" />
+                    </svg>
+                    Stopwatch
+                  </span>
+                  {hasLast ? (
+                    <span className="text-right text-xs font-medium leading-tight text-white/80">
+                      Resume
+                      <span className="ml-1 tabular-nums text-white/90">
+                        {formatTime(lastStopwatchSeconds!)}
+                      </span>
                     </span>
+                  ) : (
+                    <span className="text-xs font-medium text-white/75">From 0:00</span>
                   )}
                 </button>
               </motion.div>

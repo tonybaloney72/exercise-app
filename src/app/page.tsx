@@ -30,26 +30,26 @@ export default function LandingPage() {
 
   return (
     <main className="flex-1">
-      <div className="mx-auto flex min-h-[100dvh] max-w-lg flex-col justify-center px-4 py-10">
+      <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-start px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:justify-center sm:py-10 sm:pb-10">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-2"
+          className="space-y-1.5 sm:space-y-2"
         >
           <div className="flex justify-center">
             <Image
               src="/branding/ME_Logo_Simple.png"
               alt="MyExercise"
-              width={280}
-              height={112}
-              className="h-auto w-[min(280px,85vw)] object-contain"
+              width={240}
+              height={96}
+              className="h-auto w-[min(200px,70vw)] object-contain sm:w-[min(280px,85vw)]"
               priority
             />
           </div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold leading-tight text-foreground sm:text-3xl">
             Train every day, build the habit.
           </h1>
-          <p className="text-sm text-muted">
+          <p className="text-xs leading-snug text-muted sm:text-sm">
             A pocket coach for daily strength, cardio, and recovery — built for
             consistency over intensity.
           </p>
@@ -59,20 +59,20 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="mt-8 space-y-3"
+          className="mt-4 space-y-2 sm:mt-8 sm:space-y-3"
         >
           <button
             onClick={continueAsGuest}
             disabled={busy}
-            className="w-full rounded-xl bg-accent py-4 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] disabled:opacity-60"
+            className="w-full rounded-xl bg-accent py-3 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] disabled:opacity-60 sm:py-4"
           >
             {busy ? "Loading…" : "Continue as guest"}
           </button>
-          <p className="text-center text-[11px] text-muted">
+          <p className="text-center text-[10px] leading-snug text-muted sm:text-[11px]">
             Guest mode keeps everything on this device — no account, no sync.
           </p>
 
-          <div className="my-4 flex items-center gap-3">
+          <div className="my-2 flex items-center gap-3 sm:my-4">
             <div className="h-px flex-1 bg-border" />
             <span className="text-[10px] uppercase tracking-wider text-muted">
               or
@@ -82,13 +82,13 @@ export default function LandingPage() {
 
           <Link
             href="/login"
-            className="block w-full rounded-xl border border-border bg-surface py-3.5 text-center text-sm font-semibold text-foreground transition-colors hover:bg-surface-hover"
+            className="block w-full rounded-xl border border-border bg-surface py-3 text-center text-sm font-semibold text-foreground transition-colors hover:bg-surface-hover sm:py-3.5"
           >
             Log in
           </Link>
           <Link
             href="/signup"
-            className="block w-full rounded-xl border border-transparent py-3.5 text-center text-sm font-semibold text-accent transition-colors hover:bg-accent/10"
+            className="block w-full rounded-xl border border-transparent py-3 text-center text-sm font-semibold text-accent transition-colors hover:bg-accent/10 sm:py-3.5"
           >
             Create account
           </Link>

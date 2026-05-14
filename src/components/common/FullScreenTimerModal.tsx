@@ -19,6 +19,7 @@ export default function FullScreenTimerModal() {
   const resume = useFloatingTimerStore((s) => s.resume);
   const adjustRest = useFloatingTimerStore((s) => s.adjustRest);
   const resetRest = useFloatingTimerStore((s) => s.resetRest);
+  const resetStopwatch = useFloatingTimerStore((s) => s.resetStopwatch);
   const stop = useFloatingTimerStore((s) => s.stop);
   const tick = useFloatingTimerStore((s) => s.tick);
 
@@ -165,20 +166,30 @@ export default function FullScreenTimerModal() {
             type="button"
             onClick={resume}
             className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30 transition-transform active:scale-95"
-            aria-label="Resume"
+            aria-label="Play"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="6 4 20 12 6 20 6 4" />
             </svg>
           </button>
         )}
-        <button
-          type="button"
-          onClick={stop}
-          className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
-        >
-          Stop
-        </button>
+        {isRest ? (
+          <button
+            type="button"
+            onClick={stop}
+            className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
+          >
+            Stop
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={resetStopwatch}
+            className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
+          >
+            Reset
+          </button>
+        )}
       </div>
     </motion.div>
   );

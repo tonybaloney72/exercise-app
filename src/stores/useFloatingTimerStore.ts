@@ -36,9 +36,11 @@ interface FloatingTimerState {
   adjustRest: (deltaSeconds: number) => void;
   /** Resets countdown to its original total without leaving rest mode. */
   resetRest: () => void;
+  /** Stopwatch only: clear elapsed time to 0:00 and pause; modal stays open. */
+  resetStopwatch: () => void;
   /**
-   * Stops whichever mode is active and closes the modal. For stopwatch this
-   * preserves the final value in `lastStopwatchSeconds`; for rest it does not.
+   * Closes the modal (Escape / X). Rest: discard. Stopwatch: saves elapsed
+   * seconds to `lastStopwatchSeconds` for the floating pill.
    */
   stop: () => void;
   /** Clears the persisted "last stopwatch" pill label. */
@@ -87,6 +89,12 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
     set((s) => {
       if (s.mode !== "rest") return s;
       return { seconds: s.restTotalSeconds, running: true };
+    }),
+
+  resetStopwatch: () =>
+    set((s) => {
+      if (s.mode !== "stopwatch") return s;
+      return { seconds: 0, running: false };
     }),
 
   stop: () => {

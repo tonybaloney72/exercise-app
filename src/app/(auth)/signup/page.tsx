@@ -57,15 +57,15 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold text-foreground">Create account</h1>
-        <p className="text-sm text-muted">
+    <div className="space-y-3 sm:space-y-5">
+      <div className="space-y-0.5 sm:space-y-1">
+        <h1 className="text-xl font-bold text-foreground sm:text-2xl">Create account</h1>
+        <p className="text-xs text-muted sm:text-sm">
           Sync your workouts across devices.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
         <Field
           id="email"
           label="Email"
@@ -104,13 +104,13 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={busy}
-          className="w-full rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] disabled:opacity-60"
+          className="w-full rounded-xl bg-accent py-3 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] disabled:opacity-60 sm:py-3.5"
         >
           {busy ? "Creating account…" : "Create account"}
         </button>
       </form>
 
-      <div className="space-y-2 text-center text-xs text-muted">
+      <div className="space-y-1 text-center text-[11px] text-muted sm:space-y-2 sm:text-xs">
         <p>
           Already have an account?{" "}
           <Link href="/login" className="text-accent hover:underline">
@@ -159,7 +159,7 @@ function Field({
         required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted"
+        className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted sm:px-4 sm:py-3"
       />
       {hint && <p className="text-[10px] text-muted">{hint}</p>}
     </div>
