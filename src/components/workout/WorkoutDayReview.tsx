@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
@@ -147,16 +147,25 @@ export default function WorkoutDayReview({
           <ReviewSection key={round.roundNumber} title={`Round ${round.roundNumber}`}>
             {round.exercises.map((ex, j) => {
               const entry = roundLog?.exercises[j];
-              const meta = exerciseMap[ex.exerciseId];
-              if (!meta) return null;
+              const planned = exerciseMap[ex.exerciseId];
+              const effectiveId = entry?.swappedWith ?? ex.exerciseId;
+              const effective = exerciseMap[effectiveId];
+              if (!planned || !effective) return null;
               return (
                 <ReviewRow
                   key={`${round.roundNumber}-${ex.exerciseId}`}
-                  name={meta.name}
+                  name={effective.name}
+                  prescribedLabel={
+                    entry?.swappedWith
+                      ? `Prescribed: ${planned.name}`
+                      : undefined
+                  }
                   target={ex.targetReps}
                   detail={exerciseStatusLine(entry)}
                   exerciseNotes={entry?.notes}
-                  badge={<CategoryBadge category={ex.category} size="sm" />}
+                  badge={
+                    <CategoryBadge category={effective.category} size="sm" />
+                  }
                 />
               );
             })}
@@ -227,7 +236,7 @@ function ReviewSection({
   children,
 }: {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="rounded-xl border border-border bg-surface overflow-hidden">
@@ -241,22 +250,27 @@ function ReviewSection({
 
 function ReviewRow({
   name,
+  prescribedLabel,
   target,
   detail,
   exerciseNotes,
   badge,
 }: {
   name: string;
+  prescribedLabel?: string;
   target: string;
   detail: string;
   exerciseNotes?: string;
-  badge?: React.ReactNode;
+  badge?: ReactNode;
 }) {
   return (
     <div className="px-2 py-2.5 space-y-0.5">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-foreground">{name}</p>
+          {prescribedLabel && (
+            <p className="text-[10px] text-muted mt-0.5">{prescribedLabel}</p>
+          )}
           <p className="text-xs text-muted">{target}</p>
         </div>
         {badge}

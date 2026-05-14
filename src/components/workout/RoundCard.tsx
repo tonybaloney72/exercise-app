@@ -105,9 +105,11 @@ export default function RoundCard({ round, roundLog }: RoundCardProps) {
                     targetReps={ex.targetReps}
                     category={ex.category}
                     roundNumber={round.roundNumber}
+                    slotIndex={i}
                     completed={log?.completed ?? false}
                     skipped={log?.skipped ?? false}
                     actualReps={log?.actualReps}
+                    swappedWith={log?.swappedWith}
                   />
                 );
               })}

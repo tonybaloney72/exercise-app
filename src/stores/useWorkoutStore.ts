@@ -2,11 +2,12 @@
 
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
-import type { WorkoutLog, RoundLog, ExerciseLog, DayPlan } from "@/types";
+import type { WorkoutLog, RoundLog, ExerciseLog, DayPlan, ExerciseCategory } from "@/types";
 import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
 import { getWorkoutRepo } from "@/lib/repos";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { getSwapCandidates, pickRandomSwap } from "@/lib/exerciseSwap";
 
 interface WorkoutState {
   activeWorkout: WorkoutLog | null;
@@ -21,6 +22,18 @@ interface WorkoutState {
   toggleCoolDownStretch: (exerciseId: string) => void;
   toggleExercise: (roundNumber: number, exerciseId: string) => void;
   setActualReps: (roundNumber: number, exerciseId: string, reps: number | undefined) => void;
+  swapRoundExercise: (
+    roundNumber: number,
+    slotIndex: number,
+    substituteId: string,
+    category: ExerciseCategory,
+  ) => void;
+  clearRoundExerciseSwap: (roundNumber: number, slotIndex: number) => void;
+  shuffleRoundExercise: (
+    roundNumber: number,
+    slotIndex: number,
+    category: ExerciseCategory,
+  ) => void;
   skipExercise: (roundNumber: number, exerciseId: string) => void;
   unskipExercise: (roundNumber: number, exerciseId: string) => void;
   skipWarmUpStretch: (exerciseId: string) => void;
@@ -187,6 +200,83 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       });
       return { activeWorkout: { ...state.activeWorkout, rounds } };
     }),
+
+  swapRoundExercise: (roundNumber, slotIndex, substituteId, category) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const rounds = state.activeWorkout.rounds.map((r) => {
+        if (r.roundNumber !== roundNumber) return r;
+        if (slotIndex < 0 || slotIndex >= r.exercises.length) return r;
+        const logs = r.exercises;
+        const log = logs[slotIndex];
+        const candidates = getSwapCandidates(
+          category,
+          log.exerciseId,
+          logs,
+          slotIndex,
+        );
+        if (!candidates.some((c) => c.id === substituteId)) return r;
+        return {
+          ...r,
+          exercises: logs.map((ex, j) =>
+            j === slotIndex
+              ? {
+                  ...ex,
+                  swappedWith: substituteId,
+                  skipped: false,
+                  actualReps: undefined,
+                  actualDuration: undefined,
+                }
+              : ex,
+          ),
+        };
+      });
+      return { activeWorkout: { ...state.activeWorkout, rounds } };
+    }),
+
+  clearRoundExerciseSwap: (roundNumber, slotIndex) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const rounds = state.activeWorkout.rounds.map((r) => {
+        if (r.roundNumber !== roundNumber) return r;
+        if (slotIndex < 0 || slotIndex >= r.exercises.length) return r;
+        const logs = r.exercises;
+        return {
+          ...r,
+          exercises: logs.map((ex, j) =>
+            j === slotIndex
+              ? {
+                  ...ex,
+                  swappedWith: undefined,
+                  actualReps: undefined,
+                  actualDuration: undefined,
+                }
+              : ex,
+          ),
+        };
+      });
+      return { activeWorkout: { ...state.activeWorkout, rounds } };
+    }),
+
+  shuffleRoundExercise: (roundNumber, slotIndex, category) => {
+    const state = get();
+    if (!state.activeWorkout) return;
+    const r = state.activeWorkout.rounds.find(
+      (x) => x.roundNumber === roundNumber,
+    );
+    if (!r || slotIndex < 0 || slotIndex >= r.exercises.length) return;
+    const logs = r.exercises;
+    const log = logs[slotIndex];
+    const candidates = getSwapCandidates(
+      category,
+      log.exerciseId,
+      logs,
+      slotIndex,
+    );
+    const pick = pickRandomSwap(candidates);
+    if (!pick) return;
+    get().swapRoundExercise(roundNumber, slotIndex, pick.id, category);
+  },
 
   skipExercise: (roundNumber, exerciseId) =>
     set((state) => {
