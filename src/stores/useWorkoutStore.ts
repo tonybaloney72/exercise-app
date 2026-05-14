@@ -8,6 +8,12 @@ import { getWorkoutRepo } from "@/lib/repos";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getSwapCandidates, pickRandomSwap } from "@/lib/exerciseSwap";
+import { exerciseMap } from "@/data/exercises";
+import {
+  clearExerciseMetrics,
+  ensureExerciseMetrics,
+  hydrateWorkoutLog,
+} from "@/utils/exerciseLogDefaults";
 
 interface WorkoutState {
   activeWorkout: WorkoutLog | null;
@@ -59,6 +65,7 @@ function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
       exerciseId: ex.exerciseId,
       completed: false,
       skipped: false,
+      targetPrescription: ex.targetReps,
     })),
   }));
 }
@@ -72,11 +79,13 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       exerciseId: s.exerciseId,
       completed: false,
       skipped: false,
+      targetPrescription: s.targetReps,
     }));
     const coolDownExercises: ExerciseLog[] = DEFAULT_COOL_DOWN.map((s) => ({
       exerciseId: s.exerciseId,
       completed: false,
       skipped: false,
+      targetPrescription: s.targetReps,
     }));
     set({
       activeWorkout: {
@@ -148,7 +157,15 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       if (!state.activeWorkout) return state;
       const warmUpExercises = state.activeWorkout.warmUpExercises.map((ex) => {
         if (ex.exerciseId !== exerciseId) return ex;
-        return { ...ex, completed: !ex.completed, skipped: false };
+        const nextDone = !ex.completed;
+        if (!nextDone) {
+          return { ...clearExerciseMetrics(ex), completed: false, skipped: false };
+        }
+        return ensureExerciseMetrics({
+          ...ex,
+          completed: true,
+          skipped: false,
+        });
       });
       const warmUpCompleted = warmUpExercises.every((ex) => ex.completed || ex.skipped);
       return {
@@ -161,7 +178,15 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       if (!state.activeWorkout) return state;
       const coolDownExercises = state.activeWorkout.coolDownExercises.map((ex) => {
         if (ex.exerciseId !== exerciseId) return ex;
-        return { ...ex, completed: !ex.completed, skipped: false };
+        const nextDone = !ex.completed;
+        if (!nextDone) {
+          return { ...clearExerciseMetrics(ex), completed: false, skipped: false };
+        }
+        return ensureExerciseMetrics({
+          ...ex,
+          completed: true,
+          skipped: false,
+        });
       });
       const coolDownCompleted = coolDownExercises.every((ex) => ex.completed || ex.skipped);
       return {
@@ -178,7 +203,15 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
           ...r,
           exercises: r.exercises.map((ex) => {
             if (ex.exerciseId !== exerciseId) return ex;
-            return { ...ex, completed: !ex.completed, skipped: false };
+            const nextDone = !ex.completed;
+            if (!nextDone) {
+              return { ...clearExerciseMetrics(ex), completed: false, skipped: false };
+            }
+            return ensureExerciseMetrics({
+              ...ex,
+              completed: true,
+              skipped: false,
+            });
           }),
         };
       });
@@ -194,7 +227,16 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
           ...r,
           exercises: r.exercises.map((ex) => {
             if (ex.exerciseId !== exerciseId) return ex;
-            return { ...ex, actualReps: reps ?? undefined };
+            let next: ExerciseLog = { ...ex, actualReps: reps ?? undefined };
+            if (
+              next.completed &&
+              !next.skipped &&
+              next.actualReps == null &&
+              next.actualDuration == null
+            ) {
+              next = ensureExerciseMetrics(next);
+            }
+            return next;
           }),
         };
       });
@@ -226,6 +268,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
                   skipped: false,
                   actualReps: undefined,
                   actualDuration: undefined,
+                  targetPrescription:
+                    exerciseMap[substituteId]?.defaultReps ?? ex.targetPrescription,
                 }
               : ex,
           ),
@@ -250,6 +294,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
                   swappedWith: undefined,
                   actualReps: undefined,
                   actualDuration: undefined,
+                  targetPrescription:
+                    exerciseMap[ex.exerciseId]?.defaultReps ?? ex.targetPrescription,
                 }
               : ex,
           ),
@@ -287,7 +333,11 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
           ...r,
           exercises: r.exercises.map((ex) => {
             if (ex.exerciseId !== exerciseId) return ex;
-            return { ...ex, skipped: true, completed: false };
+            return {
+              ...clearExerciseMetrics(ex),
+              skipped: true,
+              completed: false,
+            };
           }),
         };
       });
@@ -315,7 +365,11 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       if (!state.activeWorkout) return state;
       const warmUpExercises = state.activeWorkout.warmUpExercises.map((ex) => {
         if (ex.exerciseId !== exerciseId) return ex;
-        return { ...ex, skipped: true, completed: false };
+        return {
+          ...clearExerciseMetrics(ex),
+          skipped: true,
+          completed: false,
+        };
       });
       const warmUpCompleted = warmUpExercises.every((ex) => ex.completed || ex.skipped);
       return {
@@ -341,7 +395,11 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       if (!state.activeWorkout) return state;
       const coolDownExercises = state.activeWorkout.coolDownExercises.map((ex) => {
         if (ex.exerciseId !== exerciseId) return ex;
-        return { ...ex, skipped: true, completed: false };
+        return {
+          ...clearExerciseMetrics(ex),
+          skipped: true,
+          completed: false,
+        };
       });
       const coolDownCompleted = coolDownExercises.every((ex) => ex.completed || ex.skipped);
       return {
@@ -372,10 +430,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     const state = get();
     if (!state.activeWorkout) return null;
 
-    const completed: WorkoutLog = {
+    const completed = hydrateWorkoutLog({
       ...state.activeWorkout,
       endTime: new Date().toISOString(),
-    };
+    });
 
     // Optimistic UI: update store first so the user gets immediate feedback.
     set((s) => ({
@@ -399,7 +457,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     const state = get();
     const existing = state.workoutHistory.find((w) => w.id === workoutId);
     if (!existing) return;
-    const updated: WorkoutLog = { ...existing, notes };
+    const updated = hydrateWorkoutLog({ ...existing, notes });
     set({
       workoutHistory: state.workoutHistory.map((w) =>
         w.id === workoutId ? updated : w,
@@ -416,6 +474,6 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     const mode = useAuthStore.getState().mode;
     if (mode === "loading") return; // Wait until AuthInitializer settles.
     const history = await getWorkoutRepo(mode).loadHistory();
-    set({ workoutHistory: history });
+    set({ workoutHistory: history.map(hydrateWorkoutLog) });
   },
 }));

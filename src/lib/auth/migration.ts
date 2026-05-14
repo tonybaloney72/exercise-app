@@ -1,5 +1,6 @@
 import { clearLocalData, localSettingsRepo, localWorkoutRepo } from "@/lib/repos/local";
 import { supabaseSettingsRepo, supabaseWorkoutRepo } from "@/lib/repos/supabase";
+import { hydrateWorkoutLog } from "@/utils/exerciseLogDefaults";
 
 const MIGRATION_FLAG_PREFIX = "exercise-app-migrated-";
 
@@ -31,7 +32,7 @@ export async function migrateLocalDataIfNeeded(userId: string): Promise<void> {
 
     for (const log of localHistory) {
       try {
-        await supabaseWorkoutRepo.saveWorkout(log);
+        await supabaseWorkoutRepo.saveWorkout(hydrateWorkoutLog(log));
       } catch (err) {
         console.error("[migrateLocalDataIfNeeded] failed to save workout", log.id, err);
         // Keep going — partial migration is better than aborting halfway.

@@ -6,6 +6,8 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { motion } from "framer-motion";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import ProgressChartsSection from "@/components/progress/ProgressChartsSection";
+import ExerciseProgressChart from "@/components/progress/ExerciseProgressChart";
+import JogProgressChart from "@/components/progress/JogProgressChart";
 
 export default function ProgressPage() {
   const { workoutHistory, loadHistory } = useWorkoutStore();
@@ -85,6 +87,10 @@ export default function ProgressPage() {
       </div>
 
       <ProgressChartsSection history={workoutHistory} />
+
+      <ExerciseProgressChart history={workoutHistory} />
+
+      <JogProgressChart history={workoutHistory} />
 
       {/* Recent workouts */}
       {workoutHistory.length > 0 && (

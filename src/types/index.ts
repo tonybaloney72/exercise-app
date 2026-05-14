@@ -61,6 +61,8 @@ export interface ExerciseLog {
   skipped: boolean;
   swappedWith?: string;
   notes?: string;
+  /** Prescription text from the plan when the workout started (e.g. "12", "30 sec"). */
+  targetPrescription?: string;
 }
 
 export interface RoundLog {
