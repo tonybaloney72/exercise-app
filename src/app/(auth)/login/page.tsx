@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -39,6 +40,16 @@ function LoginForm() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-center">
+        <Image
+          src="/branding/ME_Logo_Simple.png"
+          alt="MyExercise"
+          width={280}
+          height={112}
+          className="h-auto w-[min(280px,85vw)] object-contain"
+          priority
+        />
+      </div>
       <div className="space-y-1">
         <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
         <p className="text-sm text-muted">Log in to sync your progress.</p>

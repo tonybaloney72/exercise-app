@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Exercise App",
+  title: "MyExercise",
   description: "Daily workout tracker & fitness companion",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Exercise App",
+    title: "MyExercise",
   },
 };
 

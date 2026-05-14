@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -35,9 +36,16 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-2"
         >
-          <p className="text-xs font-medium uppercase tracking-wider text-accent">
-            Exercise App
-          </p>
+          <div className="flex justify-center">
+            <Image
+              src="/branding/ME_Logo_Simple.png"
+              alt="MyExercise"
+              width={280}
+              height={112}
+              className="h-auto w-[min(280px,85vw)] object-contain"
+              priority
+            />
+          </div>
           <h1 className="text-3xl font-bold text-foreground">
             Train every day, build the habit.
           </h1>

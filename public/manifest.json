@@ -1,6 +1,6 @@
 {
-  "name": "Exercise App",
-  "short_name": "Exercise",
+  "name": "MyExercise",
+  "short_name": "MyExercise",
   "description": "Daily workout tracker & fitness companion",
   "start_url": "/",
   "display": "standalone",
