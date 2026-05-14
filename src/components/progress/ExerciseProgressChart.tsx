@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -32,7 +32,10 @@ interface Props {
 }
 
 export default function ExerciseProgressChart({ history }: Props) {
-  const options = useMemo(() => listExercisesWithNumericProgress(history), [history]);
+  const options = useMemo(
+    () => listExercisesWithNumericProgress(history),
+    [history],
+  );
   const [picked, setPicked] = useState("");
 
   const exerciseId = useMemo(() => {
@@ -49,6 +52,27 @@ export default function ExerciseProgressChart({ history }: Props) {
   const axisMode = series[0]?.mode ?? "reps";
   const yLabel = axisMode === "duration" ? "Time (sec)" : "Reps";
 
+  const exerciseName = useMemo(
+    () => options.find((o) => o.id === exerciseId)?.name ?? exerciseId,
+    [options, exerciseId],
+  );
+
+  const [sessionsOpen, setSessionsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!sessionsOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setSessionsOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [sessionsOpen]);
+
   if (options.length === 0) {
     return null;
   }
@@ -56,44 +80,161 @@ export default function ExerciseProgressChart({ history }: Props) {
   return (
     <div className="space-y-3">
       <div>
-        <h2 className="text-sm font-semibold text-foreground">Exercise over time</h2>
+        <h2 className="text-sm font-semibold text-foreground">
+          Exercise over time
+        </h2>
         <p className="text-xs text-muted mt-0.5">
-          Reps or logged duration per workout (summed if the exercise appears in multiple rounds)
+          Reps or logged duration per workout (summed if the exercise appears in
+          multiple rounds)
         </p>
       </div>
 
-      <label className="block">
-        <span className="sr-only">Choose exercise</span>
-        <select
-          value={exerciseId}
-          onChange={(e) => setPicked(e.target.value)}
-          className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-accent"
+      <div className="flex gap-2">
+        <label className="block min-w-0 flex-1">
+          <span className="sr-only">Choose exercise</span>
+          <select
+            value={exerciseId}
+            onChange={(e) => {
+              setSessionsOpen(false);
+              setPicked(e.target.value);
+            }}
+            className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-accent"
+          >
+            {options.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          onClick={() => setSessionsOpen(true)}
+          disabled={series.length === 0}
+          className="shrink-0 rounded-xl border border-border bg-surface-hover px-3 py-2.5 text-sm font-medium text-foreground outline-none transition-colors hover:bg-border/40 focus:border-accent disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {options.map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.name}
-            </option>
-          ))}
-        </select>
-      </label>
+          Sessions
+        </button>
+      </div>
+
+      {sessionsOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center sm:p-6"
+          role="presentation"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/60"
+            aria-label="Close session list"
+            onClick={() => setSessionsOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="exercise-session-history-title"
+            className="relative z-10 flex max-h-[min(85dvh,560px)] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-xl"
+          >
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
+              <h3
+                id="exercise-session-history-title"
+                className="pr-2 text-sm font-semibold text-foreground"
+              >
+                {exerciseName}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSessionsOpen(false)}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-foreground"
+                aria-label="Close"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.25"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <p className="shrink-0 border-b border-border px-4 py-2 text-[11px] leading-snug text-muted">
+              One row per workout. Numbers are{" "}
+              <span className="text-foreground">what you logged </span>
+              (summed across rounds), not the prescribed targets. The line chart
+              uses <span className="text-foreground">total time</span> for
+              time-based exercises when duration was logged; otherwise it uses{" "}
+              <span className="text-foreground">total reps</span>.
+            </p>
+            <div className="min-h-0 overflow-y-auto overscroll-contain px-2 pb-3">
+              {series.length === 0 ? (
+                <p className="px-2 py-6 text-center text-xs text-muted">
+                  No sessions to list.
+                </p>
+              ) : (
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-border text-muted">
+                      <th className="px-2 py-2 font-medium">Date</th>
+                      <th className="px-2 py-2 font-medium">Reps (logged)</th>
+                      <th className="px-2 py-2 font-medium">Time (logged)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...series].reverse().map((row) => (
+                      <tr
+                        key={row.date}
+                        className="border-b border-border/80 last:border-0"
+                      >
+                        <td className="whitespace-nowrap px-2 py-2 font-mono text-foreground">
+                          {row.date}
+                        </td>
+                        <td className="px-2 py-2 tabular-nums text-foreground">
+                          {row.reps > 0 ? row.reps : "—"}
+                        </td>
+                        <td className="px-2 py-2 tabular-nums text-foreground">
+                          {row.durationSec > 0
+                            ? formatSecondsToMMSS(row.durationSec) ||
+                              `${row.durationSec}s`
+                            : "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="h-56 w-full rounded-xl border border-border bg-surface p-2 pt-3">
         {series.length === 0 ? (
           <div className="flex h-full items-center justify-center px-4">
             <p className="text-center text-xs text-muted">
-              No chartable sessions for this exercise yet (log reps or duration when you complete
-              sets).
+              No chartable sessions for this exercise yet (log reps or duration
+              when you complete sets).
             </p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={series} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
+            <LineChart
+              data={series}
+              margin={{ top: 8, right: 8, left: 4, bottom: 4 }}
+            >
               <CartesianGrid
                 stroke="var(--border-color)"
                 strokeDasharray="4 4"
                 vertical={false}
               />
-              <XAxis dataKey="xLabel" tick={axisTick} tickLine={false} axisLine={false} />
+              <XAxis
+                dataKey="xLabel"
+                tick={axisTick}
+                tickLine={false}
+                axisLine={false}
+              />
               <YAxis
                 width={40}
                 tick={axisTick}
@@ -110,7 +251,8 @@ export default function ExerciseProgressChart({ history }: Props) {
                   offset: 0,
                 }}
                 tickFormatter={(v) => {
-                  if (axisMode !== "duration" || typeof v !== "number") return String(v);
+                  if (axisMode !== "duration" || typeof v !== "number")
+                    return String(v);
                   if (v >= 60) return `${Math.floor(v / 60)}m`;
                   return `${v}s`;
                 }}
@@ -118,7 +260,9 @@ export default function ExerciseProgressChart({ history }: Props) {
               <Tooltip
                 contentStyle={tooltipStyle}
                 labelFormatter={(_label, payload) => {
-                  const row = payload?.[0]?.payload as { date?: string; xLabel?: string } | undefined;
+                  const row = payload?.[0]?.payload as
+                    | { date?: string; xLabel?: string }
+                    | undefined;
                   if (row?.date) return row.date;
                   return row?.xLabel ?? "";
                 }}
@@ -133,7 +277,8 @@ export default function ExerciseProgressChart({ history }: Props) {
                   const v = Number(value ?? 0);
                   if (p?.mode === "duration") {
                     const line = `${formatSecondsToMMSS(v) || `${v}s`} total`;
-                    if (p.reps && p.reps > 0) return [line, `Also ${p.reps} reps logged`];
+                    if (p.reps && p.reps > 0)
+                      return [line, `Also ${p.reps} reps logged`];
                     return [line, "Duration"];
                   }
                   const line = `${v} reps`;

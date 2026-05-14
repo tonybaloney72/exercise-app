@@ -1,5 +1,7 @@
-import type { ExerciseCategory, ExerciseLog, WorkoutLog } from "@/types";
+import type { DayPlan, ExerciseCategory, ExerciseLog, WorkoutLog } from "@/types";
+import { getPlanForDay } from "@/data/dailyPlans";
 import { exercises } from "@/data/exercises";
+import { formatLocalDateKey } from "@/utils/localDateKey";
 
 const exerciseCategoryById = new Map(
   exercises.map((e) => [e.id, e.category] as const),
@@ -111,4 +113,61 @@ export function trainingCategoryTotals(history: WorkoutLog[]): {
       value: counts[category] ?? 0,
     }))
     .sort((a, b) => b.value - a.value);
+}
+
+const DOW_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+
+function countPlannedRoundExercises(plan: DayPlan): number {
+  return plan.rounds.reduce((sum, r) => sum + r.exercises.length, 0);
+}
+
+function countCompletedRoundExercises(log: WorkoutLog): number {
+  return log.rounds.reduce(
+    (sum, r) =>
+      sum + r.exercises.filter((e) => e.completed && !e.skipped).length,
+    0,
+  );
+}
+
+export interface WeekToDatePlanAdherence {
+  planned: number;
+  completed: number;
+  /** Short label for the included slice, e.g. "Sun" or "Sun–Wed". */
+  spanShort: string;
+}
+
+/**
+ * Sum of prescribed main-round exercises for Sun..today (calendar week),
+ * vs completed (non-skipped) round exercises logged on those dates.
+ * Uses the newest log per date when multiple exist. Matches Progress "recent workouts" round counts.
+ */
+export function weekToDatePlanAdherence(
+  history: WorkoutLog[],
+  reference: Date = new Date(),
+): WeekToDatePlanAdherence {
+  const ref = new Date(reference);
+  ref.setHours(12, 0, 0, 0);
+  const todayDow = ref.getDay();
+  const weekStart = new Date(ref);
+  weekStart.setDate(ref.getDate() - todayDow);
+  weekStart.setHours(0, 0, 0, 0);
+
+  let planned = 0;
+  let completed = 0;
+
+  for (let dow = 0; dow <= todayDow; dow++) {
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate() + dow);
+    const dateStr = formatLocalDateKey(d);
+    planned += countPlannedRoundExercises(getPlanForDay(dow));
+    const log = history.find((w) => w.date === dateStr);
+    if (log) completed += countCompletedRoundExercises(log);
+  }
+
+  const spanShort =
+    todayDow === 0
+      ? DOW_SHORT[0]
+      : `${DOW_SHORT[0]}–${DOW_SHORT[todayDow]}`;
+
+  return { planned, completed, spanShort };
 }

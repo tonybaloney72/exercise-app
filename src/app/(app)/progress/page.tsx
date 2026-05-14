@@ -8,6 +8,7 @@ import { formatLocalDateKey } from "@/utils/localDateKey";
 import ProgressChartsSection from "@/components/progress/ProgressChartsSection";
 import ExerciseProgressChart from "@/components/progress/ExerciseProgressChart";
 import JogProgressChart from "@/components/progress/JogProgressChart";
+import { weekToDatePlanAdherence } from "@/utils/progressStats";
 
 export default function ProgressPage() {
   const { workoutHistory, loadHistory } = useWorkoutStore();
@@ -37,28 +38,24 @@ export default function ProgressPage() {
       }
     }
 
-    const totalExercises = workoutHistory.reduce(
-      (acc, w) =>
-        acc +
-        w.rounds.reduce(
-          (a, r) => a + r.exercises.filter((e) => e.completed).length,
-          0
-        ),
-      0
-    );
-
     const totalJogMiles = workoutHistory.reduce(
       (acc, w) => acc + (w.jogDistance ?? 0),
       0
     );
 
-    return { totalWorkouts, currentStreak, totalExercises, totalJogMiles };
+    const weekPlan = weekToDatePlanAdherence(workoutHistory);
+
+    return { totalWorkouts, currentStreak, totalJogMiles, weekPlan };
   }, [workoutHistory]);
 
   const statCards = [
     { label: "Total Workouts", value: stats.totalWorkouts, icon: "💪" },
     { label: "Current Streak", value: `${stats.currentStreak} day${stats.currentStreak !== 1 ? "s" : ""}`, icon: "🔥" },
-    { label: "Exercises Done", value: stats.totalExercises, icon: "✅" },
+    {
+      label: `Completed / planned (so far) · ${stats.weekPlan.spanShort}`,
+      value: `${stats.weekPlan.completed} / ${stats.weekPlan.planned}`,
+      icon: "✅",
+    },
     { label: "Miles Jogged", value: stats.totalJogMiles.toFixed(1), icon: "🏃" },
   ];
 
@@ -80,8 +77,10 @@ export default function ProgressPage() {
             className="rounded-xl border border-border bg-surface p-4"
           >
             <span className="text-lg">{card.icon}</span>
-            <p className="mt-2 text-xl font-bold text-foreground">{card.value}</p>
-            <p className="text-[11px] text-muted">{card.label}</p>
+            <p className="mt-2 text-xl font-bold tabular-nums text-foreground">
+              {card.value}
+            </p>
+            <p className="text-[11px] leading-snug text-muted">{card.label}</p>
           </motion.div>
         ))}
       </div>
