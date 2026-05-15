@@ -35,6 +35,19 @@ function muscleGroupsFor(primary, secondary) {
 
 function equipmentFor(name) {
   if (/\bring\b/i.test(name)) return ["rings"];
+  if (
+    /\b(pull-?up|chin-?up|dead hang|inverted row|hanging|toes to bar|front lever)\b/i.test(
+      name,
+    )
+  ) {
+    return ["pull_up_bar"];
+  }
+  if (/\b(swiss ball|bosu)\b/i.test(name)) return ["stability_ball"];
+  if (/\b(medicine ball|med ball)\b/i.test(name)) return ["medicine_ball"];
+  if (/\b(plyo|box jump|step-?up)\b/i.test(name) && /\bbox\b/i.test(name)) {
+    return ["plyo_box"];
+  }
+  if (/\bband\b/i.test(name)) return ["resistance_band"];
   return ["bodyweight"];
 }
 

@@ -24,7 +24,14 @@ export type ExerciseEquipment =
   | "dumbbell"
   | "barbell"
   | "machine"
-  | "cable";
+  | "cable"
+  | "medicine_ball"
+  | "plyo_box"
+  | "stability_ball"
+  | "pull_up_bar";
+
+/** Planned: ExRx-style plyometric intensity (low → high). Not used in UI yet. */
+export type PlyometricIntensity = "low" | "low_medium" | "medium" | "medium_high" | "high";
 
 export interface Exercise {
   id: string;
@@ -40,6 +47,8 @@ export interface Exercise {
   equipment?: ExerciseEquipment[];
   /** Hybrid Calisthenics muscle-group tags (e.g. "Lats", "Front Deltoids"). */
   muscleGroups?: string[];
+  /** Reserved for catalog metadata (e.g. ExRx plyometric tier). */
+  plyometricIntensity?: PlyometricIntensity;
 }
 
 /** Persisted row for `exercise_settings` (and local guest mirror). */

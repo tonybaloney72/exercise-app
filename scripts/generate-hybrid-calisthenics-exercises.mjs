@@ -500,10 +500,29 @@ function slugify(name) {
     .replace(/^-|-$/g, "");
 }
 
-function inferRings(name, equipment) {
-  if (equipment !== "bodyweight") return equipment;
-  if (/\bring\b/i.test(name)) return "rings";
-  return "bodyweight";
+/** Bodyweight HC moves that require a pull-up bar (not floor-only). */
+const PULL_UP_BAR_NAMES = new Set([
+  "Chin Up",
+  "Pullup",
+  "Commando Pullup",
+  "Dead hang",
+  "Hanging Oblique Raise",
+  "Band Resisted Hanging Leg Raise",
+  "Row",
+  "Front Lever Raise",
+  "Elbow Press",
+]);
+
+const PULL_UP_BAR_MULTI = {
+  "Band Resisted Hanging Leg Raise": ["pull_up_bar", "resistance_band"],
+};
+
+function inferEquipmentList(name, baseEquip) {
+  if (PULL_UP_BAR_MULTI[name]) return PULL_UP_BAR_MULTI[name];
+  let eq = baseEquip;
+  if (eq === "bodyweight" && /\bring\b/i.test(name)) eq = "rings";
+  if (eq === "bodyweight" && PULL_UP_BAR_NAMES.has(name)) eq = "pull_up_bar";
+  return [eq];
 }
 
 function isTimeBased(name) {
@@ -524,8 +543,8 @@ for (const [muscle, sections] of Object.entries(PAGES)) {
     for (const name of names) {
       const trimmed = name.trim();
       if (!trimmed) continue;
-      const equipment = inferRings(trimmed, baseEquip);
-      const key = `${slugify(trimmed)}|${equipment}`;
+      const equipment = inferEquipmentList(trimmed, baseEquip);
+      const key = `${slugify(trimmed)}|${equipment.join("+")}`;
       let entry = byKey.get(key);
       if (!entry) {
         entry = {
@@ -559,7 +578,7 @@ const lines = sorted.map((e) => {
 \t\tid: ${JSON.stringify(id)},
 \t\tname: ${JSON.stringify(e.name)},
 \t\tcategory: ${JSON.stringify(e.category)},
-\t\tequipment: [${JSON.stringify(e.equipment)}],
+\t\tequipment: ${JSON.stringify(e.equipment)},
 \t\tmuscleGroups: ${muscleGroupsJson},
 \t\tdefaultReps: ${JSON.stringify(defaultReps)},
 \t\tnotes: ${JSON.stringify(notes)},

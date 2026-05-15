@@ -8,6 +8,10 @@ export const ALL_EXERCISE_EQUIPMENT: ExerciseEquipment[] = [
   "barbell",
   "machine",
   "cable",
+  "medicine_ball",
+  "plyo_box",
+  "stability_ball",
+  "pull_up_bar",
 ];
 
 export const EQUIPMENT_LABELS: Record<ExerciseEquipment, string> = {
@@ -18,6 +22,10 @@ export const EQUIPMENT_LABELS: Record<ExerciseEquipment, string> = {
   barbell: "Barbell",
   machine: "Machines",
   cable: "Cables",
+  medicine_ball: "Medicine ball",
+  plyo_box: "Plyo box / bench",
+  stability_ball: "Stability ball / Bosu",
+  pull_up_bar: "Pull-up bar",
 };
 
 /** Default until the user completes equipment onboarding or changes Settings. */
