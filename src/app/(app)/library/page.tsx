@@ -10,6 +10,7 @@ import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   isPresetTimerSeconds,
+  parseRepTargetHint,
   resolveExerciseSettings,
   TIMER_DURATION_PRESET_SECONDS,
 } from "@/utils/effectiveExerciseSettings";
@@ -158,6 +159,18 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     [exercise, stored],
   );
 
+  const collapsedSummary = useMemo(() => {
+    if (resolved.defaultSetMode === "timer") {
+      const sec =
+        resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK;
+      return `${sec}s`;
+    }
+    if (resolved.defaultTargetReps != null) {
+      return String(resolved.defaultTargetReps);
+    }
+    return exercise.defaultReps;
+  }, [resolved, exercise.defaultReps]);
+
   const effectiveSec: number =
     stored?.defaultTimerSeconds ??
     (resolved.defaultSetMode === "timer"
@@ -174,12 +187,17 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
       await upsert(exercise.id, {
         defaultSetMode: "reps",
         defaultTimerSeconds: null,
+        defaultTargetReps:
+          stored?.defaultTargetReps != null && stored.defaultTargetReps > 0
+            ? stored.defaultTargetReps
+            : null,
       });
       return;
     }
     setCustomChipActive(false);
     await upsert(exercise.id, {
       defaultSetMode: "timer",
+      defaultTargetReps: null,
       defaultTimerSeconds:
         stored?.defaultSetMode === "timer" &&
         stored.defaultTimerSeconds != null &&
@@ -193,6 +211,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     setCustomChipActive(false);
     await upsert(exercise.id, {
       defaultSetMode: "timer",
+      defaultTargetReps: null,
       defaultTimerSeconds: sec,
     });
   }
@@ -209,9 +228,33 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     input.value = String(sec);
     await upsert(exercise.id, {
       defaultSetMode: "timer",
+      defaultTargetReps: null,
       defaultTimerSeconds: sec,
     });
     setCustomChipActive(false);
+  }
+
+  async function commitDefaultRepsFromInput(input: HTMLInputElement) {
+    const raw = input.value.trim();
+    if (raw === "") {
+      await upsert(exercise.id, {
+        defaultSetMode: "reps",
+        defaultTimerSeconds: null,
+        defaultTargetReps: null,
+      });
+      return;
+    }
+    const n = Math.round(Number(raw));
+    const reps = Math.min(
+      999,
+      Math.max(1, Number.isNaN(n) ? (parseRepTargetHint(exercise.defaultReps) ?? 1) : n),
+    );
+    input.value = String(reps);
+    await upsert(exercise.id, {
+      defaultSetMode: "reps",
+      defaultTimerSeconds: null,
+      defaultTargetReps: reps,
+    });
   }
 
   const modeBtn =
@@ -242,7 +285,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
         <span className="flex-1 text-sm font-medium text-foreground">
           {exercise.name}
         </span>
-        <span className="text-xs text-muted">{exercise.defaultReps}</span>
+        <span className="text-xs text-muted">{collapsedSummary}</span>
         <CategoryBadge category={exercise.category} />
       </button>
 
@@ -362,6 +405,30 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                         />
                       </div>
                     )}
+                  </div>
+                )}
+                {resolved.defaultSetMode === "reps" && (
+                  <div className="space-y-2 pt-0.5">
+                    <label className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                      Default reps
+                    </label>
+                    <input
+                      key={`default-reps-${exercise.id}-${stored?.defaultTargetReps ?? ""}`}
+                      type="number"
+                      inputMode="numeric"
+                      min={1}
+                      max={999}
+                      defaultValue={
+                        resolved.defaultTargetReps ??
+                        parseRepTargetHint(exercise.defaultReps) ??
+                        ""
+                      }
+                      onBlur={(e) => void commitDefaultRepsFromInput(e.currentTarget)}
+                      className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
+                    />
+                    <p className="text-[10px] text-muted">
+                      Clear the field and tap away to use the catalog line ({exercise.defaultReps}) until you set a number.
+                    </p>
                   </div>
                 )}
               </div>

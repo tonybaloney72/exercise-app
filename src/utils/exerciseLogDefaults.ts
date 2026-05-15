@@ -107,6 +107,27 @@ export function ensureExerciseMetrics(log: ExerciseLog): ExerciseLog {
     return { ...log, actualDuration: DEFAULT_TIMER_SECONDS_FALLBACK };
   }
 
+  const meta = exerciseMap[id];
+  const st = useExerciseSettingsStore.getState().byExerciseId[id];
+  const resolved = resolveExerciseSettings(
+    meta ?? {
+      id,
+      isTimeBased: false,
+      category: "UP",
+      name: "",
+      defaultReps: "",
+      notes: "",
+    },
+    st,
+  );
+  if (
+    mode === "reps" &&
+    resolved.defaultTargetReps != null &&
+    resolved.defaultTargetReps > 0
+  ) {
+    return { ...log, actualReps: resolved.defaultTargetReps };
+  }
+
   const parsed = metricsFromPrescription(prescription, false);
   if (parsed.actualReps != null || parsed.actualDuration != null) {
     return { ...log, ...parsed };

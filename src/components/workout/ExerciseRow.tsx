@@ -100,7 +100,12 @@ export default function ExerciseRow({
 
   const prescriptionLine = useMemo(() => {
     if (!plannedExercise || !effectiveExercise) return "";
-    if (mode === "reps") return roundExercise.targetReps;
+    if (mode === "reps") {
+      const r = resolveExerciseSettings(effectiveExercise, stored);
+      return r.defaultTargetReps != null
+        ? String(r.defaultTargetReps)
+        : roundExercise.targetReps;
+    }
     return `Timer · ${effectiveTargetSec}s`;
   }, [
     plannedExercise,
@@ -108,6 +113,7 @@ export default function ExerciseRow({
     mode,
     roundExercise.targetReps,
     effectiveTargetSec,
+    stored,
   ]);
 
   if (!plannedExercise || !effectiveExercise) return null;

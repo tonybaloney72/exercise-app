@@ -30,6 +30,8 @@ export interface ExerciseSettingsValues {
   defaultSetMode: ExerciseSetMode;
   /** Seconds for timer mode; omit or null when mode is reps. */
   defaultTimerSeconds?: number | null;
+  /** Rep target for reps mode; omit or null when mode is timer. */
+  defaultTargetReps?: number | null;
 }
 
 export interface CategoryMeta {

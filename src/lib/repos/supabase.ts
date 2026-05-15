@@ -310,6 +310,7 @@ interface ExerciseSettingsRow {
   exercise_id: string;
   default_set_mode: string;
   default_timer_seconds: number | null;
+  default_target_reps: number | null;
 }
 
 function rowToExerciseSettingsValues(
@@ -321,6 +322,7 @@ function rowToExerciseSettingsValues(
   return {
     defaultSetMode: row.default_set_mode as ExerciseSetMode,
     defaultTimerSeconds: row.default_timer_seconds ?? undefined,
+    defaultTargetReps: row.default_target_reps ?? undefined,
   };
 }
 
@@ -334,7 +336,9 @@ export const supabaseExerciseSettingsRepo: ExerciseSettingsRepo = {
 
     const { data, error } = await supabase
       .from("exercise_settings")
-      .select("exercise_id, default_set_mode, default_timer_seconds")
+      .select(
+        "exercise_id, default_set_mode, default_timer_seconds, default_target_reps",
+      )
       .eq("user_id", user.id);
 
     if (error) {
@@ -369,12 +373,20 @@ export const supabaseExerciseSettingsRepo: ExerciseSettingsRepo = {
           : DEFAULT_TIMER_SECONDS_FALLBACK
         : null;
 
+    const default_target_reps =
+      values.defaultSetMode === "reps" &&
+      values.defaultTargetReps != null &&
+      values.defaultTargetReps > 0
+        ? Math.min(999, Math.round(values.defaultTargetReps))
+        : null;
+
     const { error } = await supabase.from("exercise_settings").upsert(
       {
         user_id: user.id,
         exercise_id: exerciseId,
         default_set_mode: values.defaultSetMode,
         default_timer_seconds,
+        default_target_reps,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id,exercise_id" },

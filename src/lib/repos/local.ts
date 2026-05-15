@@ -73,10 +73,13 @@ function sanitizeExerciseSettingsMap(raw: unknown): ExerciseSettingsMap {
     const o = v as Record<string, unknown>;
     if (o.defaultSetMode !== "reps" && o.defaultSetMode !== "timer") continue;
     const ts = o.defaultTimerSeconds;
+    const tr = o.defaultTargetReps;
     out[exerciseId] = {
       defaultSetMode: o.defaultSetMode,
       defaultTimerSeconds:
         typeof ts === "number" && ts > 0 ? ts : ts === null ? null : undefined,
+      defaultTargetReps:
+        typeof tr === "number" && tr > 0 ? tr : tr === null ? null : undefined,
     };
   }
   return out;
