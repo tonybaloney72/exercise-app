@@ -408,24 +408,26 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                   </div>
                 )}
                 {resolved.defaultSetMode === "reps" && (
-                  <div className="space-y-2 pt-0.5">
-                    <label className="text-[10px] font-medium uppercase tracking-wide text-muted">
-                      Default reps
-                    </label>
-                    <input
-                      key={`default-reps-${exercise.id}-${stored?.defaultTargetReps ?? ""}`}
-                      type="number"
-                      inputMode="numeric"
-                      min={1}
-                      max={999}
-                      defaultValue={
-                        resolved.defaultTargetReps ??
-                        parseRepTargetHint(exercise.defaultReps) ??
-                        ""
-                      }
-                      onBlur={(e) => void commitDefaultRepsFromInput(e.currentTarget)}
-                      className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
-                    />
+                  <div className="space-y-3 pt-0.5">
+                    <div className="flex flex-col gap-2.5">
+                      <label className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                        Default reps
+                      </label>
+                      <input
+                        key={`default-reps-${exercise.id}-${stored?.defaultTargetReps ?? ""}`}
+                        type="number"
+                        inputMode="numeric"
+                        min={1}
+                        max={999}
+                        defaultValue={
+                          resolved.defaultTargetReps ??
+                          parseRepTargetHint(exercise.defaultReps) ??
+                          ""
+                        }
+                        onBlur={(e) => void commitDefaultRepsFromInput(e.currentTarget)}
+                        className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
+                      />
+                    </div>
                     <p className="text-[10px] text-muted">
                       Clear the field and tap away to use the catalog line ({exercise.defaultReps}) until you set a number.
                     </p>
