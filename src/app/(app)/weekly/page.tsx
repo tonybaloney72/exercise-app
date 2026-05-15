@@ -1,13 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { dailyPlans, getPlanForDay } from "@/data/dailyPlans";
-import { CATEGORIES } from "@/data/categories";
+import { dailyPlans } from "@/data/dailyPlans";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
+import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
 
 const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -32,13 +33,18 @@ export default function WeeklyPage() {
     });
   }, []);
 
+  const weekDateKeys = useMemo(
+    () => weekDates.map((d) => formatLocalDateKey(d)),
+    [weekDates],
+  );
+
   const completedDates = useMemo(() => {
     const set = new Set<string>();
-    for (const log of workoutHistory) {
-      set.add(log.date);
+    for (const key of weekDateKeys) {
+      if (findWorkoutLogForDate(workoutHistory, key)) set.add(key);
     }
     return set;
-  }, [workoutHistory]);
+  }, [workoutHistory, weekDateKeys]);
 
   return (
     <div className="py-6 space-y-5">
@@ -56,9 +62,10 @@ export default function WeeklyPage() {
           const isPast = i < today;
 
           return (
-            <div
+            <Link
               key={i}
-              className={`flex-1 flex flex-col items-center gap-1 rounded-xl py-2.5 border transition-colors ${
+              href={`/weekly/day/${dateStr}`}
+              className={`flex-1 flex flex-col items-center gap-1 rounded-xl py-2.5 border transition-colors hover:border-accent/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
                 isToday
                   ? "border-accent bg-accent/10"
                   : isCompleted
@@ -84,7 +91,7 @@ export default function WeeklyPage() {
               {!isCompleted && isPast && (
                 <div className="h-1.5 w-1.5 rounded-full bg-border" />
               )}
-            </div>
+            </Link>
           );
         })}
       </div>
@@ -109,12 +116,15 @@ export default function WeeklyPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: plan.dayOfWeek * 0.03 }}
-                className={`rounded-xl border p-4 transition-colors ${
-                  isToday
-                    ? "border-accent/50 bg-accent/5"
-                    : "border-border bg-surface"
-                }`}
               >
+                <Link
+                  href={dateStr ? `/weekly/day/${dateStr}` : "/weekly"}
+                  className={`block rounded-xl border p-4 transition-colors hover:border-accent/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                    isToday
+                      ? "border-accent/50 bg-accent/5"
+                      : "border-border bg-surface"
+                  }`}
+                >
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
@@ -148,6 +158,7 @@ export default function WeeklyPage() {
                 <div className="mt-2 text-[10px] text-muted">
                   {plan.rounds.length} round{plan.rounds.length > 1 ? "s" : ""} · {plan.rounds.reduce((a, r) => a + r.exercises.length, 0)} exercises
                 </div>
+              </Link>
               </motion.div>
             );
           })}

@@ -12,6 +12,8 @@ interface WorkoutDayReviewProps {
   plan: DayPlan;
   log: WorkoutLog;
   onNotesChange: (notes: string) => Promise<void>;
+  /** Default: "Completed today" (use for other days, e.g. "Completed · Mon, May 12") */
+  completedBannerTitle?: string;
 }
 
 function formatEndTime(iso: string | undefined): string | null {
@@ -50,6 +52,7 @@ export default function WorkoutDayReview({
   plan,
   log,
   onNotesChange,
+  completedBannerTitle = "Completed today",
 }: WorkoutDayReviewProps) {
   const [saving, setSaving] = useState(false);
   const [saveHint, setSaveHint] = useState<"idle" | "saved" | "unchanged">("idle");
@@ -91,7 +94,7 @@ export default function WorkoutDayReview({
     >
       <div className="rounded-xl border border-border bg-surface p-4">
         <p className="text-xs font-medium uppercase tracking-wider text-green-400">
-          Completed today
+          {completedBannerTitle}
         </p>
         {endLabel && (
           <p className="mt-1 text-sm text-muted">Finished {endLabel}</p>

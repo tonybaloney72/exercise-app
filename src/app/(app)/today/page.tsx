@@ -12,6 +12,7 @@ import FloatingTimer from "@/components/common/FloatingTimer";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
+import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
 
 function TodayPageInner() {
   const searchParams = useSearchParams();
@@ -36,15 +37,7 @@ function TodayPageInner() {
 
   const todaysCompletedLog = useMemo(() => {
     const todayKey = formatLocalDateKey();
-    const byStoredDate = workoutHistory.find((w) => w.date === todayKey);
-    if (byStoredDate) return byStoredDate;
-    return (
-      workoutHistory.find(
-        (w) =>
-          w.endTime &&
-          formatLocalDateKey(new Date(w.endTime)) === todayKey,
-      ) ?? null
-    );
+    return findWorkoutLogForDate(workoutHistory, todayKey);
   }, [workoutHistory]);
 
   const completedLogForUi = devForcePreWorkout ? null : todaysCompletedLog;
