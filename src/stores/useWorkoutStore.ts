@@ -2,7 +2,14 @@
 
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
-import type { WorkoutLog, RoundLog, ExerciseLog, DayPlan, ExerciseCategory } from "@/types";
+import type {
+  WorkoutLog,
+  RoundLog,
+  ExerciseLog,
+  DayPlan,
+  ExerciseCategory,
+  ExerciseSetMode,
+} from "@/types";
 import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
 import { getWorkoutRepo } from "@/lib/repos";
 import { formatLocalDateKey } from "@/utils/localDateKey";
@@ -14,6 +21,19 @@ import {
   ensureExerciseMetrics,
   hydrateWorkoutLog,
 } from "@/utils/exerciseLogDefaults";
+import {
+  DEFAULT_TIMER_SECONDS_FALLBACK,
+  resolveExerciseSettings,
+} from "@/utils/effectiveExerciseSettings";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+
+function seedTimerTargetSecondsFromResolved(
+  resolved: ReturnType<typeof resolveExerciseSettings>,
+): number | undefined {
+  if (resolved.defaultSetMode !== "timer") return undefined;
+  const sec = resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK;
+  return Math.min(999, Math.max(5, sec));
+}
 
 interface WorkoutState {
   activeWorkout: WorkoutLog | null;
@@ -28,6 +48,21 @@ interface WorkoutState {
   toggleCoolDownStretch: (exerciseId: string) => void;
   toggleExercise: (roundNumber: number, exerciseId: string) => void;
   setActualReps: (roundNumber: number, exerciseId: string, reps: number | undefined) => void;
+  setActualDuration: (
+    roundNumber: number,
+    exerciseId: string,
+    seconds: number | undefined,
+  ) => void;
+  setTargetDuration: (
+    roundNumber: number,
+    exerciseId: string,
+    seconds: number | undefined,
+  ) => void;
+  setRoundExerciseLoggingMode: (
+    roundNumber: number,
+    exerciseId: string,
+    mode: ExerciseSetMode,
+  ) => void;
   swapRoundExercise: (
     roundNumber: number,
     slotIndex: number,
@@ -59,14 +94,31 @@ interface WorkoutState {
 }
 
 function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
+  const byId = useExerciseSettingsStore.getState().byExerciseId;
   return plan.rounds.map((round) => ({
     roundNumber: round.roundNumber,
-    exercises: round.exercises.map((ex): ExerciseLog => ({
-      exerciseId: ex.exerciseId,
-      completed: false,
-      skipped: false,
-      targetPrescription: ex.targetReps,
-    })),
+    exercises: round.exercises.map((ex): ExerciseLog => {
+      const meta = exerciseMap[ex.exerciseId];
+      const resolved = resolveExerciseSettings(
+        meta ?? {
+          id: ex.exerciseId,
+          isTimeBased: false,
+          category: ex.category,
+          name: "",
+          defaultReps: "",
+          notes: "",
+        },
+        byId[ex.exerciseId],
+      );
+      return {
+        exerciseId: ex.exerciseId,
+        completed: false,
+        skipped: false,
+        targetPrescription: ex.targetReps,
+        loggingMode: resolved.defaultSetMode,
+        targetDurationSeconds: seedTimerTargetSecondsFromResolved(resolved),
+      };
+    }),
   }));
 }
 
@@ -243,6 +295,98 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       return { activeWorkout: { ...state.activeWorkout, rounds } };
     }),
 
+  setActualDuration: (roundNumber, exerciseId, seconds) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const rounds = state.activeWorkout.rounds.map((r) => {
+        if (r.roundNumber !== roundNumber) return r;
+        return {
+          ...r,
+          exercises: r.exercises.map((ex) => {
+            if (ex.exerciseId !== exerciseId) return ex;
+            let next: ExerciseLog = {
+              ...ex,
+              actualDuration: seconds ?? undefined,
+            };
+            if (
+              next.completed &&
+              !next.skipped &&
+              next.actualReps == null &&
+              next.actualDuration == null
+            ) {
+              next = ensureExerciseMetrics(next);
+            }
+            return next;
+          }),
+        };
+      });
+      return { activeWorkout: { ...state.activeWorkout, rounds } };
+    }),
+
+  setTargetDuration: (roundNumber, exerciseId, seconds) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const rounds = state.activeWorkout.rounds.map((r) => {
+        if (r.roundNumber !== roundNumber) return r;
+        return {
+          ...r,
+          exercises: r.exercises.map((ex) => {
+            if (ex.exerciseId !== exerciseId) return ex;
+            if (seconds == null || Number.isNaN(seconds)) {
+              return { ...ex, targetDurationSeconds: undefined };
+            }
+            const clamped = Math.min(999, Math.max(5, Math.round(seconds)));
+            return { ...ex, targetDurationSeconds: clamped };
+          }),
+        };
+      });
+      return { activeWorkout: { ...state.activeWorkout, rounds } };
+    }),
+
+  setRoundExerciseLoggingMode: (roundNumber, exerciseId, mode) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const rounds = state.activeWorkout.rounds.map((r) => {
+        if (r.roundNumber !== roundNumber) return r;
+        return {
+          ...r,
+          exercises: r.exercises.map((ex) => {
+            if (ex.exerciseId !== exerciseId) return ex;
+            if (mode === "reps") {
+              return {
+                ...ex,
+                loggingMode: "reps" as const,
+                actualDuration: undefined,
+                targetDurationSeconds: undefined,
+              };
+            }
+            const id = ex.exerciseId;
+            const meta = exerciseMap[id];
+            const byId = useExerciseSettingsStore.getState().byExerciseId;
+            const resolved = resolveExerciseSettings(
+              meta ?? {
+                id,
+                isTimeBased: false,
+                category: "UP",
+                name: "",
+                defaultReps: "",
+                notes: "",
+              },
+              byId[id],
+            );
+            return {
+              ...ex,
+              loggingMode: "timer" as const,
+              actualReps: undefined,
+              actualDuration: undefined,
+              targetDurationSeconds: seedTimerTargetSecondsFromResolved(resolved),
+            };
+          }),
+        };
+      });
+      return { activeWorkout: { ...state.activeWorkout, rounds } };
+    }),
+
   swapRoundExercise: (roundNumber, slotIndex, substituteId, category) =>
     set((state) => {
       if (!state.activeWorkout) return state;
@@ -262,15 +406,33 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
           ...r,
           exercises: logs.map((ex, j) =>
             j === slotIndex
-              ? {
-                  ...ex,
-                  swappedWith: substituteId,
-                  skipped: false,
-                  actualReps: undefined,
-                  actualDuration: undefined,
-                  targetPrescription:
-                    exerciseMap[substituteId]?.defaultReps ?? ex.targetPrescription,
-                }
+              ? (() => {
+                  const meta = exerciseMap[substituteId];
+                  const byId = useExerciseSettingsStore.getState().byExerciseId;
+                  const resolved = resolveExerciseSettings(
+                    meta ?? {
+                      id: substituteId,
+                      isTimeBased: false,
+                      category,
+                      name: "",
+                      defaultReps: "",
+                      notes: "",
+                    },
+                    byId[substituteId],
+                  );
+                  return {
+                    ...ex,
+                    swappedWith: substituteId,
+                    skipped: false,
+                    actualReps: undefined,
+                    actualDuration: undefined,
+                    loggingMode: resolved.defaultSetMode,
+                    targetDurationSeconds:
+                      seedTimerTargetSecondsFromResolved(resolved),
+                    targetPrescription:
+                      exerciseMap[substituteId]?.defaultReps ?? ex.targetPrescription,
+                  };
+                })()
               : ex,
           ),
         };
@@ -289,14 +451,32 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
           ...r,
           exercises: logs.map((ex, j) =>
             j === slotIndex
-              ? {
-                  ...ex,
-                  swappedWith: undefined,
-                  actualReps: undefined,
-                  actualDuration: undefined,
-                  targetPrescription:
-                    exerciseMap[ex.exerciseId]?.defaultReps ?? ex.targetPrescription,
-                }
+              ? (() => {
+                  const meta = exerciseMap[ex.exerciseId];
+                  const byId = useExerciseSettingsStore.getState().byExerciseId;
+                  const resolved = resolveExerciseSettings(
+                    meta ?? {
+                      id: ex.exerciseId,
+                      isTimeBased: false,
+                      category: exerciseMap[ex.exerciseId]?.category ?? "UP",
+                      name: "",
+                      defaultReps: "",
+                      notes: "",
+                    },
+                    byId[ex.exerciseId],
+                  );
+                  return {
+                    ...ex,
+                    swappedWith: undefined,
+                    actualReps: undefined,
+                    actualDuration: undefined,
+                    loggingMode: resolved.defaultSetMode,
+                    targetDurationSeconds:
+                      seedTimerTargetSecondsFromResolved(resolved),
+                    targetPrescription:
+                      exerciseMap[ex.exerciseId]?.defaultReps ?? ex.targetPrescription,
+                  };
+                })()
               : ex,
           ),
         };

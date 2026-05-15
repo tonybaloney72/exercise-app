@@ -67,12 +67,26 @@ export interface ExerciseLog {
   exerciseId: string;
   completed: boolean;
   actualReps?: number;
+  /**
+   * Logged time performed (timer mode), when different from the planned countdown.
+   * Optional override — if omitted when completing, we default from `targetDurationSeconds` / prescription.
+   */
   actualDuration?: number;
+  /**
+   * Planned countdown length for this set (timer mode). From `exercise_settings` at workout start
+   * or adjusted with presets / custom in the row.
+   */
+  targetDurationSeconds?: number;
   skipped: boolean;
   swappedWith?: string;
   notes?: string;
   /** Prescription text from the plan when the workout started (e.g. "12", "30 sec"). */
   targetPrescription?: string;
+  /**
+   * How this set is logged for the active workout. When omitted (e.g. loaded from
+   * the server), UI falls back to `exercise_settings` + catalog `isTimeBased`.
+   */
+  loggingMode?: ExerciseSetMode;
 }
 
 export interface RoundLog {

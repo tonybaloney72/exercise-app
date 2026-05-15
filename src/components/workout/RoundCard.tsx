@@ -98,18 +98,14 @@ export default function RoundCard({ round, roundLog }: RoundCardProps) {
             <div className="border-t border-border px-2 py-1 space-y-0.5">
               {round.exercises.map((ex, i) => {
                 const log = roundLog.exercises[i];
+                if (!log) return null;
                 return (
                   <ExerciseRow
                     key={`${round.roundNumber}-${ex.exerciseId}`}
-                    exerciseId={ex.exerciseId}
-                    targetReps={ex.targetReps}
-                    category={ex.category}
+                    roundExercise={ex}
+                    log={log}
                     roundNumber={round.roundNumber}
                     slotIndex={i}
-                    completed={log?.completed ?? false}
-                    skipped={log?.skipped ?? false}
-                    actualReps={log?.actualReps}
-                    swappedWith={log?.swappedWith}
                   />
                 );
               })}

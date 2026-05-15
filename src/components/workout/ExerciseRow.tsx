@@ -5,32 +5,30 @@ import { motion, AnimatePresence } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { getSwapCandidates } from "@/lib/exerciseSwap";
-import type { ExerciseCategory } from "@/types";
+import type { ExerciseLog, ExerciseSetMode, RoundExercise } from "@/types";
+import {
+  DEFAULT_TIMER_SECONDS_FALLBACK,
+  resolveExerciseSettings,
+} from "@/utils/effectiveExerciseSettings";
+import ExerciseSetCountdown from "./ExerciseSetCountdown";
+import TimerTargetControls from "./TimerTargetControls";
+import { formatSecondsToMMSS } from "@/utils/time";
 import SwapExerciseModal from "./SwapExerciseModal";
 
 interface ExerciseRowProps {
-  exerciseId: string;
-  targetReps: string;
-  category: ExerciseCategory;
+  roundExercise: RoundExercise;
+  log: ExerciseLog;
   roundNumber: number;
   slotIndex: number;
-  completed: boolean;
-  skipped: boolean;
-  actualReps?: number;
-  swappedWith?: string;
 }
 
 export default function ExerciseRow({
-  exerciseId,
-  targetReps,
-  category,
+  roundExercise,
+  log,
   roundNumber,
   slotIndex,
-  completed,
-  skipped,
-  actualReps,
-  swappedWith,
 }: ExerciseRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
@@ -41,14 +39,18 @@ export default function ExerciseRow({
     skipExercise,
     unskipExercise,
     setActualReps,
+    setActualDuration,
+    setTargetDuration,
+    setRoundExerciseLoggingMode,
     swapRoundExercise,
     clearRoundExerciseSwap,
     shuffleRoundExercise,
   } = useWorkoutStore();
 
-  const plannedExercise = exerciseMap[exerciseId];
-  const effectiveId = swappedWith ?? exerciseId;
+  const plannedExercise = exerciseMap[roundExercise.exerciseId];
+  const effectiveId = log.swappedWith ?? roundExercise.exerciseId;
   const effectiveExercise = exerciseMap[effectiveId];
+  const stored = useExerciseSettingsStore((s) => s.byExerciseId[effectiveId]);
 
   const roundExercises = useMemo(() => {
     const r = activeWorkout?.rounds.find(
@@ -59,26 +61,79 @@ export default function ExerciseRow({
 
   const swapCandidates = useMemo(
     () =>
-      getSwapCandidates(category, exerciseId, roundExercises, slotIndex),
-    [category, exerciseId, roundExercises, slotIndex],
+      getSwapCandidates(
+        roundExercise.category,
+        roundExercise.exerciseId,
+        roundExercises,
+        slotIndex,
+      ),
+    [roundExercise.category, roundExercise.exerciseId, roundExercises, slotIndex],
   );
+
+  const mode: ExerciseSetMode = useMemo(() => {
+    if (!plannedExercise || !effectiveExercise) return "reps";
+    return (
+      log.loggingMode ??
+      resolveExerciseSettings(effectiveExercise, stored).defaultSetMode
+    );
+  }, [
+    log.loggingMode,
+    plannedExercise,
+    effectiveExercise,
+    stored,
+  ]);
+
+  const effectiveTargetSec = useMemo(() => {
+    if (!effectiveExercise) return DEFAULT_TIMER_SECONDS_FALLBACK;
+    const raw = log.targetDurationSeconds;
+    if (raw != null && raw > 0) return Math.min(999, raw);
+    const resolved = resolveExerciseSettings(effectiveExercise, stored);
+    if (
+      resolved.defaultSetMode === "timer" &&
+      resolved.defaultTimerSeconds != null &&
+      resolved.defaultTimerSeconds > 0
+    ) {
+      return Math.min(999, resolved.defaultTimerSeconds);
+    }
+    return DEFAULT_TIMER_SECONDS_FALLBACK;
+  }, [log.targetDurationSeconds, effectiveExercise, stored]);
+
+  const prescriptionLine = useMemo(() => {
+    if (!plannedExercise || !effectiveExercise) return "";
+    if (mode === "reps") return roundExercise.targetReps;
+    return `Timer · ${effectiveTargetSec}s`;
+  }, [
+    plannedExercise,
+    effectiveExercise,
+    mode,
+    roundExercise.targetReps,
+    effectiveTargetSec,
+  ]);
 
   if (!plannedExercise || !effectiveExercise) return null;
 
+  const plannedId = roundExercise.exerciseId;
+
+  const didLine =
+    mode === "reps" && log.actualReps != null
+      ? ` → did ${log.actualReps}`
+      : mode === "timer" && log.actualDuration != null
+        ? ` → did ${formatSecondsToMMSS(log.actualDuration) || `${log.actualDuration}s`}`
+        : "";
+
   return (
-    <div className={`transition-colors ${skipped ? "opacity-40" : ""}`}>
+    <div className={`transition-colors ${log.skipped ? "opacity-40" : ""}`}>
       <div className="flex items-center gap-2 px-1">
-        {/* Checkbox */}
         <button
           type="button"
-          onClick={() => toggleExercise(roundNumber, exerciseId)}
+          onClick={() => toggleExercise(roundNumber, plannedId)}
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
           style={{
-            borderColor: completed ? "var(--accent)" : "var(--border-color)",
-            backgroundColor: completed ? "var(--accent)" : "transparent",
+            borderColor: log.completed ? "var(--accent)" : "var(--border-color)",
+            backgroundColor: log.completed ? "var(--accent)" : "transparent",
           }}
         >
-          {completed && (
+          {log.completed && (
             <motion.svg
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -97,7 +152,6 @@ export default function ExerciseRow({
           )}
         </button>
 
-        {/* Exercise info */}
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
@@ -106,25 +160,25 @@ export default function ExerciseRow({
           <div className="flex-1 min-w-0">
             <p
               className={`text-sm font-medium transition-all ${
-                completed ? "text-muted line-through" : "text-foreground"
+                log.completed ? "text-muted line-through" : "text-foreground"
               }`}
             >
               {effectiveExercise.name}
             </p>
-            {swappedWith && (
+            {log.swappedWith && (
               <p className="text-[10px] text-muted">
                 Instead of {plannedExercise.name}
               </p>
             )}
             <p className="text-xs text-muted">
-              {targetReps}
-              {actualReps != null && ` → did ${actualReps}`}
+              {prescriptionLine}
+              {didLine}
             </p>
           </div>
           <CategoryBadge category={effectiveExercise.category} />
         </button>
 
-        {!skipped && (
+        {!log.skipped && (
           <button
             type="button"
             onClick={() => {
@@ -153,10 +207,10 @@ export default function ExerciseRow({
           </button>
         )}
 
-        {!completed && !skipped && (
+        {!log.completed && !log.skipped && (
           <button
             type="button"
-            onClick={() => skipExercise(roundNumber, exerciseId)}
+            onClick={() => skipExercise(roundNumber, plannedId)}
             className="p-1.5 text-muted hover:text-foreground transition-colors shrink-0"
             title="Skip"
           >
@@ -175,10 +229,10 @@ export default function ExerciseRow({
             </svg>
           </button>
         )}
-        {skipped && (
+        {log.skipped && (
           <button
             type="button"
-            onClick={() => unskipExercise(roundNumber, exerciseId)}
+            onClick={() => unskipExercise(roundNumber, plannedId)}
             className="p-1.5 text-muted hover:text-foreground transition-colors shrink-0"
             title="Undo skip"
           >
@@ -204,20 +258,17 @@ export default function ExerciseRow({
         open={swapOpen}
         plannedName={plannedExercise.name}
         candidates={swapCandidates}
-        hasSwap={Boolean(swappedWith)}
+        hasSwap={Boolean(log.swappedWith)}
         onClose={() => setSwapOpen(false)}
         onPick={(id) =>
-          swapRoundExercise(roundNumber, slotIndex, id, category)
+          swapRoundExercise(roundNumber, slotIndex, id, roundExercise.category)
         }
         onRandom={() =>
-          shuffleRoundExercise(roundNumber, slotIndex, category)
+          shuffleRoundExercise(roundNumber, slotIndex, roundExercise.category)
         }
-        onClearSwap={() =>
-          clearRoundExerciseSwap(roundNumber, slotIndex)
-        }
+        onClearSwap={() => clearRoundExerciseSwap(roundNumber, slotIndex)}
       />
 
-      {/* Expanded detail */}
       <AnimatePresence>
         {expanded && (
           <motion.div
@@ -227,29 +278,118 @@ export default function ExerciseRow({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-10 pb-3 space-y-2">
+            <div className="px-10 pb-3 space-y-3">
               <p className="text-xs text-muted">{effectiveExercise.notes}</p>
 
-              {!effectiveExercise.isTimeBased && (
+              <div className="space-y-1.5">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                  This set
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setRoundExerciseLoggingMode(
+                        roundNumber,
+                        plannedId,
+                        "reps",
+                      )
+                    }
+                    className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                      mode === "reps"
+                        ? "border-accent bg-accent/15 text-accent"
+                        : "border-border bg-surface-hover text-muted hover:text-foreground"
+                    }`}
+                  >
+                    Reps
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setRoundExerciseLoggingMode(
+                        roundNumber,
+                        plannedId,
+                        "timer",
+                      )
+                    }
+                    className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                      mode === "timer"
+                        ? "border-accent bg-accent/15 text-accent"
+                        : "border-border bg-surface-hover text-muted hover:text-foreground"
+                    }`}
+                  >
+                    Timer
+                  </button>
+                </div>
+              </div>
+
+              {mode === "reps" && (
                 <div className="flex items-center gap-2">
                   <label className="text-xs text-muted">Actual reps:</label>
                   <input
                     type="text"
                     inputMode="numeric"
-                    value={actualReps != null ? String(actualReps) : ""}
+                    value={log.actualReps != null ? String(log.actualReps) : ""}
                     onChange={(e) => {
                       const val = e.target.value;
                       if (val === "") {
-                        setActualReps(roundNumber, exerciseId, undefined);
+                        setActualReps(roundNumber, plannedId, undefined);
                       } else {
                         const num = parseInt(val, 10);
                         if (!isNaN(num)) {
-                          setActualReps(roundNumber, exerciseId, num);
+                          setActualReps(roundNumber, plannedId, num);
                         }
                       }
                     }}
                     className="w-16 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground outline-none focus:border-accent"
                     placeholder="—"
+                  />
+                </div>
+              )}
+
+              {mode === "timer" && (
+                <div className="space-y-3">
+                  <TimerTargetControls
+                    effectiveSeconds={effectiveTargetSec}
+                    storedTargetSeconds={log.targetDurationSeconds}
+                    onPreset={(sec) =>
+                      setTargetDuration(roundNumber, plannedId, sec)
+                    }
+                    onCommitCustom={(sec) =>
+                      setTargetDuration(roundNumber, plannedId, sec)
+                    }
+                  />
+
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-muted shrink-0">
+                      Actual duration (optional)
+                    </label>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min={5}
+                      max={999}
+                      value={log.actualDuration ?? ""}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        if (v === "") {
+                          setActualDuration(roundNumber, plannedId, undefined);
+                          return;
+                        }
+                        const n = Math.round(Number(v));
+                        if (!Number.isNaN(n)) {
+                          setActualDuration(roundNumber, plannedId, n);
+                        }
+                      }}
+                      className="w-20 rounded-md border border-border bg-background px-2 py-1 font-mono text-sm text-foreground outline-none focus:border-accent"
+                      placeholder="—"
+                    />
+                  </div>
+
+                  <ExerciseSetCountdown
+                    key={`set-cd-${effectiveTargetSec}`}
+                    durationSec={effectiveTargetSec}
+                    disabled={log.skipped}
                   />
                 </div>
               )}

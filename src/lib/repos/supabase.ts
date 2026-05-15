@@ -45,6 +45,7 @@ interface ExerciseRow {
   completed: boolean;
   actual_reps: number | null;
   actual_duration: number | null;
+  target_duration_seconds: number | null;
   skipped: boolean;
   swapped_with: string | null;
   notes: string | null;
@@ -63,6 +64,7 @@ function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
     completed: r.completed,
     actualReps: r.actual_reps ?? undefined,
     actualDuration: r.actual_duration ?? undefined,
+    targetDurationSeconds: r.target_duration_seconds ?? undefined,
     skipped: r.skipped,
     swappedWith: r.swapped_with ?? undefined,
     notes: r.notes ?? undefined,
@@ -151,6 +153,7 @@ function workoutToSavePayload(log: WorkoutLog) {
     completed: boolean;
     actual_reps: number | null;
     actual_duration: number | null;
+    target_duration_seconds: number | null;
     skipped: boolean;
     swapped_with: string | null;
     notes: string | null;
@@ -165,6 +168,7 @@ function workoutToSavePayload(log: WorkoutLog) {
       completed: ex.completed,
       actual_reps: ex.actualReps ?? null,
       actual_duration: ex.actualDuration ?? null,
+      target_duration_seconds: ex.targetDurationSeconds ?? null,
       skipped: ex.skipped,
       swapped_with: ex.swappedWith ?? null,
       notes: ex.notes ?? null,
@@ -181,6 +185,7 @@ function workoutToSavePayload(log: WorkoutLog) {
         completed: ex.completed,
         actual_reps: ex.actualReps ?? null,
         actual_duration: ex.actualDuration ?? null,
+        target_duration_seconds: ex.targetDurationSeconds ?? null,
         skipped: ex.skipped,
         swapped_with: ex.swappedWith ?? null,
         notes: ex.notes ?? null,
@@ -197,6 +202,7 @@ function workoutToSavePayload(log: WorkoutLog) {
       completed: ex.completed,
       actual_reps: ex.actualReps ?? null,
       actual_duration: ex.actualDuration ?? null,
+      target_duration_seconds: ex.targetDurationSeconds ?? null,
       skipped: ex.skipped,
       swapped_with: ex.swappedWith ?? null,
       notes: ex.notes ?? null,

@@ -9,7 +9,9 @@ import type { Exercise, ExerciseCategory } from "@/types";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
+  isPresetTimerSeconds,
   resolveExerciseSettings,
+  TIMER_DURATION_PRESET_SECONDS,
 } from "@/utils/effectiveExerciseSettings";
 
 export default function LibraryPage() {
@@ -147,6 +149,7 @@ export default function LibraryPage() {
 
 function ExerciseCard({ exercise }: { exercise: Exercise }) {
   const [open, setOpen] = useState(false);
+  const [customChipActive, setCustomChipActive] = useState(false);
   const stored = useExerciseSettingsStore((s) => s.byExerciseId[exercise.id]);
   const upsert = useExerciseSettingsStore((s) => s.upsert);
 
@@ -155,14 +158,26 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     [exercise, stored],
   );
 
+  const effectiveSec: number =
+    stored?.defaultTimerSeconds ??
+    (resolved.defaultSetMode === "timer"
+      ? (resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK)
+      : DEFAULT_TIMER_SECONDS_FALLBACK);
+
+  const showCustomInput =
+    resolved.defaultSetMode === "timer" &&
+    (customChipActive || !isPresetTimerSeconds(effectiveSec));
+
   async function setMode(mode: "reps" | "timer") {
     if (mode === "reps") {
+      setCustomChipActive(false);
       await upsert(exercise.id, {
         defaultSetMode: "reps",
         defaultTimerSeconds: null,
       });
       return;
     }
+    setCustomChipActive(false);
     await upsert(exercise.id, {
       defaultSetMode: "timer",
       defaultTimerSeconds:
@@ -174,12 +189,21 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     });
   }
 
-  async function saveTimerSeconds(input: HTMLInputElement) {
+  async function pickTimerPreset(sec: number) {
+    setCustomChipActive(false);
+    await upsert(exercise.id, {
+      defaultSetMode: "timer",
+      defaultTimerSeconds: sec,
+    });
+  }
+
+  async function commitCustomSecondsFromInput(input: HTMLInputElement) {
+    const n = Math.round(Number(input.value));
     const sec = Math.min(
       999,
       Math.max(
         5,
-        Math.round(Number(input.value)) || DEFAULT_TIMER_SECONDS_FALLBACK,
+        Number.isNaN(n) ? DEFAULT_TIMER_SECONDS_FALLBACK : n,
       ),
     );
     input.value = String(sec);
@@ -187,18 +211,29 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
       defaultSetMode: "timer",
       defaultTimerSeconds: sec,
     });
+    setCustomChipActive(false);
   }
 
   const modeBtn =
     "rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors border";
 
-  const timerFieldKey = `timer-${exercise.id}-${stored?.defaultSetMode ?? "x"}-${stored?.defaultTimerSeconds ?? "n"}`;
+  const presetChipClass =
+    "rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors";
+
+  const customChipSelected =
+    customChipActive ||
+    (resolved.defaultSetMode === "timer" && !isPresetTimerSeconds(effectiveSec));
 
   return (
     <div className="rounded-lg border border-border bg-surface overflow-hidden">
       <button
         type="button"
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          setOpen((prev) => {
+            if (prev) setCustomChipActive(false);
+            return !prev;
+          });
+        }}
         className="flex w-full items-center gap-3 min-h-[48px] px-3 py-2 text-left"
       >
         <span className="text-[10px] font-mono text-muted w-8 shrink-0">
@@ -282,19 +317,52 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                   </button>
                 </div>
                 {resolved.defaultSetMode === "timer" && (
-                  <label className="flex items-center gap-2 text-xs text-foreground">
-                    <span className="text-muted shrink-0">Seconds</span>
-                    <input
-                      key={timerFieldKey}
-                      type="number"
-                      inputMode="numeric"
-                      min={5}
-                      max={999}
-                      defaultValue={resolved.defaultTimerSeconds ?? 45}
-                      onBlur={(e) => void saveTimerSeconds(e.currentTarget)}
-                      className="w-20 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
-                    />
-                  </label>
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap gap-1.5">
+                      {TIMER_DURATION_PRESET_SECONDS.map((sec) => (
+                        <button
+                          key={sec}
+                          type="button"
+                          onClick={() => void pickTimerPreset(sec)}
+                          className={`${presetChipClass} ${
+                            !customChipSelected && effectiveSec === sec
+                              ? "border-accent bg-accent/15 text-accent"
+                              : "border-border bg-surface-hover text-muted hover:text-foreground"
+                          }`}
+                        >
+                          {sec}s
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => setCustomChipActive(true)}
+                        className={`${presetChipClass} ${
+                          customChipSelected
+                            ? "border-accent bg-accent/15 text-accent"
+                            : "border-border bg-surface-hover text-muted hover:text-foreground"
+                        }`}
+                      >
+                        Custom
+                      </button>
+                    </div>
+                    {showCustomInput && (
+                      <div className="flex flex-col gap-1.5 pt-0.5">
+                        <label className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                          Seconds
+                        </label>
+                        <input
+                          key={`custom-sec-${exercise.id}-${effectiveSec}-${customChipActive}`}
+                          type="number"
+                          inputMode="numeric"
+                          min={5}
+                          max={999}
+                          defaultValue={effectiveSec}
+                          onBlur={(e) => void commitCustomSecondsFromInput(e.currentTarget)}
+                          className="w-full max-w-[8.5rem] rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
+                        />
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

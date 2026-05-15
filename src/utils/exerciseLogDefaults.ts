@@ -1,10 +1,24 @@
-import type { ExerciseLog, WorkoutLog } from "@/types";
+import type { ExerciseLog, WorkoutLog, ExerciseSetMode } from "@/types";
 import { exerciseMap } from "@/data/exercises";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import {
+  DEFAULT_TIMER_SECONDS_FALLBACK,
+  resolveExerciseSettings,
+} from "@/utils/effectiveExerciseSettings";
 
 function extractPositiveInts(s: string): number[] {
   return (s.match(/\d+/g) ?? [])
     .map((x) => parseInt(x, 10))
     .filter((n) => !Number.isNaN(n) && n > 0);
+}
+
+function effectiveLoggingMode(log: ExerciseLog): ExerciseSetMode {
+  if (log.loggingMode) return log.loggingMode;
+  const id = effectiveExerciseId(log);
+  const meta = exerciseMap[id];
+  if (!meta) return "reps";
+  const stored = useExerciseSettingsStore.getState().byExerciseId[id];
+  return resolveExerciseSettings(meta, stored).defaultSetMode;
 }
 
 /**
@@ -56,17 +70,48 @@ export function ensureExerciseMetrics(log: ExerciseLog): ExerciseLog {
   if (log.actualReps != null || log.actualDuration != null) return log;
 
   const id = effectiveExerciseId(log);
-  const meta = exerciseMap[id];
   const prescription = resolvePrescriptionText(log);
-  const parsed = metricsFromPrescription(prescription, meta?.isTimeBased ?? false);
+  const mode = effectiveLoggingMode(log);
 
+  if (mode === "timer") {
+    if (
+      log.targetDurationSeconds != null &&
+      log.targetDurationSeconds > 0
+    ) {
+      return { ...log, actualDuration: log.targetDurationSeconds };
+    }
+    const parsed = metricsFromPrescription(prescription, true);
+    if (parsed.actualDuration != null) {
+      return { ...log, ...parsed };
+    }
+    const meta = exerciseMap[id];
+    const stored = useExerciseSettingsStore.getState().byExerciseId[id];
+    const resolved = resolveExerciseSettings(
+      meta ?? {
+        id,
+        isTimeBased: false,
+        category: "UP",
+        name: "",
+        defaultReps: "",
+        notes: "",
+      },
+      stored,
+    );
+    if (
+      resolved.defaultSetMode === "timer" &&
+      resolved.defaultTimerSeconds != null &&
+      resolved.defaultTimerSeconds > 0
+    ) {
+      return { ...log, actualDuration: resolved.defaultTimerSeconds };
+    }
+    return { ...log, actualDuration: DEFAULT_TIMER_SECONDS_FALLBACK };
+  }
+
+  const parsed = metricsFromPrescription(prescription, false);
   if (parsed.actualReps != null || parsed.actualDuration != null) {
     return { ...log, ...parsed };
   }
 
-  if (meta?.isTimeBased) {
-    return { ...log, actualDuration: 30 };
-  }
   return { ...log, actualReps: 1 };
 }
 
