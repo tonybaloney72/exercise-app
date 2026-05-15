@@ -4,6 +4,8 @@
  * so mobile browsers are more likely to allow sound when it fires later.
  */
 
+import { useSettingsStore } from "@/stores/useSettingsStore";
+
 let sharedCtx: AudioContext | null = null;
 
 function getAudioContext(): AudioContext | null {
@@ -52,6 +54,8 @@ function beep(
 }
 
 export function playTimerDoneChime(): void {
+  const { timerSoundsEnabled } = useSettingsStore.getState();
+  if (!timerSoundsEnabled) return;
   const ctx = getAudioContext();
   if (!ctx) return;
   void ctx.resume().then(() => {
@@ -62,6 +66,8 @@ export function playTimerDoneChime(): void {
 }
 
 export function vibrateTimerDone(): void {
+  const { timerVibrationEnabled } = useSettingsStore.getState();
+  if (!timerVibrationEnabled) return;
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
     navigator.vibrate([200, 100, 200]);
   }

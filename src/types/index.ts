@@ -124,6 +124,15 @@ export interface UserSettings {
   restBetweenRounds: number;
   weekStartDate?: string;
   darkMode: boolean;
+  /** Web Audio chimes when a timer completes (set/rest). */
+  timerSoundsEnabled: boolean;
+  /** `navigator.vibrate` when a timer completes. */
+  timerVibrationEnabled: boolean;
+  /**
+   * Request the Screen Wake Lock API while the app tab is visible so the display
+   * does not dim or lock. Uses more battery; browser may still deny the request.
+   */
+  keepScreenAwake: boolean;
 }
 
 export interface ProgressEntry {

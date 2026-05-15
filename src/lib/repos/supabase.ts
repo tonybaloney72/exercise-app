@@ -56,6 +56,9 @@ interface SettingsRow {
   rest_between_rounds: number;
   week_start_date: string | null;
   dark_mode: boolean;
+  timer_sounds_enabled?: boolean;
+  timer_vibration_enabled?: boolean;
+  keep_screen_awake?: boolean;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -217,6 +220,9 @@ function rowToSettings(row: SettingsRow): UserSettings {
     restBetweenRounds: row.rest_between_rounds,
     weekStartDate: row.week_start_date ?? undefined,
     darkMode: row.dark_mode,
+    timerSoundsEnabled: row.timer_sounds_enabled ?? true,
+    timerVibrationEnabled: row.timer_vibration_enabled ?? true,
+    keepScreenAwake: row.keep_screen_awake ?? false,
   };
 }
 
@@ -226,6 +232,9 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     rest_between_rounds: s.restBetweenRounds,
     week_start_date: s.weekStartDate ?? null,
     dark_mode: s.darkMode,
+    timer_sounds_enabled: s.timerSoundsEnabled,
+    timer_vibration_enabled: s.timerVibrationEnabled,
+    keep_screen_awake: s.keepScreenAwake,
   };
 }
 

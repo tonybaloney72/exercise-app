@@ -28,6 +28,9 @@ export default function SettingsPage() {
         restBetweenRounds: settings.restBetweenRounds,
         weekStartDate: settings.weekStartDate,
         darkMode: settings.darkMode,
+        timerSoundsEnabled: settings.timerSoundsEnabled,
+        timerVibrationEnabled: settings.timerVibrationEnabled,
+        keepScreenAwake: settings.keepScreenAwake,
       },
       workoutHistory,
     };
@@ -156,6 +159,46 @@ export default function SettingsPage() {
         </div>
       </motion.div>
 
+      {/* Timers & device */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.045 }}
+        className="rounded-xl border border-border bg-surface p-4 space-y-4"
+      >
+        <h2 className="text-sm font-semibold text-foreground">Timers &amp; device</h2>
+        <SettingsSwitch
+          title="Timer sounds"
+          description="Play a short chime when a set timer, rest timer, or similar countdown finishes."
+          checked={settings.timerSoundsEnabled}
+          onChange={() =>
+            settings.updateSettings({
+              timerSoundsEnabled: !settings.timerSoundsEnabled,
+            })
+          }
+        />
+        <SettingsSwitch
+          title="Timer vibration"
+          description="Brief vibration when a timer finishes (if your device supports it)."
+          checked={settings.timerVibrationEnabled}
+          onChange={() =>
+            settings.updateSettings({
+              timerVibrationEnabled: !settings.timerVibrationEnabled,
+            })
+          }
+        />
+        <SettingsSwitch
+          title="Keep screen on"
+          description="Try to prevent the screen from dimming or locking while this app is open. Uses more battery; your browser may still allow sleep in some cases."
+          checked={settings.keepScreenAwake}
+          onChange={() =>
+            settings.updateSettings({
+              keepScreenAwake: !settings.keepScreenAwake,
+            })
+          }
+        />
+      </motion.div>
+
       {/* Workout preferences */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -202,6 +245,43 @@ export default function SettingsPage() {
           {workoutHistory.length} workout{workoutHistory.length !== 1 ? "s" : ""} saved locally
         </p>
       </motion.div>
+    </div>
+  );
+}
+
+function SettingsSwitch({
+  title,
+  description,
+  checked,
+  onChange,
+}: {
+  title: string;
+  description: string;
+  checked: boolean;
+  onChange: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div>
+        <p className="text-sm font-medium text-foreground">{title}</p>
+        <p className="text-xs text-muted mt-0.5">{description}</p>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={onChange}
+        className={`relative h-8 w-14 shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+          checked ? "bg-accent" : "bg-border"
+        }`}
+      >
+        <span
+          className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+            checked ? "translate-x-6" : "translate-x-0"
+          }`}
+        />
+        <span className="sr-only">{checked ? "On" : "Off"}</span>
+      </button>
     </div>
   );
 }

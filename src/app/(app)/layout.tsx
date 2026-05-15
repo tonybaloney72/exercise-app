@@ -1,5 +1,6 @@
 import BottomNav from "@/components/layout/BottomNav";
 import AppSettingsSync from "@/components/layout/AppSettingsSync";
+import WakeLockSync from "@/components/layout/WakeLockSync";
 import AuthInitializer from "@/components/auth/AuthInitializer";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
@@ -24,6 +25,7 @@ export default async function AppLayout({
         initialGuest={isGuest}
       />
       <AppSettingsSync />
+      <WakeLockSync />
       <main className="flex-1 pb-20">
         <div className="mx-auto max-w-lg px-4">{children}</div>
       </main>

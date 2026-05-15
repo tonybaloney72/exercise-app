@@ -25,4 +25,7 @@ export interface ExerciseSettingsRepo {
 export const DEFAULT_SETTINGS: UserSettings = {
   restBetweenRounds: 90,
   darkMode: true,
+  timerSoundsEnabled: true,
+  timerVibrationEnabled: true,
+  keepScreenAwake: false,
 };

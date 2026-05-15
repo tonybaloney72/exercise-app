@@ -19,6 +19,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       restBetweenRounds: partial.restBetweenRounds ?? current.restBetweenRounds,
       weekStartDate: partial.weekStartDate ?? current.weekStartDate,
       darkMode: partial.darkMode ?? current.darkMode,
+      timerSoundsEnabled:
+        partial.timerSoundsEnabled ?? current.timerSoundsEnabled,
+      timerVibrationEnabled:
+        partial.timerVibrationEnabled ?? current.timerVibrationEnabled,
+      keepScreenAwake: partial.keepScreenAwake ?? current.keepScreenAwake,
     };
     // Optimistic UI: update store first.
     set(updated);
