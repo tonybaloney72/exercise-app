@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import RoundCard from "./RoundCard";
 import StretchSection from "./StretchSection";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 
 import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
 import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
@@ -28,6 +29,11 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 		unskipWarmUpStretch,
 		skipCoolDownStretch,
 		unskipCoolDownStretch,
+		setWarmUpStretchTargetDuration,
+		setCoolDownStretchTargetDuration,
+		setWarmUpStretchActualDuration,
+		setCoolDownStretchActualDuration,
+		syncStretchTargetsFromLibrary,
 		setWorkoutNotes,
 		completeWorkout,
 		discardWorkout,
@@ -36,6 +42,13 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 	const [isJogOpen, setIsJogOpen] = useState(false);
 	const [distanceInput, setDistanceInput] = useState("");
 	const [durationInput, setDurationInput] = useState("");
+
+	const exerciseSettingsById = useExerciseSettingsStore((s) => s.byExerciseId);
+
+	useEffect(() => {
+		if (!activeWorkout) return;
+		syncStretchTargetsFromLibrary();
+	}, [activeWorkout?.id, exerciseSettingsById, syncStretchTargetsFromLibrary]);
 
 	if (!activeWorkout) return null;
 
@@ -83,6 +96,8 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 				onToggle={toggleWarmUpStretch}
 				onSkip={skipWarmUpStretch}
 				onUnskip={unskipWarmUpStretch}
+				onSetTargetDuration={setWarmUpStretchTargetDuration}
+				onSetActualDuration={setWarmUpStretchActualDuration}
 			/>
 
 			{/* Jog section — shaped like a single-row stretch section so it sits
@@ -320,6 +335,8 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 				onToggle={toggleCoolDownStretch}
 				onSkip={skipCoolDownStretch}
 				onUnskip={unskipCoolDownStretch}
+				onSetTargetDuration={setCoolDownStretchTargetDuration}
+				onSetActualDuration={setCoolDownStretchActualDuration}
 			/>
 
 			{/* Notes */}

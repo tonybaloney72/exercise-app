@@ -9,6 +9,7 @@ import type {
   DayPlan,
   ExerciseCategory,
   ExerciseSetMode,
+  StretchEntry,
 } from "@/types";
 import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
 import { getWorkoutRepo } from "@/lib/repos";
@@ -24,6 +25,7 @@ import {
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   resolveExerciseSettings,
+  resolveStretchTimerTargetSeconds,
 } from "@/utils/effectiveExerciseSettings";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 
@@ -33,6 +35,65 @@ function seedTimerTargetSecondsFromResolved(
   if (resolved.defaultSetMode !== "timer") return undefined;
   const sec = resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK;
   return Math.min(999, Math.max(5, sec));
+}
+
+function syncStretchLogsFromLibrary(logs: ExerciseLog[]): ExerciseLog[] {
+  const byId = useExerciseSettingsStore.getState().byExerciseId;
+  return logs.map((log) => {
+    const meta = exerciseMap[log.exerciseId];
+    if (!meta) return log;
+    const stored = byId[log.exerciseId];
+    const resolved = resolveExerciseSettings(meta, stored);
+    if (resolved.defaultSetMode !== "timer") return log;
+    const nextSec = resolveStretchTimerTargetSeconds(
+      meta,
+      stored,
+      log.targetDurationSeconds,
+      log.targetPrescription,
+    );
+    if (
+      log.loggingMode === "timer" &&
+      log.targetDurationSeconds === nextSec &&
+      log.targetPrescription === `${nextSec} sec`
+    ) {
+      return log;
+    }
+    return {
+      ...log,
+      loggingMode: "timer",
+      targetDurationSeconds: nextSec,
+      targetPrescription: `${nextSec} sec`,
+    };
+  });
+}
+
+function buildStretchExerciseLog(entry: StretchEntry): ExerciseLog {
+  const meta = exerciseMap[entry.exerciseId];
+  const stored = useExerciseSettingsStore.getState().byExerciseId[entry.exerciseId];
+  const resolved = resolveExerciseSettings(
+    meta ?? {
+      id: entry.exerciseId,
+      isTimeBased: false,
+      category: "SW",
+      name: "",
+      defaultReps: entry.targetReps,
+      notes: "",
+    },
+    stored,
+  );
+  const loggingMode = resolved.defaultSetMode;
+  const targetDurationSeconds = seedTimerTargetSecondsFromResolved(resolved);
+  return {
+    exerciseId: entry.exerciseId,
+    completed: false,
+    skipped: false,
+    targetPrescription:
+      loggingMode === "timer" && targetDurationSeconds != null
+        ? `${targetDurationSeconds} sec`
+        : entry.targetReps,
+    loggingMode,
+    targetDurationSeconds,
+  };
 }
 
 interface WorkoutState {
@@ -81,6 +142,22 @@ interface WorkoutState {
   unskipWarmUpStretch: (exerciseId: string) => void;
   skipCoolDownStretch: (exerciseId: string) => void;
   unskipCoolDownStretch: (exerciseId: string) => void;
+  setWarmUpStretchTargetDuration: (
+    exerciseId: string,
+    seconds: number | undefined,
+  ) => void;
+  setCoolDownStretchTargetDuration: (
+    exerciseId: string,
+    seconds: number | undefined,
+  ) => void;
+  setWarmUpStretchActualDuration: (
+    exerciseId: string,
+    seconds: number | undefined,
+  ) => void;
+  setCoolDownStretchActualDuration: (
+    exerciseId: string,
+    seconds: number | undefined,
+  ) => void;
   setWorkoutNotes: (notes: string) => void;
   completeWorkout: () => Promise<WorkoutLog | null>;
   discardWorkout: () => void;
@@ -91,6 +168,8 @@ interface WorkoutState {
   ) => Promise<void>;
 
   loadHistory: () => Promise<void>;
+  /** Re-apply Library timer defaults to warm-up / cool-down on an active workout. */
+  syncStretchTargetsFromLibrary: () => void;
 }
 
 function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
@@ -127,18 +206,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   workoutHistory: [],
   startWorkout: (plan) => {
     const now = new Date();
-    const warmUpExercises: ExerciseLog[] = DEFAULT_WARM_UP.map((s) => ({
-      exerciseId: s.exerciseId,
-      completed: false,
-      skipped: false,
-      targetPrescription: s.targetReps,
-    }));
-    const coolDownExercises: ExerciseLog[] = DEFAULT_COOL_DOWN.map((s) => ({
-      exerciseId: s.exerciseId,
-      completed: false,
-      skipped: false,
-      targetPrescription: s.targetReps,
-    }));
+    const warmUpExercises: ExerciseLog[] = DEFAULT_WARM_UP.map(buildStretchExerciseLog);
+    const coolDownExercises: ExerciseLog[] = DEFAULT_COOL_DOWN.map(buildStretchExerciseLog);
     set({
       activeWorkout: {
         id: uuidv4(),
@@ -600,6 +669,78 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       };
     }),
 
+  setWarmUpStretchTargetDuration: (exerciseId, seconds) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const warmUpExercises = state.activeWorkout.warmUpExercises.map((ex) => {
+        if (ex.exerciseId !== exerciseId) return ex;
+        if (seconds == null || Number.isNaN(seconds)) {
+          return { ...ex, targetDurationSeconds: undefined };
+        }
+        const clamped = Math.min(999, Math.max(5, Math.round(seconds)));
+        return { ...ex, targetDurationSeconds: clamped };
+      });
+      return { activeWorkout: { ...state.activeWorkout, warmUpExercises } };
+    }),
+
+  setCoolDownStretchTargetDuration: (exerciseId, seconds) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const coolDownExercises = state.activeWorkout.coolDownExercises.map((ex) => {
+        if (ex.exerciseId !== exerciseId) return ex;
+        if (seconds == null || Number.isNaN(seconds)) {
+          return { ...ex, targetDurationSeconds: undefined };
+        }
+        const clamped = Math.min(999, Math.max(5, Math.round(seconds)));
+        return { ...ex, targetDurationSeconds: clamped };
+      });
+      return { activeWorkout: { ...state.activeWorkout, coolDownExercises } };
+    }),
+
+  setWarmUpStretchActualDuration: (exerciseId, seconds) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const warmUpExercises = state.activeWorkout.warmUpExercises.map((ex) => {
+        if (ex.exerciseId !== exerciseId) return ex;
+        let next: ExerciseLog = {
+          ...ex,
+          actualDuration: seconds ?? undefined,
+        };
+        if (
+          next.completed &&
+          !next.skipped &&
+          next.actualReps == null &&
+          next.actualDuration == null
+        ) {
+          next = ensureExerciseMetrics(next);
+        }
+        return next;
+      });
+      return { activeWorkout: { ...state.activeWorkout, warmUpExercises } };
+    }),
+
+  setCoolDownStretchActualDuration: (exerciseId, seconds) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const coolDownExercises = state.activeWorkout.coolDownExercises.map((ex) => {
+        if (ex.exerciseId !== exerciseId) return ex;
+        let next: ExerciseLog = {
+          ...ex,
+          actualDuration: seconds ?? undefined,
+        };
+        if (
+          next.completed &&
+          !next.skipped &&
+          next.actualReps == null &&
+          next.actualDuration == null
+        ) {
+          next = ensureExerciseMetrics(next);
+        }
+        return next;
+      });
+      return { activeWorkout: { ...state.activeWorkout, coolDownExercises } };
+    }),
+
   setWorkoutNotes: (notes) =>
     set((state) => {
       if (!state.activeWorkout) return state;
@@ -649,6 +790,22 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       console.error("[useWorkoutStore.updateCompletedWorkoutNotes]", err);
     }
   },
+
+  syncStretchTargetsFromLibrary: () =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: {
+          ...state.activeWorkout,
+          warmUpExercises: syncStretchLogsFromLibrary(
+            state.activeWorkout.warmUpExercises,
+          ),
+          coolDownExercises: syncStretchLogsFromLibrary(
+            state.activeWorkout.coolDownExercises,
+          ),
+        },
+      };
+    }),
 
   loadHistory: async () => {
     const mode = useAuthStore.getState().mode;

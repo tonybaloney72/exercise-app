@@ -1,9 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { exerciseMap } from "@/data/exercises";
-import type { ExerciseLog, StretchEntry } from "@/types";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
+import type { ExerciseLog, ExerciseSetMode, StretchEntry } from "@/types";
+import {
+  DEFAULT_TIMER_SECONDS_FALLBACK,
+  resolveExerciseSettings,
+  resolveStretchTimerTargetSeconds,
+} from "@/utils/effectiveExerciseSettings";
+import { formatSecondsToMMSS } from "@/utils/time";
+import TimerTargetControls from "./TimerTargetControls";
 
 interface StretchSectionProps {
   title: string;
@@ -12,6 +21,11 @@ interface StretchSectionProps {
   onToggle: (exerciseId: string) => void;
   onSkip: (exerciseId: string) => void;
   onUnskip: (exerciseId: string) => void;
+  onSetTargetDuration: (exerciseId: string, seconds: number) => void;
+  onSetActualDuration: (
+    exerciseId: string,
+    seconds: number | undefined,
+  ) => void;
 }
 
 export default function StretchSection({
@@ -21,23 +35,25 @@ export default function StretchSection({
   onToggle,
   onSkip,
   onUnskip,
+  onSetTargetDuration,
+  onSetActualDuration,
 }: StretchSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const completedCount = exerciseLogs.filter(
-    (e) => e.completed || e.skipped
+    (e) => e.completed || e.skipped,
   ).length;
   const total = exerciseLogs.length;
   const allDone = completedCount === total && total > 0;
 
   return (
-    <div className="rounded-xl border border-border bg-surface overflow-hidden">
+    <motion.div layout className="rounded-xl border border-border bg-surface overflow-hidden">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex w-full items-center justify-between px-4 py-3 text-left"
       >
-        <div className="flex items-center gap-2">
+        <motion.div className="flex items-center gap-2">
           <h3 className="text-sm font-semibold text-foreground">{title}</h3>
           {allDone && (
             <motion.span
@@ -48,19 +64,21 @@ export default function StretchSection({
               ✓
             </motion.span>
           )}
-        </div>
+        </motion.div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted">
             {completedCount}/{total}
           </span>
-          <div className="h-1.5 w-16 rounded-full bg-border overflow-hidden">
+          <motion.div className="h-1.5 w-16 rounded-full bg-border overflow-hidden">
             <motion.div
               className="h-full rounded-full bg-accent"
               initial={{ width: 0 }}
-              animate={{ width: `${total > 0 ? (completedCount / total) * 100 : 0}%` }}
+              animate={{
+                width: `${total > 0 ? (completedCount / total) * 100 : 0}%`,
+              }}
               transition={{ duration: 0.3 }}
             />
-          </div>
+          </motion.div>
           <svg
             width="16"
             height="16"
@@ -89,7 +107,7 @@ export default function StretchSection({
             <div className="border-t border-border px-2 py-1 space-y-0.5">
               {stretches.map((stretch) => {
                 const log = exerciseLogs.find(
-                  (e) => e.exerciseId === stretch.exerciseId
+                  (e) => e.exerciseId === stretch.exerciseId,
                 );
                 const exercise = exerciseMap[stretch.exerciseId];
                 if (!exercise || !log) return null;
@@ -97,15 +115,18 @@ export default function StretchSection({
                 return (
                   <StretchRow
                     key={stretch.exerciseId}
-                    name={exercise.name}
+                    exerciseId={stretch.exerciseId}
                     targetReps={stretch.targetReps}
-                    completed={log.completed}
-                    skipped={log.skipped}
-                    videoUrl={exercise.videoUrl}
-                    notes={exercise.notes}
+                    log={log}
                     onToggle={() => onToggle(stretch.exerciseId)}
                     onSkip={() => onSkip(stretch.exerciseId)}
                     onUnskip={() => onUnskip(stretch.exerciseId)}
+                    onSetTargetDuration={(sec) =>
+                      onSetTargetDuration(stretch.exerciseId, sec)
+                    }
+                    onSetActualDuration={(sec) =>
+                      onSetActualDuration(stretch.exerciseId, sec)
+                    }
                   />
                 );
               })}
@@ -113,48 +134,82 @@ export default function StretchSection({
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 
 interface StretchRowProps {
-  name: string;
+  exerciseId: string;
   targetReps: string;
-  completed: boolean;
-  skipped: boolean;
-  videoUrl?: string;
-  notes: string;
+  log: ExerciseLog;
   onToggle: () => void;
   onSkip: () => void;
   onUnskip: () => void;
+  onSetTargetDuration: (seconds: number) => void;
+  onSetActualDuration: (seconds: number | undefined) => void;
 }
 
 function StretchRow({
-  name,
+  exerciseId,
   targetReps,
-  completed,
-  skipped,
-  videoUrl,
-  notes,
+  log,
   onToggle,
   onSkip,
   onUnskip,
+  onSetTargetDuration,
+  onSetActualDuration,
 }: StretchRowProps) {
   const [expanded, setExpanded] = useState(false);
+  const exercise = exerciseMap[exerciseId];
+  const stored = useExerciseSettingsStore((s) => s.byExerciseId[exerciseId]);
+
+  const mode: ExerciseSetMode = useMemo(() => {
+    if (!exercise) return "reps";
+    return (
+      log.loggingMode ??
+      resolveExerciseSettings(exercise, stored).defaultSetMode
+    );
+  }, [log.loggingMode, exercise, stored]);
+
+  const effectiveTargetSec = useMemo(() => {
+    if (!exercise || mode !== "timer") return DEFAULT_TIMER_SECONDS_FALLBACK;
+    return resolveStretchTimerTargetSeconds(
+      exercise,
+      stored,
+      log.targetDurationSeconds,
+      targetReps,
+    );
+  }, [exercise, mode, stored, log.targetDurationSeconds, targetReps]);
+
+  const prescriptionLine = useMemo(() => {
+    if (!exercise) return targetReps;
+    if (mode === "timer") return `Timer · ${effectiveTargetSec}s`;
+    const r = resolveExerciseSettings(exercise, stored);
+    return r.defaultTargetReps != null
+      ? String(r.defaultTargetReps)
+      : targetReps;
+  }, [exercise, mode, targetReps, effectiveTargetSec, stored]);
+
+  const didLine =
+    mode === "timer" && log.actualDuration != null
+      ? ` → did ${formatSecondsToMMSS(log.actualDuration) || `${log.actualDuration}s`}`
+      : "";
+
+  if (!exercise) return null;
 
   return (
-    <div className={`transition-colors ${skipped ? "opacity-40" : ""}`}>
+    <div className={`transition-colors ${log.skipped ? "opacity-40" : ""}`}>
       <div className="flex items-center gap-2 px-1">
         <button
           type="button"
           onClick={onToggle}
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
           style={{
-            borderColor: completed ? "var(--accent)" : "var(--border-color)",
-            backgroundColor: completed ? "var(--accent)" : "transparent",
+            borderColor: log.completed ? "var(--accent)" : "var(--border-color)",
+            backgroundColor: log.completed ? "var(--accent)" : "transparent",
           }}
         >
-          {completed && (
+          {log.completed && (
             <motion.svg
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -173,44 +228,99 @@ function StretchRow({
           )}
         </button>
 
-        <button
-          type="button"
-          onClick={() => setExpanded(!expanded)}
-          className="flex flex-1 items-center gap-2 min-h-[44px] py-2 text-left"
-        >
-          <div className="flex-1 min-w-0">
+        <motion.div className="flex flex-1 items-center gap-2 min-h-[44px] min-w-0">
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className="flex min-w-0 flex-1 flex-col items-start py-2 text-left"
+          >
             <p
               className={`text-sm font-medium transition-all ${
-                completed ? "text-muted line-through" : skipped ? "text-muted line-through" : "text-foreground"
+                log.completed
+                  ? "text-muted line-through"
+                  : log.skipped
+                    ? "text-muted line-through"
+                    : "text-foreground"
               }`}
             >
-              {name}
+              {exercise.name}
             </p>
-            <p className="text-xs text-muted">{targetReps}</p>
-          </div>
-        </button>
+            <p className="text-xs text-muted">
+              {prescriptionLine}
+              {didLine}
+            </p>
+          </button>
 
-        {!completed && !skipped && (
+          {mode === "timer" && !log.completed && !log.skipped && (
+            <button
+              type="button"
+              onClick={() =>
+                useFloatingTimerStore
+                  .getState()
+                  .startSetCountdown(effectiveTargetSec)
+              }
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-lg shadow-accent/30 transition-transform active:scale-95"
+              title={`Start stretch timer (${effectiveTargetSec}s)`}
+              aria-label={`Start stretch timer, ${effectiveTargetSec} seconds`}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <circle cx="12" cy="12" r="9" />
+                <polyline points="12 7 12 12 15 14" />
+              </svg>
+              <span className="tabular-nums">{effectiveTargetSec}s</span>
+            </button>
+          )}
+        </motion.div>
+
+        {!log.completed && !log.skipped && (
           <button
             type="button"
             onClick={onSkip}
             className="p-1.5 text-muted hover:text-foreground transition-colors"
             title="Skip"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <polyline points="5 4 15 12 5 20 5 4" />
               <line x1="19" y1="5" x2="19" y2="19" />
             </svg>
           </button>
         )}
-        {skipped && (
+        {log.skipped && (
           <button
             type="button"
             onClick={onUnskip}
             className="p-1.5 text-muted hover:text-foreground transition-colors"
             title="Undo skip"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <polyline points="1 4 1 10 7 10" />
               <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
             </svg>
@@ -227,11 +337,49 @@ function StretchRow({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-10 pb-3 space-y-2">
-              <p className="text-xs text-muted">{notes}</p>
-              {videoUrl && (
+            <motion.div className="px-10 pb-3 space-y-3">
+              <p className="text-xs text-muted">{exercise.notes}</p>
+
+              {mode === "timer" && (
+                <TimerTargetControls
+                  effectiveSeconds={effectiveTargetSec}
+                  storedTargetSeconds={log.targetDurationSeconds}
+                  onPreset={onSetTargetDuration}
+                  onCommitCustom={onSetTargetDuration}
+                />
+              )}
+
+              {mode === "timer" && (
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-muted shrink-0">
+                    Actual duration (optional)
+                  </label>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={5}
+                    max={999}
+                    value={log.actualDuration ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === "") {
+                        onSetActualDuration(undefined);
+                        return;
+                      }
+                      const n = Math.round(Number(v));
+                      if (!Number.isNaN(n)) {
+                        onSetActualDuration(n);
+                      }
+                    }}
+                    className="w-20 rounded-md border border-border bg-background px-2 py-1 font-mono text-sm text-foreground outline-none focus:border-accent"
+                    placeholder="—"
+                  />
+                </div>
+              )}
+
+              {exercise.videoUrl && (
                 <a
-                  href={videoUrl}
+                  href={exercise.videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
@@ -251,7 +399,7 @@ function StretchRow({
                   Watch video
                 </a>
               )}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
