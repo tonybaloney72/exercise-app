@@ -1,4 +1,6 @@
 import { exercises } from "@/data/exercises";
+import { exerciseMatchesEquipment } from "@/data/equipment";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { Exercise, ExerciseCategory, ExerciseLog } from "@/types";
 
 /** Effective movement id for this slot (substitute if set, else prescribed). */
@@ -24,13 +26,15 @@ export function getSwapCandidates(
   });
 
   const selfEffective = effectiveExerciseId(roundExercises[slotIndex]!);
+  const available = useSettingsStore.getState().availableEquipment;
 
   return exercises.filter(
     (ex) =>
       ex.category === planCategory &&
       ex.id !== plannedExerciseId &&
       ex.id !== selfEffective &&
-      !usedElsewhere.has(ex.id),
+      !usedElsewhere.has(ex.id) &&
+      exerciseMatchesEquipment(ex.equipment, available),
   );
 }
 

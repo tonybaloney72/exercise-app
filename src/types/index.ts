@@ -13,6 +13,19 @@ export type ExerciseCategory =
 /** How the user prefers to log a given exercise by default (timer mode is roadmap-backed). */
 export type ExerciseSetMode = "reps" | "timer";
 
+/**
+ * Equipment required to perform an exercise (Hybrid Calisthenics library + future gating).
+ * `bodyweight` = no gear; `rings` = gymnastic rings (listed under bodyweight on HC).
+ */
+export type ExerciseEquipment =
+  | "bodyweight"
+  | "rings"
+  | "resistance_band"
+  | "dumbbell"
+  | "barbell"
+  | "machine"
+  | "cable";
+
 export interface Exercise {
   id: string;
   name: string;
@@ -23,6 +36,10 @@ export interface Exercise {
   videoUrl?: string;
   isTimeBased: boolean;
   secondaryCategory?: ExerciseCategory;
+  /** When set, exercise only applies if the user has this equipment (see `availableEquipment`). */
+  equipment?: ExerciseEquipment[];
+  /** Hybrid Calisthenics muscle-group tags (e.g. "Lats", "Front Deltoids"). */
+  muscleGroups?: string[];
 }
 
 /** Persisted row for `exercise_settings` (and local guest mirror). */
@@ -133,6 +150,11 @@ export interface UserSettings {
    * does not dim or lock. Uses more battery; browser may still deny the request.
    */
   keepScreenAwake: boolean;
+  /**
+   * Equipment the user can use when browsing the library and building routines.
+   * Exercises with an `equipment` tag require at least one matching entry.
+   */
+  availableEquipment: ExerciseEquipment[];
 }
 
 export interface ProgressEntry {

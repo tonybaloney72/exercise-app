@@ -15,6 +15,11 @@ import type {
   WorkoutRepo,
 } from "./types";
 import { DEFAULT_SETTINGS } from "./types";
+import {
+  ALL_EXERCISE_EQUIPMENT,
+  DEFAULT_AVAILABLE_EQUIPMENT,
+} from "@/data/equipment";
+import type { ExerciseEquipment } from "@/types";
 
 type Section = "warm_up" | "round" | "cool_down";
 
@@ -59,6 +64,7 @@ interface SettingsRow {
   timer_sounds_enabled?: boolean;
   timer_vibration_enabled?: boolean;
   keep_screen_awake?: boolean;
+  available_equipment?: unknown;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -215,6 +221,16 @@ function workoutToSavePayload(log: WorkoutLog) {
   return { workout, exerciseLogs };
 }
 
+function sanitizeAvailableEquipment(raw: unknown): ExerciseEquipment[] {
+  if (!Array.isArray(raw)) return [...DEFAULT_AVAILABLE_EQUIPMENT];
+  const allowed = new Set(ALL_EXERCISE_EQUIPMENT);
+  const out = raw.filter(
+    (x): x is ExerciseEquipment =>
+      typeof x === "string" && allowed.has(x as ExerciseEquipment),
+  );
+  return out.length > 0 ? out : [...DEFAULT_AVAILABLE_EQUIPMENT];
+}
+
 function rowToSettings(row: SettingsRow): UserSettings {
   return {
     restBetweenRounds: row.rest_between_rounds,
@@ -223,6 +239,7 @@ function rowToSettings(row: SettingsRow): UserSettings {
     timerSoundsEnabled: row.timer_sounds_enabled ?? true,
     timerVibrationEnabled: row.timer_vibration_enabled ?? true,
     keepScreenAwake: row.keep_screen_awake ?? false,
+    availableEquipment: sanitizeAvailableEquipment(row.available_equipment),
   };
 }
 
@@ -235,6 +252,7 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     timer_sounds_enabled: s.timerSoundsEnabled,
     timer_vibration_enabled: s.timerVibrationEnabled,
     keep_screen_awake: s.keepScreenAwake,
+    available_equipment: s.availableEquipment,
   };
 }
 

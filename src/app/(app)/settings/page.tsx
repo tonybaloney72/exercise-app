@@ -5,6 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import {
+  ALL_EXERCISE_EQUIPMENT,
+  EQUIPMENT_LABELS,
+} from "@/data/equipment";
+import type { ExerciseEquipment } from "@/types";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { createClient } from "@/lib/supabase/client";
@@ -31,6 +36,7 @@ export default function SettingsPage() {
         timerSoundsEnabled: settings.timerSoundsEnabled,
         timerVibrationEnabled: settings.timerVibrationEnabled,
         keepScreenAwake: settings.keepScreenAwake,
+        availableEquipment: settings.availableEquipment,
       },
       workoutHistory,
     };
@@ -197,6 +203,55 @@ export default function SettingsPage() {
             })
           }
         />
+      </motion.div>
+
+      {/* Equipment */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.048 }}
+        className="rounded-xl border border-border bg-surface p-4 space-y-3"
+      >
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">Your equipment</h2>
+          <p className="text-xs text-muted mt-1">
+            The library hides exercises that need gear you don&apos;t have. Based on the{" "}
+            <a
+              href="https://www.hybridcalisthenics.com/exercise-library"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent hover:underline"
+            >
+              Hybrid Calisthenics
+            </a>{" "}
+            exercise reference.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {ALL_EXERCISE_EQUIPMENT.map((eq) => {
+            const on = settings.availableEquipment.includes(eq);
+            return (
+              <button
+                key={eq}
+                type="button"
+                onClick={() => {
+                  const next: ExerciseEquipment[] = on
+                    ? settings.availableEquipment.filter((x) => x !== eq)
+                    : [...settings.availableEquipment, eq];
+                  if (next.length === 0) return;
+                  void settings.updateSettings({ availableEquipment: next });
+                }}
+                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                  on
+                    ? "border-accent bg-accent/15 text-accent"
+                    : "border-border bg-surface-hover text-muted hover:text-foreground"
+                }`}
+              >
+                {EQUIPMENT_LABELS[eq]}
+              </button>
+            );
+          })}
+        </div>
       </motion.div>
 
       {/* Workout preferences */}

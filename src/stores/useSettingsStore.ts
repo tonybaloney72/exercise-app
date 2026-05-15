@@ -24,6 +24,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       timerVibrationEnabled:
         partial.timerVibrationEnabled ?? current.timerVibrationEnabled,
       keepScreenAwake: partial.keepScreenAwake ?? current.keepScreenAwake,
+      availableEquipment:
+        partial.availableEquipment ?? current.availableEquipment,
     };
     // Optimistic UI: update store first.
     set(updated);

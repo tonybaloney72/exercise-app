@@ -4,9 +4,14 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { exercises } from "@/data/exercises";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
+import {
+  EQUIPMENT_LABELS,
+  exerciseMatchesEquipment,
+} from "@/data/equipment";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import type { Exercise, ExerciseCategory } from "@/types";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   isPresetTimerSeconds,
@@ -20,6 +25,8 @@ export default function LibraryPage() {
   const [activeFilter, setActiveFilter] = useState<ExerciseCategory | "all">(
     "all",
   );
+  const [showUnavailable, setShowUnavailable] = useState(false);
+  const availableEquipment = useSettingsStore((s) => s.availableEquipment);
 
   const filtered = useMemo(() => {
     return exercises.filter((ex) => {
@@ -27,14 +34,22 @@ export default function LibraryPage() {
         search === "" ||
         ex.name.toLowerCase().includes(search.toLowerCase()) ||
         ex.id.toLowerCase().includes(search.toLowerCase()) ||
-        ex.notes.toLowerCase().includes(search.toLowerCase());
+        ex.notes.toLowerCase().includes(search.toLowerCase()) ||
+        (ex.muscleGroups?.some((m) =>
+          m.toLowerCase().includes(search.toLowerCase()),
+        ) ??
+          false);
 
       const matchesCategory =
         activeFilter === "all" || ex.category === activeFilter;
 
-      return matchesSearch && matchesCategory;
+      const matchesEquipment =
+        showUnavailable ||
+        exerciseMatchesEquipment(ex.equipment, availableEquipment);
+
+      return matchesSearch && matchesCategory && matchesEquipment;
     });
-  }, [search, activeFilter]);
+  }, [search, activeFilter, showUnavailable, availableEquipment]);
 
   const grouped = useMemo(() => {
     const groups: Record<string, typeof exercises> = {};
@@ -49,8 +64,23 @@ export default function LibraryPage() {
     <div className="py-6 space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Exercise Library</h1>
-        <p className="text-sm text-muted mt-1">{exercises.length} exercises</p>
+        <p className="text-sm text-muted mt-1">
+          {filtered.length} shown · {exercises.length} total
+        </p>
       </div>
+
+      <label className="flex items-start gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={showUnavailable}
+          onChange={(e) => setShowUnavailable(e.target.checked)}
+          className="mt-0.5 h-4 w-4 rounded border-border accent-accent"
+        />
+        <span className="text-xs text-muted leading-relaxed">
+          Show exercises that need equipment you haven&apos;t selected in{" "}
+          <span className="text-foreground">Settings → Your equipment</span>
+        </span>
+      </label>
 
       {/* Search */}
       <div className="relative">
@@ -282,10 +312,17 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
         <span className="text-[10px] font-mono text-muted w-8 shrink-0">
           {exercise.id}
         </span>
-        <span className="flex-1 text-sm font-medium text-foreground">
-          {exercise.name}
+        <span className="flex-1 min-w-0">
+          <span className="block text-sm font-medium text-foreground truncate">
+            {exercise.name}
+          </span>
+          {exercise.equipment && exercise.equipment.length > 0 && (
+            <span className="block text-[10px] text-muted truncate">
+              {exercise.equipment.map((eq) => EQUIPMENT_LABELS[eq]).join(" · ")}
+            </span>
+          )}
         </span>
-        <span className="text-xs text-muted">{collapsedSummary}</span>
+        <span className="text-xs text-muted shrink-0">{collapsedSummary}</span>
         <CategoryBadge category={exercise.category} />
       </button>
 

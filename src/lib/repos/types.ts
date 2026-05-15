@@ -22,10 +22,13 @@ export interface ExerciseSettingsRepo {
   upsert(exerciseId: string, values: ExerciseSettingsValues): Promise<void>;
 }
 
+import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+
 export const DEFAULT_SETTINGS: UserSettings = {
   restBetweenRounds: 90,
   darkMode: true,
   timerSoundsEnabled: true,
   timerVibrationEnabled: true,
   keepScreenAwake: false,
+  availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
 };
