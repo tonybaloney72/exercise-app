@@ -6,13 +6,13 @@ import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import { getSwapCandidates } from "@/lib/exerciseSwap";
 import type { ExerciseLog, ExerciseSetMode, RoundExercise } from "@/types";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   resolveExerciseSettings,
 } from "@/utils/effectiveExerciseSettings";
-import ExerciseSetCountdown from "./ExerciseSetCountdown";
 import TimerTargetControls from "./TimerTargetControls";
 import { formatSecondsToMMSS } from "@/utils/time";
 import SwapExerciseModal from "./SwapExerciseModal";
@@ -158,12 +158,12 @@ export default function ExerciseRow({
           )}
         </button>
 
-        <button
-          type="button"
-          onClick={() => setExpanded(!expanded)}
-          className="flex flex-1 items-center gap-2 min-h-[44px] py-2 text-left"
-        >
-          <div className="flex-1 min-w-0">
+        <div className="flex flex-1 items-center gap-2 min-h-[44px] min-w-0">
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className="flex min-w-0 flex-1 flex-col items-start py-2 text-left"
+          >
             <p
               className={`text-sm font-medium transition-all ${
                 log.completed ? "text-muted line-through" : "text-foreground"
@@ -180,9 +180,38 @@ export default function ExerciseRow({
               {prescriptionLine}
               {didLine}
             </p>
-          </div>
+          </button>
+          {mode === "timer" && !log.completed && !log.skipped && (
+            <button
+              type="button"
+              onClick={() =>
+                useFloatingTimerStore
+                  .getState()
+                  .startSetCountdown(effectiveTargetSec)
+              }
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-lg shadow-accent/30 transition-transform active:scale-95"
+              title={`Start set timer (${effectiveTargetSec}s)`}
+              aria-label={`Start set timer, ${effectiveTargetSec} seconds`}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <circle cx="12" cy="12" r="9" />
+                <polyline points="12 7 12 12 15 14" />
+              </svg>
+              <span className="tabular-nums">{effectiveTargetSec}s</span>
+            </button>
+          )}
           <CategoryBadge category={effectiveExercise.category} />
-        </button>
+        </div>
 
         {!log.skipped && (
           <button
@@ -391,12 +420,6 @@ export default function ExerciseRow({
                       placeholder="—"
                     />
                   </div>
-
-                  <ExerciseSetCountdown
-                    key={`set-cd-${effectiveTargetSec}`}
-                    durationSec={effectiveTargetSec}
-                    disabled={log.skipped}
-                  />
                 </div>
               )}
 

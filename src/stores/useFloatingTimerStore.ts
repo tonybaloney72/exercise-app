@@ -1,15 +1,16 @@
 "use client";
 
 import { create } from "zustand";
+import { primeTimerAudio, playTimerDoneAlert } from "@/utils/timerAlert";
 
-export type TimerMode = "idle" | "rest" | "stopwatch";
+export type TimerMode = "idle" | "rest" | "stopwatch" | "setTimer";
 
 interface FloatingTimerState {
   mode: TimerMode;
   running: boolean;
   /** Countdown: seconds left. Stopwatch: seconds elapsed. */
   seconds: number;
-  /** Only meaningful for `rest`. Used to render progress. */
+  /** Only meaningful for `rest` and `setTimer`. Used to render progress. */
   restTotalSeconds: number;
   /**
    * Final elapsed time from the most recent stopwatch run. Surfaced as the
@@ -24,6 +25,8 @@ interface FloatingTimerState {
    *   launches the timer manually so they can press play themselves.
    */
   startRest: (totalSeconds: number, autoStart?: boolean) => void;
+  /** Fullscreen countdown for a timed exercise set (same UX as rest timer). */
+  startSetCountdown: (totalSeconds: number) => void;
   /**
    * @param autoStart If true (default), the stopwatch starts running
    *   immediately. Pass false to open the modal paused so the user can
@@ -56,14 +59,27 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   restTotalSeconds: 0,
   lastStopwatchSeconds: null,
 
-  startRest: (totalSeconds, autoStart = true) =>
+  startRest: (totalSeconds, autoStart = true) => {
+    primeTimerAudio();
     set({
       mode: "rest",
       running: autoStart,
       seconds: Math.max(0, Math.floor(totalSeconds)),
       restTotalSeconds: Math.max(0, Math.floor(totalSeconds)),
       lastStopwatchSeconds: null,
-    }),
+    });
+  },
+
+  startSetCountdown: (totalSeconds) => {
+    primeTimerAudio();
+    set({
+      mode: "setTimer",
+      running: true,
+      seconds: Math.max(0, Math.floor(totalSeconds)),
+      restTotalSeconds: Math.max(0, Math.floor(totalSeconds)),
+      lastStopwatchSeconds: null,
+    });
+  },
 
   startStopwatch: (autoStart = true) =>
     set((s) => ({
@@ -87,7 +103,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
 
   resetRest: () =>
     set((s) => {
-      if (s.mode !== "rest") return s;
+      if (s.mode !== "rest" && s.mode !== "setTimer") return s;
       return { seconds: s.restTotalSeconds, running: true };
     }),
 
@@ -104,7 +120,8 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       running: false,
       seconds: 0,
       restTotalSeconds: 0,
-      lastStopwatchSeconds: mode === "stopwatch" ? seconds : null,
+      lastStopwatchSeconds:
+        mode === "stopwatch" && seconds > 0 ? seconds : null,
     });
   },
 
@@ -113,11 +130,9 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   tick: () =>
     set((s) => {
       if (!s.running) return s;
-      if (s.mode === "rest") {
+      if (s.mode === "rest" || s.mode === "setTimer") {
         if (s.seconds <= 1) {
-          if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-            navigator.vibrate([200, 100, 200, 100, 200]);
-          }
+          playTimerDoneAlert();
           return { seconds: 0, running: false };
         }
         return { seconds: s.seconds - 1 };

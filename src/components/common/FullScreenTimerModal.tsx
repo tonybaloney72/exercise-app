@@ -2,7 +2,9 @@
 
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import CountdownRing from "@/components/common/CountdownRing";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
+import { primeTimerAudio } from "@/utils/timerAlert";
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -40,7 +42,10 @@ export default function FullScreenTimerModal() {
       if (e.key === " ") {
         e.preventDefault();
         if (running) pause();
-        else resume();
+        else {
+          primeTimerAudio();
+          resume();
+        }
       }
     }
     window.addEventListener("keydown", onKey);
@@ -56,17 +61,24 @@ export default function FullScreenTimerModal() {
   if (!open) return null;
 
   const isRest = mode === "rest";
+  const isSetTimer = mode === "setTimer";
+  const isCountdown = isRest || isSetTimer;
   const progress =
-    isRest && restTotalSeconds > 0 ? seconds / restTotalSeconds : 0;
-  // Circle circumference for r=45 in a 100x100 viewBox.
-  const RADIUS = 45;
-  const CIRC = 2 * Math.PI * RADIUS;
+    isCountdown && restTotalSeconds > 0 ? seconds / restTotalSeconds : 0;
+
+  const dialogLabel = isRest
+    ? "Rest timer"
+    : isSetTimer
+      ? "Set timer"
+      : "Stopwatch";
+
+  const heading = isRest ? "Rest" : isSetTimer ? "Set timer" : "Stopwatch";
 
   return (
     <motion.div
       role="dialog"
       aria-modal="true"
-      aria-label={isRest ? "Rest timer" : "Stopwatch"}
+      aria-label={dialogLabel}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -95,39 +107,17 @@ export default function FullScreenTimerModal() {
       </button>
 
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/60">
-        {isRest ? "Rest" : "Stopwatch"}
+        {heading}
       </p>
 
       <div className="relative my-6 flex h-72 w-72 items-center justify-center">
-        {isRest && (
-          <svg
-            viewBox="0 0 100 100"
-            className="absolute inset-0 -rotate-90"
-            aria-hidden
-          >
-            <circle
-              cx="50"
-              cy="50"
-              r={RADIUS}
-              fill="none"
-              stroke="rgba(255,255,255,0.12)"
-              strokeWidth="4"
-            />
-            <motion.circle
-              cx="50"
-              cy="50"
-              r={RADIUS}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="4"
-              strokeLinecap="round"
-              className="text-accent"
-              strokeDasharray={CIRC}
-              initial={{ strokeDashoffset: CIRC * (1 - progress) }}
-              animate={{ strokeDashoffset: CIRC * (1 - progress) }}
-              transition={{ duration: 0.9, ease: "linear" }}
-            />
-          </svg>
+        {isCountdown && (
+          <CountdownRing
+            className="absolute inset-0 h-full w-full"
+            progress={progress}
+            trackClassName="stroke-white/12"
+            progressClassName="text-accent"
+          />
         )}
         <span className="font-mono text-7xl font-bold tabular-nums text-white">
           {formatTime(seconds)}
@@ -148,6 +138,18 @@ export default function FullScreenTimerModal() {
         </div>
       )}
 
+      {isSetTimer && (
+        <div className="mb-6 flex justify-center">
+          <button
+            type="button"
+            onClick={resetRest}
+            className="rounded-full border border-white/20 px-5 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10"
+          >
+            Reset
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center gap-3">
         {running ? (
           <button
@@ -164,7 +166,10 @@ export default function FullScreenTimerModal() {
         ) : (
           <button
             type="button"
-            onClick={resume}
+            onClick={() => {
+              primeTimerAudio();
+              resume();
+            }}
             className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30 transition-transform active:scale-95"
             aria-label="Play"
           >
@@ -173,7 +178,7 @@ export default function FullScreenTimerModal() {
             </svg>
           </button>
         )}
-        {isRest ? (
+        {isCountdown ? (
           <button
             type="button"
             onClick={stop}
