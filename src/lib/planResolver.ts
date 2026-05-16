@@ -1,10 +1,10 @@
 import { getPlanForDay } from "@/data/dailyPlans";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
-  applyDislikesToWeek,
   collectDislikedIds,
   computePrefsFingerprint,
-  TRAINING_WEEK_SOURCE_DISLIKES_V1,
+  materializeTrainingWeek,
+  TRAINING_WEEK_SOURCE_GENERATED_V1,
   weekContainsDislikedExercise,
 } from "@/lib/planGenerator";
 import {
@@ -15,7 +15,13 @@ import {
   type TrainingWeekDays,
 } from "@/lib/repos";
 import type { AuthMode } from "@/stores/useAuthStore";
-import type { DayPlan, ExerciseEquipment } from "@/types";
+import type {
+  DayPlan,
+  ExerciseEquipment,
+  ProgramFocusPreset,
+  RoundDensity,
+  UserSettings,
+} from "@/types";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { getSundayOfWeekContaining, parseLocalDateKey } from "@/utils/weekCalendar";
 
@@ -27,31 +33,63 @@ function buildCatalogWeek(): TrainingWeekDays {
   return out;
 }
 
+function settingsSlice(settings: UserSettings): {
+  availableEquipment: ExerciseEquipment[];
+  programFocus: ProgramFocusPreset;
+  roundDensity: RoundDensity;
+} {
+  return {
+    availableEquipment:
+      settings.availableEquipment?.length > 0
+        ? settings.availableEquipment
+        : [...DEFAULT_AVAILABLE_EQUIPMENT],
+    programFocus: settings.programFocus ?? "balanced",
+    roundDensity: settings.roundDensity ?? "standard",
+  };
+}
+
 async function loadGeneratorInputs(): Promise<{
   prefs: ExercisePreferenceMap;
+  settings: UserSettings;
   availableEquipment: ExerciseEquipment[];
+  programFocus: ProgramFocusPreset;
+  roundDensity: RoundDensity;
   fingerprint: string;
 }> {
   const [prefs, settings] = await Promise.all([
     getExercisePreferenceRepo("authenticated").loadAll(),
     getSettingsRepo("authenticated").load(),
   ]);
-  const availableEquipment =
-    settings.availableEquipment?.length > 0
-      ? settings.availableEquipment
-      : [...DEFAULT_AVAILABLE_EQUIPMENT];
+  const { availableEquipment, programFocus, roundDensity } =
+    settingsSlice(settings);
   return {
     prefs,
+    settings,
     availableEquipment,
-    fingerprint: computePrefsFingerprint(prefs, availableEquipment),
+    programFocus,
+    roundDensity,
+    fingerprint: computePrefsFingerprint(
+      prefs,
+      availableEquipment,
+      programFocus,
+      roundDensity,
+    ),
   };
 }
 
 function materializeWeekFromCatalog(
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
+  programFocus: ProgramFocusPreset,
+  roundDensity: RoundDensity,
 ): TrainingWeekDays {
-  return applyDislikesToWeek(buildCatalogWeek(), prefs, availableEquipment);
+  return materializeTrainingWeek(
+    buildCatalogWeek(),
+    prefs,
+    availableEquipment,
+    programFocus,
+    roundDensity,
+  );
 }
 
 function weekNeedsMaterialization(
@@ -66,12 +104,18 @@ function weekNeedsMaterialization(
   return false;
 }
 
-/** Load persisted week or materialize from catalog + dislikes; persist when stale. */
+/** Load persisted week or materialize from catalog + profile + dislikes; persist when stale. */
 async function loadOrSeedPersistedWeek(
   weekStartSundayKey: string,
 ): Promise<TrainingWeekDays> {
   const repo = getTrainingWeekRepo("authenticated");
-  const { prefs, availableEquipment, fingerprint } = await loadGeneratorInputs();
+  const {
+    prefs,
+    availableEquipment,
+    programFocus,
+    roundDensity,
+    fingerprint,
+  } = await loadGeneratorInputs();
   const dislikedIds = collectDislikedIds(prefs);
 
   const persisted = await repo.loadWeek(weekStartSundayKey);
@@ -85,9 +129,14 @@ async function loadOrSeedPersistedWeek(
       dislikedIds,
     )
   ) {
-    const materialized = materializeWeekFromCatalog(prefs, availableEquipment);
+    const materialized = materializeWeekFromCatalog(
+      prefs,
+      availableEquipment,
+      programFocus,
+      roundDensity,
+    );
     await repo.saveSeededWeek(weekStartSundayKey, materialized, {
-      source: TRAINING_WEEK_SOURCE_DISLIKES_V1,
+      source: TRAINING_WEEK_SOURCE_GENERATED_V1,
       prefsFingerprint: fingerprint,
     });
     return materialized;
@@ -104,8 +153,8 @@ async function loadOrSeedPersistedWeek(
 }
 
 /**
- * Regenerate the Sun–Sat week containing `dateKey` from catalog + current dislikes
- * (whole-week policy — Slice 3). Call after preference changes; does not alter active workouts.
+ * Regenerate the Sun–Sat week containing `dateKey` from catalog + current generator inputs
+ * (whole-week policy). Call after preference / profile changes; does not alter active workouts.
  */
 export async function refreshTrainingWeekContaining(
   dateKey: string,
@@ -114,10 +163,21 @@ export async function refreshTrainingWeekContaining(
   if (!parsed) return;
   const sun = getSundayOfWeekContaining(parsed);
   const weekKey = formatLocalDateKey(sun);
-  const { prefs, availableEquipment, fingerprint } = await loadGeneratorInputs();
-  const materialized = materializeWeekFromCatalog(prefs, availableEquipment);
+  const {
+    prefs,
+    availableEquipment,
+    programFocus,
+    roundDensity,
+    fingerprint,
+  } = await loadGeneratorInputs();
+  const materialized = materializeWeekFromCatalog(
+    prefs,
+    availableEquipment,
+    programFocus,
+    roundDensity,
+  );
   await getTrainingWeekRepo("authenticated").saveSeededWeek(weekKey, materialized, {
-    source: TRAINING_WEEK_SOURCE_DISLIKES_V1,
+    source: TRAINING_WEEK_SOURCE_GENERATED_V1,
     prefsFingerprint: fingerprint,
   });
 }

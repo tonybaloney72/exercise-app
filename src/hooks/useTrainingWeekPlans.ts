@@ -20,6 +20,9 @@ export function useTrainingWeekPlans(weekDates: Date[]): {
   const mode = useAuthStore((s) => s.mode);
   const planRevision = useTrainingWeekRefreshStore((s) => s.planRevision);
   const equipmentKey = useSettingsStore((s) => s.availableEquipment.join(","));
+  const programProfileKey = useSettingsStore(
+    (s) => `${s.programFocus}:${s.roundDensity}`,
+  );
 
   const anchorKey = useMemo(
     () => (weekDates.length > 0 ? formatLocalDateKey(weekDates[0]) : ""),
@@ -67,7 +70,7 @@ export function useTrainingWeekPlans(weekDates: Date[]): {
     return () => {
       cancelled = true;
     };
-  }, [anchorKey, mode, planRevision, equipmentKey]);
+  }, [anchorKey, mode, planRevision, equipmentKey, programProfileKey]);
 
   return { weekByDow, loading, error };
 }

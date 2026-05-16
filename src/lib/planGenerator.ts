@@ -1,66 +1,40 @@
-import { exercises } from "@/data/exercises";
-import { exerciseMatchesEquipment } from "@/data/equipment";
+import {
+  collectDislikedIds,
+  getReplacementCandidates,
+  pickDeterministicReplacement,
+} from "@/lib/exerciseCandidates";
+import { applyProgramProfileToWeek } from "@/lib/programProfile";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
 import type {
   DayPlan,
-  Exercise,
-  ExerciseCategory,
   ExerciseEquipment,
+  ProgramFocusPreset,
+  RoundDensity,
   RoundExercise,
 } from "@/types";
 
-export const TRAINING_WEEK_SOURCE_DISLIKES_V1 = "daily_plans_catalog_dislikes_v1";
+export const TRAINING_WEEK_SOURCE_GENERATED_V1 = "generated_week_v1";
 
-/** Stable key for “regenerate week when inputs change” (Slice 3 — whole-week policy). */
+/** @deprecated Use {@link TRAINING_WEEK_SOURCE_GENERATED_V1}. */
+export const TRAINING_WEEK_SOURCE_DISLIKES_V1 = TRAINING_WEEK_SOURCE_GENERATED_V1;
+
+/** Stable key for “regenerate week when inputs change” (whole-week policy). */
 export function computePrefsFingerprint(
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
+  programFocus: ProgramFocusPreset = "balanced",
+  roundDensity: RoundDensity = "standard",
 ): string {
   const disliked = Object.entries(prefs)
     .filter(([, v]) => v === "disliked")
     .map(([id]) => id)
     .sort();
   const equip = [...availableEquipment].sort();
-  return `d:${disliked.join(",")}|e:${equip.join(",")}`;
+  return `d:${disliked.join(",")}|e:${equip.join(",")}|f:${programFocus}|r:${roundDensity}`;
 }
 
-export function collectDislikedIds(prefs: ExercisePreferenceMap): Set<string> {
-  const out = new Set<string>();
-  for (const [id, kind] of Object.entries(prefs)) {
-    if (kind === "disliked") out.add(id);
-  }
-  return out;
-}
-
-/**
- * Same-category replacements for plan materialization and swap UI.
- * Excludes prescribed id, ids already used in the round, and disliked catalog entries.
- */
-export function getReplacementCandidates(options: {
-  category: ExerciseCategory;
-  excludeExerciseIds: ReadonlySet<string>;
-  availableEquipment: ExerciseEquipment[];
-  dislikedExerciseIds?: ReadonlySet<string>;
-}): Exercise[] {
-  const { category, excludeExerciseIds, availableEquipment, dislikedExerciseIds } =
-    options;
-
-  return exercises.filter(
-    (ex) =>
-      ex.category === category &&
-      !excludeExerciseIds.has(ex.id) &&
-      !dislikedExerciseIds?.has(ex.id) &&
-      exerciseMatchesEquipment(ex.equipment, availableEquipment),
-  );
-}
-
-/** Deterministic pick for persisted plans (stable across devices once saved). */
-export function pickDeterministicReplacement(candidates: Exercise[]): Exercise | null {
-  if (candidates.length === 0) return null;
-  const sorted = [...candidates].sort((a, b) => a.id.localeCompare(b.id));
-  return sorted[0] ?? null;
-}
+export { collectDislikedIds, getReplacementCandidates, pickDeterministicReplacement } from "@/lib/exerciseCandidates";
 
 function replaceSlotIfDisliked(
   slot: RoundExercise,
@@ -140,6 +114,24 @@ export function applyDislikesToWeek(
     out[i] = applyDislikesToDayPlan(day, prefs, availableEquipment);
   }
   return out;
+}
+
+/** Catalog week → program profile → dislike replacements (Slice 5 + 3). */
+export function materializeTrainingWeek(
+  catalogWeek: TrainingWeekDays,
+  prefs: ExercisePreferenceMap,
+  availableEquipment: ExerciseEquipment[],
+  programFocus: ProgramFocusPreset,
+  roundDensity: RoundDensity,
+): TrainingWeekDays {
+  const profiled = applyProgramProfileToWeek(
+    catalogWeek,
+    programFocus,
+    roundDensity,
+    availableEquipment,
+    prefs,
+  );
+  return applyDislikesToWeek(profiled, prefs, availableEquipment);
 }
 
 export function weekContainsDislikedExercise(

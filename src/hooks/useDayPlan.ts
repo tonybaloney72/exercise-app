@@ -16,6 +16,9 @@ export function useDayPlan(dateKey: string): {
   const mode = useAuthStore((s) => s.mode);
   const planRevision = useTrainingWeekRefreshStore((s) => s.planRevision);
   const equipmentKey = useSettingsStore((s) => s.availableEquipment.join(","));
+  const programProfileKey = useSettingsStore(
+    (s) => `${s.programFocus}:${s.roundDensity}`,
+  );
   const [plan, setPlan] = useState<DayPlan | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +60,7 @@ export function useDayPlan(dateKey: string): {
     return () => {
       cancelled = true;
     };
-  }, [dateKey, mode, planRevision, equipmentKey]);
+  }, [dateKey, mode, planRevision, equipmentKey, programProfileKey]);
 
   return { plan, loading, error };
 }

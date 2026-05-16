@@ -28,6 +28,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       keepScreenAwake: partial.keepScreenAwake ?? current.keepScreenAwake,
       availableEquipment:
         partial.availableEquipment ?? current.availableEquipment,
+      programFocus: partial.programFocus ?? current.programFocus,
+      roundDensity: partial.roundDensity ?? current.roundDensity,
     };
     const equipmentChanged =
       partial.availableEquipment != null &&
@@ -35,6 +37,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         current.availableEquipment,
         partial.availableEquipment,
       );
+    const programProfileChanged =
+      (partial.programFocus != null &&
+        partial.programFocus !== current.programFocus) ||
+      (partial.roundDensity != null &&
+        partial.roundDensity !== current.roundDensity);
 
     // Optimistic UI: update store first.
     set(updated);
@@ -45,9 +52,14 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       return;
     }
 
-    if (equipmentChanged && useAuthStore.getState().mode === "authenticated") {
+    if (
+      (equipmentChanged || programProfileChanged) &&
+      useAuthStore.getState().mode === "authenticated"
+    ) {
       try {
-        await refreshCurrentTrainingWeek("equipment");
+        await refreshCurrentTrainingWeek(
+          programProfileChanged ? "program" : "equipment",
+        );
       } catch (err) {
         console.error("[useSettingsStore.refreshWeek]", err);
       }

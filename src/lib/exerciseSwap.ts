@@ -1,4 +1,4 @@
-import { collectDislikedIds, getReplacementCandidates } from "@/lib/planGenerator";
+import { collectDislikedIds, getReplacementCandidates } from "@/lib/exerciseCandidates";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { Exercise, ExerciseCategory, ExerciseLog } from "@/types";

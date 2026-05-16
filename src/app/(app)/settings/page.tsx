@@ -9,7 +9,11 @@ import {
   ALL_EXERCISE_EQUIPMENT,
   EQUIPMENT_LABELS,
 } from "@/data/equipment";
-import type { ExerciseEquipment } from "@/types";
+import type { ExerciseEquipment, ProgramFocusPreset, RoundDensity } from "@/types";
+import {
+  PROGRAM_FOCUS_LABELS,
+  ROUND_DENSITY_LABELS,
+} from "@/lib/programProfile";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { createClient } from "@/lib/supabase/client";
@@ -37,6 +41,8 @@ export default function SettingsPage() {
         timerVibrationEnabled: settings.timerVibrationEnabled,
         keepScreenAwake: settings.keepScreenAwake,
         availableEquipment: settings.availableEquipment,
+        programFocus: settings.programFocus,
+        roundDensity: settings.roundDensity,
       },
       workoutHistory,
     };
@@ -255,6 +261,67 @@ export default function SettingsPage() {
           })}
         </div>
       </motion.div>
+
+      {/* Program profile (signed-in weekly plans) */}
+      {mode === "authenticated" && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.049 }}
+          className="rounded-xl border border-border bg-surface p-4 space-y-4"
+        >
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Program focus</h2>
+            <p className="text-xs text-muted mt-1">
+              Shapes how your generated training week balances strength, core, and
+              conditioning. Updates this week&apos;s prescribed plan; finished workouts
+              stay as logged.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {(
+              Object.entries(PROGRAM_FOCUS_LABELS) as [ProgramFocusPreset, string][]
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => void settings.updateSettings({ programFocus: value })}
+                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                  settings.programFocus === value
+                    ? "border-accent bg-accent/15 text-accent"
+                    : "border-border bg-surface-hover text-muted hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div>
+            <h3 className="text-xs font-semibold text-foreground">Round density</h3>
+            <p className="text-xs text-muted mt-0.5 mb-2">
+              Exercises per round when your week is generated.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(
+                Object.entries(ROUND_DENSITY_LABELS) as [RoundDensity, string][]
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => void settings.updateSettings({ roundDensity: value })}
+                  className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                    settings.roundDensity === value
+                      ? "border-accent bg-accent/15 text-accent"
+                      : "border-border bg-surface-hover text-muted hover:text-foreground"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Workout preferences */}
       <motion.div

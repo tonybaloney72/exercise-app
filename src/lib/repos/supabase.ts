@@ -4,6 +4,8 @@ import type {
   ExerciseEquipment,
   ExerciseSettingsValues,
   ExerciseSetMode,
+  ProgramFocusPreset,
+  RoundDensity,
   RoundLog,
   UserSettings,
   WorkoutLog,
@@ -72,6 +74,8 @@ interface SettingsRow {
   timer_vibration_enabled?: boolean;
   keep_screen_awake?: boolean;
   available_equipment?: unknown;
+  program_focus?: string;
+  round_density?: string;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -228,6 +232,25 @@ function workoutToSavePayload(log: WorkoutLog) {
   return { workout, exerciseLogs };
 }
 
+function sanitizeProgramFocus(raw: unknown): ProgramFocusPreset {
+  if (
+    raw === "minimal_core" ||
+    raw === "strength" ||
+    raw === "conditioning" ||
+    raw === "balanced"
+  ) {
+    return raw;
+  }
+  return "balanced";
+}
+
+function sanitizeRoundDensity(raw: unknown): RoundDensity {
+  if (raw === "compact" || raw === "full" || raw === "standard") {
+    return raw;
+  }
+  return "standard";
+}
+
 function sanitizeAvailableEquipment(raw: unknown): ExerciseEquipment[] {
   if (!Array.isArray(raw)) return [...DEFAULT_AVAILABLE_EQUIPMENT];
   const allowed = new Set(ALL_EXERCISE_EQUIPMENT);
@@ -247,6 +270,8 @@ function rowToSettings(row: SettingsRow): UserSettings {
     timerVibrationEnabled: row.timer_vibration_enabled ?? true,
     keepScreenAwake: row.keep_screen_awake ?? false,
     availableEquipment: sanitizeAvailableEquipment(row.available_equipment),
+    programFocus: sanitizeProgramFocus(row.program_focus),
+    roundDensity: sanitizeRoundDensity(row.round_density),
   };
 }
 
@@ -260,6 +285,8 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     timer_vibration_enabled: s.timerVibrationEnabled,
     keep_screen_awake: s.keepScreenAwake,
     available_equipment: s.availableEquipment,
+    program_focus: s.programFocus,
+    round_density: s.roundDensity,
   };
 }
 

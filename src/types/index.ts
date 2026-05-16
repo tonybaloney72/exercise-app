@@ -152,6 +152,16 @@ export interface WorkoutLog {
   endTime?: string;
 }
 
+/** How generated weeks bias strength vs core vs conditioning (Slice 5). */
+export type ProgramFocusPreset =
+  | "balanced"
+  | "minimal_core"
+  | "strength"
+  | "conditioning";
+
+/** Target exercises per round when materializing from templates (Slice 5). */
+export type RoundDensity = "compact" | "standard" | "full";
+
 export interface UserSettings {
   restBetweenRounds: number;
   weekStartDate?: string;
@@ -170,6 +180,8 @@ export interface UserSettings {
    * Exercises with an `equipment` tag require at least one matching entry.
    */
   availableEquipment: ExerciseEquipment[];
+  programFocus: ProgramFocusPreset;
+  roundDensity: RoundDensity;
 }
 
 export interface ProgressEntry {
