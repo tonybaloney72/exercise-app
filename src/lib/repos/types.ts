@@ -40,9 +40,24 @@ export interface ExercisePreferenceRepo {
 /** dayOfWeek 0 (Sun) … 6 (Sat) → persisted template for that day. */
 export type TrainingWeekDays = Record<number, DayPlan>;
 
+export interface PersistedTrainingWeek {
+  days: TrainingWeekDays;
+  source: string | null;
+  prefsFingerprint: string | null;
+}
+
+export interface SaveTrainingWeekOptions {
+  source?: string;
+  prefsFingerprint?: string;
+}
+
 export interface TrainingWeekRepo {
-  loadWeek(weekStartSundayKey: string): Promise<TrainingWeekDays | null>;
-  saveSeededWeek(weekStartSundayKey: string, days: TrainingWeekDays): Promise<void>;
+  loadWeek(weekStartSundayKey: string): Promise<PersistedTrainingWeek | null>;
+  saveSeededWeek(
+    weekStartSundayKey: string,
+    days: TrainingWeekDays,
+    options?: SaveTrainingWeekOptions,
+  ): Promise<void>;
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {

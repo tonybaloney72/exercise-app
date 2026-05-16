@@ -1,5 +1,5 @@
-import { exercises } from "@/data/exercises";
-import { exerciseMatchesEquipment } from "@/data/equipment";
+import { collectDislikedIds, getReplacementCandidates } from "@/lib/planGenerator";
+import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { Exercise, ExerciseCategory, ExerciseLog } from "@/types";
 
@@ -10,8 +10,7 @@ export function effectiveExerciseId(log: ExerciseLog): string {
 
 /**
  * Same-category alternatives for swapping. Excludes the prescribed exercise for
- * this slot and any exercise already used as the effective id in another slot
- * of the same round.
+ * this slot, any exercise already used in the round, and user-disliked exercises.
  */
 export function getSwapCandidates(
   planCategory: ExerciseCategory,
@@ -26,16 +25,23 @@ export function getSwapCandidates(
   });
 
   const selfEffective = effectiveExerciseId(roundExercises[slotIndex]!);
-  const available = useSettingsStore.getState().availableEquipment;
+  const exclude = new Set<string>([
+    plannedExerciseId,
+    selfEffective,
+    ...usedElsewhere,
+  ]);
 
-  return exercises.filter(
-    (ex) =>
-      ex.category === planCategory &&
-      ex.id !== plannedExerciseId &&
-      ex.id !== selfEffective &&
-      !usedElsewhere.has(ex.id) &&
-      exerciseMatchesEquipment(ex.equipment, available),
+  const available = useSettingsStore.getState().availableEquipment;
+  const disliked = collectDislikedIds(
+    useExercisePreferencesStore.getState().byExerciseId,
   );
+
+  return getReplacementCandidates({
+    category: planCategory,
+    excludeExerciseIds: exclude,
+    availableEquipment: available,
+    dislikedExerciseIds: disliked,
+  });
 }
 
 export function pickRandomSwap(candidates: Exercise[]): Exercise | null {

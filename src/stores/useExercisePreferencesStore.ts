@@ -4,10 +4,14 @@ import { create } from "zustand";
 import type { ExercisePreferenceKind } from "@/types";
 import { getExercisePreferenceRepo } from "@/lib/repos";
 import type { ExercisePreferenceMap } from "@/lib/repos";
+import { refreshTrainingWeekContaining } from "@/lib/planResolver";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { formatLocalDateKey } from "@/utils/localDateKey";
 
 type ExercisePreferencesState = {
   byExerciseId: ExercisePreferenceMap;
+  /** Bumped after persisted week regenerates (Slice 3) so plan hooks refetch. */
+  planRevision: number;
   load: () => Promise<void>;
   setPreference: (
     exerciseId: string,
@@ -18,6 +22,7 @@ type ExercisePreferencesState = {
 export const useExercisePreferencesStore = create<ExercisePreferencesState>(
   (set, get) => ({
     byExerciseId: {},
+    planRevision: 0,
 
     load: async () => {
       const mode = useAuthStore.getState().mode;
@@ -55,6 +60,14 @@ export const useExercisePreferencesStore = create<ExercisePreferencesState>(
       } catch (err) {
         console.error("[useExercisePreferencesStore.setPreference]", err);
         set({ byExerciseId: prev });
+        return;
+      }
+
+      try {
+        await refreshTrainingWeekContaining(formatLocalDateKey());
+        set((s) => ({ planRevision: s.planRevision + 1 }));
+      } catch (err) {
+        console.error("[useExercisePreferencesStore.refreshWeek]", err);
       }
     },
   }),

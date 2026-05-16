@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { resolveDayPlanForAuth } from "@/lib/planResolver";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { DayPlan } from "@/types";
 import { parseLocalDateKey } from "@/utils/weekCalendar";
 
@@ -12,6 +14,8 @@ export function useDayPlan(dateKey: string): {
   error: string | null;
 } {
   const mode = useAuthStore((s) => s.mode);
+  const planRevision = useExercisePreferencesStore((s) => s.planRevision);
+  const equipmentKey = useSettingsStore((s) => s.availableEquipment.join(","));
   const [plan, setPlan] = useState<DayPlan | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +57,7 @@ export function useDayPlan(dateKey: string): {
     return () => {
       cancelled = true;
     };
-  }, [dateKey, mode]);
+  }, [dateKey, mode, planRevision, equipmentKey]);
 
   return { plan, loading, error };
 }

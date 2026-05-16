@@ -31,6 +31,8 @@ export type {
   WorkoutRepo,
   TrainingWeekDays,
   TrainingWeekRepo,
+  PersistedTrainingWeek,
+  SaveTrainingWeekOptions,
 } from "./types";
 export { DEFAULT_SETTINGS } from "./types";
 export { clearLocalData } from "./local";

@@ -19,6 +19,8 @@ import type {
   WorkoutRepo,
   TrainingWeekDays,
   TrainingWeekRepo,
+  PersistedTrainingWeek,
+  SaveTrainingWeekOptions,
 } from "./types";
 import { DEFAULT_SETTINGS } from "./types";
 import {
@@ -529,7 +531,7 @@ function daysJsonToWeek(raw: unknown): TrainingWeekDays | null {
 }
 
 export const supabaseTrainingWeekRepo: TrainingWeekRepo = {
-  async loadWeek(weekStartSundayKey: string): Promise<TrainingWeekDays | null> {
+  async loadWeek(weekStartSundayKey: string): Promise<PersistedTrainingWeek | null> {
     const supabase = createClient();
     const {
       data: { user },
@@ -538,7 +540,7 @@ export const supabaseTrainingWeekRepo: TrainingWeekRepo = {
 
     const { data, error } = await supabase
       .from("user_training_weeks")
-      .select("days")
+      .select("days, source, prefs_fingerprint")
       .eq("user_id", user.id)
       .eq("week_start_sunday", weekStartSundayKey)
       .maybeSingle();
@@ -548,12 +550,24 @@ export const supabaseTrainingWeekRepo: TrainingWeekRepo = {
       return null;
     }
     if (!data) return null;
-    return daysJsonToWeek((data as { days: unknown }).days);
+    const row = data as {
+      days: unknown;
+      source: string | null;
+      prefs_fingerprint: string | null;
+    };
+    const days = daysJsonToWeek(row.days);
+    if (!days) return null;
+    return {
+      days,
+      source: row.source ?? null,
+      prefsFingerprint: row.prefs_fingerprint ?? null,
+    };
   },
 
   async saveSeededWeek(
     weekStartSundayKey: string,
     days: TrainingWeekDays,
+    options?: SaveTrainingWeekOptions,
   ): Promise<void> {
     const supabase = createClient();
     const {
@@ -565,7 +579,8 @@ export const supabaseTrainingWeekRepo: TrainingWeekRepo = {
       user_id: user.id,
       week_start_sunday: weekStartSundayKey,
       days,
-      source: "daily_plans_catalog",
+      source: options?.source ?? "daily_plans_catalog",
+      prefs_fingerprint: options?.prefsFingerprint ?? null,
       updated_at: new Date().toISOString(),
     };
 

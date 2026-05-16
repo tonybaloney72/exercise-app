@@ -125,7 +125,7 @@ export const localTrainingWeekRepo: TrainingWeekRepo = {
   async loadWeek() {
     return null;
   },
-  async saveSeededWeek() {
+  async saveSeededWeek(_weekKey, _days, _options) {
     /* no-op */
   },
 };

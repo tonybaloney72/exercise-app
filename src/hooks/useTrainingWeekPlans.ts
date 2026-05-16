@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { resolveTrainingWeekForAuth } from "@/lib/planResolver";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /**
@@ -16,6 +18,8 @@ export function useTrainingWeekPlans(weekDates: Date[]): {
   error: string | null;
 } {
   const mode = useAuthStore((s) => s.mode);
+  const planRevision = useExercisePreferencesStore((s) => s.planRevision);
+  const equipmentKey = useSettingsStore((s) => s.availableEquipment.join(","));
 
   const anchorKey = useMemo(
     () => (weekDates.length > 0 ? formatLocalDateKey(weekDates[0]) : ""),
@@ -63,7 +67,7 @@ export function useTrainingWeekPlans(weekDates: Date[]): {
     return () => {
       cancelled = true;
     };
-  }, [anchorKey, mode]);
+  }, [anchorKey, mode, planRevision, equipmentKey]);
 
   return { weekByDow, loading, error };
 }
