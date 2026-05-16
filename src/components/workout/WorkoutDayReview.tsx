@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
-import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
 import { formatSecondsToMMSS } from "@/utils/time";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
 
@@ -103,19 +102,16 @@ export default function WorkoutDayReview({
       </div>
 
       <ReviewSection title="Warm-Up Stretches">
-        {DEFAULT_WARM_UP.map((stretch) => {
-          const entry = log.warmUpExercises.find(
-            (e) => e.exerciseId === stretch.exerciseId,
-          );
-          const ex = exerciseMap[stretch.exerciseId];
+        {log.warmUpExercises.map((entry) => {
+          const ex = exerciseMap[entry.exerciseId];
           if (!ex) return null;
           return (
             <ReviewRow
-              key={stretch.exerciseId}
+              key={entry.exerciseId}
               name={ex.name}
-              target={stretch.targetReps}
+              target={entry.targetPrescription ?? ex.defaultReps}
               detail={exerciseStatusLine(entry)}
-              exerciseNotes={entry?.notes}
+              exerciseNotes={entry.notes}
             />
           );
         })}
@@ -183,19 +179,16 @@ export default function WorkoutDayReview({
       })}
 
       <ReviewSection title="Cool-Down Stretches">
-        {DEFAULT_COOL_DOWN.map((stretch) => {
-          const entry = log.coolDownExercises.find(
-            (e) => e.exerciseId === stretch.exerciseId,
-          );
-          const ex = exerciseMap[stretch.exerciseId];
+        {log.coolDownExercises.map((entry) => {
+          const ex = exerciseMap[entry.exerciseId];
           if (!ex) return null;
           return (
             <ReviewRow
-              key={stretch.exerciseId}
+              key={entry.exerciseId}
               name={ex.name}
-              target={stretch.targetReps}
+              target={entry.targetPrescription ?? ex.defaultReps}
               detail={exerciseStatusLine(entry)}
-              exerciseNotes={entry?.notes}
+              exerciseNotes={entry.notes}
             />
           );
         })}

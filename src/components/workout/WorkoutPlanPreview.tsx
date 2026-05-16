@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { CATEGORIES } from "@/data/categories";
-import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
+import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import type { DayPlan } from "@/types";
 
 interface WorkoutPlanPreviewProps {
@@ -28,6 +28,7 @@ export default function WorkoutPlanPreview({
   showTargetMuscleList,
 }: WorkoutPlanPreviewProps) {
   const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
+  const { warmUp, coolDown } = resolveStretchesForDay(plan);
 
   return (
     <motion.div
@@ -71,8 +72,8 @@ export default function WorkoutPlanPreview({
         </div>
       )}
 
-      <PreviewSection title="Warm-Up Stretches (default)">
-        {DEFAULT_WARM_UP.map((stretch) => {
+      <PreviewSection title="Warm-Up Stretches">
+        {warmUp.map((stretch) => {
           const ex = exerciseMap[stretch.exerciseId];
           if (!ex) return null;
           return (
@@ -115,8 +116,8 @@ export default function WorkoutPlanPreview({
         </PreviewSection>
       ))}
 
-      <PreviewSection title="Cool-Down Stretches (default)">
-        {DEFAULT_COOL_DOWN.map((stretch) => {
+      <PreviewSection title="Cool-Down Stretches">
+        {coolDown.map((stretch) => {
           const ex = exerciseMap[stretch.exerciseId];
           if (!ex) return null;
           return (

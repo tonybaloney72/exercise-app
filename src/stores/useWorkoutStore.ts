@@ -11,7 +11,7 @@ import type {
   ExerciseSetMode,
   StretchEntry,
 } from "@/types";
-import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
+import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import { getWorkoutRepo } from "@/lib/repos";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -206,8 +206,9 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   workoutHistory: [],
   startWorkout: (plan) => {
     const now = new Date();
-    const warmUpExercises: ExerciseLog[] = DEFAULT_WARM_UP.map(buildStretchExerciseLog);
-    const coolDownExercises: ExerciseLog[] = DEFAULT_COOL_DOWN.map(buildStretchExerciseLog);
+    const { warmUp, coolDown } = resolveStretchesForDay(plan);
+    const warmUpExercises: ExerciseLog[] = warmUp.map(buildStretchExerciseLog);
+    const coolDownExercises: ExerciseLog[] = coolDown.map(buildStretchExerciseLog);
     set({
       activeWorkout: {
         id: uuidv4(),

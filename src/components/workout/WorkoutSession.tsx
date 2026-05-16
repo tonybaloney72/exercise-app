@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import RoundCard from "./RoundCard";
 import StretchSection from "./StretchSection";
@@ -8,7 +8,7 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 
 import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
-import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
+import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import type { DayPlan } from "@/types";
 
 interface WorkoutSessionProps {
@@ -44,6 +44,10 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 	const [durationInput, setDurationInput] = useState("");
 
 	const exerciseSettingsById = useExerciseSettingsStore((s) => s.byExerciseId);
+	const { warmUp, coolDown } = useMemo(
+		() => resolveStretchesForDay(plan),
+		[plan],
+	);
 
 	useEffect(() => {
 		if (!activeWorkout) return;
@@ -91,7 +95,7 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 			{/* Warm-up */}
 			<StretchSection
 				title="Warm-Up Stretches"
-				stretches={DEFAULT_WARM_UP}
+				stretches={warmUp}
 				exerciseLogs={activeWorkout.warmUpExercises}
 				onToggle={toggleWarmUpStretch}
 				onSkip={skipWarmUpStretch}
@@ -330,7 +334,7 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 			{/* Cool-down */}
 			<StretchSection
 				title="Cool-Down Stretches"
-				stretches={DEFAULT_COOL_DOWN}
+				stretches={coolDown}
 				exerciseLogs={activeWorkout.coolDownExercises}
 				onToggle={toggleCoolDownStretch}
 				onSkip={skipCoolDownStretch}

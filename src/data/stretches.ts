@@ -1,9 +1,9 @@
-import type { StretchEntry } from "@/types";
+import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
+import type { DayPlan, StretchEntry } from "@/types";
 
 /**
- * Default warm-up and cool-down stretch routines.
- * These always include lower body stretches since jog days are the norm.
- * Once customization is built, users will be able to pick their own sets.
+ * Legacy full-body defaults (reference / fallback). Prefer {@link resolveStretchesForDay}
+ * for day-specific warm-up and cool-down from `DayPlan` focus metadata.
  */
 
 export const DEFAULT_WARM_UP: StretchEntry[] = [
@@ -31,3 +31,23 @@ export const DEFAULT_COOL_DOWN: StretchEntry[] = [
   { exerciseId: "SC-12", targetReps: "20–30 sec each leg" }, // Standing Calf Stretch
   { exerciseId: "SC-14", targetReps: "20–30 sec" },          // Standing Forward Fold
 ];
+
+/** Balanced template week Monday — used when no `DayPlan` is available. */
+const FALLBACK_PLAN_FOR_STRETCHES: DayPlan = {
+  dayOfWeek: 1,
+  name: "Monday",
+  theme: "Upper Push + Core",
+  hasJog: true,
+  strengthFocus: ["UP"],
+  coreGroups: ["CF", "CL"],
+  rounds: [{ roundNumber: 1, exercises: [] }],
+};
+
+export function defaultStretchesForUnknownDay(): {
+  warmUp: StretchEntry[];
+  coolDown: StretchEntry[];
+} {
+  return resolveStretchesForDay(FALLBACK_PLAN_FOR_STRETCHES);
+}
+
+export { resolveStretchesForDay } from "@/lib/dayStretchPlan";
