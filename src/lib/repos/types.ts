@@ -2,7 +2,9 @@ import type {
   UserSettings,
   WorkoutLog,
   ExerciseSettingsValues,
+  ExercisePreferenceKind,
 } from "@/types";
+import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 
 export type ExerciseSettingsMap = Record<string, ExerciseSettingsValues>;
 
@@ -22,7 +24,17 @@ export interface ExerciseSettingsRepo {
   upsert(exerciseId: string, values: ExerciseSettingsValues): Promise<void>;
 }
 
-import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+/** exerciseId → preference. Omitted keys are neutral. */
+export type ExercisePreferenceMap = Record<string, ExercisePreferenceKind>;
+
+export interface ExercisePreferenceRepo {
+  loadAll(): Promise<ExercisePreferenceMap>;
+  /** `null` removes the row (neutral). */
+  setPreference(
+    exerciseId: string,
+    preference: ExercisePreferenceKind | null,
+  ): Promise<void>;
+}
 
 export const DEFAULT_SETTINGS: UserSettings = {
   restBetweenRounds: 90,

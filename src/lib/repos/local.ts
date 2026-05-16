@@ -6,6 +6,8 @@ import type {
 import type {
   ExerciseSettingsMap,
   ExerciseSettingsRepo,
+  ExercisePreferenceRepo,
+  ExercisePreferenceMap,
   SettingsRepo,
   WorkoutRepo,
 } from "./types";
@@ -104,6 +106,16 @@ export const localExerciseSettingsRepo: ExerciseSettingsRepo = {
       LOCAL_EXERCISE_SETTINGS_KEY,
       JSON.stringify(next),
     );
+  },
+};
+
+export const localExercisePreferenceRepo: ExercisePreferenceRepo = {
+  async loadAll(): Promise<ExercisePreferenceMap> {
+    return {};
+  },
+
+  async setPreference(): Promise<void> {
+    /* Guest / local: preferences are server-only for signed-in users (Slice 1). */
   },
 };
 

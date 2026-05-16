@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { exercises } from "@/data/exercises";
@@ -11,7 +12,9 @@ import {
 import CategoryBadge from "@/components/common/CategoryBadge";
 import type { Exercise, ExerciseCategory } from "@/types";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   isPresetTimerSeconds,
@@ -27,6 +30,7 @@ export default function LibraryPage() {
   );
   const [showUnavailable, setShowUnavailable] = useState(false);
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const authMode = useAuthStore((s) => s.mode);
 
   const filtered = useMemo(() => {
     return exercises.filter((ex) => {
@@ -68,6 +72,22 @@ export default function LibraryPage() {
           {filtered.length} shown · {exercises.length} total
         </p>
       </div>
+
+      {authMode === "guest" && (
+        <div className="rounded-xl border border-border bg-surface px-4 py-3 text-sm text-muted leading-relaxed">
+          <span className="text-foreground font-medium">Guest mode: </span>
+          Prescribed workouts use the default plan.{" "}
+          <Link href="/signup" className="font-medium text-accent hover:underline">
+            Create an account
+          </Link>{" "}
+          or{" "}
+          <Link href="/login" className="font-medium text-accent hover:underline">
+            log in
+          </Link>{" "}
+          to favorite exercises and exclude moves from personalized weekly plans when that
+          feature rolls out.
+        </div>
+      )}
 
       <label className="flex items-start gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 cursor-pointer">
         <input
@@ -174,6 +194,90 @@ export default function LibraryPage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function ExercisePreferenceToggles({ exerciseId }: { exerciseId: string }) {
+  const mode = useAuthStore((s) => s.mode);
+  const preference = useExercisePreferencesStore((s) => s.byExerciseId[exerciseId]);
+  const setPreference = useExercisePreferencesStore((s) => s.setPreference);
+
+  if (mode !== "authenticated") return null;
+
+  const isFavorite = preference === "favorite";
+  const isDisliked = preference === "disliked";
+
+  return (
+    <div
+      className="flex shrink-0 items-center gap-0.5"
+      role="group"
+      aria-label="Exercise preferences"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        type="button"
+        onClick={() =>
+          void setPreference(exerciseId, isFavorite ? null : "favorite")
+        }
+        className={`rounded-lg p-1.5 transition-colors ${
+          isFavorite
+            ? "text-amber-400 bg-amber-400/15"
+            : "text-muted hover:bg-surface-hover hover:text-foreground"
+        }`}
+        title={isFavorite ? "Remove from favorites" : "Favorite"}
+        aria-pressed={isFavorite}
+        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill={isFavorite ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          void setPreference(exerciseId, isDisliked ? null : "disliked")
+        }
+        className={`rounded-lg p-1.5 transition-colors ${
+          isDisliked
+            ? "text-rose-400 bg-rose-400/15"
+            : "text-muted hover:bg-surface-hover hover:text-foreground"
+        }`}
+        title={
+          isDisliked
+            ? "Remove exclusion (neutral)"
+            : "Exclude from generated plans"
+        }
+        aria-pressed={isDisliked}
+        aria-label={
+          isDisliked
+            ? "Allow in personalized plans"
+            : "Exclude from personalized plans"
+        }
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          aria-hidden
+        >
+          <circle cx="12" cy="12" r="9" />
+          <line x1="5" y1="5" x2="19" y2="19" />
+        </svg>
+      </button>
     </div>
   );
 }
@@ -299,32 +403,35 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
 
   return (
     <div className="rounded-lg border border-border bg-surface overflow-hidden">
-      <button
-        type="button"
-        onClick={() => {
-          setOpen((prev) => {
-            if (prev) setCustomChipActive(false);
-            return !prev;
-          });
-        }}
-        className="flex w-full items-center gap-3 min-h-[48px] px-3 py-2 text-left"
-      >
-        <span className="text-[10px] font-mono text-muted w-8 shrink-0">
-          {exercise.id}
-        </span>
-        <span className="flex-1 min-w-0">
-          <span className="block text-sm font-medium text-foreground truncate">
-            {exercise.name}
+      <div className="flex w-full min-h-[48px] items-center gap-2 px-3 py-2">
+        <button
+          type="button"
+          onClick={() => {
+            setOpen((prev) => {
+              if (prev) setCustomChipActive(false);
+              return !prev;
+            });
+          }}
+          className="flex min-w-0 flex-1 items-center gap-3 text-left"
+        >
+          <span className="text-[10px] font-mono text-muted w-8 shrink-0">
+            {exercise.id}
           </span>
-          {exercise.equipment && exercise.equipment.length > 0 && (
-            <span className="block text-[10px] text-muted truncate">
-              {exercise.equipment.map((eq) => EQUIPMENT_LABELS[eq]).join(" · ")}
+          <span className="flex-1 min-w-0">
+            <span className="block text-sm font-medium text-foreground truncate">
+              {exercise.name}
             </span>
-          )}
-        </span>
+            {exercise.equipment && exercise.equipment.length > 0 && (
+              <span className="block text-[10px] text-muted truncate">
+                {exercise.equipment.map((eq) => EQUIPMENT_LABELS[eq]).join(" · ")}
+              </span>
+            )}
+          </span>
+        </button>
+        <ExercisePreferenceToggles exerciseId={exercise.id} />
         <span className="text-xs text-muted shrink-0">{collapsedSummary}</span>
         <CategoryBadge category={exercise.category} />
-      </button>
+      </div>
 
       <AnimatePresence>
         {open && (

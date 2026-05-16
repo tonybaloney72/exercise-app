@@ -11,6 +11,8 @@ import { DEFAULT_TIMER_SECONDS_FALLBACK } from "@/utils/effectiveExerciseSetting
 import type {
   ExerciseSettingsMap,
   ExerciseSettingsRepo,
+  ExercisePreferenceMap,
+  ExercisePreferenceRepo,
   SettingsRepo,
   WorkoutRepo,
 } from "./types";
@@ -421,6 +423,77 @@ export const supabaseExerciseSettingsRepo: ExerciseSettingsRepo = {
 
     if (error) {
       console.error("[supabaseExerciseSettingsRepo.upsert]", error);
+      throw error;
+    }
+  },
+};
+
+interface ExercisePreferenceRow {
+  exercise_id: string;
+  preference: "favorite" | "disliked";
+}
+
+export const supabaseExercisePreferenceRepo: ExercisePreferenceRepo = {
+  async loadAll(): Promise<ExercisePreferenceMap> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return {};
+
+    const { data, error } = await supabase
+      .from("user_exercise_preferences")
+      .select("exercise_id, preference")
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error("[supabaseExercisePreferenceRepo.loadAll]", error);
+      return {};
+    }
+
+    const map: ExercisePreferenceMap = {};
+    for (const row of (data ?? []) as ExercisePreferenceRow[]) {
+      if (row.preference === "favorite" || row.preference === "disliked") {
+        map[row.exercise_id] = row.preference;
+      }
+    }
+    return map;
+  },
+
+  async setPreference(
+    exerciseId: string,
+    preference: "favorite" | "disliked" | null,
+  ): Promise<void> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    if (preference == null) {
+      const { error } = await supabase
+        .from("user_exercise_preferences")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("exercise_id", exerciseId);
+      if (error) {
+        console.error("[supabaseExercisePreferenceRepo.setPreference delete]", error);
+        throw error;
+      }
+      return;
+    }
+
+    const { error } = await supabase.from("user_exercise_preferences").upsert(
+      {
+        user_id: user.id,
+        exercise_id: exerciseId,
+        preference,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,exercise_id" },
+    );
+    if (error) {
+      console.error("[supabaseExercisePreferenceRepo.setPreference upsert]", error);
       throw error;
     }
   },

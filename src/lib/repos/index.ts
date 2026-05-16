@@ -1,22 +1,27 @@
 import type { AuthMode } from "@/stores/useAuthStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
+  localExercisePreferenceRepo,
   localExerciseSettingsRepo,
   localSettingsRepo,
   localWorkoutRepo,
 } from "./local";
 import {
+  supabaseExercisePreferenceRepo,
   supabaseExerciseSettingsRepo,
   supabaseSettingsRepo,
   supabaseWorkoutRepo,
 } from "./supabase";
 import type {
+  ExercisePreferenceRepo,
   ExerciseSettingsRepo,
   SettingsRepo,
   WorkoutRepo,
 } from "./types";
 
 export type {
+  ExercisePreferenceMap,
+  ExercisePreferenceRepo,
   ExerciseSettingsMap,
   ExerciseSettingsRepo,
   SettingsRepo,
@@ -40,4 +45,11 @@ export function getExerciseSettingsRepo(mode?: AuthMode): ExerciseSettingsRepo {
   return m === "authenticated"
     ? supabaseExerciseSettingsRepo
     : localExerciseSettingsRepo;
+}
+
+export function getExercisePreferenceRepo(mode?: AuthMode): ExercisePreferenceRepo {
+  const m = mode ?? useAuthStore.getState().mode;
+  return m === "authenticated"
+    ? supabaseExercisePreferenceRepo
+    : localExercisePreferenceRepo;
 }

@@ -14,6 +14,12 @@ export type ExerciseCategory =
 export type ExerciseSetMode = "reps" | "timer";
 
 /**
+ * Library preference for future personalized weekly plans. No stored row = neutral.
+ * A given exercise has at most one row (favorite xor disliked).
+ */
+export type ExercisePreferenceKind = "favorite" | "disliked";
+
+/**
  * Equipment required to perform an exercise (Hybrid Calisthenics library + future gating).
  * `bodyweight` = no gear; `rings` = gymnastic rings (listed under bodyweight on HC).
  */
