@@ -84,8 +84,7 @@ export default function LibraryPage() {
           <Link href="/login" className="font-medium text-accent hover:underline">
             log in
           </Link>{" "}
-          to favorite exercises and exclude moves from personalized weekly plans when that
-          feature rolls out.
+          to save favorites and dislikes and get a personalized weekly plan.
         </div>
       )}
 

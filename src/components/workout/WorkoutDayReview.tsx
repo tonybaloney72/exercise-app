@@ -152,7 +152,8 @@ export default function WorkoutDayReview({
             {round.exercises.map((ex, j) => {
               const entry = roundLog?.exercises[j];
               const planned = exerciseMap[ex.exerciseId];
-              const effectiveId = entry?.swappedWith ?? ex.exerciseId;
+              const effectiveId =
+                entry?.swappedWith ?? entry?.exerciseId ?? ex.exerciseId;
               const effective = exerciseMap[effectiveId];
               if (!planned || !effective) return null;
               return (

@@ -1,4 +1,5 @@
 import BottomNav from "@/components/layout/BottomNav";
+import TrainingWeekRefreshBanner from "@/components/layout/TrainingWeekRefreshBanner";
 import AppSettingsSync from "@/components/layout/AppSettingsSync";
 import WakeLockSync from "@/components/layout/WakeLockSync";
 import AuthInitializer from "@/components/auth/AuthInitializer";
@@ -27,7 +28,10 @@ export default async function AppLayout({
       <AppSettingsSync />
       <WakeLockSync />
       <main className="flex-1 pb-20">
-        <div className="mx-auto max-w-lg px-4">{children}</div>
+        <div className="mx-auto max-w-lg px-4">
+          <TrainingWeekRefreshBanner />
+          {children}
+        </div>
       </main>
       <BottomNav />
     </>

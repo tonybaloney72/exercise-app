@@ -3,7 +3,9 @@
 import { create } from "zustand";
 import type { UserSettings } from "@/types";
 import { DEFAULT_SETTINGS, getSettingsRepo } from "@/lib/repos";
+import { refreshCurrentTrainingWeek } from "@/lib/trainingWeekRefresh";
 import { useAuthStore } from "@/stores/useAuthStore";
+import type { ExerciseEquipment } from "@/types";
 
 interface SettingsState extends UserSettings {
   updateSettings: (partial: Partial<UserSettings>) => Promise<void>;
@@ -27,12 +29,28 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       availableEquipment:
         partial.availableEquipment ?? current.availableEquipment,
     };
+    const equipmentChanged =
+      partial.availableEquipment != null &&
+      !equipmentListsEqual(
+        current.availableEquipment,
+        partial.availableEquipment,
+      );
+
     // Optimistic UI: update store first.
     set(updated);
     try {
       await getSettingsRepo().save(updated);
     } catch (err) {
       console.error("[useSettingsStore.updateSettings]", err);
+      return;
+    }
+
+    if (equipmentChanged && useAuthStore.getState().mode === "authenticated") {
+      try {
+        await refreshCurrentTrainingWeek("equipment");
+      } catch (err) {
+        console.error("[useSettingsStore.refreshWeek]", err);
+      }
     }
   },
 
@@ -43,3 +61,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     set(loaded);
   },
 }));
+
+function equipmentListsEqual(
+  a: ExerciseEquipment[],
+  b: ExerciseEquipment[],
+): boolean {
+  if (a.length !== b.length) return false;
+  const sa = [...a].sort().join(",");
+  const sb = [...b].sort().join(",");
+  return sa === sb;
+}

@@ -215,7 +215,9 @@ export default function SettingsPage() {
         <div>
           <h2 className="text-sm font-semibold text-foreground">Your equipment</h2>
           <p className="text-xs text-muted mt-1">
-            The library hides exercises that need gear you don&apos;t have. Based on the{" "}
+            The library hides exercises that need gear you don&apos;t have. When signed in,
+            changing equipment updates this week&apos;s prescribed plan (finished workouts
+            stay as logged). Based on the{" "}
             <a
               href="https://www.hybridcalisthenics.com/exercise-library"
               target="_blank"
