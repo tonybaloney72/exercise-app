@@ -20,21 +20,107 @@ export const ROUND_DENSITY_TARGETS: Record<RoundDensity, number> = {
 };
 
 const CORE_CATEGORIES = new Set<ExerciseCategory>(["CF", "CL", "CR", "CS"]);
-const STRENGTH_CATEGORIES = new Set<ExerciseCategory>(["UP", "UPL", "LB"]);
+const UPPER_CATEGORIES = new Set<ExerciseCategory>(["UP", "UPL"]);
+const LOWER_BODY_CATEGORIES = new Set<ExerciseCategory>(["LB"]);
 const CONDITIONING_CATEGORIES = new Set<ExerciseCategory>(["CP"]);
 
-export const PROGRAM_FOCUS_LABELS: Record<ProgramFocusPreset, string> = {
-  balanced: "Balanced",
-  minimal_core: "Minimal core",
-  strength: "Strength emphasis",
-  conditioning: "Conditioning emphasis",
+/** Display order in Settings. */
+export const PROGRAM_FOCUS_PRESETS_ORDER: ProgramFocusPreset[] = [
+  "balanced",
+  "minimal_core",
+  "core_emphasis",
+  "strength",
+  "lower_body",
+  "upper_body",
+  "conditioning",
+];
+
+export type ProgramFocusOption = {
+  value: ProgramFocusPreset;
+  label: string;
+  description: string;
 };
 
-export const ROUND_DENSITY_LABELS: Record<RoundDensity, string> = {
-  compact: "Compact (~3 / round)",
-  standard: "Standard (~5 / round)",
-  full: "Full (~7 / round)",
+export const PROGRAM_FOCUS_OPTIONS: ProgramFocusOption[] = [
+  {
+    value: "balanced",
+    label: "Balanced",
+    description:
+      "Keeps each day's template mix from the catalog. Use round density below to change how many exercises appear per round.",
+  },
+  {
+    value: "minimal_core",
+    label: "Minimal core",
+    description:
+      "When rounds are shortened, core work (flexion, lower abs, rotation, stability) is dropped first. More room for push, pull, legs, and cardio.",
+  },
+  {
+    value: "core_emphasis",
+    label: "Core emphasis",
+    description:
+      "Keeps core slots longest when trimming and prefers core categories when adding exercises. Good for core strength and stability goals.",
+  },
+  {
+    value: "strength",
+    label: "Strength emphasis",
+    description:
+      "Prioritizes push, pull, and leg strength together when slots are tight or when filling a round.",
+  },
+  {
+    value: "lower_body",
+    label: "Lower body emphasis",
+    description:
+      "Prioritizes leg and glute work (LB) over upper push/pull when adjusting slots. Pair with dislikes to avoid high-impact moves if needed.",
+  },
+  {
+    value: "upper_body",
+    label: "Upper body emphasis",
+    description:
+      "Prioritizes push and pull (UP, UPL) over legs when adjusting slots. Useful when you want less lower-body volume in a round.",
+  },
+  {
+    value: "conditioning",
+    label: "Conditioning emphasis",
+    description:
+      "Prioritizes cardio and plyo (CP) when trimming or filling rounds. Helpful for more metabolic work within each day's template.",
+  },
+];
+
+/** @deprecated Use {@link PROGRAM_FOCUS_OPTIONS}. */
+export const PROGRAM_FOCUS_LABELS: Record<ProgramFocusPreset, string> =
+  Object.fromEntries(
+    PROGRAM_FOCUS_OPTIONS.map((o) => [o.value, o.label]),
+  ) as Record<ProgramFocusPreset, string>;
+
+export type RoundDensityOption = {
+  value: RoundDensity;
+  label: string;
+  description: string;
 };
+
+export const ROUND_DENSITY_OPTIONS: RoundDensityOption[] = [
+  {
+    value: "compact",
+    label: "Compact",
+    description: "About 3 exercises per round — shorter sessions.",
+  },
+  {
+    value: "standard",
+    label: "Standard",
+    description: "About 5 exercises per round — matches the default templates.",
+  },
+  {
+    value: "full",
+    label: "Full",
+    description: "About 7 exercises per round — longer rounds when equipment allows.",
+  },
+];
+
+/** @deprecated Use {@link ROUND_DENSITY_OPTIONS}. */
+export const ROUND_DENSITY_LABELS: Record<RoundDensity, string> =
+  Object.fromEntries(
+    ROUND_DENSITY_OPTIONS.map((o) => [o.value, o.label]),
+  ) as Record<RoundDensity, string>;
 
 function slotKeepPriority(
   category: ExerciseCategory,
@@ -43,17 +129,38 @@ function slotKeepPriority(
   switch (focus) {
     case "minimal_core":
       if (CORE_CATEGORIES.has(category)) return 0;
-      if (STRENGTH_CATEGORIES.has(category)) return 3;
+      if (UPPER_CATEGORIES.has(category) || LOWER_BODY_CATEGORIES.has(category))
+        return 3;
       if (CONDITIONING_CATEGORIES.has(category)) return 2;
       return 1;
+    case "core_emphasis":
+      if (CORE_CATEGORIES.has(category)) return 3;
+      if (UPPER_CATEGORIES.has(category) || LOWER_BODY_CATEGORIES.has(category))
+        return 2;
+      if (CONDITIONING_CATEGORIES.has(category)) return 1;
+      return 1;
     case "strength":
-      if (STRENGTH_CATEGORIES.has(category)) return 3;
+      if (UPPER_CATEGORIES.has(category) || LOWER_BODY_CATEGORIES.has(category))
+        return 3;
       if (CORE_CATEGORIES.has(category)) return 2;
+      if (CONDITIONING_CATEGORIES.has(category)) return 1;
+      return 1;
+    case "lower_body":
+      if (LOWER_BODY_CATEGORIES.has(category)) return 3;
+      if (CORE_CATEGORIES.has(category)) return 2;
+      if (UPPER_CATEGORIES.has(category)) return 1;
+      if (CONDITIONING_CATEGORIES.has(category)) return 1;
+      return 1;
+    case "upper_body":
+      if (UPPER_CATEGORIES.has(category)) return 3;
+      if (CORE_CATEGORIES.has(category)) return 2;
+      if (LOWER_BODY_CATEGORIES.has(category)) return 1;
       if (CONDITIONING_CATEGORIES.has(category)) return 1;
       return 1;
     case "conditioning":
       if (CONDITIONING_CATEGORIES.has(category)) return 3;
-      if (STRENGTH_CATEGORIES.has(category)) return 2;
+      if (UPPER_CATEGORIES.has(category) || LOWER_BODY_CATEGORIES.has(category))
+        return 2;
       if (CORE_CATEGORIES.has(category)) return 1;
       return 1;
     case "balanced":

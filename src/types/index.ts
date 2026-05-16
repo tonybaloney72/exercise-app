@@ -152,11 +152,14 @@ export interface WorkoutLog {
   endTime?: string;
 }
 
-/** How generated weeks bias strength vs core vs conditioning (Slice 5). */
+/** How generated weeks bias strength vs core vs conditioning (Slice 5+). */
 export type ProgramFocusPreset =
   | "balanced"
   | "minimal_core"
+  | "core_emphasis"
   | "strength"
+  | "lower_body"
+  | "upper_body"
   | "conditioning";
 
 /** Target exercises per round when materializing from templates (Slice 5). */

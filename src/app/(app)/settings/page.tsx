@@ -9,10 +9,10 @@ import {
   ALL_EXERCISE_EQUIPMENT,
   EQUIPMENT_LABELS,
 } from "@/data/equipment";
-import type { ExerciseEquipment, ProgramFocusPreset, RoundDensity } from "@/types";
+import type { ExerciseEquipment } from "@/types";
 import {
-  PROGRAM_FOCUS_LABELS,
-  ROUND_DENSITY_LABELS,
+  PROGRAM_FOCUS_OPTIONS,
+  ROUND_DENSITY_OPTIONS,
 } from "@/lib/programProfile";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -278,46 +278,74 @@ export default function SettingsPage() {
               stay as logged.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {(
-              Object.entries(PROGRAM_FOCUS_LABELS) as [ProgramFocusPreset, string][]
-            ).map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => void settings.updateSettings({ programFocus: value })}
-                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                  settings.programFocus === value
-                    ? "border-accent bg-accent/15 text-accent"
-                    : "border-border bg-surface-hover text-muted hover:text-foreground"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="space-y-2" role="radiogroup" aria-label="Program focus">
+            {PROGRAM_FOCUS_OPTIONS.map((option) => {
+              const selected = settings.programFocus === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() =>
+                    void settings.updateSettings({ programFocus: option.value })
+                  }
+                  className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                    selected
+                      ? "border-accent bg-accent/10"
+                      : "border-border bg-surface-hover hover:border-accent/30"
+                  }`}
+                >
+                  <span
+                    className={`block text-sm font-medium ${
+                      selected ? "text-accent" : "text-foreground"
+                    }`}
+                  >
+                    {option.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-snug text-muted">
+                    {option.description}
+                  </span>
+                </button>
+              );
+            })}
           </div>
           <div>
             <h3 className="text-xs font-semibold text-foreground">Round density</h3>
             <p className="text-xs text-muted mt-0.5 mb-2">
-              Exercises per round when your week is generated.
+              How many exercises per round when your week is generated.
             </p>
-            <div className="flex flex-wrap gap-2">
-              {(
-                Object.entries(ROUND_DENSITY_LABELS) as [RoundDensity, string][]
-              ).map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => void settings.updateSettings({ roundDensity: value })}
-                  className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                    settings.roundDensity === value
-                      ? "border-accent bg-accent/15 text-accent"
-                      : "border-border bg-surface-hover text-muted hover:text-foreground"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
+            <div className="space-y-2" role="radiogroup" aria-label="Round density">
+              {ROUND_DENSITY_OPTIONS.map((option) => {
+                const selected = settings.roundDensity === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() =>
+                      void settings.updateSettings({ roundDensity: option.value })
+                    }
+                    className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                      selected
+                        ? "border-accent bg-accent/10"
+                        : "border-border bg-surface-hover hover:border-accent/30"
+                    }`}
+                  >
+                    <span
+                      className={`block text-sm font-medium ${
+                        selected ? "text-accent" : "text-foreground"
+                      }`}
+                    >
+                      {option.label}
+                    </span>
+                    <span className="mt-0.5 block text-xs leading-snug text-muted">
+                      {option.description}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </motion.div>

@@ -234,10 +234,13 @@ function workoutToSavePayload(log: WorkoutLog) {
 
 function sanitizeProgramFocus(raw: unknown): ProgramFocusPreset {
   if (
+    raw === "balanced" ||
     raw === "minimal_core" ||
+    raw === "core_emphasis" ||
     raw === "strength" ||
-    raw === "conditioning" ||
-    raw === "balanced"
+    raw === "lower_body" ||
+    raw === "upper_body" ||
+    raw === "conditioning"
   ) {
     return raw;
   }
