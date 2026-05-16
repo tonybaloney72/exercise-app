@@ -1,4 +1,5 @@
 import { getReplacementCandidates } from "@/lib/exerciseCandidates";
+import { buildRoundExcludeIds } from "@/lib/roundExclude";
 import type { Exercise, ExerciseCategory, ExerciseEquipment } from "@/types";
 
 /** Same-category alternatives for customizing a prescribed slot (plan editor). */
@@ -19,13 +20,11 @@ export function getPlanSlotCandidates(options: {
     dislikedExerciseIds,
   } = options;
 
-  const usedElsewhere = new Set<string>();
-  roundExerciseIds.forEach((id, j) => {
-    if (j === slotIndex) return;
-    usedElsewhere.add(id);
+  const exclude = buildRoundExcludeIds({
+    plannedExerciseId,
+    slotIndex,
+    slotExerciseIds: roundExerciseIds,
   });
-
-  const exclude = new Set<string>([plannedExerciseId, ...usedElsewhere]);
 
   return getReplacementCandidates({
     category,

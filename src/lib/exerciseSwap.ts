@@ -1,4 +1,5 @@
 import { collectDislikedIds, getReplacementCandidates } from "@/lib/exerciseCandidates";
+import { buildRoundExcludeIds } from "@/lib/roundExclude";
 import type {
   Exercise,
   ExerciseCategory,
@@ -27,18 +28,12 @@ export function getSwapCandidates(
   slotIndex: number,
   prefs: SwapCandidatePrefs,
 ): Exercise[] {
-  const usedElsewhere = new Set<string>();
-  roundExercises.forEach((e, j) => {
-    if (j === slotIndex) return;
-    usedElsewhere.add(effectiveExerciseId(e));
-  });
-
-  const selfEffective = effectiveExerciseId(roundExercises[slotIndex]!);
-  const exclude = new Set<string>([
+  const exclude = buildRoundExcludeIds({
     plannedExerciseId,
-    selfEffective,
-    ...usedElsewhere,
-  ]);
+    slotIndex,
+    slotExerciseIds: roundExercises.map((e) => effectiveExerciseId(e)),
+    excludeEffectiveAtSlot: true,
+  });
 
   return getReplacementCandidates({
     category: planCategory,

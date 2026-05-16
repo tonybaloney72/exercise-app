@@ -10,6 +10,7 @@ import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
 import { exerciseMap } from "@/data/exercises";
 import { rebuildDerivedStretches } from "@/lib/dayStretchPlan";
 import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
+import { buildStretchUsedExerciseIds } from "@/lib/stretchDefaults";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getPlanAddCandidates, getPlanSlotCandidates } from "@/lib/planSlotCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
@@ -65,11 +66,7 @@ export default function WorkoutPlanEditor({
 
     if (pickTarget.kind === "stretch") {
       const list = draft[pickTarget.section] ?? [];
-      const used = new Set(list.map((e) => e.exerciseId));
-      if (pickTarget.index != null) {
-        const current = list[pickTarget.index];
-        if (current) used.delete(current.exerciseId);
-      }
+      const used = buildStretchUsedExerciseIds(list, pickTarget.index);
       return getStretchCandidates({
         category: stretchCategory(pickTarget.section),
         usedExerciseIds: used,

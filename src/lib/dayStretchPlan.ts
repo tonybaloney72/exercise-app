@@ -1,15 +1,22 @@
-import { filterStretchesByDislikes } from "@/lib/stretchDefaults";
+import {
+  dedupeStretchEntries,
+  normalizeStretchList,
+} from "@/lib/stretchDefaults";
+import {
+  UNIVERSAL_COOL_DOWN_POOL,
+  UNIVERSAL_WARM_UP_POOL,
+} from "@/lib/stretchCatalogDefaults";
 import type { StretchResolveContext } from "@/lib/stretchResolveContext";
 import type { DayPlan, ExerciseCategory, StretchEntry } from "@/types";
 
+export {
+  CATALOG_DEFAULT_COOL_DOWN,
+  CATALOG_DEFAULT_WARM_UP,
+} from "@/lib/stretchCatalogDefaults";
+
 /** Stretch pools keyed by training focus (see `DayPlan.strengthFocus` / `coreGroups`). */
 const WARM_UP_POOLS = {
-  universal: [
-    { exerciseId: "SW-1", targetReps: "10 each direction" },
-    { exerciseId: "SW-2", targetReps: "10 each direction" },
-    { exerciseId: "SW-7", targetReps: "10" },
-    { exerciseId: "SW-5", targetReps: "10 each side" },
-  ] satisfies StretchEntry[],
+  universal: UNIVERSAL_WARM_UP_POOL,
   upper: [
     { exerciseId: "SW-3", targetReps: "10 each side" },
     { exerciseId: "SW-31", targetReps: "10" },
@@ -31,10 +38,7 @@ const WARM_UP_POOLS = {
 } as const;
 
 const COOL_DOWN_POOLS = {
-  universal: [
-    { exerciseId: "SC-2", targetReps: "30 sec" },
-    { exerciseId: "SC-3", targetReps: "20 sec each side" },
-  ] satisfies StretchEntry[],
+  universal: UNIVERSAL_COOL_DOWN_POOL,
   upper: [
     { exerciseId: "SC-5", targetReps: "20–30 sec" },
     { exerciseId: "SC-6", targetReps: "20 sec each arm" },
@@ -53,29 +57,9 @@ const COOL_DOWN_POOLS = {
   ] satisfies StretchEntry[],
 } as const;
 
-/** Catalog default warm-up stretches (used when settings have no custom list). */
-export const CATALOG_DEFAULT_WARM_UP: StretchEntry[] = WARM_UP_POOLS.universal.map((e) => ({
-  ...e,
-}));
-/** Catalog default cool-down stretches (used when settings have no custom list). */
-export const CATALOG_DEFAULT_COOL_DOWN: StretchEntry[] = COOL_DOWN_POOLS.universal.map((e) => ({
-  ...e,
-}));
-
 const UPPER_STRENGTH: ExerciseCategory[] = ["UP", "UPL"];
 const LOWER_STRENGTH: ExerciseCategory[] = ["LB"];
 const CORE_GROUPS: ExerciseCategory[] = ["CF", "CL", "CR", "CS"];
-
-function dedupeStretches(entries: StretchEntry[]): StretchEntry[] {
-  const seen = new Set<string>();
-  const out: StretchEntry[] = [];
-  for (const entry of entries) {
-    if (seen.has(entry.exerciseId)) continue;
-    seen.add(entry.exerciseId);
-    out.push(entry);
-  }
-  return out;
-}
 
 function appendPool(
   parts: StretchEntry[],
@@ -138,7 +122,7 @@ function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[]
   if (dayWantsConditioning(plan, cats)) appendPool(warmParts, WARM_UP_POOLS.conditioning, ctx);
 
   const warmCap = recovery ? 6 : 10;
-  return dedupeStretches(warmParts).slice(0, warmCap);
+  return dedupeStretchEntries(warmParts).slice(0, warmCap);
 }
 
 function deriveCoolDown(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[] {
@@ -151,7 +135,7 @@ function deriveCoolDown(plan: DayPlan, ctx: StretchResolveContext): StretchEntry
   if (dayWantsCore(plan, cats)) appendPool(coolParts, COOL_DOWN_POOLS.core, ctx);
 
   const coolCap = recovery ? 6 : 10;
-  return dedupeStretches(coolParts).slice(0, coolCap);
+  return dedupeStretchEntries(coolParts).slice(0, coolCap);
 }
 
 /** Recompute warm-up / cool-down from settings defaults + day focus. */
@@ -183,11 +167,11 @@ export function resolveStretchesForDay(
   return {
     warmUp:
       plan.warmUp != null
-        ? filterStretchesByDislikes(dedupeStretches(plan.warmUp), dislikedExerciseIds)
+        ? normalizeStretchList(plan.warmUp, dislikedExerciseIds)
         : deriveWarmUp(plan, ctx),
     coolDown:
       plan.coolDown != null
-        ? filterStretchesByDislikes(dedupeStretches(plan.coolDown), dislikedExerciseIds)
+        ? normalizeStretchList(plan.coolDown, dislikedExerciseIds)
         : deriveCoolDown(plan, ctx),
   };
 }

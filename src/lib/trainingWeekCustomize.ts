@@ -7,7 +7,7 @@ import { refreshTrainingWeekContaining, resolveTrainingWeekForAuth } from "@/lib
 import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import {
   cloneStretchEntries,
-  filterStretchesByDislikes,
+  normalizeStretchList,
   stretchListsEqual,
 } from "@/lib/stretchDefaults";
 import {
@@ -43,12 +43,12 @@ export function prepareDayPlanForEditor(plan: DayPlan): DayPlan {
 
   const warmUp =
     plan.warmUp != null
-      ? filterStretchesByDislikes(cloneStretchEntries(plan.warmUp), ctx.dislikedExerciseIds)
+      ? normalizeStretchList(plan.warmUp, ctx.dislikedExerciseIds)
       : resolved.warmUp;
 
   const coolDown =
     plan.coolDown != null
-      ? filterStretchesByDislikes(cloneStretchEntries(plan.coolDown), ctx.dislikedExerciseIds)
+      ? normalizeStretchList(plan.coolDown, ctx.dislikedExerciseIds)
       : resolved.coolDown;
 
   return { ...cloned, warmUp, coolDown };
@@ -65,22 +65,23 @@ export function dayPlanForCustomSave(plan: DayPlan): DayPlan {
   const basePlan: DayPlan = { ...rest };
   const resolved = resolveStretchesForDay(basePlan, ctx);
 
+  const normalizedWarm =
+    rest.warmUp != null
+      ? normalizeStretchList(rest.warmUp, ctx.dislikedExerciseIds)
+      : null;
+  const normalizedCool =
+    rest.coolDown != null
+      ? normalizeStretchList(rest.coolDown, ctx.dislikedExerciseIds)
+      : null;
+
   const warmUp =
-    rest.warmUp != null &&
-    !stretchListsEqual(
-      filterStretchesByDislikes(rest.warmUp, ctx.dislikedExerciseIds),
-      resolved.warmUp,
-    )
-      ? filterStretchesByDislikes(rest.warmUp, ctx.dislikedExerciseIds)
+    normalizedWarm != null && !stretchListsEqual(normalizedWarm, resolved.warmUp)
+      ? normalizedWarm
       : undefined;
 
   const coolDown =
-    rest.coolDown != null &&
-    !stretchListsEqual(
-      filterStretchesByDislikes(rest.coolDown, ctx.dislikedExerciseIds),
-      resolved.coolDown,
-    )
-      ? filterStretchesByDislikes(rest.coolDown, ctx.dislikedExerciseIds)
+    normalizedCool != null && !stretchListsEqual(normalizedCool, resolved.coolDown)
+      ? normalizedCool
       : undefined;
 
   return {

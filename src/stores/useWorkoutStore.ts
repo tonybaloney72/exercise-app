@@ -11,8 +11,7 @@ import type {
   ExerciseSetMode,
   StretchEntry,
 } from "@/types";
-import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
-import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
+import { resolveStretchesForPlan } from "@/lib/stretchResolveContext";
 import { getWorkoutRepo } from "@/lib/repos";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -213,10 +212,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   workoutHistory: [],
   startWorkout: (plan) => {
     const now = new Date();
-    const { warmUp, coolDown } = resolveStretchesForDay(
-      plan,
-      buildStretchResolveContext(),
-    );
+    const { warmUp, coolDown } = resolveStretchesForPlan(plan);
     const warmUpExercises: ExerciseLog[] = warmUp.map(buildStretchExerciseLog);
     const coolDownExercises: ExerciseLog[] = coolDown.map(buildStretchExerciseLog);
     set({

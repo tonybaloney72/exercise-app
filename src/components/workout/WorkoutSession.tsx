@@ -8,8 +8,7 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 
 import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
-import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
-import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
+import { useResolvedStretches } from "@/hooks/useResolvedStretches";
 import type { DayPlan } from "@/types";
 
 interface WorkoutSessionProps {
@@ -45,10 +44,7 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 	const [durationInput, setDurationInput] = useState("");
 
 	const exerciseSettingsById = useExerciseSettingsStore((s) => s.byExerciseId);
-	const { warmUp, coolDown } = useMemo(
-		() => resolveStretchesForDay(plan, buildStretchResolveContext()),
-		[plan],
-	);
+	const { warmUp, coolDown } = useResolvedStretches(plan);
 
 	useEffect(() => {
 		if (!activeWorkout) return;

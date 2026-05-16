@@ -9,8 +9,9 @@ import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
 import { pickRandomSwap } from "@/lib/exerciseSwap";
 import {
+  buildStretchUsedExerciseIds,
   cloneStretchEntries,
-  filterStretchesByDislikes,
+  normalizeStretchList,
   pruneStoredStretchDefaults,
 } from "@/lib/stretchDefaults";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
@@ -60,11 +61,7 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
   const pickCandidates = useMemo(() => {
     if (!pickTarget) return [];
     const list = pickTarget.list === "defaultWarmUp" ? draftWarmUp : draftCoolDown;
-    const used = new Set(list.map((e) => e.exerciseId));
-    if (pickTarget.index != null) {
-      const current = list[pickTarget.index];
-      if (current) used.delete(current.exerciseId);
-    }
+    const used = buildStretchUsedExerciseIds(list, pickTarget.index);
     return getStretchCandidates({
       category: pickCategory(pickTarget.list),
       usedExerciseIds: used,
@@ -121,8 +118,8 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
     setSaving(true);
     setError(null);
     try {
-      const defaultWarmUp = filterStretchesByDislikes(draftWarmUp, dislikedIds);
-      const defaultCoolDown = filterStretchesByDislikes(draftCoolDown, dislikedIds);
+      const defaultWarmUp = normalizeStretchList(draftWarmUp, dislikedIds);
+      const defaultCoolDown = normalizeStretchList(draftCoolDown, dislikedIds);
       await settings.updateSettings({ defaultWarmUp, defaultCoolDown });
       onClose();
     } catch (e: unknown) {
