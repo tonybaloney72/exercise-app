@@ -1,5 +1,5 @@
+import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan, ExerciseCategory, ExerciseLog, WorkoutLog } from "@/types";
-import { getPlanForDay } from "@/data/dailyPlans";
 import { exercises } from "@/data/exercises";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
@@ -143,6 +143,7 @@ export interface WeekToDatePlanAdherence {
  */
 export function weekToDatePlanAdherence(
   history: WorkoutLog[],
+  weekByDow: TrainingWeekDays | null,
   reference: Date = new Date(),
 ): WeekToDatePlanAdherence {
   const ref = new Date(reference);
@@ -159,7 +160,8 @@ export function weekToDatePlanAdherence(
     const d = new Date(weekStart);
     d.setDate(weekStart.getDate() + dow);
     const dateStr = formatLocalDateKey(d);
-    planned += countPlannedRoundExercises(getPlanForDay(dow));
+    const plan = weekByDow?.[dow];
+    if (plan) planned += countPlannedRoundExercises(plan);
     const log = history.find((w) => w.date === dateStr);
     if (log) completed += countCompletedRoundExercises(log);
   }

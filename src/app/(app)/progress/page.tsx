@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useTrainingWeekRefreshStore } from "@/stores/useTrainingWeekRefreshStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { motion } from "framer-motion";
+import { resolveTrainingWeekForAuth } from "@/lib/planResolver";
+import type { TrainingWeekDays } from "@/lib/repos";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import ProgressChartsSection from "@/components/progress/ProgressChartsSection";
 import ExerciseProgressChart from "@/components/progress/ExerciseProgressChart";
@@ -13,11 +17,35 @@ import { weekToDatePlanAdherence } from "@/utils/progressStats";
 export default function ProgressPage() {
   const { workoutHistory, loadHistory } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
+  const planRevision = useTrainingWeekRefreshStore((s) => s.planRevision);
+  const equipmentKey = useSettingsStore((s) => s.availableEquipment.join(","));
+  const programProfileKey = useSettingsStore(
+    (s) => `${s.programFocus}:${s.roundDensity}`,
+  );
+  const [weekByDow, setWeekByDow] = useState<TrainingWeekDays | null>(null);
 
   useEffect(() => {
     if (mode === "loading") return;
     loadHistory();
   }, [mode, loadHistory]);
+
+  useEffect(() => {
+    if (mode === "loading") return;
+    const todayKey = formatLocalDateKey(new Date());
+    let cancelled = false;
+    void resolveTrainingWeekForAuth(todayKey, mode).then(
+      (w) => {
+        if (!cancelled) setWeekByDow(w);
+      },
+      (e: unknown) => {
+        console.error("[ProgressPage] resolveTrainingWeekForAuth", e);
+        if (!cancelled) setWeekByDow(null);
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, planRevision, equipmentKey, programProfileKey]);
 
   const stats = useMemo(() => {
     const totalWorkouts = workoutHistory.length;
@@ -43,10 +71,10 @@ export default function ProgressPage() {
       0
     );
 
-    const weekPlan = weekToDatePlanAdherence(workoutHistory);
+    const weekPlan = weekToDatePlanAdherence(workoutHistory, weekByDow);
 
     return { totalWorkouts, currentStreak, totalJogMiles, weekPlan };
-  }, [workoutHistory]);
+  }, [workoutHistory, weekByDow]);
 
   const statCards = [
     { label: "Total Workouts", value: stats.totalWorkouts, icon: "💪" },

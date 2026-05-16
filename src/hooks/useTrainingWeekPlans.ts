@@ -9,8 +9,8 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /**
- * Current calendar week`s day plans: catalog-only for guests; persisted (lazy-seeded) week
- * for signed-in users — same source as Today and `/weekly/day/[date]`.
+ * Current calendar week`s day plans via `planResolver` (materialized for guests;
+ * persisted lazy-seeded week when signed in) — same source as Today and weekly day routes.
  */
 export function useTrainingWeekPlans(weekDates: Date[]): {
   weekByDow: TrainingWeekDays | null;

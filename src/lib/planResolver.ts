@@ -1,4 +1,4 @@
-import { getPlanForDay } from "@/data/dailyPlans";
+import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   collectDislikedIds,
@@ -25,14 +25,6 @@ import type {
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { getSundayOfWeekContaining, parseLocalDateKey } from "@/utils/weekCalendar";
 
-function buildCatalogWeek(): TrainingWeekDays {
-  const out: TrainingWeekDays = {};
-  for (let i = 0; i < 7; i++) {
-    out[i] = getPlanForDay(i);
-  }
-  return out;
-}
-
 function settingsSlice(settings: UserSettings): {
   availableEquipment: ExerciseEquipment[];
   programFocus: ProgramFocusPreset;
@@ -48,7 +40,11 @@ function settingsSlice(settings: UserSettings): {
   };
 }
 
-async function loadGeneratorInputs(): Promise<{
+function repoModeForPlans(mode: AuthMode): AuthMode {
+  return mode === "authenticated" ? "authenticated" : "guest";
+}
+
+async function loadGeneratorInputs(mode: AuthMode): Promise<{
   prefs: ExercisePreferenceMap;
   settings: UserSettings;
   availableEquipment: ExerciseEquipment[];
@@ -56,9 +52,10 @@ async function loadGeneratorInputs(): Promise<{
   roundDensity: RoundDensity;
   fingerprint: string;
 }> {
+  const repoMode = repoModeForPlans(mode);
   const [prefs, settings] = await Promise.all([
-    getExercisePreferenceRepo("authenticated").loadAll(),
-    getSettingsRepo("authenticated").load(),
+    getExercisePreferenceRepo(repoMode).loadAll(),
+    getSettingsRepo(repoMode).load(),
   ]);
   const { availableEquipment, programFocus, roundDensity } =
     settingsSlice(settings);
@@ -92,16 +89,36 @@ function materializeWeekFromCatalog(
   );
 }
 
+function weekDaysComplete(days: TrainingWeekDays | null): days is TrainingWeekDays {
+  if (!days) return false;
+  for (let i = 0; i < 7; i++) {
+    if (!days[i]) return false;
+  }
+  return true;
+}
+
 function weekNeedsMaterialization(
   stored: TrainingWeekDays | null,
   storedFingerprint: string | null,
   currentFingerprint: string,
   dislikedIds: ReadonlySet<string>,
 ): boolean {
-  if (!stored) return true;
+  if (!weekDaysComplete(stored)) return true;
   if (storedFingerprint !== currentFingerprint) return true;
   if (weekContainsDislikedExercise(stored, dislikedIds)) return true;
   return false;
+}
+
+/** In-memory materialized week (guest / anonymous) from catalog + local settings. */
+async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays> {
+  const { prefs, availableEquipment, programFocus, roundDensity } =
+    await loadGeneratorInputs(mode);
+  return materializeWeekFromCatalog(
+    prefs,
+    availableEquipment,
+    programFocus,
+    roundDensity,
+  );
 }
 
 /** Load persisted week or materialize from catalog + profile + dislikes; persist when stale. */
@@ -115,7 +132,7 @@ async function loadOrSeedPersistedWeek(
     programFocus,
     roundDensity,
     fingerprint,
-  } = await loadGeneratorInputs();
+  } = await loadGeneratorInputs("authenticated");
   const dislikedIds = collectDislikedIds(prefs);
 
   const persisted = await repo.loadWeek(weekStartSundayKey);
@@ -142,14 +159,10 @@ async function loadOrSeedPersistedWeek(
     return materialized;
   }
 
-  const fallback = buildCatalogWeek();
-  const merged: TrainingWeekDays = { ...fallback };
-  if (storedDays) {
-    for (let i = 0; i < 7; i++) {
-      if (storedDays[i]) merged[i] = storedDays[i];
-    }
+  if (!weekDaysComplete(storedDays)) {
+    throw new Error("Persisted training week incomplete after materialization check");
   }
-  return merged;
+  return storedDays;
 }
 
 /**
@@ -169,7 +182,7 @@ export async function refreshTrainingWeekContaining(
     programFocus,
     roundDensity,
     fingerprint,
-  } = await loadGeneratorInputs();
+  } = await loadGeneratorInputs("authenticated");
   const materialized = materializeWeekFromCatalog(
     prefs,
     availableEquipment,
@@ -183,8 +196,8 @@ export async function refreshTrainingWeekContaining(
 }
 
 /**
- * Full Sun–Sat `DayPlan` map (keys 0–6): guests use the static catalog; authenticated users
- * use the same lazy-seeded row as `/today` and `/weekly/day/[date]` (any `YYYY-MM-DD` in the week).
+ * Full Sun–Sat `DayPlan` map (keys 0–6): materialized from catalog + settings for all modes;
+ * authenticated users persist the same snapshot used by Today and weekly routes.
  */
 export async function resolveTrainingWeekForAuth(
   anyDateKeyInWeek: string,
@@ -195,7 +208,7 @@ export async function resolveTrainingWeekForAuth(
     throw new Error("Invalid date key");
   }
   if (mode !== "authenticated") {
-    return buildCatalogWeek();
+    return resolveMaterializedWeek(mode);
   }
   const sun = getSundayOfWeekContaining(parsed);
   const weekKey = formatLocalDateKey(sun);
@@ -203,8 +216,8 @@ export async function resolveTrainingWeekForAuth(
 }
 
 /**
- * Resolves the `DayPlan` for a local calendar day: guests use catalog only;
- * authenticated users lazy-seed the current Sun–Sat week into `user_training_weeks`.
+ * Resolves the `DayPlan` for a local calendar day via the single plan resolver
+ * (materialized week for guests; lazy-seeded DB week when signed in).
  */
 export async function resolveDayPlanForAuth(
   dateKey: string,
@@ -215,13 +228,10 @@ export async function resolveDayPlanForAuth(
     throw new Error("Invalid date key");
   }
   const dow = parsed.getDay();
-
-  if (mode !== "authenticated") {
-    return getPlanForDay(dow);
+  const days = await resolveTrainingWeekForAuth(dateKey, mode);
+  const plan = days[dow];
+  if (!plan) {
+    throw new Error(`No plan for dayOfWeek ${dow}`);
   }
-
-  const sun = getSundayOfWeekContaining(parsed);
-  const weekKey = formatLocalDateKey(sun);
-  const days = await loadOrSeedPersistedWeek(weekKey);
-  return days[dow] ?? getPlanForDay(dow);
+  return plan;
 }

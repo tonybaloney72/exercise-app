@@ -120,7 +120,7 @@ export const localExercisePreferenceRepo: ExercisePreferenceRepo = {
   },
 };
 
-/** Guest: weeks are not stored locally; callers use catalog `getPlanForDay` for display. */
+/** Guest: weeks are not stored locally; `planResolver` materializes on each read. */
 export const localTrainingWeekRepo: TrainingWeekRepo = {
   async loadWeek() {
     return null;
