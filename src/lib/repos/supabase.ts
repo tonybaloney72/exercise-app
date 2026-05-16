@@ -11,6 +11,11 @@ import type {
   WorkoutLog,
 } from "@/types";
 import { createClient } from "@/lib/supabase/client";
+import {
+  CATALOG_DEFAULT_COOL_DOWN,
+  CATALOG_DEFAULT_WARM_UP,
+} from "@/lib/dayStretchPlan";
+import { sanitizeStretchEntries } from "@/lib/stretchDefaults";
 import { DEFAULT_TIMER_SECONDS_FALLBACK } from "@/utils/effectiveExerciseSettings";
 import type {
   ExerciseSettingsMap,
@@ -81,6 +86,8 @@ interface SettingsRow {
   available_equipment?: unknown;
   program_focus?: string;
   round_density?: string;
+  default_warm_up?: unknown;
+  default_cool_down?: unknown;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -282,6 +289,10 @@ function rowToSettings(row: SettingsRow): UserSettings {
     availableEquipment: sanitizeAvailableEquipment(row.available_equipment),
     programFocus: sanitizeProgramFocus(row.program_focus),
     roundDensity: sanitizeRoundDensity(row.round_density),
+    defaultWarmUp:
+      sanitizeStretchEntries(row.default_warm_up) ?? [...CATALOG_DEFAULT_WARM_UP],
+    defaultCoolDown:
+      sanitizeStretchEntries(row.default_cool_down) ?? [...CATALOG_DEFAULT_COOL_DOWN],
   };
 }
 
@@ -297,6 +308,8 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     available_equipment: s.availableEquipment,
     program_focus: s.programFocus,
     round_density: s.roundDensity,
+    default_warm_up: s.defaultWarmUp,
+    default_cool_down: s.defaultCoolDown,
   };
 }
 

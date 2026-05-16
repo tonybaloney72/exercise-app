@@ -3,6 +3,8 @@ import {
   collectFavoriteIds,
   pickDislikeReplacement,
 } from "@/lib/exerciseCandidates";
+import { stretchDefaultsFingerprint } from "@/lib/stretchDefaults";
+import type { StretchEntry } from "@/types";
 import { applyProgramProfileToWeek } from "@/lib/programProfile";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
@@ -16,8 +18,15 @@ import type {
 
 export const TRAINING_WEEK_SOURCE_GENERATED_V1 = "generated_week_v1";
 
+/** User-edited week snapshot (Custom workouts v0); skips auto-regen until reset. */
+export const TRAINING_WEEK_SOURCE_CUSTOM_V1 = "custom_week_v1";
+
 /** @deprecated Use {@link TRAINING_WEEK_SOURCE_GENERATED_V1}. */
 export const TRAINING_WEEK_SOURCE_DISLIKES_V1 = TRAINING_WEEK_SOURCE_GENERATED_V1;
+
+export function isUserCustomizedWeekSource(source: string | null | undefined): boolean {
+  return source === TRAINING_WEEK_SOURCE_CUSTOM_V1;
+}
 
 /** Stable key for “regenerate week when inputs change” (whole-week policy). */
 export function computePrefsFingerprint(
@@ -25,6 +34,8 @@ export function computePrefsFingerprint(
   availableEquipment: ExerciseEquipment[],
   programFocus: ProgramFocusPreset = "balanced",
   roundDensity: RoundDensity = "standard",
+  defaultWarmUp: StretchEntry[] = [],
+  defaultCoolDown: StretchEntry[] = [],
 ): string {
   const disliked = Object.entries(prefs)
     .filter(([, v]) => v === "disliked")
@@ -35,7 +46,8 @@ export function computePrefsFingerprint(
     .map(([id]) => id)
     .sort();
   const equip = [...availableEquipment].sort();
-  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pf:${programFocus}|rd:${roundDensity}`;
+  const stretches = stretchDefaultsFingerprint(defaultWarmUp, defaultCoolDown);
+  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pf:${programFocus}|rd:${roundDensity}|${stretches}`;
 }
 
 export {

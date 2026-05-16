@@ -14,3 +14,20 @@ export async function refreshCurrentTrainingWeek(
   await refreshTrainingWeekContaining(formatLocalDateKey());
   useTrainingWeekRefreshStore.getState().notifyRefreshed(reason);
 }
+
+/** Regenerate week containing `dateKey` and notify (drops custom edits). */
+export async function resetTrainingWeekToGenerated(
+  dateKeyInWeek: string,
+): Promise<void> {
+  if (useAuthStore.getState().mode !== "authenticated") return;
+  const { resetTrainingWeekToGenerated: resetWeek } = await import(
+    "@/lib/trainingWeekCustomize"
+  );
+  await resetWeek(dateKeyInWeek);
+  useTrainingWeekRefreshStore.getState().notifyRefreshed("reset");
+}
+
+/** Refetch plan hooks after a custom day save (no banner). */
+export function bumpTrainingWeekPlans(): void {
+  useTrainingWeekRefreshStore.getState().bumpPlanRevision();
+}

@@ -19,6 +19,11 @@ export function useDayPlan(dateKey: string): {
   const programProfileKey = useSettingsStore(
     (s) => `${s.programFocus}:${s.roundDensity}`,
   );
+  const stretchDefaultsKey = useSettingsStore((s) =>
+    [...s.defaultWarmUp, ...s.defaultCoolDown]
+      .map((e) => `${e.exerciseId}:${e.targetReps}`)
+      .join("|"),
+  );
   const [plan, setPlan] = useState<DayPlan | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +65,7 @@ export function useDayPlan(dateKey: string): {
     return () => {
       cancelled = true;
     };
-  }, [dateKey, mode, planRevision, equipmentKey, programProfileKey]);
+  }, [dateKey, mode, planRevision, equipmentKey, programProfileKey, stretchDefaultsKey]);
 
   return { plan, loading, error };
 }

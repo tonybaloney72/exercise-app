@@ -3,6 +3,7 @@ import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   collectDislikedIds,
   computePrefsFingerprint,
+  isUserCustomizedWeekSource,
   materializeTrainingWeek,
   TRAINING_WEEK_SOURCE_GENERATED_V1,
   weekContainsDislikedExercise,
@@ -70,6 +71,8 @@ async function loadGeneratorInputs(mode: AuthMode): Promise<{
       availableEquipment,
       programFocus,
       roundDensity,
+      settings.defaultWarmUp,
+      settings.defaultCoolDown,
     ),
   };
 }
@@ -100,9 +103,11 @@ function weekDaysComplete(days: TrainingWeekDays | null): days is TrainingWeekDa
 function weekNeedsMaterialization(
   stored: TrainingWeekDays | null,
   storedFingerprint: string | null,
+  storedSource: string | null,
   currentFingerprint: string,
   dislikedIds: ReadonlySet<string>,
 ): boolean {
+  if (isUserCustomizedWeekSource(storedSource)) return false;
   if (!weekDaysComplete(stored)) return true;
   if (storedFingerprint !== currentFingerprint) return true;
   if (weekContainsDislikedExercise(stored, dislikedIds)) return true;
@@ -142,6 +147,7 @@ async function loadOrSeedPersistedWeek(
     weekNeedsMaterialization(
       storedDays,
       persisted?.prefsFingerprint ?? null,
+      persisted?.source ?? null,
       fingerprint,
       dislikedIds,
     )

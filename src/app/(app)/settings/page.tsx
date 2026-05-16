@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
+import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import {
   PROGRAM_FOCUS_OPTIONS,
   ROUND_DENSITY_OPTIONS,
 } from "@/lib/programProfile";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { createClient } from "@/lib/supabase/client";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
@@ -22,6 +25,24 @@ export default function SettingsPage() {
   const mode = useAuthStore((s) => s.mode);
   const user = useAuthStore((s) => s.user);
   const setGuest = useAuthStore((s) => s.setGuest);
+  const [stretchModalOpen, setStretchModalOpen] = useState(false);
+
+  const exercisePrefs = useExercisePreferencesStore((s) => s.byExerciseId);
+
+  const effectiveStretchDefaults = useMemo(() => {
+    if (!settings.hydrated) return { warm: 0, cool: 0 };
+    const ctx = buildStretchResolveContext();
+    return {
+      warm: ctx.defaultWarmUp.length,
+      cool: ctx.defaultCoolDown.length,
+    };
+  }, [
+    settings.hydrated,
+    settings.defaultWarmUp,
+    settings.defaultCoolDown,
+    settings.availableEquipment,
+    exercisePrefs,
+  ]);
   useEffect(() => {
     if (mode === "loading") return;
     loadHistory();
@@ -39,6 +60,8 @@ export default function SettingsPage() {
         availableEquipment: settings.availableEquipment,
         programFocus: settings.programFocus,
         roundDensity: settings.roundDensity,
+        defaultWarmUp: settings.defaultWarmUp,
+        defaultCoolDown: settings.defaultCoolDown,
       },
       workoutHistory,
     };
@@ -323,8 +346,31 @@ export default function SettingsPage() {
               })}
             </div>
           </div>
+          <div>
+            <h3 className="text-xs font-semibold text-foreground">Default stretches</h3>
+            <p className="text-xs text-muted mt-0.5 mb-2">
+              Stretches always merged first into each day&apos;s warm-up and cool-down.
+              Disliked exercises in the Library are excluded.
+            </p>
+            <p className="text-xs text-foreground mb-2">
+              {effectiveStretchDefaults.warm} warm-up · {effectiveStretchDefaults.cool}{" "}
+              cool-down
+            </p>
+            <button
+              type="button"
+              onClick={() => setStretchModalOpen(true)}
+              className="w-full rounded-xl border border-border bg-surface-hover py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent/40 hover:bg-accent/10"
+            >
+              Edit default stretches
+            </button>
+          </div>
         </motion.div>
       )}
+
+      <DefaultStretchesModal
+        open={stretchModalOpen}
+        onClose={() => setStretchModalOpen(false)}
+      />
 
       {/* Workout preferences */}
       <motion.div

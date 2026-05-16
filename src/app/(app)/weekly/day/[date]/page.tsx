@@ -2,15 +2,26 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
+import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
+import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
+import {
+  bumpTrainingWeekPlans,
+  resetTrainingWeekToGenerated,
+} from "@/lib/trainingWeekRefresh";
+import {
+  getWeekSourceForDate,
+  saveCustomDayPlan,
+} from "@/lib/trainingWeekCustomize";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
 import { useDayPlan } from "@/hooks/useDayPlan";
+import type { DayPlan } from "@/types";
 import {
   compareDateKeyToToday,
   isDateKeyInCurrentCalendarWeek,
@@ -85,6 +96,10 @@ export default function WeeklyDayPage() {
     activeWorkout,
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
+  const [customizing, setCustomizing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [weekSource, setWeekSource] = useState<string | null>(null);
 
   useEffect(() => {
     if (mode === "loading") return;
@@ -95,6 +110,22 @@ export default function WeeklyDayPage() {
   const inWeek = isDateKeyInCurrentCalendarWeek(dateKey);
   const planKey = parsed && inWeek ? dateKey : "";
   const { plan, loading: planLoading, error: planError } = useDayPlan(planKey);
+
+  const canCustomize = mode === "authenticated" && !!planKey;
+
+  useEffect(() => {
+    if (!canCustomize) {
+      setWeekSource(null);
+      return;
+    }
+    let cancelled = false;
+    void getWeekSourceForDate(dateKey).then((source) => {
+      if (!cancelled) setWeekSource(source);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [canCustomize, dateKey, plan]);
 
   const when = compareDateKeyToToday(dateKey);
 
@@ -150,6 +181,39 @@ export default function WeeklyDayPage() {
   }
 
   const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
+  const isCustomWeek = isUserCustomizedWeekSource(weekSource);
+  const showPlanEditor = customizing && canCustomize && !logForDay;
+
+  async function handleSaveDay(editedPlan: DayPlan) {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await saveCustomDayPlan(dateKey, editedPlan);
+      bumpTrainingWeekPlans();
+      setCustomizing(false);
+      const source = await getWeekSourceForDate(dateKey);
+      setWeekSource(source);
+    } catch (e: unknown) {
+      setSaveError(e instanceof Error ? e.message : "Could not save changes");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleResetWeek() {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await resetTrainingWeekToGenerated(dateKey);
+      setCustomizing(false);
+      const source = await getWeekSourceForDate(dateKey);
+      setWeekSource(source);
+    } catch (e: unknown) {
+      setSaveError(e instanceof Error ? e.message : "Could not reset week");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="py-6 space-y-5">
@@ -165,6 +229,11 @@ export default function WeeklyDayPage() {
           </p>
           <h1 className="text-2xl font-bold text-foreground">{formatPageTitle(dateKey)}</h1>
           <p className="text-sm text-muted">{plan.theme}</p>
+          {isCustomWeek && canCustomize && (
+            <p className="text-xs text-accent/90 pt-1">
+              This week has custom edits — reset from the editor to regenerate.
+            </p>
+          )}
         </motion.div>
       </div>
 
@@ -179,7 +248,41 @@ export default function WeeklyDayPage() {
         )}
       </div>
 
-      {when === "future" && (
+      {canCustomize && !logForDay && !showPlanEditor && (
+        <button
+          type="button"
+          onClick={() => {
+            setSaveError(null);
+            setCustomizing(true);
+          }}
+          className="w-full rounded-xl border border-accent/40 bg-accent/10 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
+        >
+          Customize this day&apos;s workout
+        </button>
+      )}
+
+      {saveError && (
+        <p className="text-sm text-red-400 text-center px-2" role="alert">
+          {saveError}
+        </p>
+      )}
+
+      {showPlanEditor && (
+        <WorkoutPlanEditor
+          key={dateKey}
+          initialPlan={plan}
+          isCustomWeek={isCustomWeek}
+          saving={saving}
+          onSave={(edited) => void handleSaveDay(edited)}
+          onCancel={() => {
+            setSaveError(null);
+            setCustomizing(false);
+          }}
+          onResetWeek={() => void handleResetWeek()}
+        />
+      )}
+
+      {when === "future" && !showPlanEditor && (
         <WorkoutPlanPreview
           plan={plan}
           bannerTitle={formatScheduledBannerTitle(dateKey)}
@@ -225,16 +328,18 @@ export default function WeeklyDayPage() {
               </p>
             </div>
           )}
-          <WorkoutPlanPreview
-            plan={plan}
-            bannerTitle={
-              when === "today"
-                ? "Today’s prescribed plan"
-                : formatScheduledBannerTitle(dateKey)
-            }
-            bannerHint={when === "today" ? undefined : "What was scheduled — not logged."}
-            showTargetMuscleList
-          />
+          {!showPlanEditor && (
+            <WorkoutPlanPreview
+              plan={plan}
+              bannerTitle={
+                when === "today"
+                  ? "Today’s prescribed plan"
+                  : formatScheduledBannerTitle(dateKey)
+              }
+              bannerHint={when === "today" ? undefined : "What was scheduled — not logged."}
+              showTargetMuscleList
+            />
+          )}
         </>
       )}
 

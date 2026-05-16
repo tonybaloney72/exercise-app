@@ -1,4 +1,5 @@
 import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
+import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import type { DayPlan, StretchEntry } from "@/types";
 
 /**
@@ -47,7 +48,10 @@ export function defaultStretchesForUnknownDay(): {
   warmUp: StretchEntry[];
   coolDown: StretchEntry[];
 } {
-  return resolveStretchesForDay(FALLBACK_PLAN_FOR_STRETCHES);
+  return resolveStretchesForDay(
+    FALLBACK_PLAN_FOR_STRETCHES,
+    buildStretchResolveContext(),
+  );
 }
 
 export { resolveStretchesForDay } from "@/lib/dayStretchPlan";

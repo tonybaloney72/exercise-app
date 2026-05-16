@@ -1,3 +1,5 @@
+import { filterStretchesByDislikes } from "@/lib/stretchDefaults";
+import type { StretchResolveContext } from "@/lib/stretchResolveContext";
 import type { DayPlan, ExerciseCategory, StretchEntry } from "@/types";
 
 /** Stretch pools keyed by training focus (see `DayPlan.strengthFocus` / `coreGroups`). */
@@ -51,6 +53,15 @@ const COOL_DOWN_POOLS = {
   ] satisfies StretchEntry[],
 } as const;
 
+/** Catalog default warm-up stretches (used when settings have no custom list). */
+export const CATALOG_DEFAULT_WARM_UP: StretchEntry[] = WARM_UP_POOLS.universal.map((e) => ({
+  ...e,
+}));
+/** Catalog default cool-down stretches (used when settings have no custom list). */
+export const CATALOG_DEFAULT_COOL_DOWN: StretchEntry[] = COOL_DOWN_POOLS.universal.map((e) => ({
+  ...e,
+}));
+
 const UPPER_STRENGTH: ExerciseCategory[] = ["UP", "UPL"];
 const LOWER_STRENGTH: ExerciseCategory[] = ["LB"];
 const CORE_GROUPS: ExerciseCategory[] = ["CF", "CL", "CR", "CS"];
@@ -64,6 +75,17 @@ function dedupeStretches(entries: StretchEntry[]): StretchEntry[] {
     out.push(entry);
   }
   return out;
+}
+
+function appendPool(
+  parts: StretchEntry[],
+  pool: readonly StretchEntry[],
+  ctx: StretchResolveContext,
+): void {
+  for (const entry of pool) {
+    if (ctx.dislikedExerciseIds.has(entry.exerciseId)) continue;
+    parts.push({ ...entry });
+  }
 }
 
 function categoriesInPlan(plan: DayPlan): Set<ExerciseCategory> {
@@ -98,43 +120,74 @@ function dayWantsLower(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
 }
 
 function dayWantsCore(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
-  return (
-    plan.coreGroups.length > 0 ||
-    CORE_GROUPS.some((c) => cats.has(c))
-  );
+  return plan.coreGroups.length > 0 || CORE_GROUPS.some((c) => cats.has(c));
 }
 
 function dayWantsConditioning(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
   return plan.strengthFocus.includes("PC") || cats.has("PC");
 }
 
-/**
- * Warm-up / cool-down for a prescribed day from stable `DayPlan` focus metadata
- * (strength focus, core groups, jog flag, and round categories).
- */
-export function resolveStretchesForDay(plan: DayPlan): {
-  warmUp: StretchEntry[];
-  coolDown: StretchEntry[];
-} {
+function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[] {
   const recovery = isLightRecoveryDay(plan);
   const cats = categoriesInPlan(plan);
 
-  const warmParts: StretchEntry[] = [...WARM_UP_POOLS.universal];
-  if (dayWantsUpper(plan, cats)) warmParts.push(...WARM_UP_POOLS.upper);
-  if (dayWantsLower(plan, cats)) warmParts.push(...WARM_UP_POOLS.lower);
-  if (dayWantsCore(plan, cats)) warmParts.push(...WARM_UP_POOLS.core);
-  if (dayWantsConditioning(plan, cats)) warmParts.push(...WARM_UP_POOLS.conditioning);
-
-  const coolParts: StretchEntry[] = [...COOL_DOWN_POOLS.universal];
-  if (dayWantsUpper(plan, cats)) coolParts.push(...COOL_DOWN_POOLS.upper);
-  if (dayWantsLower(plan, cats)) coolParts.push(...COOL_DOWN_POOLS.lower);
-  if (dayWantsCore(plan, cats)) coolParts.push(...COOL_DOWN_POOLS.core);
+  const warmParts: StretchEntry[] = [...ctx.defaultWarmUp];
+  if (dayWantsUpper(plan, cats)) appendPool(warmParts, WARM_UP_POOLS.upper, ctx);
+  if (dayWantsLower(plan, cats)) appendPool(warmParts, WARM_UP_POOLS.lower, ctx);
+  if (dayWantsCore(plan, cats)) appendPool(warmParts, WARM_UP_POOLS.core, ctx);
+  if (dayWantsConditioning(plan, cats)) appendPool(warmParts, WARM_UP_POOLS.conditioning, ctx);
 
   const warmCap = recovery ? 6 : 10;
-  const coolCap = recovery ? 6 : 10;
+  return dedupeStretches(warmParts).slice(0, warmCap);
+}
 
+function deriveCoolDown(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[] {
+  const recovery = isLightRecoveryDay(plan);
+  const cats = categoriesInPlan(plan);
+
+  const coolParts: StretchEntry[] = [...ctx.defaultCoolDown];
+  if (dayWantsUpper(plan, cats)) appendPool(coolParts, COOL_DOWN_POOLS.upper, ctx);
+  if (dayWantsLower(plan, cats)) appendPool(coolParts, COOL_DOWN_POOLS.lower, ctx);
+  if (dayWantsCore(plan, cats)) appendPool(coolParts, COOL_DOWN_POOLS.core, ctx);
+
+  const coolCap = recovery ? 6 : 10;
+  return dedupeStretches(coolParts).slice(0, coolCap);
+}
+
+/** Recompute warm-up / cool-down from settings defaults + day focus. */
+export function rebuildDerivedStretches(
+  plan: DayPlan,
+  ctx: StretchResolveContext,
+): {
+  warmUp: StretchEntry[];
+  coolDown: StretchEntry[];
+} {
   return {
-    warmUp: dedupeStretches(warmParts).slice(0, warmCap),
-    coolDown: dedupeStretches(coolParts).slice(0, coolCap),
+    warmUp: deriveWarmUp(plan, ctx),
+    coolDown: deriveCoolDown(plan, ctx),
+  };
+}
+
+/**
+ * Warm-up / cool-down for a prescribed day. Per-day overrides win; otherwise derived
+ * from settings defaults, focus, and rounds. Disliked stretches are excluded.
+ */
+export function resolveStretchesForDay(
+  plan: DayPlan,
+  ctx: StretchResolveContext,
+): {
+  warmUp: StretchEntry[];
+  coolDown: StretchEntry[];
+} {
+  const { dislikedExerciseIds } = ctx;
+  return {
+    warmUp:
+      plan.warmUp != null
+        ? filterStretchesByDislikes(dedupeStretches(plan.warmUp), dislikedExerciseIds)
+        : deriveWarmUp(plan, ctx),
+    coolDown:
+      plan.coolDown != null
+        ? filterStretchesByDislikes(dedupeStretches(plan.coolDown), dislikedExerciseIds)
+        : deriveCoolDown(plan, ctx),
   };
 }

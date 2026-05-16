@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import type { UserSettings } from "@/types";
+import type { StretchEntry, UserSettings } from "@/types";
 import { DEFAULT_SETTINGS, getSettingsRepo } from "@/lib/repos";
 import { refreshCurrentTrainingWeek } from "@/lib/trainingWeekRefresh";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -33,6 +33,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         partial.availableEquipment ?? current.availableEquipment,
       programFocus: partial.programFocus ?? current.programFocus,
       roundDensity: partial.roundDensity ?? current.roundDensity,
+      defaultWarmUp: partial.defaultWarmUp ?? current.defaultWarmUp,
+      defaultCoolDown: partial.defaultCoolDown ?? current.defaultCoolDown,
     };
     const equipmentChanged =
       partial.availableEquipment != null &&
@@ -45,8 +47,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         partial.programFocus !== current.programFocus) ||
       (partial.roundDensity != null &&
         partial.roundDensity !== current.roundDensity);
+    const stretchDefaultsChanged =
+      (partial.defaultWarmUp != null &&
+        !stretchListsEqual(current.defaultWarmUp, partial.defaultWarmUp)) ||
+      (partial.defaultCoolDown != null &&
+        !stretchListsEqual(current.defaultCoolDown, partial.defaultCoolDown));
 
-    // Optimistic UI: update store first.
     set(updated);
     try {
       await getSettingsRepo().save(updated);
@@ -55,25 +61,32 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       return;
     }
 
-    if (
-      (equipmentChanged || programProfileChanged) &&
-      useAuthStore.getState().mode === "authenticated"
-    ) {
-      try {
-        await refreshCurrentTrainingWeek(
-          programProfileChanged ? "program" : "equipment",
-        );
-      } catch (err) {
-        console.error("[useSettingsStore.refreshWeek]", err);
+    if (useAuthStore.getState().mode !== "authenticated") return;
+
+    try {
+      if (programProfileChanged) {
+        await refreshCurrentTrainingWeek("program");
+      } else if (equipmentChanged) {
+        await refreshCurrentTrainingWeek("equipment");
+      } else if (stretchDefaultsChanged) {
+        await refreshCurrentTrainingWeek("program");
       }
+    } catch (err) {
+      console.error("[useSettingsStore.refreshWeek]", err);
     }
   },
 
   loadSettings: async () => {
     const mode = useAuthStore.getState().mode;
-    if (mode === "loading") return; // Wait until AuthInitializer settles.
+    if (mode === "loading") return;
     const loaded = await getSettingsRepo(mode).load();
-    set({ ...loaded, hydrated: true });
+    set({
+      ...DEFAULT_SETTINGS,
+      ...loaded,
+      defaultWarmUp: loaded.defaultWarmUp ?? DEFAULT_SETTINGS.defaultWarmUp,
+      defaultCoolDown: loaded.defaultCoolDown ?? DEFAULT_SETTINGS.defaultCoolDown,
+      hydrated: true,
+    });
   },
 }));
 
@@ -85,4 +98,14 @@ function equipmentListsEqual(
   const sa = [...a].sort().join(",");
   const sb = [...b].sort().join(",");
   return sa === sb;
+}
+
+function stretchListsEqual(a: StretchEntry[], b: StretchEntry[]): boolean {
+  if (a.length !== b.length) return false;
+  const key = (list: StretchEntry[]) =>
+    [...list]
+      .map((e) => `${e.exerciseId}:${e.targetReps}`)
+      .sort()
+      .join("|");
+  return key(a) === key(b);
 }

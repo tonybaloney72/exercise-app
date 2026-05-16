@@ -11,8 +11,8 @@ import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
 
 const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-/** Match prior Mon–Sat → Sun card order */
-const OVERVIEW_DOW_ORDER = [1, 2, 3, 4, 5, 6, 0] as const;
+/** Same Sun–Sat order as the week strip and `weekDates`. */
+const OVERVIEW_DOW_ORDER = [0, 1, 2, 3, 4, 5, 6] as const;
 
 export default function WeeklyPage() {
   const { workoutHistory, loadHistory } = useWorkoutStore();

@@ -6,6 +6,10 @@ import type {
   DayPlan,
 } from "@/types";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+import {
+  CATALOG_DEFAULT_COOL_DOWN,
+  CATALOG_DEFAULT_WARM_UP,
+} from "@/lib/dayStretchPlan";
 
 export type ExerciseSettingsMap = Record<string, ExerciseSettingsValues>;
 
@@ -69,4 +73,6 @@ export const DEFAULT_SETTINGS: UserSettings = {
   availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
   programFocus: "balanced",
   roundDensity: "standard",
+  defaultWarmUp: [...CATALOG_DEFAULT_WARM_UP],
+  defaultCoolDown: [...CATALOG_DEFAULT_COOL_DOWN],
 };

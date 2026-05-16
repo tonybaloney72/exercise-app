@@ -9,6 +9,7 @@ import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 
 import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
 import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
+import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import type { DayPlan } from "@/types";
 
 interface WorkoutSessionProps {
@@ -45,7 +46,7 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 
 	const exerciseSettingsById = useExerciseSettingsStore((s) => s.byExerciseId);
 	const { warmUp, coolDown } = useMemo(
-		() => resolveStretchesForDay(plan),
+		() => resolveStretchesForDay(plan, buildStretchResolveContext()),
 		[plan],
 	);
 

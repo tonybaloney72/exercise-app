@@ -6,6 +6,7 @@ import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { CATEGORIES } from "@/data/categories";
 import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
+import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import type { DayPlan } from "@/types";
 
 interface WorkoutPlanPreviewProps {
@@ -28,7 +29,10 @@ export default function WorkoutPlanPreview({
   showTargetMuscleList,
 }: WorkoutPlanPreviewProps) {
   const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
-  const { warmUp, coolDown } = resolveStretchesForDay(plan);
+  const { warmUp, coolDown } = resolveStretchesForDay(
+    plan,
+    buildStretchResolveContext(),
+  );
 
   return (
     <motion.div

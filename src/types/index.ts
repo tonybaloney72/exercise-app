@@ -95,6 +95,10 @@ export interface DayPlan {
   strengthFocus: ExerciseCategory[];
   coreGroups: ExerciseCategory[];
   rounds: Round[];
+  /** Persisted warm-up list (custom day). When set, used as-is for workouts. */
+  warmUp?: StretchEntry[];
+  /** Persisted cool-down list (custom day). When set, used as-is for workouts. */
+  coolDown?: StretchEntry[];
 }
 
 export interface ExerciseLog {
@@ -185,6 +189,10 @@ export interface UserSettings {
   availableEquipment: ExerciseEquipment[];
   programFocus: ProgramFocusPreset;
   roundDensity: RoundDensity;
+  /** Always-included warm-up stretches (Settings). Merged first when deriving a day's warm-up. */
+  defaultWarmUp: StretchEntry[];
+  /** Always-included cool-down stretches (Settings). Merged first when deriving cool-down. */
+  defaultCoolDown: StretchEntry[];
 }
 
 export interface ProgressEntry {
