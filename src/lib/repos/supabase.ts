@@ -29,6 +29,11 @@ import {
   ALL_EXERCISE_EQUIPMENT,
   DEFAULT_AVAILABLE_EQUIPMENT,
 } from "@/data/equipment";
+import {
+  migrateExerciseId,
+  migrateTrainingWeekDays,
+  migrateWorkoutLog,
+} from "@/lib/cpToPcMigration";
 
 type Section = "warm_up" | "round" | "cool_down";
 
@@ -80,13 +85,15 @@ interface SettingsRow {
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
   return {
-    exerciseId: r.exercise_id,
+    exerciseId: migrateExerciseId(r.exercise_id),
     completed: r.completed,
     actualReps: r.actual_reps ?? undefined,
     actualDuration: r.actual_duration ?? undefined,
     targetDurationSeconds: r.target_duration_seconds ?? undefined,
     skipped: r.skipped,
-    swappedWith: r.swapped_with ?? undefined,
+    swappedWith: r.swapped_with
+      ? migrateExerciseId(r.swapped_with)
+      : undefined,
     notes: r.notes ?? undefined,
   };
 }
@@ -305,7 +312,7 @@ export const supabaseWorkoutRepo: WorkoutRepo = {
       console.error("[supabaseWorkoutRepo.loadHistory]", error);
       return [];
     }
-    return (data as WorkoutRow[]).map(rowToWorkout);
+    return (data as WorkoutRow[]).map((row) => migrateWorkoutLog(rowToWorkout(row)));
   },
 
   async saveWorkout(log: WorkoutLog): Promise<void> {
@@ -414,7 +421,7 @@ export const supabaseExerciseSettingsRepo: ExerciseSettingsRepo = {
     for (const row of data ?? []) {
       const r = row as ExerciseSettingsRow;
       const v = rowToExerciseSettingsValues(r);
-      if (v) map[r.exercise_id] = v;
+      if (v) map[migrateExerciseId(r.exercise_id)] = v;
     }
     return map;
   },
@@ -489,7 +496,7 @@ export const supabaseExercisePreferenceRepo: ExercisePreferenceRepo = {
     const map: ExercisePreferenceMap = {};
     for (const row of (data ?? []) as ExercisePreferenceRow[]) {
       if (row.preference === "favorite" || row.preference === "disliked") {
-        map[row.exercise_id] = row.preference;
+        map[migrateExerciseId(row.exercise_id)] = row.preference;
       }
     }
     return map;
@@ -588,7 +595,7 @@ export const supabaseTrainingWeekRepo: TrainingWeekRepo = {
     const days = daysJsonToWeek(row.days);
     if (!days) return null;
     return {
-      days,
+      days: migrateTrainingWeekDays(days),
       source: row.source ?? null,
       prefsFingerprint: row.prefs_fingerprint ?? null,
     };

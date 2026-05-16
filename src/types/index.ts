@@ -6,7 +6,7 @@ export type ExerciseCategory =
   | "UP"   // Upper Push
   | "UPL"  // Upper Pull
   | "LB"   // Lower Body
-  | "CP"   // Cardio/Plyometric
+  | "PC"   // Plyometric Cardio
   | "SW"   // Stretch – Warm-Up (Dynamic)
   | "SC";  // Stretch – Cool-Down (Static)
 

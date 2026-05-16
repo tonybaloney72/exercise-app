@@ -16,7 +16,7 @@ const TRAINING_CATEGORIES = new Set<ExerciseCategory>([
   "UP",
   "UPL",
   "LB",
-  "CP",
+  "PC",
 ]);
 
 function parseLocalDateKey(key: string): Date {

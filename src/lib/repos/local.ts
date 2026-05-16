@@ -12,6 +12,7 @@ import type {
   WorkoutRepo,
   TrainingWeekRepo,
 } from "./types";
+import { migrateExerciseId, migrateWorkoutLog } from "@/lib/cpToPcMigration";
 import { DEFAULT_SETTINGS } from "./types";
 
 export const LOCAL_HISTORY_KEY = "exercise-app-history";
@@ -27,7 +28,9 @@ export const localWorkoutRepo: WorkoutRepo = {
     if (!isBrowser()) return [];
     try {
       const raw = localStorage.getItem(LOCAL_HISTORY_KEY);
-      return raw ? (JSON.parse(raw) as WorkoutLog[]) : [];
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as WorkoutLog[];
+      return parsed.map(migrateWorkoutLog);
     } catch {
       return [];
     }
@@ -88,12 +91,22 @@ function sanitizeExerciseSettingsMap(raw: unknown): ExerciseSettingsMap {
   return out;
 }
 
+function migrateSettingsMapKeys(map: ExerciseSettingsMap): ExerciseSettingsMap {
+  const out: ExerciseSettingsMap = {};
+  for (const [id, values] of Object.entries(map)) {
+    out[migrateExerciseId(id)] = values;
+  }
+  return out;
+}
+
 export const localExerciseSettingsRepo: ExerciseSettingsRepo = {
   async loadAll(): Promise<ExerciseSettingsMap> {
     if (!isBrowser()) return {};
     try {
       const raw = localStorage.getItem(LOCAL_EXERCISE_SETTINGS_KEY);
-      return raw ? sanitizeExerciseSettingsMap(JSON.parse(raw)) : {};
+      return raw
+        ? migrateSettingsMapKeys(sanitizeExerciseSettingsMap(JSON.parse(raw)))
+        : {};
     } catch {
       return {};
     }

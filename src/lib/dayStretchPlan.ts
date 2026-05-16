@@ -91,9 +91,9 @@ function dayWantsUpper(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
 function dayWantsLower(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
   return (
     plan.hasJog ||
-    plan.strengthFocus.some((c) => LOWER_STRENGTH.includes(c) || c === "CP") ||
+    plan.strengthFocus.some((c) => LOWER_STRENGTH.includes(c) || c === "PC") ||
     cats.has("LB") ||
-    cats.has("CP")
+    cats.has("PC")
   );
 }
 
@@ -105,7 +105,7 @@ function dayWantsCore(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
 }
 
 function dayWantsConditioning(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
-  return plan.strengthFocus.includes("CP") || cats.has("CP");
+  return plan.strengthFocus.includes("PC") || cats.has("PC");
 }
 
 /**

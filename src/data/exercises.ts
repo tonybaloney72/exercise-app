@@ -160,7 +160,7 @@ const catalogExercises: Exercise[] = [
 		source: "Video 2",
 		videoUrl: "https://youtu.be/fZPS3DrShuE?si=mEE9MHh9QA4SdSnR&t=309",
 		isTimeBased: false,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 
 	// ── Core – Rotational/Obliques (CR) ──
@@ -575,7 +575,7 @@ const catalogExercises: Exercise[] = [
 		source: "Healthline",
 		videoUrl: "https://www.healthline.com/health/fitness-exercise/oblique-workout",
 		isTimeBased: false,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 	{
 		id: "CR-11",
@@ -827,7 +827,7 @@ const catalogExercises: Exercise[] = [
 		source: "Healthline",
 		videoUrl: "https://www.healthline.com/health/fitness-exercise/oblique-workout",
 		isTimeBased: false,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 	{
 		id: "CR-30",
@@ -1524,11 +1524,11 @@ const catalogExercises: Exercise[] = [
 		isTimeBased: false,
 	},
 
-	// ── Cardio/Plyometric (CP) ──
+	// ── Plyometric Cardio (PC) ──
 	{
-		id: "CP-1",
+		id: "PC-1",
 		name: "Jumping Jacks",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes","Quadriceps"],
 		defaultReps: "20–25",
@@ -1538,9 +1538,9 @@ const catalogExercises: Exercise[] = [
 		isTimeBased: false,
 	},
 	{
-		id: "CP-2",
+		id: "PC-2",
 		name: "Standing Elbows to Knees",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes","Quadriceps"],
 		defaultReps: "20 each",
@@ -1550,9 +1550,9 @@ const catalogExercises: Exercise[] = [
 		isTimeBased: false,
 	},
 	{
-		id: "CP-3",
+		id: "PC-3",
 		name: "Switch Mountain Climbers",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes","Quadriceps"],
 		defaultReps: "20 each",
@@ -1562,9 +1562,9 @@ const catalogExercises: Exercise[] = [
 		isTimeBased: false,
 	},
 	{
-		id: "CP-4",
+		id: "PC-4",
 		name: "Burpees",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes","Quadriceps"],
 		defaultReps: "5–8",
@@ -1575,9 +1575,9 @@ const catalogExercises: Exercise[] = [
 		isTimeBased: false,
 	},
 	{
-		id: "CP-5",
+		id: "PC-5",
 		name: "High Knees",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes","Quadriceps"],
 		defaultReps: "20 each",
@@ -1587,9 +1587,9 @@ const catalogExercises: Exercise[] = [
 		isTimeBased: false,
 	},
 	{
-		id: "CP-6",
+		id: "PC-6",
 		name: "Squat Jumps",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes","Quadriceps"],
 		defaultReps: "8–10",
@@ -1599,9 +1599,9 @@ const catalogExercises: Exercise[] = [
 		isTimeBased: false,
 	},
 	{
-		id: "CP-7",
+		id: "PC-7",
 		name: "Inner Thigh Pulses",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes","Quadriceps"],
 		defaultReps: "15 each",
@@ -1613,9 +1613,9 @@ const catalogExercises: Exercise[] = [
 
 	// ── Cardio/Plyometric — Rehab Hero (Plyometrics) ──
 	{
-		id: "CP-8",
+		id: "PC-8",
 		name: "Single Leg Drop Landing",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "5 each leg",
@@ -1627,9 +1627,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-9",
+		id: "PC-9",
 		name: "Drop Landing",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "6–8",
@@ -1641,9 +1641,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-10",
+		id: "PC-10",
 		name: "Crossover Side Steps",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "10 each direction",
@@ -1655,9 +1655,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-11",
+		id: "PC-11",
 		name: "Single Leg Lateral Hops",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "8 each leg",
@@ -1669,9 +1669,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-12",
+		id: "PC-12",
 		name: "Two-Footed Broad Jump",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Hamstrings", "Quadriceps"],
 		defaultReps: "5–6",
@@ -1683,9 +1683,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-13",
+		id: "PC-13",
 		name: "Lateral Skaters",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "10 each side",
@@ -1697,9 +1697,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-14",
+		id: "PC-14",
 		name: "Bulgarian Split Squat Hop",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "6 each leg",
@@ -1711,9 +1711,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-15",
+		id: "PC-15",
 		name: "Box Jumps",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "6–8",
@@ -1725,9 +1725,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-16",
+		id: "PC-16",
 		name: "Seated Jump Squat",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "6–8",
@@ -1739,9 +1739,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-17",
+		id: "PC-17",
 		name: "Depth Jump",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		plyometricIntensity: "high",
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
@@ -1754,9 +1754,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-18",
+		id: "PC-18",
 		name: "Sprinter Step-Up Jumps",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Glutes", "Hip Flexors", "Quadriceps"],
 		defaultReps: "6 each leg",
@@ -1768,9 +1768,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-19",
+		id: "PC-19",
 		name: "Seated Box Jump",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "5–6",
@@ -1784,9 +1784,9 @@ const catalogExercises: Exercise[] = [
 
 	// ── Cardio/Plyometric — ExRx.net (bodyweight / minimal gear) ──
 	{
-		id: "CP-20",
+		id: "PC-20",
 		name: "90° Jump Turns",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "6 each direction",
@@ -1797,9 +1797,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-21",
+		id: "PC-21",
 		name: "180° Jump Turns",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "5–6",
@@ -1810,9 +1810,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-22",
+		id: "PC-22",
 		name: "360° Jump Turn",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "4–5 each direction",
@@ -1823,9 +1823,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-23",
+		id: "PC-23",
 		name: "Split Jump",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "8 each leg",
@@ -1837,9 +1837,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-24",
+		id: "PC-24",
 		name: "Standing Vertical Jump",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "6–8",
@@ -1850,9 +1850,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-25",
+		id: "PC-25",
 		name: "360° Jump Turns",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "4 each direction",
@@ -1863,9 +1863,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-26",
+		id: "PC-26",
 		name: "Hurdle Jumps",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "5–6",
@@ -1877,9 +1877,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-27",
+		id: "PC-27",
 		name: "Stair Jumps",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "4–6",
@@ -1891,9 +1891,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-28",
+		id: "PC-28",
 		name: "Speed Hop",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "20 m",
@@ -1905,9 +1905,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-29",
+		id: "PC-29",
 		name: "Cone Jumps",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "8–10",
@@ -1919,9 +1919,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-30",
+		id: "PC-30",
 		name: "Alternate Bound",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Hamstrings", "Quadriceps"],
 		defaultReps: "20 m",
@@ -1933,9 +1933,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-31",
+		id: "PC-31",
 		name: "Double Leg Bound",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Hamstrings", "Quadriceps"],
 		defaultReps: "6–8",
@@ -1946,9 +1946,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-32",
+		id: "PC-32",
 		name: "Standing Triple Jump",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Hamstrings", "Quadriceps"],
 		defaultReps: "3–4",
@@ -1959,9 +1959,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-33",
+		id: "PC-33",
 		name: "Lateral Line Hop",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "20 sec",
@@ -1972,9 +1972,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-34",
+		id: "PC-34",
 		name: "Slalom Jump",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "10",
@@ -1985,9 +1985,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-35",
+		id: "PC-35",
 		name: "Lateral Cone Hop",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "8 each side",
@@ -1998,9 +1998,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-36",
+		id: "PC-36",
 		name: "Long Slalom Jumps",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "6–8",
@@ -2011,9 +2011,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "CP-37",
+		id: "PC-37",
 		name: "Pike Jump",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Abs", "Hip Flexors"],
 		defaultReps: "6–8",
@@ -2025,9 +2025,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "CF",
 	},
 	{
-		id: "CP-38",
+		id: "PC-38",
 		name: "Wall Plyo Push-Up",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
 		defaultReps: "8–10",
@@ -2039,9 +2039,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "UP",
 	},
 	{
-		id: "CP-39",
+		id: "PC-39",
 		name: "Shoulder Tap Push-Up",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
 		defaultReps: "6 each side",
@@ -2053,9 +2053,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "UP",
 	},
 	{
-		id: "CP-40",
+		id: "PC-40",
 		name: "Incline Plyo Push-Up",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
 		defaultReps: "8–10",
@@ -2067,9 +2067,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "UP",
 	},
 	{
-		id: "CP-41",
+		id: "PC-41",
 		name: "Clap Push-Up",
-		category: "CP",
+		category: "PC",
 		equipment: ["bodyweight"],
 		muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
 		defaultReps: "4–6",
@@ -2081,9 +2081,9 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "UP",
 	},
 	{
-		id: "CP-42",
+		id: "PC-42",
 		name: "Depth Push-Up",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
 		defaultReps: "5–8",
@@ -2098,9 +2098,9 @@ const catalogExercises: Exercise[] = [
 
 	// ── Cardio/Plyometric — medicine ball (ExRx.net) ──
 	{
-		id: "CP-43",
+		id: "PC-43",
 		name: "Medicine Ball Slam",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Abs", "Lats", "Obliques"],
 		defaultReps: "8–10",
@@ -2113,9 +2113,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium",
 	},
 	{
-		id: "CP-44",
+		id: "PC-44",
 		name: "Medicine Ball Russian Twist",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Obliques"],
 		defaultReps: "10 each side",
@@ -2127,9 +2127,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "low_medium",
 	},
 	{
-		id: "CP-45",
+		id: "PC-45",
 		name: "Medicine Ball Standing Twist",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Obliques"],
 		defaultReps: "10 each side",
@@ -2141,9 +2141,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "low",
 	},
 	{
-		id: "CP-46",
+		id: "PC-46",
 		name: "Medicine Ball Diagonal Chop",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Obliques"],
 		defaultReps: "8 each side",
@@ -2156,9 +2156,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "low",
 	},
 	{
-		id: "CP-47",
+		id: "PC-47",
 		name: "Medicine Ball Arch Chop",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Abs", "Obliques"],
 		defaultReps: "8–10",
@@ -2170,9 +2170,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "low",
 	},
 	{
-		id: "CP-48",
+		id: "PC-48",
 		name: "Medicine Ball Vertical Chop",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Abs", "Front Deltoids"],
 		defaultReps: "8–10",
@@ -2184,9 +2184,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "low",
 	},
 	{
-		id: "CP-49",
+		id: "PC-49",
 		name: "Medicine Ball Chest Throw",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
 		defaultReps: "8–10",
@@ -2199,9 +2199,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "low",
 	},
 	{
-		id: "CP-50",
+		id: "PC-50",
 		name: "Medicine Ball Side Throw (Wall)",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Obliques"],
 		defaultReps: "8 each side",
@@ -2213,9 +2213,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "low_medium",
 	},
 	{
-		id: "CP-51",
+		id: "PC-51",
 		name: "Medicine Ball Wall Shot",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
 		defaultReps: "10",
@@ -2227,9 +2227,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium",
 	},
 	{
-		id: "CP-52",
+		id: "PC-52",
 		name: "Medicine Ball Squat to Overhead Throw",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Glutes", "Quadriceps", "Front Deltoids"],
 		defaultReps: "6–8",
@@ -2241,9 +2241,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium_high",
 	},
 	{
-		id: "CP-53",
+		id: "PC-53",
 		name: "Medicine Ball Overhead Backward Throw",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors"],
 		defaultReps: "6–8",
@@ -2256,9 +2256,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium_high",
 	},
 	{
-		id: "CP-54",
+		id: "PC-54",
 		name: "Medicine Ball Lateral Bound",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "6 each side",
@@ -2271,9 +2271,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium",
 	},
 	{
-		id: "CP-55",
+		id: "PC-55",
 		name: "Medicine Ball Rotation Scoop Throw",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Glutes", "Obliques", "Quadriceps"],
 		defaultReps: "6 each side",
@@ -2286,9 +2286,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium_high",
 	},
 	{
-		id: "CP-56",
+		id: "PC-56",
 		name: "Medicine Ball Pullover Throw",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Lats", "Triceps"],
 		defaultReps: "8–10",
@@ -2301,9 +2301,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "low_medium",
 	},
 	{
-		id: "CP-57",
+		id: "PC-57",
 		name: "Medicine Ball Chest Throw Sit-Up (Wall)",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Abs", "Chest"],
 		defaultReps: "8–10",
@@ -2316,9 +2316,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium",
 	},
 	{
-		id: "CP-58",
+		id: "PC-58",
 		name: "Medicine Ball Overhead Throw Sit-Up (Wall)",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Abs", "Front Deltoids"],
 		defaultReps: "8–10",
@@ -2330,9 +2330,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium_high",
 	},
 	{
-		id: "CP-59",
+		id: "PC-59",
 		name: "Medicine Ball One-Arm Throw",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Chest", "Obliques", "Triceps"],
 		defaultReps: "8 each arm",
@@ -2344,9 +2344,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "low_medium",
 	},
 	{
-		id: "CP-60",
+		id: "PC-60",
 		name: "Depth Push-Up (Medicine Ball)",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
 		defaultReps: "5–8",
@@ -2359,9 +2359,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium_high",
 	},
 	{
-		id: "CP-61",
+		id: "PC-61",
 		name: "Medicine Ball Russian Twist Throw",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Obliques"],
 		defaultReps: "8 each side",
@@ -2373,9 +2373,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium",
 	},
 	{
-		id: "CP-62",
+		id: "PC-62",
 		name: "Medicine Ball Side Twist Throw",
-		category: "CP",
+		category: "PC",
 		equipment: ["medicine_ball"],
 		muscleGroups: ["Obliques"],
 		defaultReps: "8 each side",
@@ -2389,9 +2389,9 @@ const catalogExercises: Exercise[] = [
 
 	// ── Cardio/Plyometric — plyo box (ExRx.net) ──
 	{
-		id: "CP-63",
+		id: "PC-63",
 		name: "Box Depth Jump",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Calves", "Glutes", "Quadriceps"],
 		defaultReps: "4–6",
@@ -2404,9 +2404,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "high",
 	},
 	{
-		id: "CP-64",
+		id: "PC-64",
 		name: "Lateral Box Jumps",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "6 each side",
@@ -2418,9 +2418,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "medium",
 	},
 	{
-		id: "CP-65",
+		id: "PC-65",
 		name: "Lateral Box Shuffle",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "10 each direction",
@@ -2433,9 +2433,9 @@ const catalogExercises: Exercise[] = [
 		plyometricIntensity: "low",
 	},
 	{
-		id: "CP-66",
+		id: "PC-66",
 		name: "Low Box March",
-		category: "CP",
+		category: "PC",
 		equipment: ["plyo_box"],
 		muscleGroups: ["Glutes", "Quadriceps"],
 		defaultReps: "20 sec",
@@ -2680,7 +2680,7 @@ const catalogExercises: Exercise[] = [
 		source: "BarBend",
 		videoUrl: "https://barbend.com/best-dynamic-warm-up-exercises/",
 		isTimeBased: false,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 	{
 		id: "SW-18",
@@ -2747,7 +2747,7 @@ const catalogExercises: Exercise[] = [
 		source: "BarBend",
 		videoUrl: "https://barbend.com/best-dynamic-warm-up-exercises/",
 		isTimeBased: false,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 	{
 		id: "SW-23",
@@ -2788,7 +2788,7 @@ const catalogExercises: Exercise[] = [
 		source: "ACE",
 		videoUrl: "https://www.youtube.com/watch?v=2W4ZNSwoWDA",
 		isTimeBased: true,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 
 	// ── DAREBEE warm-ups (Universal, Quick, Classic, 2-Min, 4-Min, Fighter's) ──
@@ -2899,7 +2899,7 @@ const catalogExercises: Exercise[] = [
 		source: "DAREBEE",
 		videoUrl: "https://darebee.com/exercises/hops-on-the-spot.html",
 		isTimeBased: false,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 	{
 		id: "SW-34",
@@ -2913,7 +2913,7 @@ const catalogExercises: Exercise[] = [
 		source: "DAREBEE",
 		videoUrl: "https://darebee.com/exercises/hops-side-to-side.html",
 		isTimeBased: false,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 	{
 		id: "SW-35",
@@ -2927,7 +2927,7 @@ const catalogExercises: Exercise[] = [
 		source: "DAREBEE — 2-Minute Warmup",
 		videoUrl: "https://darebee.com/exercises/hops-side-to-side-feet-together.html",
 		isTimeBased: false,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 	{
 		id: "SW-36",
@@ -2941,7 +2941,7 @@ const catalogExercises: Exercise[] = [
 		source: "DAREBEE — Quick Warmup",
 		videoUrl: "https://darebee.com/workouts/quick-warmup-workout.html",
 		isTimeBased: false,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 	{
 		id: "SW-37",
@@ -2983,7 +2983,7 @@ const catalogExercises: Exercise[] = [
 		source: "DAREBEE — Universal Warmup",
 		videoUrl: "https://darebee.com/workouts/universal-warmup-workout.html",
 		isTimeBased: false,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 	{
 		id: "SW-40",
@@ -2997,7 +2997,7 @@ const catalogExercises: Exercise[] = [
 		source: "DAREBEE — Fighter's Warmup",
 		videoUrl: "https://darebee.com/workouts/fighters-warmup-workout.html",
 		isTimeBased: true,
-		secondaryCategory: "CP",
+		secondaryCategory: "PC",
 	},
 	{
 		id: "SW-41",
@@ -3382,6 +3382,18 @@ export const exercises: Exercise[] = [
 	...hybridCalisthenicsExercises,
 ];
 
-export const exerciseMap: Record<string, Exercise> = Object.fromEntries(
-	exercises.map(e => [e.id, e]),
-);
+function buildExerciseMap(): Record<string, Exercise> {
+	const map = Object.fromEntries(exercises.map((e) => [e.id, e])) as Record<
+		string,
+		Exercise
+	>;
+	for (const e of exercises) {
+		if (e.id.startsWith("PC-")) {
+			const legacyId = `CP-${e.id.slice(3)}`;
+			if (!map[legacyId]) map[legacyId] = e;
+		}
+	}
+	return map;
+}
+
+export const exerciseMap: Record<string, Exercise> = buildExerciseMap();

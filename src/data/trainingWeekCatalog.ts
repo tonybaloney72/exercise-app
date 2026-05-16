@@ -41,7 +41,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         roundNumber: 1,
         exercises: [
           { exerciseId: "UP-1", targetReps: "10–13", category: "UP" },
-          { exerciseId: "CP-1", targetReps: "20", category: "CP" },
+          { exerciseId: "PC-1", targetReps: "20", category: "PC" },
           { exerciseId: "CF-1", targetReps: "12", category: "CF" },
           { exerciseId: "CF-2", targetReps: "10", category: "CF" },
           { exerciseId: "CL-1", targetReps: "12", category: "CL" },
@@ -51,7 +51,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         roundNumber: 2,
         exercises: [
           { exerciseId: "UP-2", targetReps: "8–10", category: "UP" },
-          { exerciseId: "CP-2", targetReps: "20 each", category: "CP" },
+          { exerciseId: "PC-2", targetReps: "20 each", category: "PC" },
           { exerciseId: "CF-3", targetReps: "12", category: "CF" },
           { exerciseId: "CF-5", targetReps: "15", category: "CF" },
           { exerciseId: "CL-2", targetReps: "10", category: "CL" },
@@ -61,7 +61,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         roundNumber: 3,
         exercises: [
           { exerciseId: "UP-3", targetReps: "8–10", category: "UP" },
-          { exerciseId: "CP-1", targetReps: "20", category: "CP" },
+          { exerciseId: "PC-1", targetReps: "20", category: "PC" },
           { exerciseId: "CF-4", targetReps: "10", category: "CF" },
           { exerciseId: "CF-6", targetReps: "12", category: "CF" },
           { exerciseId: "CL-3", targetReps: "12 each", category: "CL" },
@@ -160,7 +160,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
     name: "Thursday",
     theme: "Lower Body + Cardio/Plyo + Core Lower Abs + Core Stability",
     hasJog: true,
-    strengthFocus: ["LB", "CP"],
+    strengthFocus: ["LB", "PC"],
     coreGroups: ["CL", "CS"],
     rounds: [
       {
@@ -168,7 +168,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         exercises: [
           { exerciseId: "LB-1", targetReps: "15", category: "LB" },
           { exerciseId: "LB-8", targetReps: "10 each", category: "LB" },
-          { exerciseId: "CP-5", targetReps: "20 each", category: "CP" },
+          { exerciseId: "PC-5", targetReps: "20 each", category: "PC" },
           { exerciseId: "CL-4", targetReps: "10", category: "CL" },
           { exerciseId: "CS-1", targetReps: "10", category: "CS" },
         ],
@@ -178,7 +178,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         exercises: [
           { exerciseId: "LB-3", targetReps: "10 each", category: "LB" },
           { exerciseId: "LB-6", targetReps: "15–20", category: "LB" },
-          { exerciseId: "CP-3", targetReps: "20 each", category: "CP" },
+          { exerciseId: "PC-3", targetReps: "20 each", category: "PC" },
           { exerciseId: "CL-5", targetReps: "12", category: "CL" },
           { exerciseId: "CS-2", targetReps: "10 each", category: "CS" },
         ],
@@ -188,7 +188,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         exercises: [
           { exerciseId: "LB-7", targetReps: "12", category: "LB" },
           { exerciseId: "LB-2", targetReps: "10 each", category: "LB" },
-          { exerciseId: "CP-4", targetReps: "5–8", category: "CP" },
+          { exerciseId: "PC-4", targetReps: "5–8", category: "PC" },
           { exerciseId: "CL-6", targetReps: "12", category: "CL" },
           { exerciseId: "CS-4", targetReps: "30–45 sec", category: "CS" },
         ],
@@ -210,7 +210,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         exercises: [
           { exerciseId: "UP-1", targetReps: "10–13", category: "UP" },
           { exerciseId: "UPL-1", targetReps: "8–12", category: "UPL" },
-          { exerciseId: "CP-7", targetReps: "15 each", category: "CP" },
+          { exerciseId: "PC-7", targetReps: "15 each", category: "PC" },
           { exerciseId: "CF-6", targetReps: "12", category: "CF" },
           { exerciseId: "CL-1", targetReps: "12", category: "CL" },
         ],
@@ -220,7 +220,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         exercises: [
           { exerciseId: "UP-5", targetReps: "8–12", category: "UP" },
           { exerciseId: "UPL-2", targetReps: "12–15", category: "UPL" },
-          { exerciseId: "CP-1", targetReps: "20", category: "CP" },
+          { exerciseId: "PC-1", targetReps: "20", category: "PC" },
           { exerciseId: "CF-3", targetReps: "12", category: "CF" },
           { exerciseId: "CL-3", targetReps: "12 each", category: "CL" },
         ],
@@ -230,7 +230,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         exercises: [
           { exerciseId: "UP-4", targetReps: "10–12", category: "UP" },
           { exerciseId: "UPL-3", targetReps: "12–15", category: "UPL" },
-          { exerciseId: "CP-2", targetReps: "20 each", category: "CP" },
+          { exerciseId: "PC-2", targetReps: "20 each", category: "PC" },
           { exerciseId: "CF-7", targetReps: "10", category: "CF" },
           { exerciseId: "CL-2", targetReps: "10", category: "CL" },
         ],
@@ -244,7 +244,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
     name: "Saturday",
     theme: "Lower Body + Cardio/Plyo + Core Rotational + Core Stability",
     hasJog: true,
-    strengthFocus: ["LB", "CP"],
+    strengthFocus: ["LB", "PC"],
     coreGroups: ["CR", "CS"],
     rounds: [
       {
@@ -252,7 +252,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         exercises: [
           { exerciseId: "LB-1", targetReps: "15", category: "LB" },
           { exerciseId: "LB-2", targetReps: "10 each", category: "LB" },
-          { exerciseId: "CP-6", targetReps: "8–10", category: "CP" },
+          { exerciseId: "PC-6", targetReps: "8–10", category: "PC" },
           { exerciseId: "CR-1", targetReps: "12 each", category: "CR" },
           { exerciseId: "CS-3", targetReps: "10 each", category: "CS" },
         ],
@@ -262,7 +262,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         exercises: [
           { exerciseId: "LB-4", targetReps: "8 each", category: "LB" },
           { exerciseId: "LB-6", targetReps: "15–20", category: "LB" },
-          { exerciseId: "CP-5", targetReps: "20 each", category: "CP" },
+          { exerciseId: "PC-5", targetReps: "20 each", category: "PC" },
           { exerciseId: "CR-4", targetReps: "15 each", category: "CR" },
           { exerciseId: "CS-5", targetReps: "15", category: "CS" },
         ],
@@ -272,7 +272,7 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
         exercises: [
           { exerciseId: "LB-5", targetReps: "30–45 sec", category: "LB" },
           { exerciseId: "LB-8", targetReps: "10 each", category: "LB" },
-          { exerciseId: "CP-4", targetReps: "5–8", category: "CP" },
+          { exerciseId: "PC-4", targetReps: "5–8", category: "PC" },
           { exerciseId: "CR-6", targetReps: "20–30 sec each", category: "CR" },
           { exerciseId: "CS-1", targetReps: "10", category: "CS" },
         ],

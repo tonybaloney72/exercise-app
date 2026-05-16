@@ -20,7 +20,7 @@ const CATEGORY_MUSCLE_GROUPS = {
   UP: ["Chest", "Front Deltoids", "Triceps"],
   UPL: ["Lats", "Rhomboids", "Rear Deltoids", "Biceps"],
   LB: ["Quadriceps", "Hamstrings", "Glutes", "Calves"],
-  CP: ["Quadriceps", "Glutes"],
+  PC: ["Quadriceps", "Glutes"],
   SW: ["Mobility"],
   SC: ["Mobility"],
 };

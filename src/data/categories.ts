@@ -64,9 +64,9 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
     textColor: "text-green-400",
     description: "Quadriceps, hamstrings, glutes, calves",
   },
-  CP: {
-    id: "CP",
-    name: "Cardio/Plyometric",
+  PC: {
+    id: "PC",
+    name: "Plyometric Cardio",
     shortName: "Cardio",
     color: "#eab308",
     bgColor: "bg-amber-500/20",
@@ -94,5 +94,5 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
 };
 
 export const CATEGORY_ORDER: ExerciseCategory[] = [
-  "CF", "CL", "CR", "CS", "UP", "UPL", "LB", "CP", "SW", "SC",
+  "CF", "CL", "CR", "CS", "UP", "UPL", "LB", "PC", "SW", "SC",
 ];

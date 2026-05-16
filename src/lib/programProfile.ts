@@ -24,7 +24,7 @@ export const ROUND_DENSITY_TARGETS: Record<RoundDensity, number> = {
 const CORE_CATEGORIES = new Set<ExerciseCategory>(["CF", "CL", "CR", "CS"]);
 const UPPER_CATEGORIES = new Set<ExerciseCategory>(["UP", "UPL"]);
 const LOWER_BODY_CATEGORIES = new Set<ExerciseCategory>(["LB"]);
-const CONDITIONING_CATEGORIES = new Set<ExerciseCategory>(["CP"]);
+const CONDITIONING_CATEGORIES = new Set<ExerciseCategory>(["PC"]);
 
 /** Display order in Settings. */
 export const PROGRAM_FOCUS_PRESETS_ORDER: ProgramFocusPreset[] = [
@@ -84,7 +84,7 @@ export const PROGRAM_FOCUS_OPTIONS: ProgramFocusOption[] = [
     value: "conditioning",
     label: "Conditioning emphasis",
     description:
-      "Prioritizes cardio and plyo (CP) when trimming or filling rounds. Helpful for more metabolic work within each day's template.",
+      "Prioritizes cardio and plyo (PC) when trimming or filling rounds. Helpful for more metabolic work within each day's template.",
   },
 ];
 
