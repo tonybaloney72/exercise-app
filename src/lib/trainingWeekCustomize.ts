@@ -2,10 +2,14 @@ import {
   computePrefsFingerprint,
   TRAINING_WEEK_SOURCE_CUSTOM_V1,
 } from "@/lib/planGenerator";
-import { rebuildDerivedStretches } from "@/lib/dayStretchPlan";
+import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import { refreshTrainingWeekContaining, resolveTrainingWeekForAuth } from "@/lib/planResolver";
 import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
-import { cloneStretchEntries } from "@/lib/stretchDefaults";
+import {
+  cloneStretchEntries,
+  filterStretchesByDislikes,
+  stretchListsEqual,
+} from "@/lib/stretchDefaults";
 import {
   getExercisePreferenceRepo,
   getSettingsRepo,
@@ -32,27 +36,59 @@ export function cloneDayPlan(plan: DayPlan): DayPlan {
   };
 }
 
-/** Seed editor with per-day stretch lists (defaults come from Settings). */
+/** Seed editor lists from resolved stretches (respects dislikes; matches day preview). */
 export function prepareDayPlanForEditor(plan: DayPlan): DayPlan {
   const cloned = cloneDayPlan(plan);
   const ctx = buildStretchResolveContext();
-  const derived = rebuildDerivedStretches(plan, ctx);
-  return {
-    ...cloned,
-    warmUp: plan.warmUp ? cloneStretchEntries(plan.warmUp) : cloneStretchEntries(derived.warmUp),
-    coolDown: plan.coolDown
-      ? cloneStretchEntries(plan.coolDown)
-      : cloneStretchEntries(derived.coolDown),
-  };
+  const resolved = resolveStretchesForDay(plan, ctx);
+
+  const warmUp =
+    plan.warmUp != null
+      ? filterStretchesByDislikes(cloneStretchEntries(plan.warmUp), ctx.dislikedExerciseIds)
+      : resolved.warmUp;
+
+  const coolDown =
+    plan.coolDown != null
+      ? filterStretchesByDislikes(cloneStretchEntries(plan.coolDown), ctx.dislikedExerciseIds)
+      : resolved.coolDown;
+
+  return { ...cloned, warmUp, coolDown };
 }
 
-/** Strip legacy per-day default fields before persisting (now in Settings). */
+/** Strip legacy fields; only persist per-day stretch overrides when they differ from derived. */
 export function dayPlanForCustomSave(plan: DayPlan): DayPlan {
+  const ctx = buildStretchResolveContext();
   const { defaultWarmUp: _w, defaultCoolDown: _c, ...rest } = plan as DayPlan & {
     defaultWarmUp?: StretchEntry[];
     defaultCoolDown?: StretchEntry[];
   };
-  return rest;
+
+  const basePlan: DayPlan = { ...rest };
+  const resolved = resolveStretchesForDay(basePlan, ctx);
+
+  const warmUp =
+    rest.warmUp != null &&
+    !stretchListsEqual(
+      filterStretchesByDislikes(rest.warmUp, ctx.dislikedExerciseIds),
+      resolved.warmUp,
+    )
+      ? filterStretchesByDislikes(rest.warmUp, ctx.dislikedExerciseIds)
+      : undefined;
+
+  const coolDown =
+    rest.coolDown != null &&
+    !stretchListsEqual(
+      filterStretchesByDislikes(rest.coolDown, ctx.dislikedExerciseIds),
+      resolved.coolDown,
+    )
+      ? filterStretchesByDislikes(rest.coolDown, ctx.dislikedExerciseIds)
+      : undefined;
+
+  return {
+    ...basePlan,
+    warmUp,
+    coolDown,
+  };
 }
 
 /**
@@ -72,9 +108,10 @@ export async function saveCustomDayPlan(
   const dow = parsed.getDay();
 
   const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");
+  const toSave = dayPlanForCustomSave(dayPlan);
   const merged = {
     ...week,
-    [dow]: { ...dayPlanForCustomSave(dayPlan), dayOfWeek: dow },
+    [dow]: { ...toSave, dayOfWeek: dow },
   };
 
   const [prefs, settings] = await Promise.all([

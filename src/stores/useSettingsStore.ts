@@ -1,10 +1,16 @@
 "use client";
 
 import { create } from "zustand";
-import type { StretchEntry, UserSettings } from "@/types";
+import type { UserSettings } from "@/types";
+import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { DEFAULT_SETTINGS, getSettingsRepo } from "@/lib/repos";
 import { refreshCurrentTrainingWeek } from "@/lib/trainingWeekRefresh";
+import {
+  pruneStoredStretchDefaults,
+  stretchListsEqual,
+} from "@/lib/stretchDefaults";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import type { ExerciseEquipment } from "@/types";
 
 interface SettingsState extends UserSettings {
@@ -80,13 +86,34 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const mode = useAuthStore.getState().mode;
     if (mode === "loading") return;
     const loaded = await getSettingsRepo(mode).load();
-    set({
+    const disliked = collectDislikedIds(
+      useExercisePreferencesStore.getState().byExerciseId,
+    );
+    const { defaultWarmUp, defaultCoolDown } = pruneStoredStretchDefaults(
+      loaded.defaultWarmUp ?? [],
+      loaded.defaultCoolDown ?? [],
+      disliked,
+    );
+    const merged: UserSettings = {
       ...DEFAULT_SETTINGS,
       ...loaded,
-      defaultWarmUp: loaded.defaultWarmUp ?? DEFAULT_SETTINGS.defaultWarmUp,
-      defaultCoolDown: loaded.defaultCoolDown ?? DEFAULT_SETTINGS.defaultCoolDown,
-      hydrated: true,
-    });
+      defaultWarmUp,
+      defaultCoolDown,
+    };
+
+    const pruned =
+      !stretchListsEqual(defaultWarmUp, loaded.defaultWarmUp ?? []) ||
+      !stretchListsEqual(defaultCoolDown, loaded.defaultCoolDown ?? []);
+
+    set({ ...merged, hydrated: true });
+
+    if (mode === "authenticated" && pruned) {
+      try {
+        await getSettingsRepo(mode).save(merged);
+      } catch (err) {
+        console.error("[useSettingsStore.pruneStretchDefaults]", err);
+      }
+    }
   },
 }));
 
@@ -98,14 +125,4 @@ function equipmentListsEqual(
   const sa = [...a].sort().join(",");
   const sb = [...b].sort().join(",");
   return sa === sb;
-}
-
-function stretchListsEqual(a: StretchEntry[], b: StretchEntry[]): boolean {
-  if (a.length !== b.length) return false;
-  const key = (list: StretchEntry[]) =>
-    [...list]
-      .map((e) => `${e.exerciseId}:${e.targetReps}`)
-      .sort()
-      .join("|");
-  return key(a) === key(b);
 }

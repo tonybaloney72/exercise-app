@@ -3,6 +3,7 @@ import {
   resolveDefaultCoolDownFromSettings,
   resolveDefaultWarmUpFromSettings,
 } from "@/lib/stretchDefaults";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { StretchEntry } from "@/types";
@@ -16,6 +17,8 @@ export type StretchResolveContext = {
 /** Sync context for stores / workout start (non-React). */
 export function buildStretchResolveContext(): StretchResolveContext {
   const settings = useSettingsStore.getState();
+  const mode = useAuthStore.getState().mode;
+  const useCatalogIfEmpty = mode === "guest";
   const dislikedExerciseIds = collectDislikedIds(
     useExercisePreferencesStore.getState().byExerciseId,
   );
@@ -23,10 +26,12 @@ export function buildStretchResolveContext(): StretchResolveContext {
     defaultWarmUp: resolveDefaultWarmUpFromSettings(
       settings.defaultWarmUp,
       dislikedExerciseIds,
+      useCatalogIfEmpty,
     ),
     defaultCoolDown: resolveDefaultCoolDownFromSettings(
       settings.defaultCoolDown,
       dislikedExerciseIds,
+      useCatalogIfEmpty,
     ),
     dislikedExerciseIds,
   };

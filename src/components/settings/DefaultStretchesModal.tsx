@@ -11,6 +11,7 @@ import { pickRandomSwap } from "@/lib/exerciseSwap";
 import {
   cloneStretchEntries,
   filterStretchesByDislikes,
+  pruneStoredStretchDefaults,
 } from "@/lib/stretchDefaults";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -39,10 +40,15 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
   const [error, setError] = useState<string | null>(null);
 
   const resetDraft = useCallback(() => {
-    setDraftWarmUp(cloneStretchEntries(settings.defaultWarmUp));
-    setDraftCoolDown(cloneStretchEntries(settings.defaultCoolDown));
+    const { defaultWarmUp, defaultCoolDown } = pruneStoredStretchDefaults(
+      settings.defaultWarmUp,
+      settings.defaultCoolDown,
+      dislikedIds,
+    );
+    setDraftWarmUp(cloneStretchEntries(defaultWarmUp));
+    setDraftCoolDown(cloneStretchEntries(defaultCoolDown));
     setError(null);
-  }, [settings.defaultWarmUp, settings.defaultCoolDown]);
+  }, [settings.defaultWarmUp, settings.defaultCoolDown, dislikedIds]);
 
   useEffect(() => {
     if (open) resetDraft();
@@ -162,8 +168,8 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
               <div>
                 <h2 className="text-sm font-semibold text-foreground">Default stretches</h2>
                 <p className="text-[11px] text-muted mt-0.5">
-                  Always included when building warm-up and cool-down. Disliked exercises
-                  are hidden and removed on save.
+                  These are merged first into each day&apos;s lists. Disliked exercises are
+                  hidden here and removed when you save.
                 </p>
               </div>
               <button

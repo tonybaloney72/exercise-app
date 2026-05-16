@@ -349,12 +349,13 @@ export default function SettingsPage() {
           <div>
             <h3 className="text-xs font-semibold text-foreground">Default stretches</h3>
             <p className="text-xs text-muted mt-0.5 mb-2">
-              Stretches always merged first into each day&apos;s warm-up and cool-down.
-              Disliked exercises in the Library are excluded.
+              Stretches you always want included when a day&apos;s warm-up or cool-down is
+              built. Start empty and add your own; disliked Library exercises are excluded.
             </p>
             <p className="text-xs text-foreground mb-2">
-              {effectiveStretchDefaults.warm} warm-up · {effectiveStretchDefaults.cool}{" "}
-              cool-down
+              {effectiveStretchDefaults.warm === 0 && effectiveStretchDefaults.cool === 0
+                ? "None selected — focus-based stretches still apply per day."
+                : `${effectiveStretchDefaults.warm} warm-up · ${effectiveStretchDefaults.cool} cool-down`}
             </p>
             <button
               type="button"

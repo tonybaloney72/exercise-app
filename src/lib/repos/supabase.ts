@@ -11,10 +11,6 @@ import type {
   WorkoutLog,
 } from "@/types";
 import { createClient } from "@/lib/supabase/client";
-import {
-  CATALOG_DEFAULT_COOL_DOWN,
-  CATALOG_DEFAULT_WARM_UP,
-} from "@/lib/dayStretchPlan";
 import { sanitizeStretchEntries } from "@/lib/stretchDefaults";
 import { DEFAULT_TIMER_SECONDS_FALLBACK } from "@/utils/effectiveExerciseSettings";
 import type {
@@ -289,10 +285,8 @@ function rowToSettings(row: SettingsRow): UserSettings {
     availableEquipment: sanitizeAvailableEquipment(row.available_equipment),
     programFocus: sanitizeProgramFocus(row.program_focus),
     roundDensity: sanitizeRoundDensity(row.round_density),
-    defaultWarmUp:
-      sanitizeStretchEntries(row.default_warm_up) ?? [...CATALOG_DEFAULT_WARM_UP],
-    defaultCoolDown:
-      sanitizeStretchEntries(row.default_cool_down) ?? [...CATALOG_DEFAULT_COOL_DOWN],
+    defaultWarmUp: sanitizeStretchEntries(row.default_warm_up),
+    defaultCoolDown: sanitizeStretchEntries(row.default_cool_down),
   };
 }
 

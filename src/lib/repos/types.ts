@@ -7,9 +7,9 @@ import type {
 } from "@/types";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
-  CATALOG_DEFAULT_COOL_DOWN,
-  CATALOG_DEFAULT_WARM_UP,
-} from "@/lib/dayStretchPlan";
+  GUEST_FALLBACK_COOL_DOWN,
+  GUEST_FALLBACK_WARM_UP,
+} from "@/lib/stretchDefaults";
 
 export type ExerciseSettingsMap = Record<string, ExerciseSettingsValues>;
 
@@ -73,6 +73,14 @@ export const DEFAULT_SETTINGS: UserSettings = {
   availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
   programFocus: "balanced",
   roundDensity: "standard",
-  defaultWarmUp: [...CATALOG_DEFAULT_WARM_UP],
-  defaultCoolDown: [...CATALOG_DEFAULT_COOL_DOWN],
+  /** Signed-in users configure their own; guests get catalog fallbacks at resolve time. */
+  defaultWarmUp: [],
+  defaultCoolDown: [],
 };
+
+/** Stretch defaults seeded for guest localStorage when none are stored. */
+export const GUEST_DEFAULT_SETTINGS: Pick<UserSettings, "defaultWarmUp" | "defaultCoolDown"> =
+  {
+    defaultWarmUp: [...GUEST_FALLBACK_WARM_UP],
+    defaultCoolDown: [...GUEST_FALLBACK_COOL_DOWN],
+  };
