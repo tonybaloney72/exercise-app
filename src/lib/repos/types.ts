@@ -3,6 +3,7 @@ import type {
   WorkoutLog,
   ExerciseSettingsValues,
   ExercisePreferenceKind,
+  DayPlan,
 } from "@/types";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 
@@ -34,6 +35,14 @@ export interface ExercisePreferenceRepo {
     exerciseId: string,
     preference: ExercisePreferenceKind | null,
   ): Promise<void>;
+}
+
+/** dayOfWeek 0 (Sun) … 6 (Sat) → persisted template for that day. */
+export type TrainingWeekDays = Record<number, DayPlan>;
+
+export interface TrainingWeekRepo {
+  loadWeek(weekStartSundayKey: string): Promise<TrainingWeekDays | null>;
+  saveSeededWeek(weekStartSundayKey: string, days: TrainingWeekDays): Promise<void>;
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {

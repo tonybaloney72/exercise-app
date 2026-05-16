@@ -10,6 +10,7 @@ import type {
   ExercisePreferenceMap,
   SettingsRepo,
   WorkoutRepo,
+  TrainingWeekRepo,
 } from "./types";
 import { DEFAULT_SETTINGS } from "./types";
 
@@ -116,6 +117,16 @@ export const localExercisePreferenceRepo: ExercisePreferenceRepo = {
 
   async setPreference(): Promise<void> {
     /* Guest / local: preferences are server-only for signed-in users (Slice 1). */
+  },
+};
+
+/** Guest: weeks are not stored locally; callers use catalog `getPlanForDay` for display. */
+export const localTrainingWeekRepo: TrainingWeekRepo = {
+  async loadWeek() {
+    return null;
+  },
+  async saveSeededWeek() {
+    /* no-op */
   },
 };
 

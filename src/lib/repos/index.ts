@@ -5,18 +5,21 @@ import {
   localExerciseSettingsRepo,
   localSettingsRepo,
   localWorkoutRepo,
+  localTrainingWeekRepo,
 } from "./local";
 import {
   supabaseExercisePreferenceRepo,
   supabaseExerciseSettingsRepo,
   supabaseSettingsRepo,
   supabaseWorkoutRepo,
+  supabaseTrainingWeekRepo,
 } from "./supabase";
 import type {
   ExercisePreferenceRepo,
   ExerciseSettingsRepo,
   SettingsRepo,
   WorkoutRepo,
+  TrainingWeekRepo,
 } from "./types";
 
 export type {
@@ -26,6 +29,8 @@ export type {
   ExerciseSettingsRepo,
   SettingsRepo,
   WorkoutRepo,
+  TrainingWeekDays,
+  TrainingWeekRepo,
 } from "./types";
 export { DEFAULT_SETTINGS } from "./types";
 export { clearLocalData } from "./local";
@@ -52,4 +57,9 @@ export function getExercisePreferenceRepo(mode?: AuthMode): ExercisePreferenceRe
   return m === "authenticated"
     ? supabaseExercisePreferenceRepo
     : localExercisePreferenceRepo;
+}
+
+export function getTrainingWeekRepo(mode?: AuthMode): TrainingWeekRepo {
+  const m = mode ?? useAuthStore.getState().mode;
+  return m === "authenticated" ? supabaseTrainingWeekRepo : localTrainingWeekRepo;
 }

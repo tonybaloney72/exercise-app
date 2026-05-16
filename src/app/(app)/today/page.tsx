@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { getTodaysPlan } from "@/data/dailyPlans";
 import { CATEGORIES } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutSession from "@/components/workout/WorkoutSession";
@@ -13,6 +12,7 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
+import { useDayPlan } from "@/hooks/useDayPlan";
 
 function TodayPageInner() {
   const searchParams = useSearchParams();
@@ -24,7 +24,8 @@ function TodayPageInner() {
     updateCompletedWorkoutNotes,
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
-  const plan = useMemo(() => getTodaysPlan(), []);
+  const todayKey = formatLocalDateKey();
+  const { plan, loading: planLoading, error: planError } = useDayPlan(todayKey);
 
   const devForcePreWorkout =
     process.env.NODE_ENV === "development" &&
@@ -35,12 +36,30 @@ function TodayPageInner() {
     loadHistory();
   }, [mode, loadHistory]);
 
-  const todaysCompletedLog = useMemo(() => {
-    const todayKey = formatLocalDateKey();
-    return findWorkoutLogForDate(workoutHistory, todayKey);
-  }, [workoutHistory]);
+  const todaysCompletedLog = useMemo(
+    () => findWorkoutLogForDate(workoutHistory, todayKey),
+    [workoutHistory, todayKey],
+  );
 
   const completedLogForUi = devForcePreWorkout ? null : todaysCompletedLog;
+
+  if (planLoading) {
+    return (
+      <div className="py-12 text-center text-sm text-muted">
+        Loading today&apos;s plan…
+      </div>
+    );
+  }
+
+  if (planError || !plan) {
+    return (
+      <div className="py-8 space-y-3 text-center px-2">
+        <p className="text-sm text-foreground">
+          {planError ?? "Could not load today&apos;s plan."}
+        </p>
+      </div>
+    );
+  }
 
   const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
 

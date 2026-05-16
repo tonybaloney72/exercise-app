@@ -1,5 +1,7 @@
 import type {
+  DayPlan,
   ExerciseLog,
+  ExerciseEquipment,
   ExerciseSettingsValues,
   ExerciseSetMode,
   RoundLog,
@@ -15,13 +17,14 @@ import type {
   ExercisePreferenceRepo,
   SettingsRepo,
   WorkoutRepo,
+  TrainingWeekDays,
+  TrainingWeekRepo,
 } from "./types";
 import { DEFAULT_SETTINGS } from "./types";
 import {
   ALL_EXERCISE_EQUIPMENT,
   DEFAULT_AVAILABLE_EQUIPMENT,
 } from "@/data/equipment";
-import type { ExerciseEquipment } from "@/types";
 
 type Section = "warm_up" | "round" | "cool_down";
 
@@ -494,6 +497,84 @@ export const supabaseExercisePreferenceRepo: ExercisePreferenceRepo = {
     );
     if (error) {
       console.error("[supabaseExercisePreferenceRepo.setPreference upsert]", error);
+      throw error;
+    }
+  },
+};
+
+function isDayPlanShape(v: unknown): v is DayPlan {
+  if (!v || typeof v !== "object") return false;
+  const o = v as Record<string, unknown>;
+  return (
+    typeof o.dayOfWeek === "number" &&
+    typeof o.name === "string" &&
+    typeof o.theme === "string" &&
+    typeof o.hasJog === "boolean" &&
+    Array.isArray(o.strengthFocus) &&
+    Array.isArray(o.coreGroups) &&
+    Array.isArray(o.rounds)
+  );
+}
+
+function daysJsonToWeek(raw: unknown): TrainingWeekDays | null {
+  if (!raw || typeof raw !== "object") return null;
+  const obj = raw as Record<string, unknown>;
+  const out: TrainingWeekDays = {};
+  for (let i = 0; i < 7; i++) {
+    const v = obj[String(i)];
+    if (!isDayPlanShape(v)) return null;
+    out[i] = v;
+  }
+  return out;
+}
+
+export const supabaseTrainingWeekRepo: TrainingWeekRepo = {
+  async loadWeek(weekStartSundayKey: string): Promise<TrainingWeekDays | null> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data, error } = await supabase
+      .from("user_training_weeks")
+      .select("days")
+      .eq("user_id", user.id)
+      .eq("week_start_sunday", weekStartSundayKey)
+      .maybeSingle();
+
+    if (error) {
+      console.error("[supabaseTrainingWeekRepo.loadWeek]", error);
+      return null;
+    }
+    if (!data) return null;
+    return daysJsonToWeek((data as { days: unknown }).days);
+  },
+
+  async saveSeededWeek(
+    weekStartSundayKey: string,
+    days: TrainingWeekDays,
+  ): Promise<void> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    const payload = {
+      user_id: user.id,
+      week_start_sunday: weekStartSundayKey,
+      days,
+      source: "daily_plans_catalog",
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase
+      .from("user_training_weeks")
+      .upsert(payload, { onConflict: "user_id,week_start_sunday" });
+
+    if (error) {
+      console.error("[supabaseTrainingWeekRepo.saveSeededWeek]", error);
       throw error;
     }
   },

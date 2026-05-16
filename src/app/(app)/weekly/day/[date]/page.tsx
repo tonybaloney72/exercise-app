@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { getPlanForDay } from "@/data/dailyPlans";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
+import { useDayPlan } from "@/hooks/useDayPlan";
 import {
   compareDateKeyToToday,
   isDateKeyInCurrentCalendarWeek,
@@ -93,12 +93,10 @@ export default function WeeklyDayPage() {
 
   const parsed = parseLocalDateKey(dateKey);
   const inWeek = isDateKeyInCurrentCalendarWeek(dateKey);
-  const when = compareDateKeyToToday(dateKey);
+  const planKey = parsed && inWeek ? dateKey : "";
+  const { plan, loading: planLoading, error: planError } = useDayPlan(planKey);
 
-  const plan = useMemo(() => {
-    if (parsed == null) return null;
-    return getPlanForDay(parsed.getDay());
-  }, [parsed]);
+  const when = compareDateKeyToToday(dateKey);
 
   const logForDay = useMemo(
     () => findWorkoutLogForDate(workoutHistory, dateKey),
@@ -111,7 +109,7 @@ export default function WeeklyDayPage() {
     activeWorkout &&
     activeWorkout.date === dateKey;
 
-  if (!parsed || !plan) {
+  if (!parsed) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 px-2">
         <p className="text-sm text-muted text-center">Invalid date in URL.</p>
@@ -125,6 +123,26 @@ export default function WeeklyDayPage() {
       <div className="flex flex-col items-center gap-4 py-8 px-2">
         <p className="text-sm text-foreground text-center px-2">
           Only the current calendar week can be opened here.
+        </p>
+        <WeeklyOverviewBackLink />
+      </div>
+    );
+  }
+
+  if (planLoading) {
+    return (
+      <div className="flex flex-col items-center gap-4 py-12 px-2">
+        <p className="text-sm text-muted text-center">Loading this day&apos;s plan…</p>
+        <WeeklyOverviewBackLink />
+      </div>
+    );
+  }
+
+  if (planError || !plan) {
+    return (
+      <div className="flex flex-col items-center gap-4 py-8 px-2">
+        <p className="text-sm text-foreground text-center px-2">
+          {planError ?? "Could not load this day&apos;s plan."}
         </p>
         <WeeklyOverviewBackLink />
       </div>

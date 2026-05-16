@@ -1,0 +1,59 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { resolveDayPlanForAuth } from "@/lib/planResolver";
+import { useAuthStore } from "@/stores/useAuthStore";
+import type { DayPlan } from "@/types";
+import { parseLocalDateKey } from "@/utils/weekCalendar";
+
+export function useDayPlan(dateKey: string): {
+  plan: DayPlan | null;
+  loading: boolean;
+  error: string | null;
+} {
+  const mode = useAuthStore((s) => s.mode);
+  const [plan, setPlan] = useState<DayPlan | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!dateKey.trim() || !parseLocalDateKey(dateKey)) {
+      setPlan(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    if (mode === "loading") {
+      setLoading(true);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    void resolveDayPlanForAuth(dateKey, mode).then(
+      (p) => {
+        if (!cancelled) {
+          setPlan(p);
+          setLoading(false);
+        }
+      },
+      (e: unknown) => {
+        console.error("[useDayPlan]", e);
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : "Failed to load plan");
+          setPlan(null);
+          setLoading(false);
+        }
+      },
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dateKey, mode]);
+
+  return { plan, loading, error };
+}
