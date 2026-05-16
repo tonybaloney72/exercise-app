@@ -4,6 +4,7 @@ import { useState, useRef, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
+import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import { DEFAULT_WARM_UP, DEFAULT_COOL_DOWN } from "@/data/stretches";
 import { formatSecondsToMMSS } from "@/utils/time";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
@@ -163,7 +164,11 @@ export default function WorkoutDayReview({
                       ? `Prescribed: ${planned.name}`
                       : undefined
                   }
-                  target={ex.targetReps}
+                  target={
+                    entry
+                      ? resolvePrescriptionText(entry) || ex.targetReps
+                      : ex.targetReps
+                  }
                   detail={exerciseStatusLine(entry)}
                   exerciseNotes={entry?.notes}
                   badge={

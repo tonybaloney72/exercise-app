@@ -15,6 +15,7 @@ import {
 } from "@/utils/effectiveExerciseSettings";
 import TimerTargetControls from "./TimerTargetControls";
 import { formatSecondsToMMSS } from "@/utils/time";
+import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import SwapExerciseModal from "./SwapExerciseModal";
 
 interface ExerciseRowProps {
@@ -102,15 +103,17 @@ export default function ExerciseRow({
     if (!plannedExercise || !effectiveExercise) return "";
     if (mode === "reps") {
       const r = resolveExerciseSettings(effectiveExercise, stored);
-      return r.defaultTargetReps != null
-        ? String(r.defaultTargetReps)
-        : roundExercise.targetReps;
+      if (r.defaultTargetReps != null) {
+        return String(r.defaultTargetReps);
+      }
+      return resolvePrescriptionText(log) || roundExercise.targetReps;
     }
     return `Timer · ${effectiveTargetSec}s`;
   }, [
     plannedExercise,
     effectiveExercise,
     mode,
+    log,
     roundExercise.targetReps,
     effectiveTargetSec,
     stored,
