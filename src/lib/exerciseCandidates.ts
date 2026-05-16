@@ -11,6 +11,14 @@ export function collectDislikedIds(prefs: ExercisePreferenceMap): Set<string> {
   return out;
 }
 
+export function collectFavoriteIds(prefs: ExercisePreferenceMap): Set<string> {
+  const out = new Set<string>();
+  for (const [id, kind] of Object.entries(prefs)) {
+    if (kind === "favorite") out.add(id);
+  }
+  return out;
+}
+
 /**
  * Same-category replacements for plan materialization and swap UI.
  * Excludes prescribed id, ids already used in the round, and disliked catalog entries.
@@ -33,9 +41,29 @@ export function getReplacementCandidates(options: {
   );
 }
 
-/** Deterministic pick for persisted plans (stable across devices once saved). */
-export function pickDeterministicReplacement(candidates: Exercise[]): Exercise | null {
+/**
+ * Deterministic pick for persisted plans (stable across devices once saved).
+ * Favorites in the candidate list sort ahead; optional seed breaks ties within each tier.
+ */
+export function pickReplacementCandidate(
+  candidates: Exercise[],
+  favoriteIds: ReadonlySet<string> = new Set(),
+  seed?: string,
+): Exercise | null {
   if (candidates.length === 0) return null;
-  const sorted = [...candidates].sort((a, b) => a.id.localeCompare(b.id));
+  const sorted = [...candidates].sort((a, b) => {
+    const favA = favoriteIds.has(a.id) ? 0 : 1;
+    const favB = favoriteIds.has(b.id) ? 0 : 1;
+    if (favA !== favB) return favA - favB;
+    if (seed) {
+      return `${seed}:${a.id}`.localeCompare(`${seed}:${b.id}`);
+    }
+    return a.id.localeCompare(b.id);
+  });
   return sorted[0] ?? null;
+}
+
+/** @deprecated Use {@link pickReplacementCandidate}. */
+export function pickDeterministicReplacement(candidates: Exercise[]): Exercise | null {
+  return pickReplacementCandidate(candidates);
 }

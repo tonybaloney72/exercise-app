@@ -2,11 +2,17 @@
 
 import { create } from "zustand";
 
-export type TrainingWeekRefreshReason = "dislike" | "equipment" | "program";
+export type TrainingWeekRefreshReason =
+  | "dislike"
+  | "favorite"
+  | "equipment"
+  | "program";
 
 const MESSAGES: Record<TrainingWeekRefreshReason, string> = {
   dislike:
     "Your training week was updated to reflect exercise preferences. Workouts you already finished are unchanged.",
+  favorite:
+    "Your training week was updated to favor exercises you starred in the Library. Workouts you already finished are unchanged.",
   equipment:
     "Your training week was updated for your equipment selection. Workouts you already finished are unchanged.",
   program:

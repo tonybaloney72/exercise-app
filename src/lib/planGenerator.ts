@@ -1,7 +1,8 @@
 import {
   collectDislikedIds,
+  collectFavoriteIds,
   getReplacementCandidates,
-  pickDeterministicReplacement,
+  pickReplacementCandidate,
 } from "@/lib/exerciseCandidates";
 import { applyProgramProfileToWeek } from "@/lib/programProfile";
 import type { ExercisePreferenceMap } from "@/lib/repos";
@@ -30,16 +31,27 @@ export function computePrefsFingerprint(
     .filter(([, v]) => v === "disliked")
     .map(([id]) => id)
     .sort();
+  const favorites = Object.entries(prefs)
+    .filter(([, v]) => v === "favorite")
+    .map(([id]) => id)
+    .sort();
   const equip = [...availableEquipment].sort();
-  return `d:${disliked.join(",")}|e:${equip.join(",")}|f:${programFocus}|r:${roundDensity}`;
+  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pf:${programFocus}|rd:${roundDensity}`;
 }
 
-export { collectDislikedIds, getReplacementCandidates, pickDeterministicReplacement } from "@/lib/exerciseCandidates";
+export {
+  collectDislikedIds,
+  collectFavoriteIds,
+  getReplacementCandidates,
+  pickDeterministicReplacement,
+  pickReplacementCandidate,
+} from "@/lib/exerciseCandidates";
 
 function replaceSlotIfDisliked(
   slot: RoundExercise,
   usedInRound: Set<string>,
   dislikedIds: ReadonlySet<string>,
+  favoriteIds: ReadonlySet<string>,
   availableEquipment: ExerciseEquipment[],
 ): RoundExercise {
   if (!dislikedIds.has(slot.exerciseId)) {
@@ -57,7 +69,11 @@ function replaceSlotIfDisliked(
     dislikedExerciseIds: dislikedIds,
   });
 
-  const substitute = pickDeterministicReplacement(candidates);
+  const substitute = pickReplacementCandidate(
+    candidates,
+    favoriteIds,
+    `dislike:${slot.exerciseId}`,
+  );
   if (!substitute) {
     console.warn(
       "[planGenerator] No replacement for disliked exercise",
@@ -84,6 +100,7 @@ export function applyDislikesToDayPlan(
   availableEquipment: ExerciseEquipment[],
 ): DayPlan {
   const dislikedIds = collectDislikedIds(prefs);
+  const favoriteIds = collectFavoriteIds(prefs);
   if (dislikedIds.size === 0) {
     return plan;
   }
@@ -95,7 +112,13 @@ export function applyDislikesToDayPlan(
       return {
         ...round,
         exercises: round.exercises.map((slot) =>
-          replaceSlotIfDisliked(slot, usedInRound, dislikedIds, availableEquipment),
+          replaceSlotIfDisliked(
+            slot,
+            usedInRound,
+            dislikedIds,
+            favoriteIds,
+            availableEquipment,
+          ),
         ),
       };
     }),

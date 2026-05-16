@@ -6,6 +6,7 @@ import { getExercisePreferenceRepo } from "@/lib/repos";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import { refreshCurrentTrainingWeek } from "@/lib/trainingWeekRefresh";
 import { useAuthStore } from "@/stores/useAuthStore";
+import type { TrainingWeekRefreshReason } from "@/stores/useTrainingWeekRefreshStore";
 
 type ExercisePreferencesState = {
   byExerciseId: ExercisePreferenceMap;
@@ -58,10 +59,21 @@ export const useExercisePreferencesStore = create<ExercisePreferencesState>(
         return;
       }
 
-      try {
-        await refreshCurrentTrainingWeek("dislike");
-      } catch (err) {
-        console.error("[useExercisePreferencesStore.refreshWeek]", err);
+      const was = prev[exerciseId];
+      const affectsDislikes =
+        preference === "disliked" || was === "disliked";
+      const affectsFavorites =
+        preference === "favorite" || was === "favorite";
+
+      if (affectsDislikes || affectsFavorites) {
+        const reason: TrainingWeekRefreshReason = affectsDislikes
+          ? "dislike"
+          : "favorite";
+        try {
+          await refreshCurrentTrainingWeek(reason);
+        } catch (err) {
+          console.error("[useExercisePreferencesStore.refreshWeek]", err);
+        }
       }
     },
   }),

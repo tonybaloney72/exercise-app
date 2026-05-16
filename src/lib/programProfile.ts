@@ -1,6 +1,8 @@
 import {
   collectDislikedIds,
+  collectFavoriteIds,
   getReplacementCandidates,
+  pickReplacementCandidate,
 } from "@/lib/exerciseCandidates";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
@@ -207,6 +209,7 @@ function fillSlot(
   usedInRound: Set<string>,
   availableEquipment: ExerciseEquipment[],
   dislikedIds: ReadonlySet<string>,
+  favoriteIds: ReadonlySet<string>,
   seed: string,
 ): RoundExercise | null {
   const candidates = getReplacementCandidates({
@@ -215,14 +218,7 @@ function fillSlot(
     availableEquipment,
     dislikedExerciseIds: dislikedIds,
   });
-  if (candidates.length === 0) return null;
-
-  const sorted = [...candidates].sort((a, b) => {
-    const keyA = `${seed}:${a.id}`;
-    const keyB = `${seed}:${b.id}`;
-    return keyA.localeCompare(keyB);
-  });
-  const pick = sorted[0] ?? null;
+  const pick = pickReplacementCandidate(candidates, favoriteIds, seed);
   if (!pick) return null;
 
   return {
@@ -240,6 +236,7 @@ function reshapeRound(
   density: RoundDensity,
   availableEquipment: ExerciseEquipment[],
   dislikedIds: ReadonlySet<string>,
+  favoriteIds: ReadonlySet<string>,
 ): RoundExercise[] {
   const target = Math.max(2, Math.min(8, ROUND_DENSITY_TARGETS[density]));
 
@@ -263,6 +260,7 @@ function reshapeRound(
       usedInRound,
       availableEquipment,
       dislikedIds,
+      favoriteIds,
       `d${plan.dayOfWeek}-r${roundNumber}-s${kept.length}`,
     );
     if (!filled) break;
@@ -286,6 +284,7 @@ export function applyProgramProfileToDayPlan(
   }
 
   const dislikedIds = collectDislikedIds(prefs);
+  const favoriteIds = collectFavoriteIds(prefs);
 
   return {
     ...plan,
@@ -299,6 +298,7 @@ export function applyProgramProfileToDayPlan(
         density,
         availableEquipment,
         dislikedIds,
+        favoriteIds,
       ),
     })),
   };
