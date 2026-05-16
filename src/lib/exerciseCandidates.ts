@@ -1,5 +1,8 @@
 import { exercises } from "@/data/exercises";
-import { exerciseMatchesEquipment } from "@/data/equipment";
+import {
+  ALL_EXERCISE_EQUIPMENT,
+  exerciseMatchesEquipment,
+} from "@/data/equipment";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import type { Exercise, ExerciseCategory, ExerciseEquipment } from "@/types";
 
@@ -66,4 +69,43 @@ export function pickReplacementCandidate(
 /** @deprecated Use {@link pickReplacementCandidate}. */
 export function pickDeterministicReplacement(candidates: Exercise[]): Exercise | null {
   return pickReplacementCandidate(candidates);
+}
+
+/**
+ * Pick a substitute for a disliked slot: user's equipment first, then any equipment
+ * in the same category (still excluding dislikes and round duplicates).
+ */
+export function pickDislikeReplacement(options: {
+  category: ExerciseCategory;
+  excludeExerciseIds: ReadonlySet<string>;
+  availableEquipment: ExerciseEquipment[];
+  dislikedExerciseIds: ReadonlySet<string>;
+  favoriteIds?: ReadonlySet<string>;
+  seed: string;
+}): Exercise | null {
+  const {
+    category,
+    excludeExerciseIds,
+    availableEquipment,
+    dislikedExerciseIds,
+    favoriteIds = new Set(),
+    seed,
+  } = options;
+
+  const withUserEquipment = getReplacementCandidates({
+    category,
+    excludeExerciseIds,
+    availableEquipment,
+    dislikedExerciseIds,
+  });
+  const pick = pickReplacementCandidate(withUserEquipment, favoriteIds, seed);
+  if (pick) return pick;
+
+  const anyEquipment = getReplacementCandidates({
+    category,
+    excludeExerciseIds,
+    availableEquipment: ALL_EXERCISE_EQUIPMENT,
+    dislikedExerciseIds,
+  });
+  return pickReplacementCandidate(anyEquipment, favoriteIds, `${seed}:any`);
 }

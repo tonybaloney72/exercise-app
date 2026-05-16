@@ -279,10 +279,6 @@ export function applyProgramProfileToDayPlan(
   availableEquipment: ExerciseEquipment[],
   prefs: ExercisePreferenceMap,
 ): DayPlan {
-  if (focus === "balanced" && density === "standard") {
-    return plan;
-  }
-
   const dislikedIds = collectDislikedIds(prefs);
   const favoriteIds = collectFavoriteIds(prefs);
 

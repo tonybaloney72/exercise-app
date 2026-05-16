@@ -1,4 +1,5 @@
 import BottomNav from "@/components/layout/BottomNav";
+import EquipmentOnboardingGate from "@/components/onboarding/EquipmentOnboardingGate";
 import TrainingWeekRefreshBanner from "@/components/layout/TrainingWeekRefreshBanner";
 import AppSettingsSync from "@/components/layout/AppSettingsSync";
 import WakeLockSync from "@/components/layout/WakeLockSync";
@@ -26,6 +27,7 @@ export default async function AppLayout({
         initialGuest={isGuest}
       />
       <AppSettingsSync />
+      <EquipmentOnboardingGate />
       <WakeLockSync />
       <main className="flex-1 pb-20">
         <div className="mx-auto max-w-lg px-4">

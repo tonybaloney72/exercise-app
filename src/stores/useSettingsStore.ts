@@ -8,12 +8,15 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import type { ExerciseEquipment } from "@/types";
 
 interface SettingsState extends UserSettings {
+  /** True after first `loadSettings` for the current auth mode. */
+  hydrated: boolean;
   updateSettings: (partial: Partial<UserSettings>) => Promise<void>;
   loadSettings: () => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
   ...DEFAULT_SETTINGS,
+  hydrated: false,
 
   updateSettings: async (partial) => {
     const current = get();
@@ -70,7 +73,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const mode = useAuthStore.getState().mode;
     if (mode === "loading") return; // Wait until AuthInitializer settles.
     const loaded = await getSettingsRepo(mode).load();
-    set(loaded);
+    set({ ...loaded, hydrated: true });
   },
 }));
 

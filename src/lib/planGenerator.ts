@@ -1,8 +1,7 @@
 import {
   collectDislikedIds,
   collectFavoriteIds,
-  getReplacementCandidates,
-  pickReplacementCandidate,
+  pickDislikeReplacement,
 } from "@/lib/exerciseCandidates";
 import { applyProgramProfileToWeek } from "@/lib/programProfile";
 import type { ExercisePreferenceMap } from "@/lib/repos";
@@ -44,6 +43,7 @@ export {
   collectFavoriteIds,
   getReplacementCandidates,
   pickDeterministicReplacement,
+  pickDislikeReplacement,
   pickReplacementCandidate,
 } from "@/lib/exerciseCandidates";
 
@@ -53,7 +53,7 @@ function replaceSlotIfDisliked(
   dislikedIds: ReadonlySet<string>,
   favoriteIds: ReadonlySet<string>,
   availableEquipment: ExerciseEquipment[],
-): RoundExercise {
+): RoundExercise | null {
   if (!dislikedIds.has(slot.exerciseId)) {
     usedInRound.add(slot.exerciseId);
     return slot;
@@ -62,27 +62,21 @@ function replaceSlotIfDisliked(
   const exclude = new Set(usedInRound);
   exclude.add(slot.exerciseId);
 
-  const candidates = getReplacementCandidates({
+  const substitute = pickDislikeReplacement({
     category: slot.category,
     excludeExerciseIds: exclude,
     availableEquipment,
     dislikedExerciseIds: dislikedIds,
-  });
-
-  const substitute = pickReplacementCandidate(
-    candidates,
     favoriteIds,
-    `dislike:${slot.exerciseId}`,
-  );
+    seed: `dislike:${slot.exerciseId}`,
+  });
   if (!substitute) {
     console.warn(
-      "[planGenerator] No replacement for disliked exercise",
+      "[planGenerator] No replacement for disliked exercise; omitting slot",
       slot.exerciseId,
-      "in category",
       slot.category,
     );
-    usedInRound.add(slot.exerciseId);
-    return slot;
+    return null;
   }
 
   usedInRound.add(substitute.id);
@@ -111,15 +105,17 @@ export function applyDislikesToDayPlan(
       const usedInRound = new Set<string>();
       return {
         ...round,
-        exercises: round.exercises.map((slot) =>
-          replaceSlotIfDisliked(
-            slot,
-            usedInRound,
-            dislikedIds,
-            favoriteIds,
-            availableEquipment,
-          ),
-        ),
+        exercises: round.exercises
+          .map((slot) =>
+            replaceSlotIfDisliked(
+              slot,
+              usedInRound,
+              dislikedIds,
+              favoriteIds,
+              availableEquipment,
+            ),
+          )
+          .filter((slot): slot is RoundExercise => slot != null),
       };
     }),
   };

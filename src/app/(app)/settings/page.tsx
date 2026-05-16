@@ -5,11 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import {
-  ALL_EXERCISE_EQUIPMENT,
-  EQUIPMENT_LABELS,
-} from "@/data/equipment";
-import type { ExerciseEquipment } from "@/types";
+import EquipmentPicker from "@/components/settings/EquipmentPicker";
 import {
   PROGRAM_FOCUS_OPTIONS,
   ROUND_DENSITY_OPTIONS,
@@ -235,31 +231,10 @@ export default function SettingsPage() {
             exercise reference.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {ALL_EXERCISE_EQUIPMENT.map((eq) => {
-            const on = settings.availableEquipment.includes(eq);
-            return (
-              <button
-                key={eq}
-                type="button"
-                onClick={() => {
-                  const next: ExerciseEquipment[] = on
-                    ? settings.availableEquipment.filter((x) => x !== eq)
-                    : [...settings.availableEquipment, eq];
-                  if (next.length === 0) return;
-                  void settings.updateSettings({ availableEquipment: next });
-                }}
-                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                  on
-                    ? "border-accent bg-accent/15 text-accent"
-                    : "border-border bg-surface-hover text-muted hover:text-foreground"
-                }`}
-              >
-                {EQUIPMENT_LABELS[eq]}
-              </button>
-            );
-          })}
-        </div>
+        <EquipmentPicker
+          selected={settings.availableEquipment}
+          onChange={(next) => void settings.updateSettings({ availableEquipment: next })}
+        />
       </motion.div>
 
       {/* Program profile (signed-in weekly plans) */}
