@@ -1,12 +1,20 @@
 import { collectDislikedIds, getReplacementCandidates } from "@/lib/exerciseCandidates";
-import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
-import { useSettingsStore } from "@/stores/useSettingsStore";
-import type { Exercise, ExerciseCategory, ExerciseLog } from "@/types";
+import type {
+  Exercise,
+  ExerciseCategory,
+  ExerciseEquipment,
+  ExerciseLog,
+} from "@/types";
 
 /** Effective movement id for this slot (substitute if set, else prescribed). */
 export function effectiveExerciseId(log: ExerciseLog): string {
   return log.swappedWith ?? log.exerciseId;
 }
+
+export type SwapCandidatePrefs = {
+  availableEquipment: ExerciseEquipment[];
+  dislikedExerciseIds: ReadonlySet<string>;
+};
 
 /**
  * Same-category alternatives for swapping. Excludes the prescribed exercise for
@@ -17,6 +25,7 @@ export function getSwapCandidates(
   plannedExerciseId: string,
   roundExercises: ExerciseLog[],
   slotIndex: number,
+  prefs: SwapCandidatePrefs,
 ): Exercise[] {
   const usedElsewhere = new Set<string>();
   roundExercises.forEach((e, j) => {
@@ -31,16 +40,11 @@ export function getSwapCandidates(
     ...usedElsewhere,
   ]);
 
-  const available = useSettingsStore.getState().availableEquipment;
-  const disliked = collectDislikedIds(
-    useExercisePreferencesStore.getState().byExerciseId,
-  );
-
   return getReplacementCandidates({
     category: planCategory,
     excludeExerciseIds: exclude,
-    availableEquipment: available,
-    dislikedExerciseIds: disliked,
+    availableEquipment: prefs.availableEquipment,
+    dislikedExerciseIds: prefs.dislikedExerciseIds,
   });
 }
 
@@ -48,4 +52,15 @@ export function pickRandomSwap(candidates: Exercise[]): Exercise | null {
   if (candidates.length === 0) return null;
   const i = Math.floor(Math.random() * candidates.length);
   return candidates[i] ?? null;
+}
+
+/** Read equipment + dislikes from Zustand at call time (live workout / swap UI). */
+export function swapCandidatePrefsFromStores(
+  getEquipment: () => ExerciseEquipment[],
+  getPreferenceMap: () => Parameters<typeof collectDislikedIds>[0],
+): SwapCandidatePrefs {
+  return {
+    availableEquipment: getEquipment(),
+    dislikedExerciseIds: collectDislikedIds(getPreferenceMap()),
+  };
 }

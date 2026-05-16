@@ -39,3 +39,14 @@ export function formatSecondsToMMSS(totalSeconds: number | undefined): string {
   const secs = totalSeconds % 60;
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
+
+/** MM:SS for countdown / stopwatch UI (seconds is always defined). */
+export function formatTimerDisplay(totalSeconds: number): string {
+  return formatSecondsToMMSS(totalSeconds);
+}
+
+/** Logged duration for display (MM:SS, or raw seconds if formatting fails). */
+export function formatLoggedDuration(seconds: number | undefined | null): string {
+  if (seconds == null) return "";
+  return formatSecondsToMMSS(seconds) || `${seconds}s`;
+}

@@ -23,8 +23,11 @@ import type {
   RoundDensity,
   UserSettings,
 } from "@/types";
-import { formatLocalDateKey } from "@/utils/localDateKey";
-import { getSundayOfWeekContaining, parseLocalDateKey } from "@/utils/weekCalendar";
+import {
+  parseLocalDateKey,
+  weekAnchorFromDateKey,
+  weekKeyFromDateKey,
+} from "@/utils/weekCalendar";
 
 function settingsSlice(settings: UserSettings): {
   availableEquipment: ExerciseEquipment[];
@@ -178,10 +181,8 @@ async function loadOrSeedPersistedWeek(
 export async function refreshTrainingWeekContaining(
   dateKey: string,
 ): Promise<void> {
-  const parsed = parseLocalDateKey(dateKey);
-  if (!parsed) return;
-  const sun = getSundayOfWeekContaining(parsed);
-  const weekKey = formatLocalDateKey(sun);
+  const weekKey = weekKeyFromDateKey(dateKey);
+  if (!weekKey) return;
   const {
     prefs,
     availableEquipment,
@@ -209,16 +210,14 @@ export async function resolveTrainingWeekForAuth(
   anyDateKeyInWeek: string,
   mode: AuthMode,
 ): Promise<TrainingWeekDays> {
-  const parsed = parseLocalDateKey(anyDateKeyInWeek);
-  if (!parsed) {
+  const anchor = weekAnchorFromDateKey(anyDateKeyInWeek);
+  if (!anchor) {
     throw new Error("Invalid date key");
   }
   if (mode !== "authenticated") {
     return resolveMaterializedWeek(mode);
   }
-  const sun = getSundayOfWeekContaining(parsed);
-  const weekKey = formatLocalDateKey(sun);
-  return loadOrSeedPersistedWeek(weekKey);
+  return loadOrSeedPersistedWeek(anchor.weekKey);
 }
 
 /**

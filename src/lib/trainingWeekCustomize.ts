@@ -16,8 +16,7 @@ import {
   getTrainingWeekRepo,
 } from "@/lib/repos";
 import type { DayPlan, StretchEntry } from "@/types";
-import { formatLocalDateKey } from "@/utils/localDateKey";
-import { getSundayOfWeekContaining, parseLocalDateKey } from "@/utils/weekCalendar";
+import { weekAnchorFromDateKey } from "@/utils/weekCalendar";
 
 export { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 
@@ -99,12 +98,11 @@ export async function saveCustomDayPlan(
   dateKey: string,
   dayPlan: DayPlan,
 ): Promise<void> {
-  const parsed = parseLocalDateKey(dateKey);
-  if (!parsed) {
+  const anchor = weekAnchorFromDateKey(dateKey);
+  if (!anchor) {
     throw new Error("Invalid date key");
   }
-
-  const weekKey = formatLocalDateKey(getSundayOfWeekContaining(parsed));
+  const { parsed, weekKey } = anchor;
   const dow = parsed.getDay();
 
   const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");
@@ -143,9 +141,9 @@ export async function resetTrainingWeekToGenerated(
 export async function getWeekSourceForDate(
   dateKey: string,
 ): Promise<string | null> {
-  const parsed = parseLocalDateKey(dateKey);
-  if (!parsed) return null;
-  const weekKey = formatLocalDateKey(getSundayOfWeekContaining(parsed));
+  const anchor = weekAnchorFromDateKey(dateKey);
+  if (!anchor) return null;
+  const { weekKey } = anchor;
   const row = await getTrainingWeekRepo("authenticated").loadWeek(weekKey);
   return row?.source ?? null;
 }

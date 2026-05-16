@@ -57,3 +57,20 @@ export function compareDateKeyToToday(dateKey: string): "past" | "today" | "futu
   if (t > tn) return "future";
   return "today";
 }
+
+/** Parsed local date and Sun `YYYY-MM-DD` week key for the week containing that day. */
+export function weekAnchorFromDateKey(
+  dateKey: string,
+): { parsed: Date; weekKey: string } | null {
+  const parsed = parseLocalDateKey(dateKey);
+  if (!parsed) return null;
+  return {
+    parsed,
+    weekKey: formatLocalDateKey(getSundayOfWeekContaining(parsed)),
+  };
+}
+
+/** Sun `YYYY-MM-DD` for the calendar week containing `dateKey`, or null if invalid. */
+export function weekKeyFromDateKey(dateKey: string): string | null {
+  return weekAnchorFromDateKey(dateKey)?.weekKey ?? null;
+}

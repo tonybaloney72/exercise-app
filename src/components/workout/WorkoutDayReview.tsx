@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
-import { formatSecondsToMMSS } from "@/utils/time";
+import { formatLoggedDuration } from "@/utils/time";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
 
 interface WorkoutDayReviewProps {
@@ -37,9 +37,7 @@ function exerciseStatusLine(log: ExerciseLog | undefined): string {
   const parts: string[] = ["Done"];
   if (log.actualReps != null) parts.push(`${log.actualReps} reps`);
   if (log.actualDuration != null) {
-    parts.push(
-      formatSecondsToMMSS(log.actualDuration) || `${log.actualDuration}s`,
-    );
+    parts.push(formatLoggedDuration(log.actualDuration));
   }
   if (log.swappedWith) {
     const swap = exerciseMap[log.swappedWith];
@@ -128,7 +126,7 @@ export default function WorkoutDayReview({
                 {[
                   log.jogDistance != null ? `${log.jogDistance} mi` : null,
                   log.jogDurationSeconds != null
-                    ? formatSecondsToMMSS(log.jogDurationSeconds)
+                    ? formatLoggedDuration(log.jogDurationSeconds)
                     : null,
                 ]
                   .filter(Boolean)

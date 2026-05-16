@@ -4,13 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { formatTimerDisplay } from "@/utils/time";
 import FullScreenTimerModal from "./FullScreenTimerModal";
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
 
 /**
  * Floating pill in the top-right that:
@@ -45,7 +40,7 @@ export default function FloatingTimer() {
 
   const idle = mode === "idle";
   const hasLast = lastStopwatchSeconds != null;
-  const pillLabel = hasLast ? formatTime(lastStopwatchSeconds!) : "Timer";
+  const pillLabel = hasLast ? formatTimerDisplay(lastStopwatchSeconds!) : "Timer";
 
   return (
     <>
@@ -136,7 +131,7 @@ export default function FloatingTimer() {
                     Rest timer
                   </span>
                   <span className="tabular-nums text-xs font-semibold text-white/85">
-                    {formatTime(restBetweenRounds)}
+                    {formatTimerDisplay(restBetweenRounds)}
                   </span>
                 </button>
                 <button
@@ -170,7 +165,7 @@ export default function FloatingTimer() {
                     <span className="text-right text-xs font-medium leading-tight text-white/80">
                       Resume
                       <span className="ml-1 tabular-nums text-white/90">
-                        {formatTime(lastStopwatchSeconds!)}
+                        {formatTimerDisplay(lastStopwatchSeconds!)}
                       </span>
                     </span>
                   ) : (

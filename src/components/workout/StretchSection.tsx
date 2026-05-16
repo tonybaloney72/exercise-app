@@ -11,7 +11,7 @@ import {
   resolveExerciseSettings,
   resolveStretchTimerTargetSeconds,
 } from "@/utils/effectiveExerciseSettings";
-import { formatSecondsToMMSS } from "@/utils/time";
+import { formatLoggedDuration } from "@/utils/time";
 import TimerTargetControls from "./TimerTargetControls";
 
 interface StretchSectionProps {
@@ -192,7 +192,7 @@ function StretchRow({
 
   const didLine =
     mode === "timer" && log.actualDuration != null
-      ? ` → did ${formatSecondsToMMSS(log.actualDuration) || `${log.actualDuration}s`}`
+      ? ` → did ${formatLoggedDuration(log.actualDuration)}`
       : "";
 
   if (!exercise) return null;

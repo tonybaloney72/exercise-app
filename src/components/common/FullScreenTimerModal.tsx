@@ -5,12 +5,7 @@ import { motion } from "framer-motion";
 import CountdownRing from "@/components/common/CountdownRing";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import { primeTimerAudio } from "@/utils/timerAlert";
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
+import { formatTimerDisplay } from "@/utils/time";
 
 export default function FullScreenTimerModal() {
   const mode = useFloatingTimerStore((s) => s.mode);
@@ -120,7 +115,7 @@ export default function FullScreenTimerModal() {
           />
         )}
         <span className="font-mono text-7xl font-bold tabular-nums text-white">
-          {formatTime(seconds)}
+          {formatTimerDisplay(seconds)}
         </span>
       </div>
 

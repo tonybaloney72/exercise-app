@@ -2,6 +2,10 @@ import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan, ExerciseCategory, ExerciseLog, WorkoutLog } from "@/types";
 import { exercises } from "@/data/exercises";
 import { formatLocalDateKey } from "@/utils/localDateKey";
+import {
+  getSundayOfWeekContaining,
+  parseLocalDateKey,
+} from "@/utils/weekCalendar";
 
 const exerciseCategoryById = new Map(
   exercises.map((e) => [e.id, e.category] as const),
@@ -19,19 +23,6 @@ const TRAINING_CATEGORIES = new Set<ExerciseCategory>([
   "PC",
 ]);
 
-function parseLocalDateKey(key: string): Date {
-  const [y, m, d] = key.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, d ?? 1, 12, 0, 0, 0);
-}
-
-function startOfLocalWeek(d: Date): Date {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  const dow = x.getDay();
-  x.setDate(x.getDate() - dow);
-  return x;
-}
-
 function addDays(d: Date, n: number): Date {
   const x = new Date(d);
   x.setDate(x.getDate() + n);
@@ -39,7 +30,9 @@ function addDays(d: Date, n: number): Date {
 }
 
 function dateKeyBetweenInclusive(key: string, start: Date, end: Date): boolean {
-  const t = parseLocalDateKey(key).getTime();
+  const d = parseLocalDateKey(key);
+  if (!d) return false;
+  const t = d.getTime();
   return t >= start.getTime() && t <= end.getTime();
 }
 
@@ -59,7 +52,7 @@ export function weeklyWorkoutCounts(
 ): WeeklyWorkoutPoint[] {
   const ref = new Date(reference);
   ref.setHours(12, 0, 0, 0);
-  const thisWeekStart = startOfLocalWeek(ref);
+  const thisWeekStart = getSundayOfWeekContaining(ref);
 
   const points: WeeklyWorkoutPoint[] = [];
   for (let i = numWeeks - 1; i >= 0; i--) {

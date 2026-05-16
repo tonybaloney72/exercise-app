@@ -16,7 +16,13 @@ import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import { getWorkoutRepo } from "@/lib/repos";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { getSwapCandidates, pickRandomSwap } from "@/lib/exerciseSwap";
+import {
+  getSwapCandidates,
+  pickRandomSwap,
+  swapCandidatePrefsFromStores,
+} from "@/lib/exerciseSwap";
+import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { exerciseMap } from "@/data/exercises";
 import {
   clearExerciseMetrics,
@@ -474,6 +480,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
           log.exerciseId,
           logs,
           slotIndex,
+          swapCandidatePrefsFromStores(
+            () => useSettingsStore.getState().availableEquipment,
+            () => useExercisePreferencesStore.getState().byExerciseId,
+          ),
         );
         if (!candidates.some((c) => c.id === substituteId)) return r;
         return {
@@ -572,6 +582,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       log.exerciseId,
       logs,
       slotIndex,
+      swapCandidatePrefsFromStores(
+        () => useSettingsStore.getState().availableEquipment,
+        () => useExercisePreferencesStore.getState().byExerciseId,
+      ),
     );
     const pick = pickRandomSwap(candidates);
     if (!pick) return;

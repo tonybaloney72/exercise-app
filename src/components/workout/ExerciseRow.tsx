@@ -7,14 +7,17 @@ import { exerciseMap } from "@/data/exercises";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
+import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getSwapCandidates } from "@/lib/exerciseSwap";
+import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { ExerciseLog, ExerciseSetMode, RoundExercise } from "@/types";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   resolveExerciseSettings,
 } from "@/utils/effectiveExerciseSettings";
 import TimerTargetControls from "./TimerTargetControls";
-import { formatSecondsToMMSS } from "@/utils/time";
+import { formatLoggedDuration } from "@/utils/time";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import SwapExerciseModal from "./SwapExerciseModal";
 
@@ -60,6 +63,16 @@ export default function ExerciseRow({
     return r?.exercises ?? [];
   }, [activeWorkout?.rounds, roundNumber]);
 
+  const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const preferenceMap = useExercisePreferencesStore((s) => s.byExerciseId);
+  const swapPrefs = useMemo(
+    () => ({
+      availableEquipment,
+      dislikedExerciseIds: collectDislikedIds(preferenceMap),
+    }),
+    [availableEquipment, preferenceMap],
+  );
+
   const swapCandidates = useMemo(
     () =>
       getSwapCandidates(
@@ -67,8 +80,15 @@ export default function ExerciseRow({
         roundExercise.exerciseId,
         roundExercises,
         slotIndex,
+        swapPrefs,
       ),
-    [roundExercise.category, roundExercise.exerciseId, roundExercises, slotIndex],
+    [
+      roundExercise.category,
+      roundExercise.exerciseId,
+      roundExercises,
+      slotIndex,
+      swapPrefs,
+    ],
   );
 
   const mode: ExerciseSetMode = useMemo(() => {
@@ -127,7 +147,7 @@ export default function ExerciseRow({
     mode === "reps" && log.actualReps != null
       ? ` → did ${log.actualReps}`
       : mode === "timer" && log.actualDuration != null
-        ? ` → did ${formatSecondsToMMSS(log.actualDuration) || `${log.actualDuration}s`}`
+        ? ` → did ${formatLoggedDuration(log.actualDuration)}`
         : "";
 
   return (
