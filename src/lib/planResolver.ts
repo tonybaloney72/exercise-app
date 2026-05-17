@@ -3,10 +3,10 @@ import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   collectDislikedIds,
   computePrefsFingerprint,
-  isUserCustomizedWeekSource,
   materializeTrainingWeek,
   TRAINING_WEEK_SOURCE_GENERATED_V1,
-  weekContainsDislikedExercise,
+  weekDaysComplete,
+  weekNeedsMaterialization,
 } from "@/lib/planGenerator";
 import {
   getExercisePreferenceRepo,
@@ -93,28 +93,6 @@ function materializeWeekFromCatalog(
     programFocus,
     roundDensity,
   );
-}
-
-function weekDaysComplete(days: TrainingWeekDays | null): days is TrainingWeekDays {
-  if (!days) return false;
-  for (let i = 0; i < 7; i++) {
-    if (!days[i]) return false;
-  }
-  return true;
-}
-
-function weekNeedsMaterialization(
-  stored: TrainingWeekDays | null,
-  storedFingerprint: string | null,
-  storedSource: string | null,
-  currentFingerprint: string,
-  dislikedIds: ReadonlySet<string>,
-): boolean {
-  if (isUserCustomizedWeekSource(storedSource)) return false;
-  if (!weekDaysComplete(stored)) return true;
-  if (storedFingerprint !== currentFingerprint) return true;
-  if (weekContainsDislikedExercise(stored, dislikedIds)) return true;
-  return false;
 }
 
 /** In-memory materialized week (guest / anonymous) from catalog + local settings. */

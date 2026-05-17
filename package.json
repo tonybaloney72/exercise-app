@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "supabase": "supabase",
     "db:push": "supabase db push",
     "db:push:dry": "supabase db push --dry-run",
@@ -24,7 +26,6 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "supabase": "2.98.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -33,7 +34,9 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "prettier": "^3.8.3",
+    "supabase": "2.98.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.6"
   }
 }

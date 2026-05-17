@@ -181,3 +181,26 @@ export function weekContainsDislikedExercise(
   }
   return false;
 }
+
+export function weekDaysComplete(days: TrainingWeekDays | null): days is TrainingWeekDays {
+  if (!days) return false;
+  for (let i = 0; i < 7; i++) {
+    if (!days[i]) return false;
+  }
+  return true;
+}
+
+/** Whether a stored week should be regenerated from catalog + current prefs. */
+export function weekNeedsMaterialization(
+  stored: TrainingWeekDays | null,
+  storedFingerprint: string | null,
+  storedSource: string | null,
+  currentFingerprint: string,
+  dislikedIds: ReadonlySet<string>,
+): boolean {
+  if (isUserCustomizedWeekSource(storedSource)) return false;
+  if (!weekDaysComplete(stored)) return true;
+  if (storedFingerprint !== currentFingerprint) return true;
+  if (weekContainsDislikedExercise(stored, dislikedIds)) return true;
+  return false;
+}
