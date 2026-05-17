@@ -6,6 +6,7 @@ import ExerciseRow from "./ExerciseRow";
 import type { Round, RoundLog } from "@/types";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { formatTimerDisplay } from "@/utils/time";
 
 interface RoundCardProps {
   round: Round;
@@ -14,6 +15,9 @@ interface RoundCardProps {
 
 export default function RoundCard({ round, roundLog }: RoundCardProps) {
   const [isOpen, setIsOpen] = useState(true);
+  const [showRestPrompt, setShowRestPrompt] = useState(false);
+  const restBetweenRounds = useSettingsStore((s) => s.restBetweenRounds);
+  const restTimerAutoStart = useSettingsStore((s) => s.restTimerAutoStart);
 
   const completedCount = roundLog.exercises.filter(
     (e) => e.completed || e.skipped
@@ -26,13 +30,24 @@ export default function RoundCard({ round, roundLog }: RoundCardProps) {
   // so we trigger regardless of whether this is the last round.
   const wasDoneRef = useRef(allDone);
   useEffect(() => {
-    if (!wasDoneRef.current && allDone) {
+    if (!allDone) {
+      setShowRestPrompt(false);
+    } else if (!wasDoneRef.current && allDone) {
       setIsOpen(false);
-      const restSeconds = useSettingsStore.getState().restBetweenRounds;
-      useFloatingTimerStore.getState().startRest(restSeconds);
+      if (restTimerAutoStart) {
+        setShowRestPrompt(false);
+        useFloatingTimerStore.getState().startRest(restBetweenRounds);
+      } else {
+        setShowRestPrompt(true);
+      }
     }
     wasDoneRef.current = allDone;
-  }, [allDone]);
+  }, [allDone, restBetweenRounds, restTimerAutoStart]);
+
+  function handleStartRest() {
+    setShowRestPrompt(false);
+    useFloatingTimerStore.getState().startRest(restBetweenRounds);
+  }
 
   return (
     <div className="rounded-xl border border-border bg-surface overflow-hidden">
@@ -84,6 +99,25 @@ export default function RoundCard({ round, roundLog }: RoundCardProps) {
           </svg>
         </div>
       </button>
+
+      {!isOpen && showRestPrompt && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="border-t border-border px-4 py-3"
+        >
+          <button
+            type="button"
+            onClick={handleStartRest}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-accent/35 bg-accent/10 py-2.5 text-sm font-semibold text-accent transition-colors hover:bg-accent/15 active:scale-[0.98]"
+          >
+            <span>Start rest</span>
+            <span className="tabular-nums text-accent/80">
+              {formatTimerDisplay(restBetweenRounds)}
+            </span>
+          </button>
+        </motion.div>
+      )}
 
       {/* Exercise list */}
       <AnimatePresence initial={false}>

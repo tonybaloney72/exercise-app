@@ -55,6 +55,7 @@ export default function SettingsPage() {
         restBetweenRounds: settings.restBetweenRounds,
         weekStartDate: settings.weekStartDate,
         darkMode: settings.darkMode,
+        restTimerAutoStart: settings.restTimerAutoStart,
         timerSoundsEnabled: settings.timerSoundsEnabled,
         timerVibrationEnabled: settings.timerVibrationEnabled,
         keepScreenAwake: settings.keepScreenAwake,
@@ -190,6 +191,40 @@ export default function SettingsPage() {
       <AnimatedSection delay={0.045}>
         <SurfaceCard className="p-4 space-y-4">
         <h2 className="text-sm font-semibold text-foreground">Timers &amp; device</h2>
+        <div>
+          <h3 className="text-xs font-semibold text-foreground">
+            Rest between rounds
+          </h3>
+          <p className="text-xs text-muted mt-0.5 mb-2">
+            Default countdown length when you start a rest timer.
+          </p>
+          <div className="flex gap-2" role="group" aria-label="Rest between rounds in seconds">
+            {[60, 75, 90, 120].map((val) => (
+              <button
+                key={val}
+                type="button"
+                onClick={() => settings.updateSettings({ restBetweenRounds: val })}
+                className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+                  settings.restBetweenRounds === val
+                    ? "bg-accent text-white"
+                    : "bg-surface-hover text-muted hover:text-foreground border border-border"
+                }`}
+              >
+                {val}s
+              </button>
+            ))}
+          </div>
+        </div>
+        <SettingsSwitch
+          title="Auto-start rest timer"
+          description="When you finish a round, open the rest countdown immediately. Turn off to tap Start rest on the round card instead."
+          checked={settings.restTimerAutoStart}
+          onChange={() =>
+            settings.updateSettings({
+              restTimerAutoStart: !settings.restTimerAutoStart,
+            })
+          }
+        />
         <SettingsSwitch
           title="Timer sounds"
           description="Play a short chime when a set timer, rest timer, or similar countdown finishes."
@@ -359,31 +394,6 @@ export default function SettingsPage() {
         open={stretchModalOpen}
         onClose={() => setStretchModalOpen(false)}
       />
-
-      {/* Workout preferences */}
-      <AnimatedSection delay={0.05}>
-        <SurfaceCard className="p-4">
-        <h2 className="text-sm font-semibold text-foreground mb-3">Workout</h2>
-        <div>
-          <label className="text-xs text-muted">Rest Between Rounds (seconds)</label>
-          <div className="mt-2 flex gap-2">
-            {[60, 75, 90, 120].map((val) => (
-              <button
-                key={val}
-                onClick={() => settings.updateSettings({ restBetweenRounds: val })}
-                className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
-                  settings.restBetweenRounds === val
-                    ? "bg-accent text-white"
-                    : "bg-surface-hover text-muted hover:text-foreground border border-border"
-                }`}
-              >
-                {val}s
-              </button>
-            ))}
-          </div>
-        </div>
-        </SurfaceCard>
-      </AnimatedSection>
 
       {/* Data management */}
       <AnimatedSection delay={0.1}>

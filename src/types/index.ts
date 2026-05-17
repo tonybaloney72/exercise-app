@@ -173,6 +173,11 @@ export interface UserSettings {
   restBetweenRounds: number;
   weekStartDate?: string;
   darkMode: boolean;
+  /**
+   * When true, finishing a round opens the rest countdown immediately.
+   * When false, show a manual “Start rest” control on the completed round.
+   */
+  restTimerAutoStart: boolean;
   /** Web Audio chimes when a timer completes (set/rest). */
   timerSoundsEnabled: boolean;
   /** `navigator.vibrate` when a timer completes. */

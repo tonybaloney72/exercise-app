@@ -79,6 +79,7 @@ interface SettingsRow {
   timer_sounds_enabled?: boolean;
   timer_vibration_enabled?: boolean;
   keep_screen_awake?: boolean;
+  rest_timer_auto_start?: boolean;
   available_equipment?: unknown;
   program_focus?: string;
   round_density?: string;
@@ -279,6 +280,7 @@ function rowToSettings(row: SettingsRow): UserSettings {
     restBetweenRounds: row.rest_between_rounds,
     weekStartDate: row.week_start_date ?? undefined,
     darkMode: row.dark_mode,
+    restTimerAutoStart: row.rest_timer_auto_start ?? true,
     timerSoundsEnabled: row.timer_sounds_enabled ?? true,
     timerVibrationEnabled: row.timer_vibration_enabled ?? true,
     keepScreenAwake: row.keep_screen_awake ?? false,
@@ -296,6 +298,7 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     rest_between_rounds: s.restBetweenRounds,
     week_start_date: s.weekStartDate ?? null,
     dark_mode: s.darkMode,
+    rest_timer_auto_start: s.restTimerAutoStart,
     timer_sounds_enabled: s.timerSoundsEnabled,
     timer_vibration_enabled: s.timerVibrationEnabled,
     keep_screen_awake: s.keepScreenAwake,

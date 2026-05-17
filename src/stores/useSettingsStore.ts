@@ -30,6 +30,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       restBetweenRounds: partial.restBetweenRounds ?? current.restBetweenRounds,
       weekStartDate: partial.weekStartDate ?? current.weekStartDate,
       darkMode: partial.darkMode ?? current.darkMode,
+      restTimerAutoStart:
+        partial.restTimerAutoStart ?? current.restTimerAutoStart,
       timerSoundsEnabled:
         partial.timerSoundsEnabled ?? current.timerSoundsEnabled,
       timerVibrationEnabled:
