@@ -12,6 +12,8 @@ import { formatLocalDateKey } from "@/utils/localDateKey";
 import ProgressChartsSection from "@/components/progress/ProgressChartsSection";
 import ExerciseProgressChart from "@/components/progress/ExerciseProgressChart";
 import JogProgressChart from "@/components/progress/JogProgressChart";
+import EmptyState from "@/components/common/EmptyState";
+import SurfaceCard, { surfaceCardClassName } from "@/components/common/SurfaceCard";
 import { weekToDatePlanAdherence } from "@/utils/progressStats";
 
 export default function ProgressPage() {
@@ -102,7 +104,7 @@ export default function ProgressPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="rounded-xl border border-border bg-surface p-4"
+            className={`${surfaceCardClassName} p-4`}
           >
             <span className="text-lg">{card.icon}</span>
             <p className="mt-2 text-xl font-bold tabular-nums text-foreground">
@@ -152,10 +154,12 @@ export default function ProgressPage() {
       )}
 
       {workoutHistory.length === 0 && (
-        <div className="rounded-xl border border-dashed border-border bg-surface/50 py-12 text-center">
-          <p className="text-sm text-muted">No workouts logged yet.</p>
-          <p className="text-xs text-muted mt-1">Complete your first workout to see progress!</p>
-        </div>
+        <SurfaceCard className="border-dashed bg-surface/50 py-12">
+          <EmptyState
+            title="No workouts logged yet."
+            description="Complete your first workout to see progress!"
+          />
+        </SurfaceCard>
       )}
     </div>
   );

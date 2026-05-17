@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import AnimatedSection from "@/components/common/AnimatedSection";
+import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import CategoryPickModal from "@/components/workout/CategoryPickModal";
 import StretchPlanSection from "@/components/workout/StretchPlanSection";
@@ -246,12 +247,8 @@ export default function WorkoutPlanEditor({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-4"
-    >
-      <motion.div className="rounded-xl border border-accent/40 bg-accent/10 p-4 space-y-2">
+    <AnimatedSection className="space-y-4" delay={0}>
+      <SurfaceCard className="border-accent/40 bg-accent/10 p-4 space-y-2">
         <p className="text-xs font-medium uppercase tracking-wider text-accent">
           Customize workout
         </p>
@@ -262,9 +259,9 @@ export default function WorkoutPlanEditor({
             ? " This week is customized — settings changes won’t overwrite until reset."
             : " Saving marks this week as customized."}
         </p>
-      </motion.div>
+      </SurfaceCard>
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-border bg-surface px-4 py-3">
+      <SurfaceCard className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted">
           Rebuild from your Settings defaults plus this day&apos;s focus and rounds.
         </p>
@@ -276,7 +273,7 @@ export default function WorkoutPlanEditor({
         >
           Rebuild stretch lists
         </button>
-      </div>
+      </SurfaceCard>
 
       <StretchPlanSection
         title="Warm-up for this workout"
@@ -299,11 +296,11 @@ export default function WorkoutPlanEditor({
       />
 
       {draft.rounds.map((round, roundIndex) => (
-        <motion.div
+        <SurfaceCard
           key={round.roundNumber}
-          className="rounded-xl border border-border bg-surface overflow-hidden"
+          className="overflow-hidden p-0"
         >
-          <motion.div className="border-b border-border px-4 py-3 flex items-center justify-between gap-2">
+          <div className="border-b border-border px-4 py-3 flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-foreground">
               Round {round.roundNumber}
             </h2>
@@ -314,22 +311,22 @@ export default function WorkoutPlanEditor({
             >
               + Add exercise
             </button>
-          </motion.div>
-          <motion.div className="divide-y divide-border px-2 py-1">
+          </div>
+          <div className="divide-y divide-border px-2 py-1">
             {round.exercises.map((slot, slotIndex) => {
               const meta = exerciseMap[slot.exerciseId];
               if (!meta) return null;
               return (
-                <motion.div
+                <div
                   key={`${round.roundNumber}-${slotIndex}-${slot.exerciseId}`}
                   className="px-2 py-3 space-y-2"
                 >
-                  <motion.div className="flex items-start justify-between gap-2">
-                    <motion.div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-foreground">{meta.name}</p>
                       <CategoryBadge category={meta.category} size="sm" />
-                    </motion.div>
-                    <motion.div className="flex shrink-0 gap-1">
+                    </div>
+                    <div className="flex shrink-0 gap-1">
                       <button
                         type="button"
                         onClick={() =>
@@ -348,8 +345,8 @@ export default function WorkoutPlanEditor({
                       >
                         Remove
                       </button>
-                    </motion.div>
-                  </motion.div>
+                    </div>
+                  </div>
                   <label className="block">
                     <span className="text-[11px] text-muted">Target</span>
                     <input
@@ -361,14 +358,14 @@ export default function WorkoutPlanEditor({
                       className="mt-0.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
                     />
                   </label>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
-        </motion.div>
+          </div>
+        </SurfaceCard>
       ))}
 
-      <motion.div className="flex flex-col gap-2 sm:flex-row">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <button
           type="button"
           disabled={saving}
@@ -385,15 +382,15 @@ export default function WorkoutPlanEditor({
         >
           Cancel
         </button>
-      </motion.div>
+      </div>
 
-      <motion.div className="rounded-xl border border-border bg-surface p-4 space-y-2">
+      <SurfaceCard className="p-4 space-y-2">
         <p className="text-sm font-medium text-foreground">Reset entire week</p>
         <p className="text-xs text-muted">
           Regenerate Sun–Sat from your settings and remove all custom edits for this week.
         </p>
         {resetConfirm ? (
-          <motion.div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-2 pt-1">
             <button
               type="button"
               disabled={saving}
@@ -413,7 +410,7 @@ export default function WorkoutPlanEditor({
             >
               Keep custom plan
             </button>
-          </motion.div>
+          </div>
         ) : (
           <button
             type="button"
@@ -424,7 +421,7 @@ export default function WorkoutPlanEditor({
             Reset week to auto-generated
           </button>
         )}
-      </motion.div>
+      </SurfaceCard>
 
       <CategoryPickModal
         open={categoryPickRound !== null}
@@ -469,6 +466,6 @@ export default function WorkoutPlanEditor({
           });
         }}
       />
-    </motion.div>
+    </AnimatedSection>
   );
 }

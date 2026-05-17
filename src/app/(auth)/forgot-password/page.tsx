@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import AuthField from "@/components/auth/AuthField";
+import { humanizeAuthError } from "@/lib/auth/humanizeAuthError";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
@@ -23,7 +25,7 @@ export default function ForgotPasswordPage() {
     });
 
     if (error) {
-      setError(error.message);
+      setError(humanizeAuthError(error.message, "reset"));
       setBusy(false);
       return;
     }
@@ -60,21 +62,15 @@ export default function ForgotPasswordPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
-        <div className="space-y-1.5">
-          <label htmlFor="email" className="text-xs font-medium text-muted">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted sm:px-4 sm:py-3"
-          />
-        </div>
+        <AuthField
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={setEmail}
+        />
 
         {error && (
           <p className="text-xs text-red-400" role="alert">

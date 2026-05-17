@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
+import SurfaceCard from "@/components/common/SurfaceCard";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
@@ -61,25 +62,27 @@ function formatPageTitle(dateKey: string): string {
 }
 
 const WEEKLY_BACK_LINK_CLASS =
-  "group flex w-full max-w-md items-center gap-3 rounded-xl border-2 border-border bg-surface px-4 py-3.5 text-left shadow-sm transition-colors hover:border-accent/50 hover:bg-accent/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:mx-auto";
+  "group block w-full max-w-md text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:mx-auto";
 
 function WeeklyOverviewBackLink() {
   return (
     <Link href="/weekly" className={WEEKLY_BACK_LINK_CLASS}>
-      <span
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20 text-lg font-bold text-accent group-hover:bg-accent/30"
-        aria-hidden
-      >
-        ←
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold text-foreground">
-          Back to weekly overview
+      <SurfaceCard className="flex items-center gap-3 border-2 px-4 py-3.5 shadow-sm transition-colors hover:border-accent/50 hover:bg-accent/10">
+        <span
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20 text-lg font-bold text-accent group-hover:bg-accent/30"
+          aria-hidden
+        >
+          ←
         </span>
-        <span className="mt-0.5 block text-xs leading-snug text-muted">
-          All days in this training week
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold text-foreground">
+            Back to weekly overview
+          </span>
+          <span className="mt-0.5 block text-xs leading-snug text-muted">
+            All days in this training week
+          </span>
         </span>
-      </span>
+      </SurfaceCard>
     </Link>
   );
 }
@@ -163,7 +166,9 @@ export default function WeeklyDayPage() {
   if (planLoading) {
     return (
       <div className="flex flex-col items-center gap-4 py-12 px-2">
-        <p className="text-sm text-muted text-center">Loading this day&apos;s plan…</p>
+        <p className="text-sm text-muted text-center">
+          Loading this day&apos;s plan…
+        </p>
         <WeeklyOverviewBackLink />
       </div>
     );
@@ -227,7 +232,9 @@ export default function WeeklyDayPage() {
           <p className="text-xs font-medium uppercase tracking-wider text-accent">
             {plan.name}
           </p>
-          <h1 className="text-2xl font-bold text-foreground">{formatPageTitle(dateKey)}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {formatPageTitle(dateKey)}
+          </h1>
           <p className="text-sm text-muted">{plan.theme}</p>
           {isCustomWeek && canCustomize && (
             <p className="text-xs text-accent/90 pt-1">
@@ -297,36 +304,47 @@ export default function WeeklyDayPage() {
           plan={plan}
           log={logForDay}
           completedBannerTitle={formatCompletedBannerTitle(dateKey)}
-          onNotesChange={(notes) => updateCompletedWorkoutNotes(logForDay.id, notes)}
+          onNotesChange={(notes) =>
+            updateCompletedWorkoutNotes(logForDay.id, notes)
+          }
         />
       )}
 
       {when !== "future" && !logForDay && (
         <>
           {when === "past" ? (
-            <div className="rounded-xl border border-border bg-surface px-4 py-3">
-              <p className="text-sm text-muted">No workout was logged on this day.</p>
-            </div>
+            <SurfaceCard className="px-4 py-3">
+              <p className="text-sm text-muted">
+                No workout was logged on this day.
+              </p>
+            </SurfaceCard>
           ) : continueWorkoutHere ? (
-            <div className="rounded-xl border border-accent/30 bg-accent/10 px-4 py-3">
+            <SurfaceCard className="border-accent/30 bg-accent/10 px-4 py-3">
               <p className="text-sm text-foreground">
                 Workout in progress — continue on{" "}
-                <Link href="/today" className="font-medium text-accent hover:underline">
+                <Link
+                  href="/today"
+                  className="font-medium text-accent hover:underline"
+                >
                   Today
                 </Link>{" "}
                 for timers and logging.
               </p>
-            </div>
+            </SurfaceCard>
           ) : (
-            <div className="rounded-xl border border-border bg-surface px-4 py-3">
+            <SurfaceCard className="px-4 py-3">
               <p className="text-sm text-foreground">
-                You haven&apos;t completed today&apos;s workout yet — preview below or use{" "}
-                <Link href="/today" className="font-medium text-accent hover:underline">
+                You haven&apos;t completed today&apos;s workout yet — preview
+                below or use{" "}
+                <Link
+                  href="/today"
+                  className="font-medium text-accent hover:underline"
+                >
                   Today
                 </Link>
                 .
               </p>
-            </div>
+            </SurfaceCard>
           )}
           {!showPlanEditor && (
             <WorkoutPlanPreview
@@ -336,7 +354,11 @@ export default function WeeklyDayPage() {
                   ? "Today’s prescribed plan"
                   : formatScheduledBannerTitle(dateKey)
               }
-              bannerHint={when === "today" ? undefined : "What was scheduled — not logged."}
+              bannerHint={
+                when === "today"
+                  ? undefined
+                  : "What was scheduled — not logged."
+              }
               showTargetMuscleList
             />
           )}

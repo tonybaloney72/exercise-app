@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
+import AnimatedSection from "@/components/common/AnimatedSection";
+import { surfaceCardClassName } from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
@@ -113,7 +115,7 @@ export default function WeeklyPage() {
           OVERVIEW_DOW_ORDER.map((dow) => (
             <div
               key={dow}
-              className="rounded-xl border border-border bg-surface p-4 animate-pulse"
+              className={`${surfaceCardClassName} p-4 animate-pulse`}
             >
               <div className="h-4 w-2/5 rounded bg-border" />
               <div className="mt-2 h-3 w-3/5 rounded bg-border/80" />
@@ -135,11 +137,9 @@ export default function WeeklyPage() {
             const isCompleted = dateStr ? completedDates.has(dateStr) : false;
 
             return (
-              <motion.div
+              <AnimatedSection
                 key={plan.dayOfWeek}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: plan.dayOfWeek * 0.03 }}
+                delay={plan.dayOfWeek * 0.03}
               >
                 <Link
                   href={dateStr ? `/weekly/day/${dateStr}` : "/weekly"}
@@ -186,7 +186,7 @@ export default function WeeklyPage() {
                     {plan.rounds.reduce((a, r) => a + r.exercises.length, 0)} exercises
                   </div>
                 </Link>
-              </motion.div>
+              </AnimatedSection>
             );
           })}
       </div>

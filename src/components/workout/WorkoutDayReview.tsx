@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import AnimatedSection from "@/components/common/AnimatedSection";
+import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
@@ -84,20 +85,15 @@ export default function WorkoutDayReview({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
-      className="space-y-4"
-    >
-      <div className="rounded-xl border border-border bg-surface p-4">
+    <AnimatedSection className="space-y-4" delay={0.1}>
+      <SurfaceCard className="p-4">
         <p className="text-xs font-medium uppercase tracking-wider text-green-400">
           {completedBannerTitle}
         </p>
         {endLabel && (
           <p className="mt-1 text-sm text-muted">Finished {endLabel}</p>
         )}
-      </div>
+      </SurfaceCard>
 
       <ReviewSection title="Warm-Up Stretches">
         {log.warmUpExercises.map((entry) => {
@@ -192,7 +188,7 @@ export default function WorkoutDayReview({
         })}
       </ReviewSection>
 
-      <div className="rounded-xl border border-border bg-surface p-4">
+      <SurfaceCard className="p-4">
         <label className="text-xs font-medium text-muted" htmlFor="review-notes">
           Notes
         </label>
@@ -226,8 +222,8 @@ export default function WorkoutDayReview({
         {saveHint === "unchanged" && (
           <p className="mt-2 text-xs text-muted">Nothing new to save.</p>
         )}
-      </div>
-    </motion.div>
+      </SurfaceCard>
+    </AnimatedSection>
   );
 }
 
@@ -239,12 +235,12 @@ function ReviewSection({
   children: ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-surface overflow-hidden">
+    <SurfaceCard className="overflow-hidden p-0">
       <div className="border-b border-border px-4 py-3">
         <h2 className="text-sm font-semibold text-foreground">{title}</h2>
       </div>
       <div className="divide-y divide-border px-2 py-1">{children}</div>
-    </div>
+    </SurfaceCard>
   );
 }
 

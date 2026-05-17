@@ -3,6 +3,8 @@
 import { Suspense, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import AnimatedSection from "@/components/common/AnimatedSection";
+import SurfaceCard from "@/components/common/SurfaceCard";
 import { CATEGORIES } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutSession from "@/components/workout/WorkoutSession";
@@ -121,13 +123,8 @@ function TodayPageInner() {
 
       {/* Pre-workout: plan context + start */}
       {!activeWorkout && !completedLogForUi && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="space-y-4"
-        >
-          <div className="rounded-xl border border-border bg-surface p-4 space-y-3">
+        <AnimatedSection className="space-y-4" delay={0.15}>
+          <SurfaceCard className="p-4 space-y-3">
             <h2 className="text-sm font-semibold text-foreground">
               Target Muscles
             </h2>
@@ -149,7 +146,7 @@ function TodayPageInner() {
                 </div>
               ))}
             </div>
-          </div>
+          </SurfaceCard>
 
           <button
             type="button"
@@ -158,7 +155,7 @@ function TodayPageInner() {
           >
             Start Workout
           </button>
-        </motion.div>
+        </AnimatedSection>
       )}
     </div>
   );

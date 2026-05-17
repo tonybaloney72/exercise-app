@@ -10,6 +10,7 @@ import {
   exerciseMatchesEquipment,
 } from "@/data/equipment";
 import CategoryBadge from "@/components/common/CategoryBadge";
+import EmptyState from "@/components/common/EmptyState";
 import type { Exercise, ExerciseCategory } from "@/types";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
@@ -188,9 +189,10 @@ export default function LibraryPage() {
         </AnimatePresence>
 
         {filtered.length === 0 && (
-          <div className="py-12 text-center text-sm text-muted">
-            No exercises match your search.
-          </div>
+          <EmptyState
+            title="No exercises match your search."
+            className="py-12"
+          />
         )}
       </div>
     </div>

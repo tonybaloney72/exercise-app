@@ -16,6 +16,9 @@ import {
   listExercisesWithNumericProgress,
 } from "@/utils/exerciseProgressStats";
 import { formatSecondsToMMSS } from "@/utils/time";
+import BottomSheetModal from "@/components/common/BottomSheetModal";
+import EmptyState from "@/components/common/EmptyState";
+import SurfaceCard from "@/components/common/SurfaceCard";
 
 const tooltipStyle = {
   backgroundColor: "var(--surface)",
@@ -117,106 +120,70 @@ export default function ExerciseProgressChart({ history }: Props) {
         </button>
       </div>
 
-      {sessionsOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center sm:p-6"
-          role="presentation"
-        >
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/60"
-            aria-label="Close session list"
-            onClick={() => setSessionsOpen(false)}
+      <BottomSheetModal
+        open={sessionsOpen}
+        onClose={() => setSessionsOpen(false)}
+        title={exerciseName}
+        maxWidth="lg"
+        panelClassName="max-h-[min(85dvh,560px)] sm:max-h-[min(85dvh,560px)]"
+        bodyClassName="overflow-y-auto overscroll-contain px-2 pb-3"
+        headerExtra={
+          <p className="shrink-0 border-b border-border px-4 py-2 text-[11px] leading-snug text-muted">
+            One row per workout. Numbers are{" "}
+            <span className="text-foreground">what you logged </span>
+            (summed across rounds), not the prescribed targets. The line chart
+            uses <span className="text-foreground">total time</span> for
+            time-based exercises when duration was logged; otherwise it uses{" "}
+            <span className="text-foreground">total reps</span>.
+          </p>
+        }
+      >
+        {series.length === 0 ? (
+          <EmptyState
+            title="No sessions to list."
+            className="px-2 py-6 text-xs"
           />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="exercise-session-history-title"
-            className="relative z-10 flex max-h-[min(85dvh,560px)] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-xl"
-          >
-            <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
-              <h3
-                id="exercise-session-history-title"
-                className="pr-2 text-sm font-semibold text-foreground"
-              >
-                {exerciseName}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setSessionsOpen(false)}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-foreground"
-                aria-label="Close"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.25"
+        ) : (
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-border text-muted">
+                <th className="px-2 py-2 font-medium">Date</th>
+                <th className="px-2 py-2 font-medium">Reps (logged)</th>
+                <th className="px-2 py-2 font-medium">Time (logged)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...series].reverse().map((row) => (
+                <tr
+                  key={row.date}
+                  className="border-b border-border/80 last:border-0"
                 >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-            <p className="shrink-0 border-b border-border px-4 py-2 text-[11px] leading-snug text-muted">
-              One row per workout. Numbers are{" "}
-              <span className="text-foreground">what you logged </span>
-              (summed across rounds), not the prescribed targets. The line chart
-              uses <span className="text-foreground">total time</span> for
-              time-based exercises when duration was logged; otherwise it uses{" "}
-              <span className="text-foreground">total reps</span>.
-            </p>
-            <div className="min-h-0 overflow-y-auto overscroll-contain px-2 pb-3">
-              {series.length === 0 ? (
-                <p className="px-2 py-6 text-center text-xs text-muted">
-                  No sessions to list.
-                </p>
-              ) : (
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-border text-muted">
-                      <th className="px-2 py-2 font-medium">Date</th>
-                      <th className="px-2 py-2 font-medium">Reps (logged)</th>
-                      <th className="px-2 py-2 font-medium">Time (logged)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[...series].reverse().map((row) => (
-                      <tr
-                        key={row.date}
-                        className="border-b border-border/80 last:border-0"
-                      >
-                        <td className="whitespace-nowrap px-2 py-2 font-mono text-foreground">
-                          {row.date}
-                        </td>
-                        <td className="px-2 py-2 tabular-nums text-foreground">
-                          {row.reps > 0 ? row.reps : "—"}
-                        </td>
-                        <td className="px-2 py-2 tabular-nums text-foreground">
-                          {row.durationSec > 0
-                            ? formatSecondsToMMSS(row.durationSec) ||
-                              `${row.durationSec}s`
-                            : "—"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+                  <td className="whitespace-nowrap px-2 py-2 font-mono text-foreground">
+                    {row.date}
+                  </td>
+                  <td className="px-2 py-2 tabular-nums text-foreground">
+                    {row.reps > 0 ? row.reps : "—"}
+                  </td>
+                  <td className="px-2 py-2 tabular-nums text-foreground">
+                    {row.durationSec > 0
+                      ? formatSecondsToMMSS(row.durationSec) ||
+                        `${row.durationSec}s`
+                      : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </BottomSheetModal>
 
-      <div className="h-56 w-full rounded-xl border border-border bg-surface p-2 pt-3">
+      <SurfaceCard className="h-56 w-full p-2 pt-3">
         {series.length === 0 ? (
           <div className="flex h-full items-center justify-center px-4">
-            <p className="text-center text-xs text-muted">
-              No chartable sessions for this exercise yet (log reps or duration
-              when you complete sets).
-            </p>
+            <EmptyState
+              title="No chartable sessions for this exercise yet (log reps or duration when you complete sets)."
+              className="text-xs"
+            />
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
@@ -308,7 +275,7 @@ export default function ExerciseProgressChart({ history }: Props) {
             </LineChart>
           </ResponsiveContainer>
         )}
-      </div>
+      </SurfaceCard>
     </div>
   );
 }

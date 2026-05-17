@@ -4,6 +4,8 @@ import { Suspense, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import AuthField from "@/components/auth/AuthField";
+import { humanizeAuthError } from "@/lib/auth/humanizeAuthError";
 import { createClient } from "@/lib/supabase/client";
 import { APP_HOME, safeReturnTo } from "@/lib/auth/constants";
 
@@ -29,7 +31,7 @@ function LoginForm() {
     });
 
     if (error) {
-      setError(humanize(error.message));
+      setError(humanizeAuthError(error.message, "login"));
       setBusy(false);
       return;
     }
@@ -56,7 +58,7 @@ function LoginForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
-        <Field
+        <AuthField
           id="email"
           label="Email"
           type="email"
@@ -65,7 +67,7 @@ function LoginForm() {
           value={email}
           onChange={setEmail}
         />
-        <Field
+        <AuthField
           id="password"
           label="Password"
           type="password"
@@ -118,51 +120,4 @@ export default function LoginPage() {
       <LoginForm />
     </Suspense>
   );
-}
-
-function Field({
-  id,
-  label,
-  type,
-  autoComplete,
-  required,
-  value,
-  onChange,
-}: {
-  id: string;
-  label: string;
-  type: string;
-  autoComplete?: string;
-  required?: boolean;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="space-y-1 sm:space-y-1.5">
-      <label htmlFor={id} className="text-xs font-medium text-muted">
-        {label}
-      </label>
-      <input
-        id={id}
-        name={id}
-        type={type}
-        autoComplete={autoComplete}
-        required={required}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted sm:px-4 sm:py-3"
-      />
-    </div>
-  );
-}
-
-function humanize(msg: string): string {
-  const lower = msg.toLowerCase();
-  if (lower.includes("invalid login credentials"))
-    return "That email and password don't match. Try again.";
-  if (lower.includes("email not confirmed"))
-    return "Please confirm your email address before logging in.";
-  if (lower.includes("rate limit"))
-    return "Too many attempts. Please wait a moment and try again.";
-  return msg;
 }

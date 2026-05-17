@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import AuthField from "@/components/auth/AuthField";
+import { humanizeAuthError } from "@/lib/auth/humanizeAuthError";
 import { createClient } from "@/lib/supabase/client";
 import { APP_HOME } from "@/lib/auth/constants";
 
@@ -38,7 +40,7 @@ export default function SignupPage() {
     });
 
     if (error) {
-      setError(humanize(error.message));
+      setError(humanizeAuthError(error.message, "signup"));
       setBusy(false);
       return;
     }
@@ -66,7 +68,7 @@ export default function SignupPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
-        <Field
+        <AuthField
           id="email"
           label="Email"
           type="email"
@@ -75,7 +77,7 @@ export default function SignupPage() {
           value={email}
           onChange={setEmail}
         />
-        <Field
+        <AuthField
           id="password"
           label="Password"
           type="password"
@@ -85,7 +87,7 @@ export default function SignupPage() {
           onChange={setPassword}
           hint="At least 8 characters"
         />
-        <Field
+        <AuthField
           id="confirm"
           label="Confirm password"
           type="password"
@@ -125,54 +127,4 @@ export default function SignupPage() {
       </div>
     </div>
   );
-}
-
-function Field({
-  id,
-  label,
-  type,
-  autoComplete,
-  required,
-  value,
-  onChange,
-  hint,
-}: {
-  id: string;
-  label: string;
-  type: string;
-  autoComplete?: string;
-  required?: boolean;
-  value: string;
-  onChange: (v: string) => void;
-  hint?: string;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label htmlFor={id} className="text-xs font-medium text-muted">
-        {label}
-      </label>
-      <input
-        id={id}
-        name={id}
-        type={type}
-        autoComplete={autoComplete}
-        required={required}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted sm:px-4 sm:py-3"
-      />
-      {hint && <p className="text-[10px] text-muted">{hint}</p>}
-    </div>
-  );
-}
-
-function humanize(msg: string): string {
-  const lower = msg.toLowerCase();
-  if (lower.includes("already registered") || lower.includes("user already"))
-    return "An account with that email already exists. Try logging in.";
-  if (lower.includes("password should be"))
-    return "Password is too short. Use at least 8 characters.";
-  if (lower.includes("rate limit"))
-    return "Too many attempts. Please wait a moment and try again.";
-  return msg;
 }

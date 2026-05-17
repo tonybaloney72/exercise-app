@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import AuthField from "@/components/auth/AuthField";
+import { humanizeAuthError } from "@/lib/auth/humanizeAuthError";
 import { createClient } from "@/lib/supabase/client";
 import { APP_HOME } from "@/lib/auth/constants";
 
@@ -31,7 +33,7 @@ export default function UpdatePasswordPage() {
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      setError(humanize(error.message));
+      setError(humanizeAuthError(error.message, "password"));
       setBusy(false);
       return;
     }
@@ -51,18 +53,22 @@ export default function UpdatePasswordPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
-        <Field
+        <AuthField
           id="password"
           label="New password"
+          type="password"
           autoComplete="new-password"
+          required
           value={password}
           onChange={setPassword}
           hint="At least 8 characters"
         />
-        <Field
+        <AuthField
           id="confirm"
           label="Confirm new password"
+          type="password"
           autoComplete="new-password"
+          required
           value={confirm}
           onChange={setConfirm}
         />
@@ -90,50 +96,4 @@ export default function UpdatePasswordPage() {
       </p>
     </div>
   );
-}
-
-function Field({
-  id,
-  label,
-  autoComplete,
-  value,
-  onChange,
-  hint,
-}: {
-  id: string;
-  label: string;
-  autoComplete?: string;
-  value: string;
-  onChange: (v: string) => void;
-  hint?: string;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label htmlFor={id} className="text-xs font-medium text-muted">
-        {label}
-      </label>
-      <input
-        id={id}
-        name={id}
-        type="password"
-        autoComplete={autoComplete}
-        required
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted sm:px-4 sm:py-3"
-      />
-      {hint && <p className="text-[10px] text-muted">{hint}</p>}
-    </div>
-  );
-}
-
-function humanize(msg: string): string {
-  const lower = msg.toLowerCase();
-  if (lower.includes("same") && lower.includes("password"))
-    return "New password must be different from your current one.";
-  if (lower.includes("password should be") || lower.includes("at least"))
-    return "Password is too short. Use at least 8 characters.";
-  if (lower.includes("auth session missing"))
-    return "Your reset link has expired. Please request a new one.";
-  return msg;
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { motion } from "framer-motion";
+import AnimatedSection from "@/components/common/AnimatedSection";
+import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { CATEGORIES } from "@/data/categories";
@@ -31,13 +32,8 @@ export default function WorkoutPlanPreview({
   const { warmUp, coolDown } = useResolvedStretches(plan);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.05 }}
-      className="space-y-4"
-    >
-      <div className="rounded-xl border border-border bg-surface p-4 space-y-1">
+    <AnimatedSection className="space-y-4" delay={0.05}>
+      <SurfaceCard className="p-4 space-y-1">
         <p className="text-xs font-medium uppercase tracking-wider text-accent">
           {bannerTitle}
         </p>
@@ -50,10 +46,10 @@ export default function WorkoutPlanPreview({
             back on this day (use <span className="font-medium text-foreground">Today</span>).
           </p>
         )}
-      </div>
+      </SurfaceCard>
 
       {showTargetMuscleList && (
-        <div className="rounded-xl border border-border bg-surface p-4 space-y-3">
+        <SurfaceCard className="p-4 space-y-3">
           <h2 className="text-sm font-semibold text-foreground">Target muscles</h2>
           <div className="space-y-1.5">
             {allCategories.map((cat) => (
@@ -69,7 +65,7 @@ export default function WorkoutPlanPreview({
               </div>
             ))}
           </div>
-        </div>
+        </SurfaceCard>
       )}
 
       <PreviewSection title="Warm-Up Stretches">
@@ -129,7 +125,7 @@ export default function WorkoutPlanPreview({
           );
         })}
       </PreviewSection>
-    </motion.div>
+    </AnimatedSection>
   );
 }
 
@@ -141,12 +137,12 @@ function PreviewSection({
   children: ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-surface overflow-hidden">
+    <SurfaceCard className="overflow-hidden p-0">
       <div className="border-b border-border px-4 py-3">
         <h2 className="text-sm font-semibold text-foreground">{title}</h2>
       </div>
       <div className="divide-y divide-border px-2 py-1">{children}</div>
-    </div>
+    </SurfaceCard>
   );
 }
 

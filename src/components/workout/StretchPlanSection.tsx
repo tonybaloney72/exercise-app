@@ -1,5 +1,7 @@
 "use client";
 
+import EmptyState from "@/components/common/EmptyState";
+import SurfaceCard from "@/components/common/SurfaceCard";
 import { exerciseMap } from "@/data/exercises";
 import type { StretchEntry } from "@/types";
 
@@ -25,7 +27,7 @@ export default function StretchPlanSection({
   onUpdateTarget,
 }: StretchPlanSectionProps) {
   return (
-    <div className="rounded-xl border border-border bg-surface overflow-hidden">
+    <SurfaceCard className="overflow-hidden p-0">
       <div className="border-b border-border px-4 py-3 flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h2 className="text-sm font-semibold text-foreground">{title}</h2>
@@ -41,7 +43,7 @@ export default function StretchPlanSection({
       </div>
       <div className="divide-y divide-border px-2 py-1">
         {entries.length === 0 ? (
-          <p className="px-2 py-4 text-center text-xs text-muted">No stretches yet.</p>
+          <EmptyState title="No stretches yet." className="px-2 py-4 text-xs" />
         ) : (
           entries.map((entry, index) => {
             const meta = exerciseMap[entry.exerciseId];
@@ -84,6 +86,6 @@ export default function StretchPlanSection({
           })
         )}
       </div>
-    </div>
+    </SurfaceCard>
   );
 }

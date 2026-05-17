@@ -16,6 +16,8 @@ import {
 import type { WorkoutLog } from "@/types";
 import { CATEGORIES } from "@/data/categories";
 import { weeklyWorkoutCounts, trainingCategoryTotals } from "@/utils/progressStats";
+import EmptyState from "@/components/common/EmptyState";
+import SurfaceCard from "@/components/common/SurfaceCard";
 
 const tooltipStyle = {
   backgroundColor: "var(--surface)",
@@ -56,7 +58,7 @@ export default function ProgressChartsSection({ history }: Props) {
         <p className="text-xs text-muted mt-0.5">
           Sunday–Saturday weeks; label is the week&apos;s start date
         </p>
-        <div className="mt-3 h-56 w-full rounded-xl border border-border bg-surface p-2 pt-3">
+        <SurfaceCard className="mt-3 h-56 w-full p-2 pt-3">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={weekly} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
               <CartesianGrid
@@ -87,7 +89,7 @@ export default function ProgressChartsSection({ history }: Props) {
               />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </SurfaceCard>
       </div>
 
       <div>
@@ -96,7 +98,7 @@ export default function ProgressChartsSection({ history }: Props) {
           Completed strength exercises by category (stretches excluded)
         </p>
         {hasCategoryData ? (
-          <div className="mt-3 w-full overflow-hidden rounded-xl border border-border bg-surface">
+          <SurfaceCard className="mt-3 w-full overflow-hidden p-0">
             <div className="h-[220px] w-full px-4 pt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
@@ -153,13 +155,14 @@ export default function ProgressChartsSection({ history }: Props) {
                 </li>
               ))}
             </ul>
-          </div>
+          </SurfaceCard>
         ) : (
-          <div className="mt-3 rounded-xl border border-dashed border-border bg-surface/50 px-4 py-8 text-center">
-            <p className="text-xs text-muted">
-              No logged strength sets yet — finish round exercises to see this chart.
-            </p>
-          </div>
+          <SurfaceCard className="mt-3 border-dashed bg-surface/50 px-4 py-8">
+            <EmptyState
+              title="No logged strength sets yet — finish round exercises to see this chart."
+              className="text-xs"
+            />
+          </SurfaceCard>
         )}
       </div>
     </div>

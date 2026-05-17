@@ -48,3 +48,4 @@ REFACTOR_AUDIT.md
 # planning slices, ADRs, and similar local design notes (not committed)
 docs/*-slices.md
 docs/adr/
+.cursor/rules/no-script-file-edits.mdc

@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import AnimatedSection from "@/components/common/AnimatedSection";
+import SurfaceCard from "@/components/common/SurfaceCard";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
@@ -97,11 +98,8 @@ export default function SettingsPage() {
       </div>
 
       {/* Account */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-xl border border-border bg-surface p-4 space-y-3"
-      >
+      <AnimatedSection>
+        <SurfaceCard className="p-4 space-y-3">
         <h2 className="text-sm font-semibold text-foreground">Account</h2>
 
         {mode === "authenticated" && user && (
@@ -154,15 +152,12 @@ export default function SettingsPage() {
         {(mode === "loading" || mode === "anonymous") && (
           <p className="text-xs text-muted">Loading account…</p>
         )}
-      </motion.div>
+        </SurfaceCard>
+      </AnimatedSection>
 
       {/* Appearance */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.04 }}
-        className="rounded-xl border border-border bg-surface p-4"
-      >
+      <AnimatedSection delay={0.04}>
+        <SurfaceCard className="p-4">
         <h2 className="text-sm font-semibold text-foreground mb-3">Appearance</h2>
         <div className="flex items-center justify-between gap-4">
           <div>
@@ -188,15 +183,12 @@ export default function SettingsPage() {
             <span className="sr-only">{settings.darkMode ? "On" : "Off"}</span>
           </button>
         </div>
-      </motion.div>
+        </SurfaceCard>
+      </AnimatedSection>
 
       {/* Timers & device */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.045 }}
-        className="rounded-xl border border-border bg-surface p-4 space-y-4"
-      >
+      <AnimatedSection delay={0.045}>
+        <SurfaceCard className="p-4 space-y-4">
         <h2 className="text-sm font-semibold text-foreground">Timers &amp; device</h2>
         <SettingsSwitch
           title="Timer sounds"
@@ -228,15 +220,12 @@ export default function SettingsPage() {
             })
           }
         />
-      </motion.div>
+        </SurfaceCard>
+      </AnimatedSection>
 
       {/* Equipment */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.048 }}
-        className="rounded-xl border border-border bg-surface p-4 space-y-3"
-      >
+      <AnimatedSection delay={0.048}>
+        <SurfaceCard className="p-4 space-y-3">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Your equipment</h2>
           <p className="text-xs text-muted mt-1">
@@ -258,16 +247,13 @@ export default function SettingsPage() {
           selected={settings.availableEquipment}
           onChange={(next) => void settings.updateSettings({ availableEquipment: next })}
         />
-      </motion.div>
+        </SurfaceCard>
+      </AnimatedSection>
 
       {/* Program profile (signed-in weekly plans) */}
       {mode === "authenticated" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.049 }}
-          className="rounded-xl border border-border bg-surface p-4 space-y-4"
-        >
+        <AnimatedSection delay={0.049}>
+          <SurfaceCard className="p-4 space-y-4">
           <div>
             <h2 className="text-sm font-semibold text-foreground">Program focus</h2>
             <p className="text-xs text-muted mt-1">
@@ -365,7 +351,8 @@ export default function SettingsPage() {
               Edit default stretches
             </button>
           </div>
-        </motion.div>
+          </SurfaceCard>
+        </AnimatedSection>
       )}
 
       <DefaultStretchesModal
@@ -374,12 +361,8 @@ export default function SettingsPage() {
       />
 
       {/* Workout preferences */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="rounded-xl border border-border bg-surface p-4"
-      >
+      <AnimatedSection delay={0.05}>
+        <SurfaceCard className="p-4">
         <h2 className="text-sm font-semibold text-foreground mb-3">Workout</h2>
         <div>
           <label className="text-xs text-muted">Rest Between Rounds (seconds)</label>
@@ -399,15 +382,12 @@ export default function SettingsPage() {
             ))}
           </div>
         </div>
-      </motion.div>
+        </SurfaceCard>
+      </AnimatedSection>
 
       {/* Data management */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="rounded-xl border border-border bg-surface p-4 space-y-3"
-      >
+      <AnimatedSection delay={0.1}>
+        <SurfaceCard className="p-4 space-y-3">
         <h2 className="text-sm font-semibold text-foreground">Data</h2>
         <button
           onClick={handleExport}
@@ -418,7 +398,8 @@ export default function SettingsPage() {
         <p className="text-[10px] text-muted text-center">
           {workoutHistory.length} workout{workoutHistory.length !== 1 ? "s" : ""} saved locally
         </p>
-      </motion.div>
+        </SurfaceCard>
+      </AnimatedSection>
     </div>
   );
 }
