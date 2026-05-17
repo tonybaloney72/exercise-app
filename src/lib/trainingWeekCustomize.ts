@@ -7,9 +7,12 @@ import {
   TRAINING_WEEK_SOURCE_CUSTOM_V1,
   TRAINING_WEEK_SOURCE_GENERATED_V1,
 } from "@/lib/planGenerator";
-import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
+import { rebuildDerivedStretches, resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import { refreshTrainingWeekContaining, resolveTrainingWeekForAuth } from "@/lib/planResolver";
-import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
+import {
+  buildStretchResolveContext,
+  type StretchResolveContext,
+} from "@/lib/stretchResolveContext";
 import {
   cloneStretchEntries,
   normalizeStretchList,
@@ -20,7 +23,14 @@ import {
   getSettingsRepo,
   getTrainingWeekRepo,
 } from "@/lib/repos";
-import type { DayPlan, StretchEntry } from "@/types";
+import type {
+  DayPlan,
+  ExerciseEquipment,
+  ProgramFocusPreset,
+  RoundDensity,
+  StretchEntry,
+} from "@/types";
+import type { ExercisePreferenceMap } from "@/lib/repos";
 import { weekAnchorFromDateKey } from "@/utils/weekCalendar";
 
 export { isUserCustomizedWeekSource } from "@/lib/planGenerator";
@@ -60,15 +70,20 @@ export function prepareDayPlanForEditor(plan: DayPlan): DayPlan {
 }
 
 /** Strip legacy fields; only persist per-day stretch overrides when they differ from derived. */
-export function dayPlanForCustomSave(plan: DayPlan): DayPlan {
-  const ctx = buildStretchResolveContext();
+export function dayPlanForCustomSave(
+  plan: DayPlan,
+  ctx: StretchResolveContext = buildStretchResolveContext(),
+): DayPlan {
   const { defaultWarmUp: _w, defaultCoolDown: _c, ...rest } = plan as DayPlan & {
     defaultWarmUp?: StretchEntry[];
     defaultCoolDown?: StretchEntry[];
   };
 
   const basePlan: DayPlan = { ...rest };
-  const resolved = resolveStretchesForDay(basePlan, ctx);
+  const derived = rebuildDerivedStretches(
+    { ...basePlan, warmUp: undefined, coolDown: undefined },
+    ctx,
+  );
 
   const normalizedWarm =
     rest.warmUp != null
@@ -80,12 +95,12 @@ export function dayPlanForCustomSave(plan: DayPlan): DayPlan {
       : null;
 
   const warmUp =
-    normalizedWarm != null && !stretchListsEqual(normalizedWarm, resolved.warmUp)
+    normalizedWarm != null && !stretchListsEqual(normalizedWarm, derived.warmUp)
       ? normalizedWarm
       : undefined;
 
   const coolDown =
-    normalizedCool != null && !stretchListsEqual(normalizedCool, resolved.coolDown)
+    normalizedCool != null && !stretchListsEqual(normalizedCool, derived.coolDown)
       ? normalizedCool
       : undefined;
 
@@ -144,6 +159,28 @@ export async function resetTrainingWeekToGenerated(
   await refreshTrainingWeekContaining(dateKeyInWeek);
 }
 
+/** Fresh catalog + generator plan for one day-of-week (no persistence). */
+export function buildGeneratedDayPlan(
+  dayOfWeek: number,
+  prefs: ExercisePreferenceMap,
+  availableEquipment: ExerciseEquipment[],
+  programFocus: ProgramFocusPreset,
+  roundDensity: RoundDensity,
+): DayPlan {
+  const generated = materializeTrainingWeek(
+    buildCatalogWeek(),
+    prefs,
+    availableEquipment,
+    programFocus,
+    roundDensity,
+  );
+  const day = generated[dayOfWeek];
+  if (!day) {
+    throw new Error(`No catalog day for dayOfWeek ${dayOfWeek}`);
+  }
+  return { ...day, dayOfWeek };
+}
+
 /**
  * Replace one day in the persisted week with a freshly generated plan for that
  * day-of-week. Other days in the week are unchanged.
@@ -167,14 +204,13 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
   const programFocus = settings.programFocus ?? "balanced";
   const roundDensity = settings.roundDensity ?? "standard";
 
-  const generated = materializeTrainingWeek(
-    buildCatalogWeek(),
+  const freshDay = buildGeneratedDayPlan(
+    dow,
     prefs,
     availableEquipment,
     programFocus,
     roundDensity,
   );
-  const freshDay: DayPlan = { ...generated[dow], dayOfWeek: dow };
 
   const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");
   const merged = {
