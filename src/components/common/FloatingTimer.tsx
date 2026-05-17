@@ -3,21 +3,37 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
+import type { TimerMode } from "@/stores/useFloatingTimerStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { primeTimerAudio } from "@/utils/timerAlert";
 import { formatTimerDisplay } from "@/utils/time";
 import FullScreenTimerModal from "./FullScreenTimerModal";
+
+function timerModeLabel(mode: TimerMode): string {
+  if (mode === "rest") return "Rest";
+  if (mode === "setTimer") return "Set";
+  return "Stopwatch";
+}
 
 /**
  * Floating pill in the top-right that:
  *   - Shows "Timer" by default
  *   - After a stopwatch run, shows the captured time until dismissed
  *   - Opens a small popover with two options (Rest / Stopwatch)
- *   - Renders the full-screen modal while the timer is active
+ *   - Renders the full-screen modal while the timer is active (unless minimized)
  */
 export default function FloatingTimer() {
   const mode = useFloatingTimerStore((s) => s.mode);
+  const presentation = useFloatingTimerStore((s) => s.presentation);
+  const running = useFloatingTimerStore((s) => s.running);
+  const seconds = useFloatingTimerStore((s) => s.seconds);
   const startRest = useFloatingTimerStore((s) => s.startRest);
   const startStopwatch = useFloatingTimerStore((s) => s.startStopwatch);
+  const pause = useFloatingTimerStore((s) => s.pause);
+  const resume = useFloatingTimerStore((s) => s.resume);
+  const stop = useFloatingTimerStore((s) => s.stop);
+  const expandTimer = useFloatingTimerStore((s) => s.expandTimer);
+  const tick = useFloatingTimerStore((s) => s.tick);
   const lastStopwatchSeconds = useFloatingTimerStore(
     (s) => s.lastStopwatchSeconds,
   );
@@ -26,6 +42,16 @@ export default function FloatingTimer() {
 
   const [open, setOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement | null>(null);
+
+  const idle = mode === "idle";
+  const minimized = !idle && presentation === "minimized";
+  const fullscreen = !idle && presentation === "fullscreen";
+
+  useEffect(() => {
+    if (idle || !running) return;
+    const id = setInterval(() => tick(), 1000);
+    return () => clearInterval(id);
+  }, [idle, running, tick]);
 
   // Close popover on outside click.
   useEffect(() => {
@@ -38,14 +64,13 @@ export default function FloatingTimer() {
     return () => window.removeEventListener("mousedown", onDown);
   }, [open]);
 
-  const idle = mode === "idle";
   const hasLast = lastStopwatchSeconds != null;
   const pillLabel = hasLast ? formatTimerDisplay(lastStopwatchSeconds!) : "Timer";
 
   return (
     <>
       {idle && (
-        <div className="fixed top-4 right-4 z-40" ref={popoverRef}>
+        <motion.div className="fixed top-4 right-4 z-40" ref={popoverRef}>
           <div className="flex items-center gap-1.5 rounded-full bg-accent shadow-lg shadow-accent/30">
             <button
               type="button"
@@ -175,10 +200,85 @@ export default function FloatingTimer() {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
       )}
 
-      <AnimatePresence>{!idle && <FullScreenTimerModal />}</AnimatePresence>
+      <AnimatePresence>
+        {minimized && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.96 }}
+            transition={{ duration: 0.14 }}
+            className="fixed top-4 right-4 z-40"
+          >
+            <div className="flex items-center gap-1 rounded-full bg-accent shadow-lg shadow-accent/30 pl-1 pr-1 py-1">
+              <button
+                type="button"
+                onClick={expandTimer}
+                aria-label={`Expand ${timerModeLabel(mode)} timer`}
+                className="flex min-w-0 items-center gap-2 rounded-full py-2 pl-3 pr-2 text-left text-white active:scale-[0.97] transition-transform"
+              >
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-white/75">
+                  {timerModeLabel(mode)}
+                </span>
+                <span className="font-mono text-sm font-bold tabular-nums">
+                  {formatTimerDisplay(seconds)}
+                </span>
+                {!running && seconds === 0 && (mode === "rest" || mode === "setTimer") && (
+                  <span className="text-[10px] font-medium text-white/90">Done</span>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (running) pause();
+                  else {
+                    primeTimerAudio();
+                    resume();
+                  }
+                }}
+                aria-label={running ? "Pause timer" : "Resume timer"}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/90 hover:bg-white/15 transition-colors"
+              >
+                {running ? (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <rect x="6" y="5" width="4" height="14" rx="1" />
+                    <rect x="14" y="5" width="4" height="14" rx="1" />
+                  </svg>
+                ) : (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <polygon points="6 4 20 12 6 20 6 4" />
+                  </svg>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={stop}
+                aria-label="Stop timer"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/80 hover:text-white hover:bg-white/15 transition-colors"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>{fullscreen && <FullScreenTimerModal />}</AnimatePresence>
     </>
   );
 }

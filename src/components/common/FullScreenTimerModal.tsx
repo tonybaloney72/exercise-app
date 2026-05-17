@@ -18,7 +18,7 @@ export default function FullScreenTimerModal() {
   const resetRest = useFloatingTimerStore((s) => s.resetRest);
   const resetStopwatch = useFloatingTimerStore((s) => s.resetStopwatch);
   const stop = useFloatingTimerStore((s) => s.stop);
-  const tick = useFloatingTimerStore((s) => s.tick);
+  const minimizeTimer = useFloatingTimerStore((s) => s.minimizeTimer);
 
   const open = mode !== "idle";
 
@@ -47,12 +47,6 @@ export default function FullScreenTimerModal() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, running, pause, resume, stop]);
 
-  useEffect(() => {
-    if (!open || !running) return;
-    const id = setInterval(() => tick(), 1000);
-    return () => clearInterval(id);
-  }, [open, running, tick]);
-
   if (!open) return null;
 
   const isRest = mode === "rest";
@@ -80,6 +74,30 @@ export default function FullScreenTimerModal() {
       transition={{ duration: 0.18 }}
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/85 backdrop-blur-sm px-6"
     >
+      {isCountdown && (
+        <button
+          type="button"
+          onClick={minimizeTimer}
+          aria-label="Minimize timer"
+          className="absolute top-5 left-5 flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.25"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+          Minimize
+        </button>
+      )}
+
       <button
         type="button"
         onClick={stop}

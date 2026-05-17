@@ -4,9 +4,11 @@ import { create } from "zustand";
 import { primeTimerAudio, playTimerDoneAlert } from "@/utils/timerAlert";
 
 export type TimerMode = "idle" | "rest" | "stopwatch" | "setTimer";
+export type TimerPresentation = "fullscreen" | "minimized";
 
 interface FloatingTimerState {
   mode: TimerMode;
+  presentation: TimerPresentation;
   running: boolean;
   /** Countdown: seconds left. Stopwatch: seconds elapsed. */
   seconds: number;
@@ -48,12 +50,16 @@ interface FloatingTimerState {
   stop: () => void;
   /** Clears the persisted "last stopwatch" pill label. */
   dismissLast: () => void;
-  /** Internal tick — invoked by the modal's interval. */
+  /** Collapse rest/set countdown to the floating pill (workout stays scrollable). */
+  minimizeTimer: () => void;
+  expandTimer: () => void;
+  /** Internal tick — driven by {@link FloatingTimer} while a timer is active. */
   tick: () => void;
 }
 
 export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   mode: "idle",
+  presentation: "fullscreen",
   running: false,
   seconds: 0,
   restTotalSeconds: 0,
@@ -63,6 +69,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
     primeTimerAudio();
     set({
       mode: "rest",
+      presentation: "fullscreen",
       running: autoStart,
       seconds: Math.max(0, Math.floor(totalSeconds)),
       restTotalSeconds: Math.max(0, Math.floor(totalSeconds)),
@@ -74,6 +81,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
     primeTimerAudio();
     set({
       mode: "setTimer",
+      presentation: "fullscreen",
       running: true,
       seconds: Math.max(0, Math.floor(totalSeconds)),
       restTotalSeconds: Math.max(0, Math.floor(totalSeconds)),
@@ -84,6 +92,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   startStopwatch: (autoStart = true) =>
     set((s) => ({
       mode: "stopwatch",
+      presentation: "fullscreen",
       running: autoStart,
       seconds: s.lastStopwatchSeconds ?? 0,
       restTotalSeconds: 0,
@@ -117,6 +126,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
     const { mode, seconds } = get();
     set({
       mode: "idle",
+      presentation: "fullscreen",
       running: false,
       seconds: 0,
       restTotalSeconds: 0,
@@ -126,6 +136,14 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   },
 
   dismissLast: () => set({ lastStopwatchSeconds: null }),
+
+  minimizeTimer: () => {
+    const { mode } = get();
+    if (mode !== "rest" && mode !== "setTimer") return;
+    set({ presentation: "minimized" });
+  },
+
+  expandTimer: () => set({ presentation: "fullscreen" }),
 
   tick: () =>
     set((s) => {
