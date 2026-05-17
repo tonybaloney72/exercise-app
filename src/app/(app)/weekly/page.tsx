@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useMemo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/common/AnimatedSection";
+import EmptyState from "@/components/common/EmptyState";
+import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
-import { surfaceCardClassName } from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import { resetTrainingWeekToGenerated } from "@/lib/trainingWeekRefresh";
@@ -151,22 +152,21 @@ export default function WeeklyPage() {
         })}
       </div>
 
+      {!weekLoading && completedDates.size === 0 && (
+        <SurfaceCard className="border-dashed bg-surface/50 py-8">
+          <EmptyState
+            icon="📅"
+            title="No workouts completed this week yet."
+            description="Finish a session on Today and it will show up here."
+            action={{ label: "Go to Today", href: "/today" }}
+          />
+        </SurfaceCard>
+      )}
+
       {/* Daily plans */}
       <div className="space-y-3">
         {weekLoading &&
-          OVERVIEW_DOW_ORDER.map((dow) => (
-            <div
-              key={dow}
-              className={`${surfaceCardClassName} p-4 animate-pulse`}
-            >
-              <div className="h-4 w-2/5 rounded bg-border" />
-              <div className="mt-2 h-3 w-3/5 rounded bg-border/80" />
-              <div className="mt-3 flex gap-1.5">
-                <div className="h-5 w-14 rounded-full bg-border/70" />
-                <div className="h-5 w-14 rounded-full bg-border/70" />
-              </div>
-            </div>
-          ))}
+          OVERVIEW_DOW_ORDER.map((dow) => <PlanCardSkeleton key={dow} />)}
 
         {!weekLoading &&
           OVERVIEW_DOW_ORDER.map((dow) => {

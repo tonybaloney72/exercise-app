@@ -180,7 +180,7 @@ export interface UserSettings {
   restTimerAutoStart: boolean;
   /** Web Audio chimes when a timer completes (set/rest). */
   timerSoundsEnabled: boolean;
-  /** `navigator.vibrate` when a timer completes. */
+  /** `navigator.vibrate` when a timer or exercise/stretch is marked complete. */
   timerVibrationEnabled: boolean;
   /**
    * Request the Screen Wake Lock API while the app tab is visible so the display

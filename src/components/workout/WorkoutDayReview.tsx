@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, type ReactNode } from "react";
+import { motion } from "framer-motion";
 import AnimatedSection from "@/components/common/AnimatedSection";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
@@ -86,14 +87,20 @@ export default function WorkoutDayReview({
 
   return (
     <AnimatedSection className="space-y-4" delay={0.1}>
-      <SurfaceCard className="p-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-green-400">
-          {completedBannerTitle}
-        </p>
-        {endLabel && (
-          <p className="mt-1 text-sm text-muted">Finished {endLabel}</p>
-        )}
-      </SurfaceCard>
+      <motion.div
+        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", stiffness: 320, damping: 26 }}
+      >
+        <SurfaceCard className="p-4 border-green-500/25 bg-green-500/5">
+          <p className="text-xs font-medium uppercase tracking-wider text-green-400">
+            {completedBannerTitle}
+          </p>
+          {endLabel && (
+            <p className="mt-1 text-sm text-muted">Finished {endLabel}</p>
+          )}
+        </SurfaceCard>
+      </motion.div>
 
       <ReviewSection title="Warm-Up Stretches">
         {log.warmUpExercises.map((entry) => {

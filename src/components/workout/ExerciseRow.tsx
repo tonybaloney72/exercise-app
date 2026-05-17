@@ -20,6 +20,7 @@ import TimerTargetControls from "./TimerTargetControls";
 import { formatLoggedDuration } from "@/utils/time";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import SwapExerciseModal from "./SwapExerciseModal";
+import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 
 interface ExerciseRowProps {
   roundExercise: RoundExercise;
@@ -155,7 +156,10 @@ export default function ExerciseRow({
       <div className="flex items-center gap-2 px-1">
         <button
           type="button"
-          onClick={() => toggleExercise(roundNumber, plannedId)}
+          onClick={() => {
+            if (!log.completed && !log.skipped) vibrateOnExerciseComplete();
+            toggleExercise(roundNumber, plannedId);
+          }}
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
           style={{
             borderColor: log.completed ? "var(--accent)" : "var(--border-color)",

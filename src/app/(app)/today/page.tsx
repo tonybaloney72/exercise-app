@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/common/AnimatedSection";
+import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import { CATEGORIES } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
@@ -91,8 +92,21 @@ function TodayPageInner() {
 
   if (planLoading) {
     return (
-      <div className="py-12 text-center text-sm text-muted">
-        Loading today&apos;s plan…
+      <div className="py-6 space-y-5" aria-busy="true">
+        <div className="space-y-2 animate-pulse">
+          <div className="h-3 w-24 rounded bg-border" />
+          <div className="h-8 w-52 max-w-[80%] rounded bg-border" />
+          <div className="h-4 w-full max-w-sm rounded bg-border/80" />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-7 w-16 rounded-full bg-border animate-pulse"
+            />
+          ))}
+        </div>
+        <PlanCardSkeleton />
       </div>
     );
   }

@@ -236,8 +236,8 @@ export default function SettingsPage() {
           }
         />
         <SettingsSwitch
-          title="Timer vibration"
-          description="Brief vibration when a timer finishes (if your device supports it)."
+          title="Timer & exercise vibration"
+          description="Brief vibration when a timer finishes or you mark an exercise complete (if your device supports it)."
           checked={settings.timerVibrationEnabled}
           onChange={() =>
             settings.updateSettings({

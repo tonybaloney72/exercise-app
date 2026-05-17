@@ -156,8 +156,10 @@ export default function ProgressPage() {
       {workoutHistory.length === 0 && (
         <SurfaceCard className="border-dashed bg-surface/50 py-12">
           <EmptyState
+            icon="📈"
             title="No workouts logged yet."
-            description="Complete your first workout to see progress!"
+            description="Complete your first workout to see trends and history here."
+            action={{ label: "Start today's workout", href: "/today" }}
           />
         </SurfaceCard>
       )}

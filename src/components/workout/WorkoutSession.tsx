@@ -8,7 +8,9 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 
 import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
+import { celebrateWorkoutComplete } from "@/utils/workoutCelebration";
 import { useResolvedStretches } from "@/hooks/useResolvedStretches";
+import { toast } from "sonner";
 import type { DayPlan } from "@/types";
 
 interface WorkoutSessionProps {
@@ -65,8 +67,14 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 	const overallProgress =
 		totalExercises > 0 ? completedExercises / totalExercises : 0;
 
-	const handleComplete = () => {
-		completeWorkout();
+	const handleComplete = async () => {
+		const log = await completeWorkout();
+		if (!log) return;
+		void celebrateWorkoutComplete();
+		toast.success("Workout complete!", {
+			description: "Nice work — your session is saved.",
+			duration: 4000,
+		});
 	};
 
 	return (

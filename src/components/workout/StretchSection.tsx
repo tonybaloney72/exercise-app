@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { exerciseMap } from "@/data/exercises";
+import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import type { ExerciseLog, ExerciseSetMode, StretchEntry } from "@/types";
@@ -118,7 +119,12 @@ export default function StretchSection({
                     exerciseId={stretch.exerciseId}
                     targetReps={stretch.targetReps}
                     log={log}
-                    onToggle={() => onToggle(stretch.exerciseId)}
+                    onToggle={() => {
+                      if (!log.completed && !log.skipped) {
+                        vibrateOnExerciseComplete();
+                      }
+                      onToggle(stretch.exerciseId);
+                    }}
                     onSkip={() => onSkip(stretch.exerciseId)}
                     onUnskip={() => onUnskip(stretch.exerciseId)}
                     onSetTargetDuration={(sec) =>
