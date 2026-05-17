@@ -27,6 +27,16 @@ export async function resetTrainingWeekToGenerated(
   useTrainingWeekRefreshStore.getState().notifyRefreshed("reset");
 }
 
+/** Regenerate a single day in the current week and refetch plan hooks (no banner). */
+export async function resetTrainingDayToGenerated(
+  dateKey: string,
+): Promise<void> {
+  if (useAuthStore.getState().mode !== "authenticated") return;
+  const { resetDayToGenerated } = await import("@/lib/trainingWeekCustomize");
+  await resetDayToGenerated(dateKey);
+  bumpTrainingWeekPlans();
+}
+
 /** Refetch plan hooks after a custom day save (no banner). */
 export function bumpTrainingWeekPlans(): void {
   useTrainingWeekRefreshStore.getState().bumpPlanRevision();

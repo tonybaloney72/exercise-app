@@ -12,7 +12,7 @@ import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import {
   bumpTrainingWeekPlans,
-  resetTrainingWeekToGenerated,
+  resetTrainingDayToGenerated,
 } from "@/lib/trainingWeekRefresh";
 import {
   getWeekSourceForDate,
@@ -206,16 +206,16 @@ export default function WeeklyDayPage() {
     }
   }
 
-  async function handleResetWeek() {
+  async function handleResetDay() {
     setSaving(true);
     setSaveError(null);
     try {
-      await resetTrainingWeekToGenerated(dateKey);
+      await resetTrainingDayToGenerated(dateKey);
       setCustomizing(false);
       const source = await getWeekSourceForDate(dateKey);
       setWeekSource(source);
     } catch (e: unknown) {
-      setSaveError(e instanceof Error ? e.message : "Could not reset week");
+      setSaveError(e instanceof Error ? e.message : "Could not reset this day");
     } finally {
       setSaving(false);
     }
@@ -239,7 +239,7 @@ export default function WeeklyDayPage() {
           <p className="text-sm text-muted">{plan.theme}</p>
           {isCustomWeek && canCustomize && (
             <p className="text-xs text-accent/90 pt-1">
-              This week has custom edits — reset from the editor to regenerate.
+              This week has custom edits — reset the full week from Weekly overview.
             </p>
           )}
         </motion.div>
@@ -286,7 +286,7 @@ export default function WeeklyDayPage() {
             setSaveError(null);
             setCustomizing(false);
           }}
-          onResetWeek={() => void handleResetWeek()}
+          onResetDay={() => void handleResetDay()}
         />
       )}
 

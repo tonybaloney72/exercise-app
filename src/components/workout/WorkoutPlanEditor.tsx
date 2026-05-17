@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import AnimatedSection from "@/components/common/AnimatedSection";
+import CollapsibleSection from "@/components/common/CollapsibleSection";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import CategoryPickModal from "@/components/workout/CategoryPickModal";
@@ -42,7 +43,7 @@ interface WorkoutPlanEditorProps {
   saving: boolean;
   onSave: (plan: DayPlan) => void;
   onCancel: () => void;
-  onResetWeek: () => void;
+  onResetDay: () => void;
 }
 
 export default function WorkoutPlanEditor({
@@ -51,7 +52,7 @@ export default function WorkoutPlanEditor({
   saving,
   onSave,
   onCancel,
-  onResetWeek,
+  onResetDay,
 }: WorkoutPlanEditorProps) {
   const [draft, setDraft] = useState(() => prepareDayPlanForEditor(initialPlan));
   const [pickTarget, setPickTarget] = useState<PickTarget | null>(null);
@@ -256,7 +257,7 @@ export default function WorkoutPlanEditor({
           Edit this day&apos;s rounds and stretch lists. Default stretches are in Settings.
           Swap keeps the same category; add exercise can use any training category.
           {isCustomWeek
-            ? " This week is customized — settings changes won’t overwrite until reset."
+            ? " This week has other custom days — settings changes won’t overwrite the week until you reset it from Weekly."
             : " Saving marks this week as customized."}
         </p>
       </SurfaceCard>
@@ -276,8 +277,9 @@ export default function WorkoutPlanEditor({
       </SurfaceCard>
 
       <StretchPlanSection
-        title="Warm-up for this workout"
-        hint="Full list used when you start this day’s workout."
+        title="Warm-up"
+        collapsible
+        defaultOpen
         entries={stretchLists.warmUp}
         onAdd={() => openPickModal({ kind: "stretch", section: "warmUp" })}
         onChange={(index) => openPickModal({ kind: "stretch", section: "warmUp", index })}
@@ -286,8 +288,8 @@ export default function WorkoutPlanEditor({
       />
 
       <StretchPlanSection
-        title="Cool-down for this workout"
-        hint="Full list used when you finish this day’s workout."
+        title="Cool-down"
+        collapsible
         entries={stretchLists.coolDown}
         onAdd={() => openPickModal({ kind: "stretch", section: "coolDown" })}
         onChange={(index) => openPickModal({ kind: "stretch", section: "coolDown", index })}
@@ -296,14 +298,14 @@ export default function WorkoutPlanEditor({
       />
 
       {draft.rounds.map((round, roundIndex) => (
-        <SurfaceCard
+        <CollapsibleSection
           key={round.roundNumber}
-          className="overflow-hidden p-0"
-        >
-          <div className="border-b border-border px-4 py-3 flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-foreground">
-              Round {round.roundNumber}
-            </h2>
+          title={`Round ${round.roundNumber}`}
+          badge={`${round.exercises.length} exercise${
+            round.exercises.length === 1 ? "" : "s"
+          }`}
+          defaultOpen={roundIndex === 0}
+          headerActions={
             <button
               type="button"
               onClick={() => setCategoryPickRound(roundIndex)}
@@ -311,7 +313,8 @@ export default function WorkoutPlanEditor({
             >
               + Add exercise
             </button>
-          </div>
+          }
+        >
           <div className="divide-y divide-border px-2 py-1">
             {round.exercises.map((slot, slotIndex) => {
               const meta = exerciseMap[slot.exerciseId];
@@ -362,7 +365,7 @@ export default function WorkoutPlanEditor({
               );
             })}
           </div>
-        </SurfaceCard>
+        </CollapsibleSection>
       ))}
 
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -384,10 +387,9 @@ export default function WorkoutPlanEditor({
         </button>
       </div>
 
-      <SurfaceCard className="p-4 space-y-2">
-        <p className="text-sm font-medium text-foreground">Reset entire week</p>
+      <div className="rounded-xl border border-border bg-surface px-4 py-3 space-y-2">
         <p className="text-xs text-muted">
-          Regenerate Sun–Sat from your settings and remove all custom edits for this week.
+          Discard unsaved edits and restore this day&apos;s auto-generated workout.
         </p>
         {resetConfirm ? (
           <div className="flex flex-wrap gap-2 pt-1">
@@ -396,11 +398,11 @@ export default function WorkoutPlanEditor({
               disabled={saving}
               onClick={() => {
                 setResetConfirm(false);
-                onResetWeek();
+                onResetDay();
               }}
               className="rounded-lg bg-red-600/90 px-3 py-2 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50"
             >
-              Yes, reset week
+              Yes, reset this day
             </button>
             <button
               type="button"
@@ -408,7 +410,7 @@ export default function WorkoutPlanEditor({
               onClick={() => setResetConfirm(false)}
               className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-foreground"
             >
-              Keep custom plan
+              Keep editing
             </button>
           </div>
         ) : (
@@ -418,10 +420,10 @@ export default function WorkoutPlanEditor({
             onClick={() => setResetConfirm(true)}
             className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-50"
           >
-            Reset week to auto-generated
+            Reset this day
           </button>
         )}
-      </SurfaceCard>
+      </div>
 
       <CategoryPickModal
         open={categoryPickRound !== null}

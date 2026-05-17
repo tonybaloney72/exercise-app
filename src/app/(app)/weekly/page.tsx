@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/common/AnimatedSection";
+import SurfaceCard from "@/components/common/SurfaceCard";
 import { surfaceCardClassName } from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
+import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
+import { resetTrainingWeekToGenerated } from "@/lib/trainingWeekRefresh";
+import { getWeekSourceForDate } from "@/lib/trainingWeekCustomize";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -19,11 +23,49 @@ const OVERVIEW_DOW_ORDER = [0, 1, 2, 3, 4, 5, 6] as const;
 export default function WeeklyPage() {
   const { workoutHistory, loadHistory } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
+  const todayKey = formatLocalDateKey();
+  const [weekSource, setWeekSource] = useState<string | null>(null);
+  const [resettingWeek, setResettingWeek] = useState(false);
+  const [resetWeekConfirm, setResetWeekConfirm] = useState(false);
+  const [resetWeekError, setResetWeekError] = useState<string | null>(null);
 
   useEffect(() => {
     if (mode === "loading") return;
     loadHistory();
   }, [mode, loadHistory]);
+
+  useEffect(() => {
+    if (mode !== "authenticated") {
+      setWeekSource(null);
+      return;
+    }
+    let cancelled = false;
+    void getWeekSourceForDate(todayKey).then((source) => {
+      if (!cancelled) setWeekSource(source);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, todayKey]);
+
+  const isCustomWeek = isUserCustomizedWeekSource(weekSource);
+
+  async function handleResetWeek() {
+    setResettingWeek(true);
+    setResetWeekError(null);
+    try {
+      await resetTrainingWeekToGenerated(todayKey);
+      setResetWeekConfirm(false);
+      const source = await getWeekSourceForDate(todayKey);
+      setWeekSource(source);
+    } catch (e: unknown) {
+      setResetWeekError(
+        e instanceof Error ? e.message : "Could not reset training week",
+      );
+    } finally {
+      setResettingWeek(false);
+    }
+  }
 
   const today = new Date().getDay();
 
@@ -190,6 +232,60 @@ export default function WeeklyPage() {
             );
           })}
       </div>
+
+      {mode === "authenticated" && isCustomWeek && (
+        <AnimatedSection delay={0.12}>
+          <SurfaceCard className="p-4 space-y-2">
+            <h2 className="text-sm font-semibold text-foreground">
+              Reset training week
+            </h2>
+            <p className="text-xs text-muted">
+              Regenerate Sun–Sat from your current settings and remove all custom
+              workout edits for this week. Finished workout logs are unchanged.
+            </p>
+            {resetWeekError && (
+              <p className="text-sm text-red-400" role="alert">
+                {resetWeekError}
+              </p>
+            )}
+            {resetWeekConfirm ? (
+              <div className="flex flex-wrap gap-2 pt-1">
+                <button
+                  type="button"
+                  disabled={resettingWeek}
+                  onClick={() => void handleResetWeek()}
+                  className="rounded-lg bg-red-600/90 px-3 py-2 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50"
+                >
+                  {resettingWeek ? "Resetting…" : "Yes, reset entire week"}
+                </button>
+                <button
+                  type="button"
+                  disabled={resettingWeek}
+                  onClick={() => {
+                    setResetWeekConfirm(false);
+                    setResetWeekError(null);
+                  }}
+                  className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-foreground"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                disabled={resettingWeek}
+                onClick={() => {
+                  setResetWeekError(null);
+                  setResetWeekConfirm(true);
+                }}
+                className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-50"
+              >
+                Reset week to auto-generated
+              </button>
+            )}
+          </SurfaceCard>
+        </AnimatedSection>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/common/AnimatedSection";
@@ -9,12 +9,23 @@ import { CATEGORIES } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
+import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import FloatingTimer from "@/components/common/FloatingTimer";
+import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
+import {
+  bumpTrainingWeekPlans,
+  resetTrainingDayToGenerated,
+} from "@/lib/trainingWeekRefresh";
+import {
+  getWeekSourceForDate,
+  saveCustomDayPlan,
+} from "@/lib/trainingWeekCustomize";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
 import { useDayPlan } from "@/hooks/useDayPlan";
+import type { DayPlan } from "@/types";
 
 function TodayPageInner() {
   const searchParams = useSearchParams();
@@ -31,6 +42,10 @@ function TodayPageInner() {
   const mode = useAuthStore((s) => s.mode);
   const todayKey = formatLocalDateKey();
   const { plan, loading: planLoading, error: planError } = useDayPlan(todayKey);
+  const [customizing, setCustomizing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [weekSource, setWeekSource] = useState<string | null>(null);
 
   const devForcePreWorkout =
     process.env.NODE_ENV === "development" &&
@@ -52,6 +67,28 @@ function TodayPageInner() {
     !completedLogForUi &&
     pausedWorkoutDate === todayKey;
 
+  const canCustomize = mode === "authenticated" && !!plan;
+  const canEditPlan =
+    canCustomize &&
+    !activeWorkout &&
+    !devForcePreWorkout &&
+    !todaysCompletedLog &&
+    pausedWorkoutDate !== todayKey;
+
+  useEffect(() => {
+    if (!canCustomize) {
+      setWeekSource(null);
+      return;
+    }
+    let cancelled = false;
+    void getWeekSourceForDate(todayKey).then((source) => {
+      if (!cancelled) setWeekSource(source);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [canCustomize, todayKey]);
+
   if (planLoading) {
     return (
       <div className="py-12 text-center text-sm text-muted">
@@ -71,6 +108,39 @@ function TodayPageInner() {
   }
 
   const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
+  const isCustomWeek = isUserCustomizedWeekSource(weekSource);
+  const showPlanEditor = customizing && canEditPlan;
+
+  async function handleSaveDay(editedPlan: DayPlan) {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await saveCustomDayPlan(todayKey, editedPlan);
+      bumpTrainingWeekPlans();
+      setCustomizing(false);
+      const source = await getWeekSourceForDate(todayKey);
+      setWeekSource(source);
+    } catch (e: unknown) {
+      setSaveError(e instanceof Error ? e.message : "Could not save changes");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleResetDay() {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await resetTrainingDayToGenerated(todayKey);
+      setCustomizing(false);
+      const source = await getWeekSourceForDate(todayKey);
+      setWeekSource(source);
+    } catch (e: unknown) {
+      setSaveError(e instanceof Error ? e.message : "Could not reset this day");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="py-6 space-y-5">
@@ -94,6 +164,11 @@ function TodayPageInner() {
           Today&apos;s Workout
         </h1>
         <p className="text-sm text-muted">{plan.theme}</p>
+        {isCustomWeek && canCustomize && (
+          <p className="text-xs text-accent/90 pt-1">
+            This week has custom edits — reset the full week from Weekly overview.
+          </p>
+        )}
       </motion.div>
 
       {/* Category chips */}
@@ -112,6 +187,40 @@ function TodayPageInner() {
           </span>
         )}
       </motion.div>
+
+      {canEditPlan && !showPlanEditor && (
+        <button
+          type="button"
+          onClick={() => {
+            setSaveError(null);
+            setCustomizing(true);
+          }}
+          className="w-full rounded-xl border border-accent/40 bg-accent/10 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
+        >
+          Customize this workout
+        </button>
+      )}
+
+      {saveError && (
+        <p className="text-sm text-red-400 text-center px-2" role="alert">
+          {saveError}
+        </p>
+      )}
+
+      {showPlanEditor && (
+        <WorkoutPlanEditor
+          key={todayKey}
+          initialPlan={plan}
+          isCustomWeek={isCustomWeek}
+          saving={saving}
+          onSave={(edited) => void handleSaveDay(edited)}
+          onCancel={() => {
+            setSaveError(null);
+            setCustomizing(false);
+          }}
+          onResetDay={() => void handleResetDay()}
+        />
+      )}
 
       {/* Active workout session */}
       {activeWorkout && <WorkoutSession plan={plan} />}
@@ -157,7 +266,10 @@ function TodayPageInner() {
       )}
 
       {/* Pre-workout: plan context + start */}
-      {!activeWorkout && !completedLogForUi && !hasPausedDraftToday && (
+      {!activeWorkout &&
+        !completedLogForUi &&
+        !hasPausedDraftToday &&
+        !showPlanEditor && (
         <AnimatedSection className="space-y-4" delay={0.15}>
           <SurfaceCard className="p-4 space-y-3">
             <h2 className="text-sm font-semibold text-foreground">

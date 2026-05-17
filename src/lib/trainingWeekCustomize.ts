@@ -1,6 +1,11 @@
+import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
+import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   computePrefsFingerprint,
+  isUserCustomizedWeekSource,
+  materializeTrainingWeek,
   TRAINING_WEEK_SOURCE_CUSTOM_V1,
+  TRAINING_WEEK_SOURCE_GENERATED_V1,
 } from "@/lib/planGenerator";
 import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import { refreshTrainingWeekContaining, resolveTrainingWeekForAuth } from "@/lib/planResolver";
@@ -137,6 +142,66 @@ export async function resetTrainingWeekToGenerated(
   dateKeyInWeek: string,
 ): Promise<void> {
   await refreshTrainingWeekContaining(dateKeyInWeek);
+}
+
+/**
+ * Replace one day in the persisted week with a freshly generated plan for that
+ * day-of-week. Other days in the week are unchanged.
+ */
+export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
+  const anchor = weekAnchorFromDateKey(dateKey);
+  if (!anchor) {
+    throw new Error("Invalid date key");
+  }
+  const { weekKey, parsed } = anchor;
+  const dow = parsed.getDay();
+
+  const [prefs, settings] = await Promise.all([
+    getExercisePreferenceRepo("authenticated").loadAll(),
+    getSettingsRepo("authenticated").load(),
+  ]);
+  const availableEquipment =
+    settings.availableEquipment?.length > 0
+      ? settings.availableEquipment
+      : [...DEFAULT_AVAILABLE_EQUIPMENT];
+  const programFocus = settings.programFocus ?? "balanced";
+  const roundDensity = settings.roundDensity ?? "standard";
+
+  const generated = materializeTrainingWeek(
+    buildCatalogWeek(),
+    prefs,
+    availableEquipment,
+    programFocus,
+    roundDensity,
+  );
+  const freshDay: DayPlan = { ...generated[dow], dayOfWeek: dow };
+
+  const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");
+  const merged = {
+    ...week,
+    [dow]: freshDay,
+  };
+
+  const fingerprint = computePrefsFingerprint(
+    prefs,
+    availableEquipment,
+    programFocus,
+    roundDensity,
+    settings.defaultWarmUp,
+    settings.defaultCoolDown,
+  );
+
+  const row = await getTrainingWeekRepo("authenticated").loadWeek(weekKey);
+  const source = isUserCustomizedWeekSource(row?.source)
+    ? TRAINING_WEEK_SOURCE_CUSTOM_V1
+    : TRAINING_WEEK_SOURCE_GENERATED_V1;
+
+  await getTrainingWeekRepo("authenticated").saveSeededWeek(weekKey, merged, {
+    source,
+    prefsFingerprint: fingerprint,
+  });
+
+  return freshDay;
 }
 
 export async function getWeekSourceForDate(
