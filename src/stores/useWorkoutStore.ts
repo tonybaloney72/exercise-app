@@ -34,6 +34,21 @@ import {
   resolveStretchTimerTargetSeconds,
 } from "@/utils/effectiveExerciseSettings";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import {
+  cancelScheduledPersistActiveWorkoutDraft,
+  clearActiveWorkoutDraft,
+  getPausedDraftDate,
+  loadActiveWorkoutDraft,
+  saveActiveWorkoutDraft,
+  schedulePersistActiveWorkoutDraft,
+  shouldAutoRestoreDraft,
+  type DraftAuthScope,
+} from "@/lib/activeWorkoutDraft";
+
+function draftScope(): DraftAuthScope {
+  const auth = useAuthStore.getState();
+  return { mode: auth.mode, userId: auth.user?.id ?? null };
+}
 
 function seedTimerTargetSecondsFromResolved(
   resolved: ReturnType<typeof resolveExerciseSettings>,
@@ -105,6 +120,8 @@ function buildStretchExerciseLog(entry: StretchEntry): ExerciseLog {
 interface WorkoutState {
   activeWorkout: WorkoutLog | null;
   workoutHistory: WorkoutLog[];
+  /** Calendar date (`YYYY-MM-DD`) of a paused draft, if any. */
+  pausedWorkoutDate: string | null;
   startWorkout: (plan: DayPlan) => void;
   toggleJog: () => void;
   skipJog: () => void;
@@ -167,6 +184,9 @@ interface WorkoutState {
   setWorkoutNotes: (notes: string) => void;
   completeWorkout: () => Promise<WorkoutLog | null>;
   discardWorkout: () => void;
+  /** Persist progress and leave Today until Resume. */
+  pauseWorkout: () => void;
+  resumeWorkout: () => void;
   /** Update notes on a finished workout (same id upsert via repo). */
   updateCompletedWorkoutNotes: (
     workoutId: string,
@@ -210,12 +230,14 @@ function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
 export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   activeWorkout: null,
   workoutHistory: [],
+  pausedWorkoutDate: null,
   startWorkout: (plan) => {
     const now = new Date();
     const { warmUp, coolDown } = resolveStretchesForPlan(plan);
     const warmUpExercises: ExerciseLog[] = warmUp.map(buildStretchExerciseLog);
     const coolDownExercises: ExerciseLog[] = coolDown.map(buildStretchExerciseLog);
     set({
+      pausedWorkoutDate: null,
       activeWorkout: {
         id: uuidv4(),
         date: formatLocalDateKey(now),
@@ -771,9 +793,13 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       endTime: new Date().toISOString(),
     });
 
+    cancelScheduledPersistActiveWorkoutDraft();
+    clearActiveWorkoutDraft(draftScope());
+
     // Optimistic UI: update store first so the user gets immediate feedback.
     set((s) => ({
       activeWorkout: null,
+      pausedWorkoutDate: null,
       workoutHistory: [completed, ...s.workoutHistory],
     }));
 
@@ -787,7 +813,32 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     return completed;
   },
 
-  discardWorkout: () => set({ activeWorkout: null }),
+  discardWorkout: () => {
+    cancelScheduledPersistActiveWorkoutDraft();
+    clearActiveWorkoutDraft(draftScope());
+    set({ activeWorkout: null, pausedWorkoutDate: null });
+  },
+
+  pauseWorkout: () => {
+    const state = get();
+    if (!state.activeWorkout) return;
+    const scope = draftScope();
+    cancelScheduledPersistActiveWorkoutDraft();
+    saveActiveWorkoutDraft(scope, state.activeWorkout, { paused: true });
+    set({
+      activeWorkout: null,
+      pausedWorkoutDate: state.activeWorkout.date,
+    });
+  },
+
+  resumeWorkout: () => {
+    const scope = draftScope();
+    const payload = loadActiveWorkoutDraft(scope);
+    if (!payload?.meta.paused || payload.log.endTime) return;
+    const log = hydrateWorkoutLog(payload.log);
+    saveActiveWorkoutDraft(scope, log, { paused: false });
+    set({ activeWorkout: log, pausedWorkoutDate: null });
+  },
 
   updateCompletedWorkoutNotes: async (workoutId, notes) => {
     const state = get();
@@ -825,7 +876,30 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   loadHistory: async () => {
     const mode = useAuthStore.getState().mode;
     if (mode === "loading") return; // Wait until AuthInitializer settles.
+    const scope = draftScope();
     const history = await getWorkoutRepo(mode).loadHistory();
-    set({ workoutHistory: history.map(hydrateWorkoutLog) });
+    const workoutHistory = history.map(hydrateWorkoutLog);
+    const pausedWorkoutDate = getPausedDraftDate(scope);
+
+    const current = get();
+    let activeWorkout = current.activeWorkout;
+    if (!activeWorkout) {
+      const restored = shouldAutoRestoreDraft(scope, workoutHistory);
+      if (restored) activeWorkout = hydrateWorkoutLog(restored);
+    }
+
+    set({
+      workoutHistory,
+      pausedWorkoutDate,
+      ...(activeWorkout && !current.activeWorkout ? { activeWorkout } : {}),
+    });
   },
 }));
+
+if (typeof window !== "undefined") {
+  useWorkoutStore.subscribe((state, prevState) => {
+    const log = state.activeWorkout;
+    if (!log || log === prevState.activeWorkout) return;
+    schedulePersistActiveWorkoutDraft(draftScope(), log);
+  });
+}

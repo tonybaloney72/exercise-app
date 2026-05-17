@@ -21,7 +21,10 @@ function TodayPageInner() {
   const {
     activeWorkout,
     workoutHistory,
+    pausedWorkoutDate,
     startWorkout,
+    resumeWorkout,
+    discardWorkout,
     loadHistory,
     updateCompletedWorkoutNotes,
   } = useWorkoutStore();
@@ -44,6 +47,10 @@ function TodayPageInner() {
   );
 
   const completedLogForUi = devForcePreWorkout ? null : todaysCompletedLog;
+  const hasPausedDraftToday =
+    !activeWorkout &&
+    !completedLogForUi &&
+    pausedWorkoutDate === todayKey;
 
   if (planLoading) {
     return (
@@ -121,8 +128,36 @@ function TodayPageInner() {
         />
       )}
 
+      {hasPausedDraftToday && (
+        <AnimatedSection className="space-y-3" delay={0.15}>
+          <SurfaceCard className="p-4 space-y-2">
+            <p className="text-sm font-medium text-foreground">
+              Workout in progress
+            </p>
+            <p className="text-xs text-muted">
+              You saved this session for later. Resume to pick up where you left
+              off, or discard to start fresh.
+            </p>
+          </SurfaceCard>
+          <button
+            type="button"
+            onClick={() => resumeWorkout()}
+            className="w-full rounded-xl bg-accent py-4 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
+          >
+            Resume workout
+          </button>
+          <button
+            type="button"
+            onClick={() => discardWorkout()}
+            className="w-full rounded-xl border border-border bg-surface py-3 text-sm font-medium text-muted transition-colors hover:text-foreground"
+          >
+            Discard saved session
+          </button>
+        </AnimatedSection>
+      )}
+
       {/* Pre-workout: plan context + start */}
-      {!activeWorkout && !completedLogForUi && (
+      {!activeWorkout && !completedLogForUi && !hasPausedDraftToday && (
         <AnimatedSection className="space-y-4" delay={0.15}>
           <SurfaceCard className="p-4 space-y-3">
             <h2 className="text-sm font-semibold text-foreground">

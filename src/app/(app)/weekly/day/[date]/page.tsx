@@ -97,6 +97,7 @@ export default function WeeklyDayPage() {
     startWorkout,
     updateCompletedWorkoutNotes,
     activeWorkout,
+    pausedWorkoutDate,
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
   const [customizing, setCustomizing] = useState(false);
@@ -140,8 +141,8 @@ export default function WeeklyDayPage() {
   const continueWorkoutHere =
     when === "today" &&
     !logForDay &&
-    activeWorkout &&
-    activeWorkout.date === dateKey;
+    ((activeWorkout && activeWorkout.date === dateKey) ||
+      pausedWorkoutDate === dateKey);
 
   if (!parsed) {
     return (
@@ -376,7 +377,9 @@ export default function WeeklyDayPage() {
               href="/today"
               className="flex w-full items-center justify-center rounded-xl bg-accent py-4 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
             >
-              Continue workout
+              {pausedWorkoutDate === dateKey && !activeWorkout
+                ? "Resume workout"
+                : "Continue workout"}
             </Link>
           ) : (
             <button
@@ -392,7 +395,9 @@ export default function WeeklyDayPage() {
           )}
           <p className="text-center text-[11px] text-muted">
             {continueWorkoutHere
-              ? "Resume your session on Today."
+              ? pausedWorkoutDate === dateKey && !activeWorkout
+                ? "Resume your saved session on Today."
+                : "Resume your session on Today."
               : "Opens the Today tab with your live session and timers."}
           </p>
         </motion.div>

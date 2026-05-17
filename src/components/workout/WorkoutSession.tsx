@@ -37,6 +37,7 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 		setWorkoutNotes,
 		completeWorkout,
 		discardWorkout,
+		pauseWorkout,
 	} = useWorkoutStore();
 
 	const [isJogOpen, setIsJogOpen] = useState(false);
@@ -353,9 +354,17 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
 					className='mt-2 w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted'
 				/>
 				<p className='mt-2 text-[11px] text-muted'>
-					These notes are saved when you tap <span className='font-medium text-foreground'>Complete Workout</span> below.
+					Progress saves automatically. Notes are saved when you tap{" "}
+					<span className='font-medium text-foreground'>Complete Workout</span>.
 				</p>
 			</div>
+
+			<button
+				type='button'
+				onClick={pauseWorkout}
+				className='w-full rounded-xl border border-border bg-surface py-3 text-sm font-medium text-foreground transition-colors hover:border-accent/40'>
+				Save for later
+			</button>
 
 			{/* Actions */}
 			<div className='flex gap-3'>
