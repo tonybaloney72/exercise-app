@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useBalanceAlertToasts } from "@/hooks/useBalanceAlertToasts";
 import AnimatedSection from "@/components/common/AnimatedSection";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import SurfaceCard from "@/components/common/SurfaceCard";
@@ -77,6 +78,8 @@ export default function WorkoutPlanEditor({
   const prefs = useExercisePreferencesStore((s) => s.byExerciseId);
   const dislikedIds = useMemo(() => collectDislikedIds(prefs), [prefs]);
   const balanceAlerts = useMemo(() => analyzeDayPlanBalance(draft), [draft]);
+  const hasBalanceWarning = balanceAlerts.some((a) => a.severity === "warning");
+  useBalanceAlertToasts(balanceAlerts);
 
   const pickCandidates = useMemo(() => {
     if (!pickTarget) return [];
@@ -282,75 +285,21 @@ export default function WorkoutPlanEditor({
 
   return (
     <AnimatedSection className="space-y-4" delay={0}>
-      <SurfaceCard className="border-accent/40 bg-accent/10 p-4 space-y-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-accent">
-          Customize workout
+      <SurfaceCard className="border-accent/40 bg-accent/10 p-4 space-y-1.5">
+        <p className="text-sm font-semibold text-foreground">Customize workout</p>
+        <p className="text-sm text-muted leading-snug">
+          Change exercises and targets for this day. Pick any category when adding slots;
+          change keeps the same category.
         </p>
-        <p className="text-sm text-muted">
-          Edit this day&apos;s rounds and stretch lists. Default stretches are in Settings.
-          Swap keeps the same category; add exercise can use any training category.
-          {isCustomWeek
-            ? " This week has other custom days — settings changes won’t overwrite the week until you reset it from Weekly."
-            : " Saving marks this week as customized."}
-        </p>
-      </SurfaceCard>
-
-      <SurfaceCard className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted">
-          Rebuild from your Settings defaults plus this day&apos;s focus and rounds.
-        </p>
-        <button
-          type="button"
-          disabled={saving}
-          onClick={rebuildWorkoutStretches}
-          className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover disabled:opacity-50"
-        >
-          Rebuild stretch lists
-        </button>
-      </SurfaceCard>
-
-      <StretchPlanSection
-        title="Warm-up"
-        collapsible
-        defaultOpen
-        entries={stretchLists.warmUp}
-        onAdd={() => openPickModal({ kind: "stretch", section: "warmUp" })}
-        onChange={(index) => openPickModal({ kind: "stretch", section: "warmUp", index })}
-        onRemove={(index) => removeStretch("warmUp", index)}
-        onUpdateTarget={(index, target) => updateStretchTarget("warmUp", index, target)}
-      />
-
-      <StretchPlanSection
-        title="Cool-down"
-        collapsible
-        entries={stretchLists.coolDown}
-        onAdd={() => openPickModal({ kind: "stretch", section: "coolDown" })}
-        onChange={(index) => openPickModal({ kind: "stretch", section: "coolDown", index })}
-        onRemove={(index) => removeStretch("coolDown", index)}
-        onUpdateTarget={(index, target) => updateStretchTarget("coolDown", index, target)}
-      />
-
-      {balanceAlerts.length > 0 && (
-        <SurfaceCard className="space-y-2 p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted">
-            Balance notes
+        {isCustomWeek ? (
+          <p className="text-xs text-muted leading-snug">
+            This week is already customized — changing settings won&apos;t replace your edits
+            until you reset from Weekly.
           </p>
-          <ul className="space-y-2">
-            {balanceAlerts.map((alert) => (
-              <li
-                key={alert.id}
-                className={`text-sm leading-snug ${
-                  alert.severity === "warning"
-                    ? "text-amber-700 dark:text-amber-300"
-                    : "text-muted"
-                }`}
-              >
-                {alert.message}
-              </li>
-            ))}
-          </ul>
-        </SurfaceCard>
-      )}
+        ) : (
+          <p className="text-xs text-muted leading-snug">Saving marks this week as customized.</p>
+        )}
+      </SurfaceCard>
 
       <div className="flex items-center justify-between gap-2 px-1">
         <p className="text-xs font-medium uppercase tracking-wider text-muted">
@@ -456,6 +405,38 @@ export default function WorkoutPlanEditor({
         </CollapsibleSection>
       ))}
 
+      {balanceAlerts.length > 0 && (
+        <SurfaceCard
+          className={`space-y-2 p-4 ${
+            hasBalanceWarning
+              ? "border-amber-500/50 bg-amber-500/10"
+              : "border-border"
+          }`}
+        >
+          <p
+            className={`text-xs font-semibold uppercase tracking-wider ${
+              hasBalanceWarning ? "text-amber-800 dark:text-amber-200" : "text-muted"
+            }`}
+          >
+            Balance notes
+          </p>
+          <ul className="space-y-2">
+            {balanceAlerts.map((alert) => (
+              <li
+                key={alert.id}
+                className={`text-sm leading-snug ${
+                  alert.severity === "warning"
+                    ? "text-amber-900 dark:text-amber-100"
+                    : "text-muted"
+                }`}
+              >
+                {alert.message}
+              </li>
+            ))}
+          </ul>
+        </SurfaceCard>
+      )}
+
       <div className="flex flex-col gap-2 sm:flex-row">
         <button
           type="button"
@@ -512,6 +493,49 @@ export default function WorkoutPlanEditor({
           </button>
         )}
       </div>
+
+      <p className="px-1 pt-2 text-xs font-medium uppercase tracking-wider text-muted">
+        Stretches (optional)
+      </p>
+      <p className="px-1 text-xs text-muted leading-snug">
+        Defaults live in Settings. Override warm-up or cool-down for this day only.
+      </p>
+
+      <StretchPlanSection
+        title="Warm-up"
+        collapsible
+        defaultOpen={false}
+        entries={stretchLists.warmUp}
+        onAdd={() => openPickModal({ kind: "stretch", section: "warmUp" })}
+        onChange={(index) => openPickModal({ kind: "stretch", section: "warmUp", index })}
+        onRemove={(index) => removeStretch("warmUp", index)}
+        onUpdateTarget={(index, target) => updateStretchTarget("warmUp", index, target)}
+      />
+
+      <StretchPlanSection
+        title="Cool-down"
+        collapsible
+        defaultOpen={false}
+        entries={stretchLists.coolDown}
+        onAdd={() => openPickModal({ kind: "stretch", section: "coolDown" })}
+        onChange={(index) => openPickModal({ kind: "stretch", section: "coolDown", index })}
+        onRemove={(index) => removeStretch("coolDown", index)}
+        onUpdateTarget={(index, target) => updateStretchTarget("coolDown", index, target)}
+      />
+
+      <SurfaceCard className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs text-muted leading-snug">
+          Reset warm-up and cool-down from Settings defaults and this day&apos;s focus.
+        </p>
+        <button
+          type="button"
+          disabled={saving}
+          onClick={rebuildWorkoutStretches}
+          className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover disabled:opacity-50"
+        >
+          Rebuild stretch lists
+        </button>
+      </SurfaceCard>
 
       <CategoryPickModal
         open={categoryPickRound !== null}

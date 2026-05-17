@@ -3,6 +3,7 @@ import EquipmentOnboardingGate from "@/components/onboarding/EquipmentOnboarding
 import TrainingWeekRefreshBanner from "@/components/layout/TrainingWeekRefreshBanner";
 import AppSettingsSync from "@/components/layout/AppSettingsSync";
 import WakeLockSync from "@/components/layout/WakeLockSync";
+import AppToaster from "@/components/layout/AppToaster";
 import AuthInitializer from "@/components/auth/AuthInitializer";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
@@ -29,6 +30,7 @@ export default async function AppLayout({
       <AppSettingsSync />
       <EquipmentOnboardingGate />
       <WakeLockSync />
+      <AppToaster />
       <main className="flex-1 pb-20">
         <div className="mx-auto max-w-lg px-4">
           <TrainingWeekRefreshBanner />
