@@ -293,8 +293,8 @@ export default function WorkoutPlanEditor({
         </p>
         {isCustomWeek ? (
           <p className="text-xs text-muted leading-snug">
-            This week is already customized — changing settings won&apos;t replace your edits
-            until you reset from Weekly.
+            This week is customized — settings updates change today and upcoming days only
+            (not past days). Reset from Weekly restores the full auto-generated week.
           </p>
         ) : (
           <p className="text-xs text-muted leading-snug">Saving marks this week as customized.</p>

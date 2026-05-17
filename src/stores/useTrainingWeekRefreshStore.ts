@@ -11,13 +11,13 @@ export type TrainingWeekRefreshReason =
 
 const MESSAGES: Record<TrainingWeekRefreshReason, string> = {
   dislike:
-    "Your training week was updated to reflect exercise preferences. Workouts you already finished are unchanged.",
+    "Today and the rest of this week were updated for your exercise preferences. Past days and finished workouts are unchanged. If you already started today’s workout, today’s plan was left as-is.",
   favorite:
-    "Your training week was updated to favor exercises you starred in the Library. Workouts you already finished are unchanged.",
+    "Today and the rest of this week now favor your starred exercises. Past days and finished workouts are unchanged. If you already started today’s workout, today’s plan was left as-is.",
   equipment:
-    "Your training week was updated for your equipment selection. Workouts you already finished are unchanged.",
+    "Today and the rest of this week were updated for your equipment. Past days and finished workouts are unchanged. If you already started today’s workout, today’s plan was left as-is.",
   program:
-    "Your training week was updated for your program focus and round density. Workouts you already finished are unchanged.",
+    "Today and the rest of this week were updated for program focus, round density, or default stretches. Past days and finished workouts are unchanged. If you already started today’s workout, today’s plan was left as-is.",
   reset:
     "Your training week was reset to the auto-generated plan. Custom edits were removed. Finished workouts are unchanged.",
 };

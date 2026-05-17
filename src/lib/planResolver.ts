@@ -3,11 +3,18 @@ import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   collectDislikedIds,
   computePrefsFingerprint,
+  isUserCustomizedWeekSource,
   materializeTrainingWeek,
   TRAINING_WEEK_SOURCE_GENERATED_V1,
   weekDaysComplete,
   weekNeedsMaterialization,
 } from "@/lib/planGenerator";
+import {
+  mergeRegeneratedDays,
+  regenDayIndicesForPrefsChange,
+} from "@/lib/trainingWeekRegen";
+import { isWorkoutStartedForDate } from "@/lib/workoutSessionGuard";
+import { formatLocalDateKey } from "@/utils/localDateKey";
 import {
   getExercisePreferenceRepo,
   getSettingsRepo,
@@ -95,6 +102,82 @@ function materializeWeekFromCatalog(
   );
 }
 
+export type RefreshTrainingWeekScope = "prefs" | "full";
+
+function isWorkoutStartedToday(): boolean {
+  return isWorkoutStartedForDate(formatLocalDateKey());
+}
+
+async function persistTrainingWeek(
+  weekKey: string,
+  days: TrainingWeekDays,
+  options: {
+    source: string;
+    prefsFingerprint: string;
+  },
+): Promise<void> {
+  await getTrainingWeekRepo("authenticated").saveSeededWeek(weekKey, days, {
+    source: options.source,
+    prefsFingerprint: options.prefsFingerprint,
+  });
+}
+
+async function refreshPersistedWeek(
+  weekKey: string,
+  scope: RefreshTrainingWeekScope,
+): Promise<TrainingWeekDays> {
+  const {
+    prefs,
+    availableEquipment,
+    programFocus,
+    roundDensity,
+    fingerprint,
+  } = await loadGeneratorInputs("authenticated");
+
+  const materialized = materializeWeekFromCatalog(
+    prefs,
+    availableEquipment,
+    programFocus,
+    roundDensity,
+  );
+
+  const repo = getTrainingWeekRepo("authenticated");
+  const persisted = await repo.loadWeek(weekKey);
+  const storedDays = persisted?.days ?? null;
+
+  if (scope === "full" || !weekDaysComplete(storedDays)) {
+    await persistTrainingWeek(weekKey, materialized, {
+      source: TRAINING_WEEK_SOURCE_GENERATED_V1,
+      prefsFingerprint: fingerprint,
+    });
+    return materialized;
+  }
+
+  const todayKey = formatLocalDateKey();
+  const todayParsed = parseLocalDateKey(todayKey);
+  const todayDow = todayParsed?.getDay() ?? 0;
+  const indices = regenDayIndicesForPrefsChange({
+    todayDayOfWeek: todayDow,
+    workoutStartedToday: isWorkoutStartedToday(),
+  });
+
+  const merged =
+    indices.length > 0
+      ? mergeRegeneratedDays(storedDays, materialized, indices)
+      : storedDays;
+
+  const source =
+    persisted?.source && isUserCustomizedWeekSource(persisted.source)
+      ? persisted.source
+      : TRAINING_WEEK_SOURCE_GENERATED_V1;
+
+  await persistTrainingWeek(weekKey, merged, {
+    source,
+    prefsFingerprint: fingerprint,
+  });
+  return merged;
+}
+
 /** In-memory materialized week (guest / anonymous) from catalog + local settings. */
 async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays> {
   const { prefs, availableEquipment, programFocus, roundDensity } =
@@ -133,17 +216,7 @@ async function loadOrSeedPersistedWeek(
       dislikedIds,
     )
   ) {
-    const materialized = materializeWeekFromCatalog(
-      prefs,
-      availableEquipment,
-      programFocus,
-      roundDensity,
-    );
-    await repo.saveSeededWeek(weekStartSundayKey, materialized, {
-      source: TRAINING_WEEK_SOURCE_GENERATED_V1,
-      prefsFingerprint: fingerprint,
-    });
-    return materialized;
+    return refreshPersistedWeek(weekStartSundayKey, "prefs");
   }
 
   if (!weekDaysComplete(storedDays)) {
@@ -153,31 +226,17 @@ async function loadOrSeedPersistedWeek(
 }
 
 /**
- * Regenerate the Sun–Sat week containing `dateKey` from catalog + current generator inputs
- * (whole-week policy). Call after preference / profile changes; does not alter active workouts.
+ * Regenerate days in the Sun–Sat week containing `dateKey`.
+ * `prefs` — today (if no workout started) + future; past days and in-progress today are kept.
+ * `full` — entire week from catalog (explicit reset).
  */
 export async function refreshTrainingWeekContaining(
   dateKey: string,
+  scope: RefreshTrainingWeekScope = "prefs",
 ): Promise<void> {
   const weekKey = weekKeyFromDateKey(dateKey);
   if (!weekKey) return;
-  const {
-    prefs,
-    availableEquipment,
-    programFocus,
-    roundDensity,
-    fingerprint,
-  } = await loadGeneratorInputs("authenticated");
-  const materialized = materializeWeekFromCatalog(
-    prefs,
-    availableEquipment,
-    programFocus,
-    roundDensity,
-  );
-  await getTrainingWeekRepo("authenticated").saveSeededWeek(weekKey, materialized, {
-    source: TRAINING_WEEK_SOURCE_GENERATED_V1,
-    prefsFingerprint: fingerprint,
-  });
+  await refreshPersistedWeek(weekKey, scope);
 }
 
 /**

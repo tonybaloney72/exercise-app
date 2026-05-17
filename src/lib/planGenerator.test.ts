@@ -121,16 +121,16 @@ describe("weekNeedsMaterialization", () => {
   const fingerprint = computePrefsFingerprint(EMPTY_PREFS, EQUIP);
   const stored = materializeBalanced();
 
-  it("skips regen for custom week source", () => {
+  it("requires regen for custom week when fingerprint mismatches", () => {
     expect(
       weekNeedsMaterialization(
         stored,
-        fingerprint,
+        "stale",
         TRAINING_WEEK_SOURCE_CUSTOM_V1,
         fingerprint,
         new Set(),
       ),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("requires regen when week is incomplete, fingerprint mismatches, or dislikes remain", () => {

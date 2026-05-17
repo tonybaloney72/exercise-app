@@ -194,11 +194,10 @@ export function weekDaysComplete(days: TrainingWeekDays | null): days is Trainin
 export function weekNeedsMaterialization(
   stored: TrainingWeekDays | null,
   storedFingerprint: string | null,
-  storedSource: string | null,
+  _storedSource: string | null,
   currentFingerprint: string,
   dislikedIds: ReadonlySet<string>,
 ): boolean {
-  if (isUserCustomizedWeekSource(storedSource)) return false;
   if (!weekDaysComplete(stored)) return true;
   if (storedFingerprint !== currentFingerprint) return true;
   if (weekContainsDislikedExercise(stored, dislikedIds)) return true;

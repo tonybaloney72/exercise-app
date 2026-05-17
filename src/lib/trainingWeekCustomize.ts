@@ -156,7 +156,7 @@ export async function saveCustomDayPlan(
 export async function resetTrainingWeekToGenerated(
   dateKeyInWeek: string,
 ): Promise<void> {
-  await refreshTrainingWeekContaining(dateKeyInWeek);
+  await refreshTrainingWeekContaining(dateKeyInWeek, "full");
 }
 
 /** Fresh catalog + generator plan for one day-of-week (no persistence). */
