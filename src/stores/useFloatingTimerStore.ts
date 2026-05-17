@@ -20,41 +20,39 @@ interface FloatingTimerState {
    * Cleared on dismiss or when a new stopwatch run starts.
    */
   lastStopwatchSeconds: number | null;
+  /** Wall-clock ms when an active countdown reaches zero. */
+  countdownEndsAtMs: number | null;
+  /** Wall-clock ms when the current stopwatch segment started (null while paused). */
+  stopwatchStartedAtMs: number | null;
+  /** Elapsed seconds accumulated before the current stopwatch segment. */
+  stopwatchBaseSeconds: number;
 
-  /**
-   * @param autoStart If true (default), the countdown starts running
-   *   immediately. Pass false to open the modal paused — used when the user
-   *   launches the timer manually so they can press play themselves.
-   */
   startRest: (totalSeconds: number, autoStart?: boolean) => void;
-  /** Fullscreen countdown for a timed exercise set (same UX as rest timer). */
   startSetCountdown: (totalSeconds: number) => void;
-  /**
-   * @param autoStart If true (default), the stopwatch starts running
-   *   immediately. Pass false to open the modal paused so the user can
-   *   press play themselves.
-   */
   startStopwatch: (autoStart?: boolean) => void;
   pause: () => void;
   resume: () => void;
-  /** ±15s adjustment for an active or paused rest countdown. */
   adjustRest: (deltaSeconds: number) => void;
-  /** Resets countdown to its original total without leaving rest mode. */
   resetRest: () => void;
-  /** Stopwatch only: clear elapsed time to 0:00 and pause; modal stays open. */
   resetStopwatch: () => void;
-  /**
-   * Closes the modal (Escape / X). Rest: discard. Stopwatch: saves elapsed
-   * seconds to `lastStopwatchSeconds` for the floating pill.
-   */
   stop: () => void;
-  /** Clears the persisted "last stopwatch" pill label. */
   dismissLast: () => void;
-  /** Collapse rest/set countdown to the floating pill (workout stays scrollable). */
   minimizeTimer: () => void;
   expandTimer: () => void;
-  /** Internal tick — driven by {@link FloatingTimer} while a timer is active. */
-  tick: () => void;
+  /** Recompute display from wall clock (screen lock / background safe). */
+  syncTimerClock: () => void;
+}
+
+function countdownEndsAtFromSeconds(seconds: number): number {
+  return Date.now() + Math.max(0, seconds) * 1000;
+}
+
+function clearClockFields() {
+  return {
+    countdownEndsAtMs: null as number | null,
+    stopwatchStartedAtMs: null as number | null,
+    stopwatchBaseSeconds: 0,
+  };
 }
 
 export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
@@ -64,62 +62,138 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   seconds: 0,
   restTotalSeconds: 0,
   lastStopwatchSeconds: null,
+  countdownEndsAtMs: null,
+  stopwatchStartedAtMs: null,
+  stopwatchBaseSeconds: 0,
 
   startRest: (totalSeconds, autoStart = true) => {
     primeTimerAudio();
+    const seconds = Math.max(0, Math.floor(totalSeconds));
     set({
       mode: "rest",
       presentation: "fullscreen",
       running: autoStart,
-      seconds: Math.max(0, Math.floor(totalSeconds)),
-      restTotalSeconds: Math.max(0, Math.floor(totalSeconds)),
+      seconds,
+      restTotalSeconds: seconds,
       lastStopwatchSeconds: null,
+      countdownEndsAtMs: autoStart ? countdownEndsAtFromSeconds(seconds) : null,
+      stopwatchStartedAtMs: null,
+      stopwatchBaseSeconds: 0,
     });
   },
 
   startSetCountdown: (totalSeconds) => {
     primeTimerAudio();
+    const seconds = Math.max(0, Math.floor(totalSeconds));
     set({
       mode: "setTimer",
       presentation: "fullscreen",
       running: true,
-      seconds: Math.max(0, Math.floor(totalSeconds)),
-      restTotalSeconds: Math.max(0, Math.floor(totalSeconds)),
+      seconds,
+      restTotalSeconds: seconds,
       lastStopwatchSeconds: null,
+      countdownEndsAtMs: countdownEndsAtFromSeconds(seconds),
+      stopwatchStartedAtMs: null,
+      stopwatchBaseSeconds: 0,
     });
   },
 
   startStopwatch: (autoStart = true) =>
-    set((s) => ({
-      mode: "stopwatch",
-      presentation: "fullscreen",
-      running: autoStart,
-      seconds: s.lastStopwatchSeconds ?? 0,
-      restTotalSeconds: 0,
-      lastStopwatchSeconds: null,
-    })),
+    set((s) => {
+      const base = s.lastStopwatchSeconds ?? 0;
+      return {
+        mode: "stopwatch",
+        presentation: "fullscreen",
+        running: autoStart,
+        seconds: base,
+        restTotalSeconds: 0,
+        lastStopwatchSeconds: null,
+        countdownEndsAtMs: null,
+        stopwatchBaseSeconds: base,
+        stopwatchStartedAtMs: autoStart ? Date.now() : null,
+      };
+    }),
 
-  pause: () => set({ running: false }),
-  resume: () => set({ running: true }),
+  pause: () =>
+    set((s) => {
+      if (!s.running) return s;
+      if (s.mode === "rest" || s.mode === "setTimer") {
+        if (s.countdownEndsAtMs != null) {
+          const left = Math.max(
+            0,
+            Math.ceil((s.countdownEndsAtMs - Date.now()) / 1000),
+          );
+          return { running: false, seconds: left, countdownEndsAtMs: null };
+        }
+        return { running: false };
+      }
+      if (s.mode === "stopwatch" && s.stopwatchStartedAtMs != null) {
+        const elapsed =
+          s.stopwatchBaseSeconds +
+          Math.floor((Date.now() - s.stopwatchStartedAtMs) / 1000);
+        return {
+          running: false,
+          seconds: elapsed,
+          stopwatchBaseSeconds: elapsed,
+          stopwatchStartedAtMs: null,
+        };
+      }
+      return { running: false };
+    }),
+
+  resume: () =>
+    set((s) => {
+      if (s.mode === "rest" || s.mode === "setTimer") {
+        return {
+          running: true,
+          countdownEndsAtMs: countdownEndsAtFromSeconds(s.seconds),
+        };
+      }
+      if (s.mode === "stopwatch") {
+        return {
+          running: true,
+          stopwatchStartedAtMs: Date.now(),
+        };
+      }
+      return { running: true };
+    }),
 
   adjustRest: (deltaSeconds) =>
     set((s) => {
       if (s.mode !== "rest") return s;
       const next = Math.max(0, s.seconds + deltaSeconds);
       const total = Math.max(s.restTotalSeconds, next);
-      return { seconds: next, restTotalSeconds: total };
+      return {
+        seconds: next,
+        restTotalSeconds: total,
+        countdownEndsAtMs:
+          s.running && s.countdownEndsAtMs != null
+            ? s.countdownEndsAtMs + deltaSeconds * 1000
+            : s.running
+              ? countdownEndsAtFromSeconds(next)
+              : null,
+      };
     }),
 
   resetRest: () =>
     set((s) => {
       if (s.mode !== "rest" && s.mode !== "setTimer") return s;
-      return { seconds: s.restTotalSeconds, running: true };
+      return {
+        seconds: s.restTotalSeconds,
+        running: true,
+        countdownEndsAtMs: countdownEndsAtFromSeconds(s.restTotalSeconds),
+      };
     }),
 
   resetStopwatch: () =>
     set((s) => {
       if (s.mode !== "stopwatch") return s;
-      return { seconds: 0, running: false };
+      return {
+        seconds: 0,
+        running: false,
+        stopwatchBaseSeconds: 0,
+        stopwatchStartedAtMs: null,
+      };
     }),
 
   stop: () => {
@@ -132,6 +206,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       restTotalSeconds: 0,
       lastStopwatchSeconds:
         mode === "stopwatch" && seconds > 0 ? seconds : null,
+      ...clearClockFields(),
     });
   },
 
@@ -145,19 +220,37 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
 
   expandTimer: () => set({ presentation: "fullscreen" }),
 
-  tick: () =>
+  syncTimerClock: () =>
     set((s) => {
       if (!s.running) return s;
+
       if (s.mode === "rest" || s.mode === "setTimer") {
-        if (s.seconds <= 1) {
+        if (s.countdownEndsAtMs == null) return s;
+        const left = Math.max(
+          0,
+          Math.ceil((s.countdownEndsAtMs - Date.now()) / 1000),
+        );
+        if (left <= 0) {
           playTimerDoneAlert();
-          return { seconds: 0, running: false };
+          return {
+            seconds: 0,
+            running: false,
+            countdownEndsAtMs: null,
+          };
         }
-        return { seconds: s.seconds - 1 };
+        if (left === s.seconds) return s;
+        return { seconds: left };
       }
+
       if (s.mode === "stopwatch") {
-        return { seconds: s.seconds + 1 };
+        if (s.stopwatchStartedAtMs == null) return s;
+        const elapsed =
+          s.stopwatchBaseSeconds +
+          Math.floor((Date.now() - s.stopwatchStartedAtMs) / 1000);
+        if (elapsed === s.seconds) return s;
+        return { seconds: elapsed };
       }
+
       return s;
     }),
 }));

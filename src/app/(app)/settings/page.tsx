@@ -247,7 +247,7 @@ export default function SettingsPage() {
         />
         <SettingsSwitch
           title="Keep screen on"
-          description="Try to prevent the screen from dimming or locking while this app is open. Uses more battery; your browser may still allow sleep in some cases."
+          description="Try to prevent the screen from dimming while this app is open. Rest and set timers also keep the screen awake while running. Countdowns stay accurate if the phone locks (wall-clock sync)."
           checked={settings.keepScreenAwake}
           onChange={() =>
             settings.updateSettings({

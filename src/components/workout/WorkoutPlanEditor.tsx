@@ -17,10 +17,17 @@ import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getPlanAddCandidates, getPlanSlotCandidates } from "@/lib/planSlotCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
 import { pickRandomSwap } from "@/lib/exerciseSwap";
+import { analyzeDayPlanBalance } from "@/lib/workoutBalanceAlerts";
 import { prepareDayPlanForEditor } from "@/lib/trainingWeekCustomize";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import type { DayPlan, ExerciseCategory, RoundExercise, StretchEntry } from "@/types";
+import type {
+  DayPlan,
+  ExerciseCategory,
+  Round,
+  RoundExercise,
+  StretchEntry,
+} from "@/types";
 
 const ROUND_ADD_CATEGORIES = CATEGORY_ORDER.filter(
   (c) => c !== "SW" && c !== "SC",
@@ -35,6 +42,13 @@ type PickTarget =
 
 function stretchCategory(section: StretchSectionKey): "SW" | "SC" {
   return section === "coolDown" ? "SC" : "SW";
+}
+
+function renumberRounds(rounds: Round[]): Round[] {
+  return rounds.map((round, index) => ({
+    ...round,
+    roundNumber: index + 1,
+  }));
 }
 
 interface WorkoutPlanEditorProps {
@@ -62,6 +76,7 @@ export default function WorkoutPlanEditor({
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
   const prefs = useExercisePreferencesStore((s) => s.byExerciseId);
   const dislikedIds = useMemo(() => collectDislikedIds(prefs), [prefs]);
+  const balanceAlerts = useMemo(() => analyzeDayPlanBalance(draft), [draft]);
 
   const pickCandidates = useMemo(() => {
     if (!pickTarget) return [];
@@ -172,6 +187,24 @@ export default function WorkoutPlanEditor({
           : r,
       );
       return { ...prev, rounds };
+    });
+  };
+
+  const addRound = () => {
+    setDraft((prev) => ({
+      ...prev,
+      rounds: renumberRounds([
+        ...prev.rounds,
+        { roundNumber: prev.rounds.length + 1, exercises: [] },
+      ]),
+    }));
+  };
+
+  const removeRound = (roundIndex: number) => {
+    setDraft((prev) => {
+      if (prev.rounds.length <= 1) return prev;
+      const next = prev.rounds.filter((_, ri) => ri !== roundIndex);
+      return { ...prev, rounds: renumberRounds(next) };
     });
   };
 
@@ -297,25 +330,80 @@ export default function WorkoutPlanEditor({
         onUpdateTarget={(index, target) => updateStretchTarget("coolDown", index, target)}
       />
 
+      {balanceAlerts.length > 0 && (
+        <SurfaceCard className="space-y-2 p-4">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted">
+            Balance notes
+          </p>
+          <ul className="space-y-2">
+            {balanceAlerts.map((alert) => (
+              <li
+                key={alert.id}
+                className={`text-sm leading-snug ${
+                  alert.severity === "warning"
+                    ? "text-amber-700 dark:text-amber-300"
+                    : "text-muted"
+                }`}
+              >
+                {alert.message}
+              </li>
+            ))}
+          </ul>
+        </SurfaceCard>
+      )}
+
+      <div className="flex items-center justify-between gap-2 px-1">
+        <p className="text-xs font-medium uppercase tracking-wider text-muted">
+          Rounds
+        </p>
+        <button
+          type="button"
+          disabled={saving || draft.rounds.length >= 6}
+          onClick={addRound}
+          className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover disabled:opacity-50"
+        >
+          + Add round
+        </button>
+      </div>
+
       {draft.rounds.map((round, roundIndex) => (
         <CollapsibleSection
           key={round.roundNumber}
           title={`Round ${round.roundNumber}`}
-          badge={`${round.exercises.length} exercise${
-            round.exercises.length === 1 ? "" : "s"
-          }`}
+          hint={
+            round.exercises.length === 0
+              ? "No exercises yet"
+              : `${round.exercises.length} exercise${
+                  round.exercises.length === 1 ? "" : "s"
+                }`
+          }
           defaultOpen={roundIndex === 0}
-          headerActions={
-            <button
-              type="button"
-              onClick={() => setCategoryPickRound(roundIndex)}
-              className="rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-surface-hover"
-            >
-              + Add exercise
-            </button>
+          toolbar={
+            <div className="flex w-full items-center justify-between gap-3">
+              <button
+                type="button"
+                disabled={draft.rounds.length <= 1 || saving}
+                onClick={() => removeRound(roundIndex)}
+                className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-40"
+              >
+                Remove round
+              </button>
+              <button
+                type="button"
+                onClick={() => setCategoryPickRound(roundIndex)}
+                className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover"
+              >
+                + Add exercise
+              </button>
+            </div>
           }
         >
           <div className="divide-y divide-border px-2 py-1">
+            {round.exercises.length === 0 && (
+              <p className="px-2 py-4 text-center text-sm text-muted">
+                Add an exercise to build this round.
+              </p>
+            )}
             {round.exercises.map((slot, slotIndex) => {
               const meta = exerciseMap[slot.exerciseId];
               if (!meta) return null;

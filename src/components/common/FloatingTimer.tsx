@@ -33,7 +33,7 @@ export default function FloatingTimer() {
   const resume = useFloatingTimerStore((s) => s.resume);
   const stop = useFloatingTimerStore((s) => s.stop);
   const expandTimer = useFloatingTimerStore((s) => s.expandTimer);
-  const tick = useFloatingTimerStore((s) => s.tick);
+  const syncTimerClock = useFloatingTimerStore((s) => s.syncTimerClock);
   const lastStopwatchSeconds = useFloatingTimerStore(
     (s) => s.lastStopwatchSeconds,
   );
@@ -49,9 +49,23 @@ export default function FloatingTimer() {
 
   useEffect(() => {
     if (idle || !running) return;
-    const id = setInterval(() => tick(), 1000);
+    syncTimerClock();
+    const id = setInterval(() => syncTimerClock(), 250);
     return () => clearInterval(id);
-  }, [idle, running, tick]);
+  }, [idle, running, syncTimerClock]);
+
+  useEffect(() => {
+    if (idle || !running) return;
+    function onVisible() {
+      if (document.visibilityState === "visible") syncTimerClock();
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
+  }, [idle, running, syncTimerClock]);
 
   // Close popover on outside click.
   useEffect(() => {

@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
 /**
- * Holds a screen wake lock while `keepScreenAwake` is on and the document is visible.
- * Releases when the tab hides, the setting turns off, or the component unmounts.
+ * Holds a screen wake lock while `keepScreenAwake` is on, or while a workout timer
+ * is running, and the document is visible. Releases when the tab hides or timers stop.
  */
 export default function WakeLockSync() {
   const keepScreenAwake = useSettingsStore((s) => s.keepScreenAwake);
+  const timerMode = useFloatingTimerStore((s) => s.mode);
+  const timerRunning = useFloatingTimerStore((s) => s.running);
+  const holdForTimer = timerMode !== "idle" && timerRunning;
+  const shouldHold = keepScreenAwake || holdForTimer;
   const lockRef = useRef<WakeLockSentinel | null>(null);
 
   useEffect(() => {
@@ -27,7 +32,7 @@ export default function WakeLockSync() {
     }
 
     async function acquire() {
-      if (cancelled || !keepScreenAwake) return;
+      if (cancelled || !shouldHold) return;
       if (typeof document === "undefined" || document.visibilityState !== "visible") {
         return;
       }
@@ -49,7 +54,7 @@ export default function WakeLockSync() {
       }
     }
 
-    if (!keepScreenAwake) {
+    if (!shouldHold) {
       void release();
       return () => {
         cancelled = true;
@@ -71,7 +76,7 @@ export default function WakeLockSync() {
       document.removeEventListener("visibilitychange", onVisibility);
       void release();
     };
-  }, [keepScreenAwake]);
+  }, [shouldHold]);
 
   return null;
 }

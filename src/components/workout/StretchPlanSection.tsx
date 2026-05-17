@@ -122,7 +122,7 @@ export default function StretchPlanSection({
         title={title}
         hint={stretchCountLabel(entries.length)}
         defaultOpen={defaultOpen}
-        headerActions={addButton}
+        toolbar={addButton}
       >
         {body}
       </CollapsibleSection>
