@@ -13,7 +13,7 @@ import {
   mergeRegeneratedDays,
   regenDayIndicesForPrefsChange,
 } from "@/lib/trainingWeekRegen";
-import { isWorkoutStartedForDate } from "@/lib/workoutSessionGuard";
+import { isPrescribedPlanFrozenForDate } from "@/lib/workoutSessionGuard";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import {
   getExercisePreferenceRepo,
@@ -32,6 +32,7 @@ import type {
   RoundDensity,
   UserSettings,
 } from "@/types";
+import { buildVarietySeed, varietySeedForCurrentWeek } from "@/lib/planVariety";
 import {
   parseLocalDateKey,
   weekAnchorFromDateKey,
@@ -98,6 +99,7 @@ function materializeWeekFromCatalog(
   programFocus: ProgramFocusPreset,
   roundDensity: RoundDensity,
   exerciseSettings: ExerciseSettingsMap,
+  varietySeed: string,
 ): TrainingWeekDays {
   return materializeTrainingWeek(
     buildCatalogWeek(),
@@ -106,13 +108,14 @@ function materializeWeekFromCatalog(
     programFocus,
     roundDensity,
     exerciseSettings,
+    varietySeed,
   );
 }
 
 export type RefreshTrainingWeekScope = "prefs" | "full";
 
-function isWorkoutStartedToday(): boolean {
-  return isWorkoutStartedForDate(formatLocalDateKey());
+function isTodayPrescribedPlanFrozen(): boolean {
+  return isPrescribedPlanFrozenForDate(formatLocalDateKey());
 }
 
 async function persistTrainingWeek(
@@ -148,6 +151,7 @@ async function refreshPersistedWeek(
     programFocus,
     roundDensity,
     exerciseSettings,
+    buildVarietySeed(weekKey, "authenticated"),
   );
 
   const repo = getTrainingWeekRepo("authenticated");
@@ -167,7 +171,7 @@ async function refreshPersistedWeek(
   const todayDow = todayParsed?.getDay() ?? 0;
   const indices = regenDayIndicesForPrefsChange({
     todayDayOfWeek: todayDow,
-    workoutStartedToday: isWorkoutStartedToday(),
+    freezeTodayPlan: isTodayPrescribedPlanFrozen(),
   });
 
   const merged =
@@ -191,12 +195,14 @@ async function refreshPersistedWeek(
 async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays> {
   const { prefs, availableEquipment, programFocus, roundDensity, exerciseSettings } =
     await loadGeneratorInputs(mode);
+  const scope = mode === "authenticated" ? "authenticated" : "guest";
   return materializeWeekFromCatalog(
     prefs,
     availableEquipment,
     programFocus,
     roundDensity,
     exerciseSettings,
+    varietySeedForCurrentWeek(scope),
   );
 }
 

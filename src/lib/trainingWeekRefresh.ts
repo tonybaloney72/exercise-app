@@ -1,5 +1,6 @@
 import { refreshTrainingWeekContaining } from "@/lib/planResolver";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import {
   useTrainingWeekRefreshStore,
   type TrainingWeekRefreshReason,
@@ -11,6 +12,7 @@ export async function refreshCurrentTrainingWeek(
   reason: TrainingWeekRefreshReason,
 ): Promise<void> {
   if (useAuthStore.getState().mode !== "authenticated") return;
+  await useWorkoutStore.getState().loadHistory();
   await refreshTrainingWeekContaining(formatLocalDateKey());
   useTrainingWeekRefreshStore.getState().notifyRefreshed(reason);
 }

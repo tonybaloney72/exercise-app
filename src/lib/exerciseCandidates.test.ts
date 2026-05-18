@@ -22,6 +22,16 @@ describe("exerciseCandidates", () => {
     expect(pick?.id).toBe("UP-3");
   });
 
+  it("different seeds can change the pick among non-favorites", () => {
+    const candidates = exercises.filter((ex) => ex.category === "CF").slice(0, 8);
+    expect(candidates.length).toBeGreaterThan(2);
+    const a = pickReplacementCandidate(candidates, new Set(), "week-a");
+    const b = pickReplacementCandidate(candidates, new Set(), "week-b");
+    expect(a).not.toBeNull();
+    expect(b).not.toBeNull();
+    expect(a!.id).not.toBe(b!.id);
+  });
+
   it("picks a deterministic substitute for a disliked slot", () => {
     const substitute = pickDislikeReplacement({
       category: "UP",

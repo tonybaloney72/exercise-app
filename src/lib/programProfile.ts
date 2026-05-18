@@ -7,6 +7,7 @@ import {
 } from "@/lib/exerciseCandidates";
 import type { ExercisePreferenceMap, ExerciseSettingsMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
+import { balancedRoundBudget } from "@/lib/balancedRoundBudget";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 import type {
   DayPlan,
@@ -334,6 +335,18 @@ function stubSlots(categories: ExerciseCategory[]): RoundExercise[] {
   }));
 }
 
+function roundCategoriesForFocus(
+  plan: DayPlan,
+  roundNumber: number,
+  focus: ProgramFocusPreset,
+  target: number,
+): ExerciseCategory[] {
+  if (focus === "balanced") {
+    return balancedRoundBudget(plan, roundNumber, target);
+  }
+  return buildRoundCategoriesFromDayBudget(plan, roundNumber, focus, target);
+}
+
 /** Category slots for a round from day theme + focus (not catalog exercise ids). */
 function buildRoundCategoriesFromDayBudget(
   plan: DayPlan,
@@ -367,9 +380,10 @@ function rebuildRound(
   favoriteIds: ReadonlySet<string>,
   usedInDay: Set<string>,
   exerciseSettings?: ExerciseSettingsMap,
+  varietySeed?: string,
 ): RoundExercise[] {
   const target = Math.max(2, Math.min(8, ROUND_DENSITY_TARGETS[density]));
-  const categories = buildRoundCategoriesFromDayBudget(
+  const categories = roundCategoriesForFocus(
     plan,
     roundNumber,
     focus,
@@ -377,6 +391,7 @@ function rebuildRound(
   );
   const usedInRound = new Set<string>();
   const rebuilt: RoundExercise[] = [];
+  const variety = varietySeed?.trim() ? varietySeed.trim() : "static";
 
   for (let i = 0; i < categories.length; i++) {
     const filled = fillSlot(
@@ -386,7 +401,7 @@ function rebuildRound(
       availableEquipment,
       dislikedIds,
       favoriteIds,
-      `d${plan.dayOfWeek}-r${roundNumber}-i${i}-pf:${focus}-u:${usedInDay.size}`,
+      `d${plan.dayOfWeek}-r${roundNumber}-i${i}-pf:${focus}-v:${variety}-u:${usedInDay.size}`,
       exerciseSettings,
     );
     if (!filled) continue;
@@ -406,6 +421,7 @@ export function applyProgramProfileToDayPlan(
   availableEquipment: ExerciseEquipment[],
   prefs: ExercisePreferenceMap,
   exerciseSettings?: ExerciseSettingsMap,
+  varietySeed?: string,
 ): DayPlan {
   const dislikedIds = collectDislikedIds(prefs);
   const favoriteIds = collectFavoriteIds(prefs);
@@ -425,6 +441,7 @@ export function applyProgramProfileToDayPlan(
         favoriteIds,
         usedInDay,
         exerciseSettings,
+        varietySeed,
       ),
     })),
   };
@@ -437,6 +454,7 @@ export function applyProgramProfileToWeek(
   availableEquipment: ExerciseEquipment[],
   prefs: ExercisePreferenceMap,
   exerciseSettings?: ExerciseSettingsMap,
+  varietySeed?: string,
 ): TrainingWeekDays {
   const out: TrainingWeekDays = {};
   for (let i = 0; i < 7; i++) {
@@ -449,6 +467,7 @@ export function applyProgramProfileToWeek(
       availableEquipment,
       prefs,
       exerciseSettings,
+      varietySeed,
     );
   }
   return out;

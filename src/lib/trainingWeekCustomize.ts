@@ -8,6 +8,7 @@ import {
   TRAINING_WEEK_SOURCE_GENERATED_V1,
 } from "@/lib/planGenerator";
 import { rebuildDerivedStretches, resolveStretchesForDay } from "@/lib/dayStretchPlan";
+import { buildVarietySeed } from "@/lib/planVariety";
 import { refreshTrainingWeekContaining, resolveTrainingWeekForAuth } from "@/lib/planResolver";
 import {
   buildStretchResolveContext,
@@ -169,6 +170,7 @@ export function buildGeneratedDayPlan(
   programFocus: ProgramFocusPreset,
   roundDensity: RoundDensity,
   exerciseSettings?: ExerciseSettingsMap,
+  varietySeed?: string,
 ): DayPlan {
   const generated = materializeTrainingWeek(
     buildCatalogWeek(),
@@ -177,6 +179,7 @@ export function buildGeneratedDayPlan(
     programFocus,
     roundDensity,
     exerciseSettings,
+    varietySeed,
   );
   const day = generated[dayOfWeek];
   if (!day) {
@@ -216,6 +219,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
     programFocus,
     roundDensity,
     exerciseSettings,
+    buildVarietySeed(weekKey, "authenticated"),
   );
 
   const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");

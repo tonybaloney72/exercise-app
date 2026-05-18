@@ -12,21 +12,21 @@ const EQUIP = [...DEFAULT_AVAILABLE_EQUIPMENT];
 const EMPTY_PREFS: ExercisePreferenceMap = {};
 
 describe("regenDayIndicesForPrefsChange", () => {
-  it("includes today through Saturday when no workout started", () => {
+  it("includes today through Saturday when today is not frozen", () => {
     expect(
-      regenDayIndicesForPrefsChange({ todayDayOfWeek: 1, workoutStartedToday: false }),
+      regenDayIndicesForPrefsChange({ todayDayOfWeek: 1, freezeTodayPlan: false }),
     ).toEqual([1, 2, 3, 4, 5, 6]);
   });
 
-  it("skips today when a workout is in progress", () => {
+  it("skips today when today's plan is frozen (in progress or completed)", () => {
     expect(
-      regenDayIndicesForPrefsChange({ todayDayOfWeek: 1, workoutStartedToday: true }),
+      regenDayIndicesForPrefsChange({ todayDayOfWeek: 1, freezeTodayPlan: true }),
     ).toEqual([2, 3, 4, 5, 6]);
   });
 
-  it("returns empty when today is Saturday and workout started", () => {
+  it("returns empty when today is Saturday and today is frozen", () => {
     expect(
-      regenDayIndicesForPrefsChange({ todayDayOfWeek: 6, workoutStartedToday: true }),
+      regenDayIndicesForPrefsChange({ todayDayOfWeek: 6, freezeTodayPlan: true }),
     ).toEqual([]);
   });
 });

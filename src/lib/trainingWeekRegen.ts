@@ -4,9 +4,10 @@ import type { DayPlan } from "@/types";
 /** Which days to replace when prefs/profile change (not a full-week reset). */
 export function regenDayIndicesForPrefsChange(options: {
   todayDayOfWeek: number;
-  workoutStartedToday: boolean;
+  /** Skip today when in-progress, paused, or already logged for this date. */
+  freezeTodayPlan: boolean;
 }): number[] {
-  const start = options.workoutStartedToday
+  const start = options.freezeTodayPlan
     ? options.todayDayOfWeek + 1
     : options.todayDayOfWeek;
   const indices: number[] = [];

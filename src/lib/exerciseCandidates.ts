@@ -44,6 +44,17 @@ export function getReplacementCandidates(options: {
   );
 }
 
+/** Mix seed + exercise id so sort order varies by seed (not only by id). */
+export function seededCandidateRank(seed: string, exerciseId: string): string {
+  let h = 2166136261;
+  const s = `${seed}\0${exerciseId}`;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(16).padStart(8, "0");
+}
+
 /**
  * Deterministic pick for persisted plans (stable across devices once saved).
  * Favorites in the candidate list sort ahead; optional seed breaks ties within each tier.
@@ -59,7 +70,10 @@ export function pickReplacementCandidate(
     const favB = favoriteIds.has(b.id) ? 0 : 1;
     if (favA !== favB) return favA - favB;
     if (seed) {
-      return `${seed}:${a.id}`.localeCompare(`${seed}:${b.id}`);
+      const ra = seededCandidateRank(seed, a.id);
+      const rb = seededCandidateRank(seed, b.id);
+      const byRank = ra.localeCompare(rb);
+      if (byRank !== 0) return byRank;
     }
     return a.id.localeCompare(b.id);
   });

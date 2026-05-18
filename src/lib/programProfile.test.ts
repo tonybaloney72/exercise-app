@@ -4,10 +4,12 @@ import {
   isThemesOnlyCatalogPlan,
 } from "@/data/trainingWeekCatalog";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+import { balancedRoundBudget } from "@/lib/balancedRoundBudget";
 import {
   applyProgramProfileToDayPlan,
   ROUND_DENSITY_TARGETS,
 } from "@/lib/programProfile";
+import { buildVarietySeed } from "@/lib/planVariety";
 import type { DayPlan, ExerciseCategory } from "@/types";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 
@@ -128,6 +130,19 @@ describe("applyProgramProfileToDayPlan", () => {
     expect(idsUpper.sort()).not.toEqual(idsLower.sort());
   });
 
+  it("balanced uses explicit round budgets at standard density", () => {
+    const shaped = applyProgramProfileToDayPlan(
+      mondaySeed,
+      "balanced",
+      "standard",
+      EQUIP,
+      EMPTY_PREFS,
+    );
+    expect(
+      shaped.rounds[0]!.exercises.map((e) => e.category),
+    ).toEqual(balancedRoundBudget(mondaySeed, 1, ROUND_DENSITY_TARGETS.standard));
+  });
+
   it("uses different exercises across rounds at standard density", () => {
     const shaped = applyProgramProfileToDayPlan(
       mondaySeed,
@@ -162,5 +177,31 @@ describe("applyProgramProfileToDayPlan", () => {
     if (russian) {
       expect(russian.targetReps).toBe("45 sec");
     }
+  });
+
+  it("variety seed changes balanced exercise ids for the same day theme", () => {
+    const seedA = buildVarietySeed("2026-05-10", "test");
+    const seedB = buildVarietySeed("2026-05-17", "test");
+    const a = applyProgramProfileToDayPlan(
+      mondaySeed,
+      "balanced",
+      "standard",
+      EQUIP,
+      EMPTY_PREFS,
+      undefined,
+      seedA,
+    );
+    const b = applyProgramProfileToDayPlan(
+      mondaySeed,
+      "balanced",
+      "standard",
+      EQUIP,
+      EMPTY_PREFS,
+      undefined,
+      seedB,
+    );
+    const idsA = a.rounds.flatMap((r) => r.exercises.map((e) => e.exerciseId));
+    const idsB = b.rounds.flatMap((r) => r.exercises.map((e) => e.exerciseId));
+    expect(idsA.sort()).not.toEqual(idsB.sort());
   });
 });

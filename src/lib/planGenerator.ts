@@ -171,6 +171,7 @@ export function materializeTrainingWeek(
   programFocus: ProgramFocusPreset,
   roundDensity: RoundDensity,
   exerciseSettings?: ExerciseSettingsMap,
+  varietySeed?: string,
 ): TrainingWeekDays {
   const profiled = applyProgramProfileToWeek(
     catalogWeek,
@@ -179,6 +180,7 @@ export function materializeTrainingWeek(
     availableEquipment,
     prefs,
     exerciseSettings,
+    varietySeed,
   );
   return applyDislikesToWeek(
     profiled,
