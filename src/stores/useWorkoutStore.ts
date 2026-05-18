@@ -29,6 +29,7 @@ import {
 } from "@/utils/exerciseLogDefaults";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
+  formatPlanTargetPrescription,
   resolveExerciseSettings,
   resolveStretchTimerTargetSeconds,
 } from "@/utils/effectiveExerciseSettings";
@@ -214,11 +215,19 @@ function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
         },
         byId[ex.exerciseId],
       );
+      const targetPrescription = formatPlanTargetPrescription(
+        meta ?? {
+          id: ex.exerciseId,
+          isTimeBased: false,
+          defaultReps: ex.targetReps,
+        },
+        byId[ex.exerciseId],
+      );
       return {
         exerciseId: ex.exerciseId,
         completed: false,
         skipped: false,
-        targetPrescription: ex.targetReps,
+        targetPrescription,
         loggingMode: resolved.defaultSetMode,
         targetDurationSeconds: seedTimerTargetSecondsFromResolved(resolved),
       };

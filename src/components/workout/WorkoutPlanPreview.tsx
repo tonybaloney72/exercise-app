@@ -7,7 +7,9 @@ import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { CATEGORIES } from "@/data/categories";
 import { useResolvedStretches } from "@/hooks/useResolvedStretches";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import type { DayPlan } from "@/types";
+import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 
 interface WorkoutPlanPreviewProps {
   plan: DayPlan;
@@ -30,6 +32,13 @@ export default function WorkoutPlanPreview({
 }: WorkoutPlanPreviewProps) {
   const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
   const { warmUp, coolDown } = useResolvedStretches(plan);
+  const exerciseSettings = useExerciseSettingsStore((s) => s.byExerciseId);
+
+  const roundTargetLabel = (exerciseId: string, fallback: string) => {
+    const meta = exerciseMap[exerciseId];
+    if (!meta) return fallback;
+    return formatPlanTargetPrescription(meta, exerciseSettings[exerciseId]);
+  };
 
   return (
     <AnimatedSection className="space-y-4" delay={0.05}>
@@ -110,7 +119,9 @@ export default function WorkoutPlanPreview({
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-foreground">{meta.name}</p>
-                    <p className="text-xs text-muted">{ex.targetReps}</p>
+                    <p className="text-xs text-muted">
+                      {roundTargetLabel(ex.exerciseId, ex.targetReps)}
+                    </p>
                   </div>
                   <CategoryBadge category={meta.category} size="sm" />
                 </div>

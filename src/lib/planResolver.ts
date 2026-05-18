@@ -17,9 +17,11 @@ import { isWorkoutStartedForDate } from "@/lib/workoutSessionGuard";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import {
   getExercisePreferenceRepo,
+  getExerciseSettingsRepo,
   getSettingsRepo,
   getTrainingWeekRepo,
   type ExercisePreferenceMap,
+  type ExerciseSettingsMap,
   type TrainingWeekDays,
 } from "@/lib/repos";
 import type { AuthMode } from "@/stores/useAuthStore";
@@ -58,21 +60,24 @@ function repoModeForPlans(mode: AuthMode): AuthMode {
 async function loadGeneratorInputs(mode: AuthMode): Promise<{
   prefs: ExercisePreferenceMap;
   settings: UserSettings;
+  exerciseSettings: ExerciseSettingsMap;
   availableEquipment: ExerciseEquipment[];
   programFocus: ProgramFocusPreset;
   roundDensity: RoundDensity;
   fingerprint: string;
 }> {
   const repoMode = repoModeForPlans(mode);
-  const [prefs, settings] = await Promise.all([
+  const [prefs, settings, exerciseSettings] = await Promise.all([
     getExercisePreferenceRepo(repoMode).loadAll(),
     getSettingsRepo(repoMode).load(),
+    getExerciseSettingsRepo(repoMode).loadAll(),
   ]);
   const { availableEquipment, programFocus, roundDensity } =
     settingsSlice(settings);
   return {
     prefs,
     settings,
+    exerciseSettings,
     availableEquipment,
     programFocus,
     roundDensity,
@@ -92,6 +97,7 @@ function materializeWeekFromCatalog(
   availableEquipment: ExerciseEquipment[],
   programFocus: ProgramFocusPreset,
   roundDensity: RoundDensity,
+  exerciseSettings: ExerciseSettingsMap,
 ): TrainingWeekDays {
   return materializeTrainingWeek(
     buildCatalogWeek(),
@@ -99,6 +105,7 @@ function materializeWeekFromCatalog(
     availableEquipment,
     programFocus,
     roundDensity,
+    exerciseSettings,
   );
 }
 
@@ -131,6 +138,7 @@ async function refreshPersistedWeek(
     availableEquipment,
     programFocus,
     roundDensity,
+    exerciseSettings,
     fingerprint,
   } = await loadGeneratorInputs("authenticated");
 
@@ -139,6 +147,7 @@ async function refreshPersistedWeek(
     availableEquipment,
     programFocus,
     roundDensity,
+    exerciseSettings,
   );
 
   const repo = getTrainingWeekRepo("authenticated");
@@ -180,13 +189,14 @@ async function refreshPersistedWeek(
 
 /** In-memory materialized week (guest / anonymous) from catalog + local settings. */
 async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays> {
-  const { prefs, availableEquipment, programFocus, roundDensity } =
+  const { prefs, availableEquipment, programFocus, roundDensity, exerciseSettings } =
     await loadGeneratorInputs(mode);
   return materializeWeekFromCatalog(
     prefs,
     availableEquipment,
     programFocus,
     roundDensity,
+    exerciseSettings,
   );
 }
 

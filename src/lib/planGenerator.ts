@@ -7,8 +7,10 @@ import { stretchDefaultsFingerprint } from "@/lib/stretchDefaults";
 import type { StretchEntry } from "@/types";
 import { applyProgramProfileToWeek } from "@/lib/programProfile";
 import { dayPlanContainsDislikedExercise } from "@/lib/trainingWeekFrozenDay";
-import type { ExercisePreferenceMap } from "@/lib/repos";
+import type { ExercisePreferenceMap, ExerciseSettingsMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
+import { exerciseMap } from "@/data/exercises";
+import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 import type {
   DayPlan,
   ExerciseEquipment,
@@ -66,6 +68,7 @@ function replaceSlotIfDisliked(
   dislikedIds: ReadonlySet<string>,
   favoriteIds: ReadonlySet<string>,
   availableEquipment: ExerciseEquipment[],
+  exerciseSettings?: ExerciseSettingsMap,
 ): RoundExercise | null {
   if (!dislikedIds.has(slot.exerciseId)) {
     usedInRound.add(slot.exerciseId);
@@ -93,10 +96,14 @@ function replaceSlotIfDisliked(
   }
 
   usedInRound.add(substitute.id);
+  const meta = exerciseMap[substitute.id];
+  const targetReps = meta
+    ? formatPlanTargetPrescription(meta, exerciseSettings?.[substitute.id])
+    : substitute.defaultReps;
   return {
     exerciseId: substitute.id,
     category: slot.category,
-    targetReps: substitute.defaultReps,
+    targetReps,
   };
 }
 
@@ -105,6 +112,7 @@ export function applyDislikesToDayPlan(
   plan: DayPlan,
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
+  exerciseSettings?: ExerciseSettingsMap,
 ): DayPlan {
   const dislikedIds = collectDislikedIds(prefs);
   const favoriteIds = collectFavoriteIds(prefs);
@@ -126,6 +134,7 @@ export function applyDislikesToDayPlan(
               dislikedIds,
               favoriteIds,
               availableEquipment,
+              exerciseSettings,
             ),
           )
           .filter((slot): slot is RoundExercise => slot != null),
@@ -138,12 +147,18 @@ export function applyDislikesToWeek(
   week: TrainingWeekDays,
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
+  exerciseSettings?: ExerciseSettingsMap,
 ): TrainingWeekDays {
   const out: TrainingWeekDays = {};
   for (let i = 0; i < 7; i++) {
     const day = week[i];
     if (!day) continue;
-    out[i] = applyDislikesToDayPlan(day, prefs, availableEquipment);
+    out[i] = applyDislikesToDayPlan(
+      day,
+      prefs,
+      availableEquipment,
+      exerciseSettings,
+    );
   }
   return out;
 }
@@ -155,6 +170,7 @@ export function materializeTrainingWeek(
   availableEquipment: ExerciseEquipment[],
   programFocus: ProgramFocusPreset,
   roundDensity: RoundDensity,
+  exerciseSettings?: ExerciseSettingsMap,
 ): TrainingWeekDays {
   const profiled = applyProgramProfileToWeek(
     catalogWeek,
@@ -162,8 +178,14 @@ export function materializeTrainingWeek(
     roundDensity,
     availableEquipment,
     prefs,
+    exerciseSettings,
   );
-  return applyDislikesToWeek(profiled, prefs, availableEquipment);
+  return applyDislikesToWeek(
+    profiled,
+    prefs,
+    availableEquipment,
+    exerciseSettings,
+  );
 }
 
 export function weekContainsDislikedExercise(

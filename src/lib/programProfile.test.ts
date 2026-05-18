@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
+import {
+  buildCatalogWeek,
+  isThemesOnlyCatalogPlan,
+} from "@/data/trainingWeekCatalog";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   applyProgramProfileToDayPlan,
@@ -20,11 +23,23 @@ function roundCategories(plan: DayPlan, roundIndex = 0): ExerciseCategory[] {
 }
 
 describe("applyProgramProfileToDayPlan", () => {
-  const monday = buildCatalogWeek()[1]!;
+  const mondaySeed = buildCatalogWeek()[1]!;
+
+  it("fills rounds from themes-only catalog seed", () => {
+    expect(isThemesOnlyCatalogPlan(mondaySeed)).toBe(true);
+    const shaped = applyProgramProfileToDayPlan(
+      mondaySeed,
+      "balanced",
+      "standard",
+      EQUIP,
+      EMPTY_PREFS,
+    );
+    expect(shaped.rounds[0]!.exercises.length).toBeGreaterThan(0);
+  });
 
   it("trims each round to the compact density target", () => {
     const shaped = applyProgramProfileToDayPlan(
-      monday,
+      mondaySeed,
       "balanced",
       "compact",
       EQUIP,
@@ -35,14 +50,14 @@ describe("applyProgramProfileToDayPlan", () => {
 
   it("keeps fewer core slots than core_emphasis at compact density", () => {
     const minimal = applyProgramProfileToDayPlan(
-      monday,
+      mondaySeed,
       "minimal_core",
       "compact",
       EQUIP,
       EMPTY_PREFS,
     );
     const coreHeavy = applyProgramProfileToDayPlan(
-      monday,
+      mondaySeed,
       "core_emphasis",
       "compact",
       EQUIP,
@@ -70,7 +85,7 @@ describe("applyProgramProfileToDayPlan", () => {
 
   it("prefers conditioning slots when focus is conditioning at compact density", () => {
     const conditioning = applyProgramProfileToDayPlan(
-      monday,
+      mondaySeed,
       "conditioning",
       "compact",
       EQUIP,
@@ -81,7 +96,7 @@ describe("applyProgramProfileToDayPlan", () => {
 
   it("includes conditioning in rounds when the day has a jog", () => {
     const shaped = applyProgramProfileToDayPlan(
-      monday,
+      mondaySeed,
       "balanced",
       "standard",
       EQUIP,
@@ -95,14 +110,14 @@ describe("applyProgramProfileToDayPlan", () => {
 
   it("re-picks exercises when program focus changes at standard density", () => {
     const upper = applyProgramProfileToDayPlan(
-      monday,
+      mondaySeed,
       "upper_body",
       "standard",
       EQUIP,
       EMPTY_PREFS,
     );
     const lower = applyProgramProfileToDayPlan(
-      monday,
+      mondaySeed,
       "lower_body",
       "standard",
       EQUIP,
@@ -111,5 +126,41 @@ describe("applyProgramProfileToDayPlan", () => {
     const idsUpper = upper.rounds.flatMap((r) => r.exercises.map((e) => e.exerciseId));
     const idsLower = lower.rounds.flatMap((r) => r.exercises.map((e) => e.exerciseId));
     expect(idsUpper.sort()).not.toEqual(idsLower.sort());
+  });
+
+  it("uses different exercises across rounds at standard density", () => {
+    const shaped = applyProgramProfileToDayPlan(
+      mondaySeed,
+      "core_emphasis",
+      "standard",
+      EQUIP,
+      EMPTY_PREFS,
+    );
+    expect(shaped.rounds.length).toBeGreaterThanOrEqual(2);
+    const r0 = shaped.rounds[0]!.exercises.map((e) => e.exerciseId);
+    const r1 = shaped.rounds[1]!.exercises.map((e) => e.exerciseId);
+    expect(r0).not.toEqual(r1);
+  });
+
+  it("applies per-exercise timer settings to targetReps", () => {
+    const shaped = applyProgramProfileToDayPlan(
+      mondaySeed,
+      "balanced",
+      "standard",
+      EQUIP,
+      EMPTY_PREFS,
+      {
+        "CR-4": {
+          defaultSetMode: "timer",
+          defaultTimerSeconds: 45,
+        },
+      },
+    );
+    const russian = shaped.rounds
+      .flatMap((r) => r.exercises)
+      .find((e) => e.exerciseId === "CR-4");
+    if (russian) {
+      expect(russian.targetReps).toBe("45 sec");
+    }
   });
 });

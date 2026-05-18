@@ -117,3 +117,22 @@ export function resolveStretchTimerTargetSeconds(
 
   return librarySec;
 }
+
+/**
+ * Prescription string for plan slots and previews (Library defaults over catalog).
+ */
+export function formatPlanTargetPrescription(
+  exercise: Pick<Exercise, "isTimeBased" | "defaultReps">,
+  stored: StoredExerciseSlice | undefined,
+): string {
+  const resolved = resolveExerciseSettings(exercise, stored);
+  if (resolved.defaultSetMode === "timer") {
+    const sec =
+      resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK;
+    return `${sec} sec`;
+  }
+  if (resolved.defaultTargetReps != null && resolved.defaultTargetReps > 0) {
+    return String(resolved.defaultTargetReps);
+  }
+  return exercise.defaultReps;
+}

@@ -20,8 +20,10 @@ import {
 } from "@/lib/stretchDefaults";
 import {
   getExercisePreferenceRepo,
+  getExerciseSettingsRepo,
   getSettingsRepo,
   getTrainingWeekRepo,
+  type ExerciseSettingsMap,
 } from "@/lib/repos";
 import type {
   DayPlan,
@@ -166,6 +168,7 @@ export function buildGeneratedDayPlan(
   availableEquipment: ExerciseEquipment[],
   programFocus: ProgramFocusPreset,
   roundDensity: RoundDensity,
+  exerciseSettings?: ExerciseSettingsMap,
 ): DayPlan {
   const generated = materializeTrainingWeek(
     buildCatalogWeek(),
@@ -173,6 +176,7 @@ export function buildGeneratedDayPlan(
     availableEquipment,
     programFocus,
     roundDensity,
+    exerciseSettings,
   );
   const day = generated[dayOfWeek];
   if (!day) {
@@ -193,9 +197,10 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
   const { weekKey, parsed } = anchor;
   const dow = parsed.getDay();
 
-  const [prefs, settings] = await Promise.all([
+  const [prefs, settings, exerciseSettings] = await Promise.all([
     getExercisePreferenceRepo("authenticated").loadAll(),
     getSettingsRepo("authenticated").load(),
+    getExerciseSettingsRepo("authenticated").loadAll(),
   ]);
   const availableEquipment =
     settings.availableEquipment?.length > 0
@@ -210,6 +215,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
     availableEquipment,
     programFocus,
     roundDensity,
+    exerciseSettings,
   );
 
   const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");

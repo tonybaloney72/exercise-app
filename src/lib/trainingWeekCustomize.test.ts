@@ -105,6 +105,7 @@ const mockSaveSeededWeek = vi.fn();
 const mockResolveWeek = vi.fn();
 const mockLoadPrefs = vi.fn();
 const mockLoadSettings = vi.fn();
+const mockLoadExerciseSettings = vi.fn();
 
 vi.mock("@/lib/repos", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/repos")>();
@@ -115,6 +116,9 @@ vi.mock("@/lib/repos", async (importOriginal) => {
     }),
     getSettingsRepo: () => ({
       load: mockLoadSettings,
+    }),
+    getExerciseSettingsRepo: () => ({
+      loadAll: mockLoadExerciseSettings,
     }),
     getTrainingWeekRepo: () => ({
       loadWeek: mockLoadWeek,
@@ -132,6 +136,7 @@ describe("resetDayToGenerated", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLoadPrefs.mockResolvedValue(EMPTY_PREFS);
+    mockLoadExerciseSettings.mockResolvedValue({});
     mockLoadSettings.mockResolvedValue({
       availableEquipment: EQUIP,
       programFocus: "balanced",
