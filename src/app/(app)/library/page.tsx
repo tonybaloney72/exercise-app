@@ -5,10 +5,8 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { exercises } from "@/data/exercises";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
-import {
-  EQUIPMENT_LABELS,
-  exerciseMatchesEquipment,
-} from "@/data/equipment";
+import CategoryBadge from "@/components/common/CategoryBadge";
+import { EQUIPMENT_LABELS, exerciseMatchesEquipment } from "@/data/equipment";
 import EmptyState from "@/components/common/EmptyState";
 import type { Exercise, ExerciseCategory } from "@/types";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
@@ -77,11 +75,17 @@ export default function LibraryPage() {
         <div className="rounded-xl border border-border bg-surface px-4 py-3 text-sm text-muted leading-relaxed">
           <span className="text-foreground font-medium">Guest mode: </span>
           Prescribed workouts use the default plan.{" "}
-          <Link href="/signup" className="font-medium text-accent hover:underline">
+          <Link
+            href="/signup"
+            className="font-medium text-accent hover:underline"
+          >
             Create an account
           </Link>{" "}
           or{" "}
-          <Link href="/login" className="font-medium text-accent hover:underline">
+          <Link
+            href="/login"
+            className="font-medium text-accent hover:underline"
+          >
             log in
           </Link>{" "}
           to save favorites and dislikes and get a personalized weekly plan.
@@ -200,7 +204,9 @@ export default function LibraryPage() {
 
 function ExercisePreferenceToggles({ exerciseId }: { exerciseId: string }) {
   const mode = useAuthStore((s) => s.mode);
-  const preference = useExercisePreferencesStore((s) => s.byExerciseId[exerciseId]);
+  const preference = useExercisePreferencesStore(
+    (s) => s.byExerciseId[exerciseId],
+  );
   const setPreference = useExercisePreferencesStore((s) => s.setPreference);
 
   if (mode !== "authenticated") return null;
@@ -342,10 +348,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     const n = Math.round(Number(input.value));
     const sec = Math.min(
       999,
-      Math.max(
-        5,
-        Number.isNaN(n) ? DEFAULT_TIMER_SECONDS_FALLBACK : n,
-      ),
+      Math.max(5, Number.isNaN(n) ? DEFAULT_TIMER_SECONDS_FALLBACK : n),
     );
     input.value = String(sec);
     await upsert(exercise.id, {
@@ -369,7 +372,10 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     const n = Math.round(Number(raw));
     const reps = Math.min(
       999,
-      Math.max(1, Number.isNaN(n) ? (parseRepTargetHint(exercise.defaultReps) ?? 1) : n),
+      Math.max(
+        1,
+        Number.isNaN(n) ? (parseRepTargetHint(exercise.defaultReps) ?? 1) : n,
+      ),
     );
     input.value = String(reps);
     await upsert(exercise.id, {
@@ -387,7 +393,8 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
 
   const customChipSelected =
     customChipActive ||
-    (resolved.defaultSetMode === "timer" && !isPresetTimerSeconds(effectiveSec));
+    (resolved.defaultSetMode === "timer" &&
+      !isPresetTimerSeconds(effectiveSec));
 
   return (
     <div className="rounded-lg border border-border bg-surface overflow-hidden">
@@ -542,7 +549,9 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                           min={5}
                           max={999}
                           defaultValue={effectiveSec}
-                          onBlur={(e) => void commitCustomSecondsFromInput(e.currentTarget)}
+                          onBlur={(e) =>
+                            void commitCustomSecondsFromInput(e.currentTarget)
+                          }
                           className="w-full max-w-[8.5rem] rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
                         />
                       </div>
@@ -566,12 +575,15 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                           parseRepTargetHint(exercise.defaultReps) ??
                           ""
                         }
-                        onBlur={(e) => void commitDefaultRepsFromInput(e.currentTarget)}
+                        onBlur={(e) =>
+                          void commitDefaultRepsFromInput(e.currentTarget)
+                        }
                         className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
                       />
                     </div>
                     <p className="text-[10px] text-muted">
-                      Clear the field and tap away to use the catalog line ({exercise.defaultReps}) until you set a number.
+                      Clear the field and tap away to use the catalog line (
+                      {exercise.defaultReps}) until you set a number.
                     </p>
                   </div>
                 )}
