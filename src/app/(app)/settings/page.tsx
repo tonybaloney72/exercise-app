@@ -10,7 +10,11 @@ import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
 import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import { ROUND_DENSITY_OPTIONS } from "@/lib/programProfile";
+import ProgramModeSelector from "@/components/settings/ProgramModeSelector";
+import WeekModeOptionsPanel from "@/components/settings/WeekModeOptionsPanel";
 import TrainingPriorityCustomize from "@/components/settings/TrainingPriorityCustomize";
+import WeeklyCategoryLayoutEditor from "@/components/settings/WeeklyCategoryLayoutEditor";
+import type { ProgramMode } from "@/lib/weeklyCategoryLayout";
 import {
   scoresFromPreset,
   TRAINING_PRIORITY_OPTIONS,
@@ -65,6 +69,9 @@ export default function SettingsPage() {
         trainingPriorityPreset: settings.trainingPriorityPreset,
         trainingPriorityScores: settings.trainingPriorityScores,
         trainingPriorityCustomized: settings.trainingPriorityCustomized,
+        programMode: settings.programMode,
+        weeklyCategoryLayout: settings.weeklyCategoryLayout,
+        weeklyCategoryLayoutCustomized: settings.weeklyCategoryLayoutCustomized,
         roundDensity: settings.roundDensity,
         defaultWarmUp: settings.defaultWarmUp,
         defaultCoolDown: settings.defaultCoolDown,
@@ -300,15 +307,39 @@ export default function SettingsPage() {
         </CollapsibleSection>
       </AnimatedSection>
 
-      {/* Training priorities (signed-in weekly plans) */}
+      {/* Week builder (signed-in) */}
       {mode === "authenticated" && (
         <AnimatedSection delay={0.049}>
           <CollapsibleSection
-            title="Training priorities"
-            hint="How core, cardio, legs, and upper body appear when your week is generated. Updates today and upcoming days."
+            title="Your week"
+            hint="How your Sun–Sat plan is built. Updates today and upcoming days."
             defaultOpen={false}
             contentClassName="space-y-4 p-4"
           >
+          <ProgramModeSelector
+            value={settings.programMode}
+            onChange={(programMode: ProgramMode) =>
+              void settings.updateSettings({ programMode })
+            }
+          />
+
+          {settings.programMode === "custom" && (
+            <WeekModeOptionsPanel
+              title="Step 2 · Build on Weekly"
+              hint="Edit each day’s plan yourself. A dedicated custom-week flow is coming soon."
+            >
+              <p className="text-xs text-muted">
+                Open <strong className="text-foreground">Weekly</strong>, tap a day, then
+                customize rounds and exercises. Changes save to that day only.
+              </p>
+            </WeekModeOptionsPanel>
+          )}
+
+          {settings.programMode === "priorities" && (
+            <WeekModeOptionsPanel
+              title="Step 2 · Priority preset"
+              hint="The catalog still rotates push, pull, legs, and core across the week. Presets tilt how hard each group shows up on each day."
+            >
           <div className="space-y-2" role="radiogroup" aria-label="Training priority preset">
             {TRAINING_PRIORITY_OPTIONS.map((option) => {
               const selected =
@@ -365,6 +396,33 @@ export default function SettingsPage() {
               });
             }}
           />
+            </WeekModeOptionsPanel>
+          )}
+
+          {settings.programMode === "layout" && (
+            <WeekModeOptionsPanel
+              title="Step 2 · Groups per day"
+              hint="Turn groups on or off for each day. We pick exercises only from what’s enabled (all off = rest)."
+            >
+              <WeeklyCategoryLayoutEditor
+                layout={settings.weeklyCategoryLayout}
+                onChange={(weeklyCategoryLayout, weeklyCategoryLayoutCustomized) => {
+                  void settings.updateSettings({
+                    weeklyCategoryLayout,
+                    weeklyCategoryLayoutCustomized,
+                  });
+                }}
+              />
+            </WeekModeOptionsPanel>
+          )}
+
+          {settings.programMode !== "custom" && (
+          <>
+          <div className="border-t border-border pt-4">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted mb-3">
+              Generated week options
+            </p>
+          </div>
           <CollapsibleSection
             embedded
             title="Round density"
@@ -426,6 +484,8 @@ export default function SettingsPage() {
               Edit default stretches
             </button>
           </CollapsibleSection>
+          </>
+          )}
           </CollapsibleSection>
         </AnimatedSection>
       )}

@@ -20,12 +20,20 @@ import {
   trainingPriorityFingerprint,
   type TrainingPriorityScores,
 } from "@/lib/trainingPriorities";
+import {
+  resolveWeeklyCategoryLayout,
+  sanitizeProgramMode,
+  weeklyCategoryLayoutFingerprint,
+  type ProgramMode,
+  type WeeklyCategoryLayout,
+} from "@/lib/weeklyCategoryLayout";
 import type {
   DayPlan,
   ExerciseEquipment,
   RoundDensity,
   RoundExercise,
   TrainingPriorityPreset,
+  UserSettings,
 } from "@/types";
 
 export const TRAINING_WEEK_SOURCE_GENERATED_V1 = "generated_week_v1";
@@ -50,6 +58,9 @@ export function computePrefsFingerprint(
   defaultCoolDown: StretchEntry[] = [],
   trainingPriorityScores?: TrainingPriorityScores,
   trainingPriorityCustomized = false,
+  programMode: ProgramMode = "priorities",
+  weeklyCategoryLayout?: WeeklyCategoryLayout,
+  weeklyCategoryLayoutCustomized = false,
 ): string {
   const disliked = Object.entries(prefs)
     .filter(([, v]) => v === "disliked")
@@ -64,7 +75,45 @@ export function computePrefsFingerprint(
   const scores =
     trainingPriorityScores ??
     resolveTrainingPriorityScores({ trainingPriorityPreset });
-  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|${trainingPriorityFingerprint(trainingPriorityPreset, scores, trainingPriorityCustomized)}|rd:${roundDensity}|${stretches}`;
+  const mode = sanitizeProgramMode(programMode);
+  const layoutSeg =
+    mode === "layout"
+      ? weeklyCategoryLayoutFingerprint(
+          weeklyCategoryLayout ??
+            resolveWeeklyCategoryLayout({
+              weeklyCategoryLayout,
+              weeklyCategoryLayoutCustomized,
+            }),
+        )
+      : "wcl:default";
+  const prioritySeg =
+    mode === "priorities"
+      ? trainingPriorityFingerprint(
+          trainingPriorityPreset,
+          scores,
+          trainingPriorityCustomized,
+        )
+      : "tp:layout";
+  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pm:${mode}|${prioritySeg}|${layoutSeg}|rd:${roundDensity}|${stretches}`;
+}
+
+export function computePrefsFingerprintFromSettings(
+  prefs: ExercisePreferenceMap,
+  settings: UserSettings,
+): string {
+  return computePrefsFingerprint(
+    prefs,
+    settings.availableEquipment,
+    settings.trainingPriorityPreset,
+    settings.roundDensity,
+    settings.defaultWarmUp,
+    settings.defaultCoolDown,
+    resolveTrainingPriorityScores(settings),
+    settings.trainingPriorityCustomized ?? false,
+    settings.programMode ?? "priorities",
+    settings.weeklyCategoryLayout,
+    settings.weeklyCategoryLayoutCustomized ?? false,
+  );
 }
 
 export {

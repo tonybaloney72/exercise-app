@@ -16,6 +16,10 @@ import {
   sanitizeTrainingPriorityPreset,
   sanitizeTrainingPriorityScores,
 } from "@/lib/trainingPriorities";
+import {
+  sanitizeProgramMode,
+  sanitizeWeeklyCategoryLayout,
+} from "@/lib/weeklyCategoryLayout";
 import { DEFAULT_TIMER_SECONDS_FALLBACK } from "@/utils/effectiveExerciseSettings";
 import type {
   ExerciseSettingsMap,
@@ -88,6 +92,9 @@ interface SettingsRow {
   program_focus?: string;
   training_priority_customized?: boolean;
   training_priority_scores?: unknown;
+  program_mode?: string;
+  weekly_category_layout?: unknown;
+  weekly_category_layout_customized?: boolean;
   round_density?: string;
   default_warm_up?: unknown;
   default_cool_down?: unknown;
@@ -281,6 +288,12 @@ function rowToSettings(row: SettingsRow): UserSettings {
     trainingPriorityScores: sanitizeTrainingPriorityScores(
       row.training_priority_scores,
     ),
+    programMode: sanitizeProgramMode(row.program_mode),
+    weeklyCategoryLayout: sanitizeWeeklyCategoryLayout(
+      row.weekly_category_layout,
+    ),
+    weeklyCategoryLayoutCustomized:
+      row.weekly_category_layout_customized ?? false,
     roundDensity: sanitizeRoundDensity(row.round_density),
     defaultWarmUp: sanitizeStretchEntries(row.default_warm_up),
     defaultCoolDown: sanitizeStretchEntries(row.default_cool_down),
@@ -301,6 +314,9 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     program_focus: s.trainingPriorityPreset,
     training_priority_customized: s.trainingPriorityCustomized,
     training_priority_scores: s.trainingPriorityScores,
+    program_mode: s.programMode,
+    weekly_category_layout: s.weeklyCategoryLayout,
+    weekly_category_layout_customized: s.weeklyCategoryLayoutCustomized,
     round_density: s.roundDensity,
     default_warm_up: s.defaultWarmUp,
     default_cool_down: s.defaultCoolDown,

@@ -16,6 +16,7 @@ import type {
   RoundDensity,
   RoundExercise,
   TrainingPriorityPreset,
+  UserSettings,
 } from "@/types";
 import {
   categoryPriorityScore,
@@ -26,24 +27,55 @@ import {
   type TrainingPriorityScores,
   type TrainingPriorityWeights,
 } from "@/lib/trainingPriorities";
+import {
+  categoriesForDayLayout,
+  resolveWeeklyCategoryLayout,
+  type WeeklyCategoryLayout,
+} from "@/lib/weeklyCategoryLayout";
 
 export type ProgramProfileInput = {
   preset: TrainingPriorityPreset;
   scores: TrainingPriorityScores;
   customized: boolean;
+  /** Layout mode: per-day group allowlist, equal fill weights, no preset extras. */
+  layoutMode?: boolean;
+  weeklyCategoryLayout?: WeeklyCategoryLayout;
 };
 
 export function buildProgramProfileInput(
   preset: TrainingPriorityPreset,
   scores?: TrainingPriorityScores,
   customized = false,
+  options?: {
+    layoutMode?: boolean;
+    weeklyCategoryLayout?: WeeklyCategoryLayout;
+  },
 ): ProgramProfileInput {
   const resolved = scores ?? scoresFromPreset(preset);
   return {
     preset,
     scores: resolved,
     customized,
+    layoutMode: options?.layoutMode,
+    weeklyCategoryLayout: options?.weeklyCategoryLayout,
   };
+}
+
+export function buildProgramProfileInputFromSettings(
+  settings: UserSettings,
+): ProgramProfileInput {
+  if (settings.programMode === "layout") {
+    return buildProgramProfileInput("balanced", scoresFromPreset("balanced"), false, {
+      layoutMode: true,
+      weeklyCategoryLayout: resolveWeeklyCategoryLayout(settings),
+    });
+  }
+  const preset = settings.trainingPriorityPreset ?? "balanced";
+  return buildProgramProfileInput(
+    preset,
+    settings.trainingPriorityScores,
+    settings.trainingPriorityCustomized ?? false,
+  );
 }
 
 export const ROUND_DENSITY_TARGETS: Record<RoundDensity, number> = {
@@ -82,7 +114,7 @@ export const ROUND_DENSITY_LABELS: Record<RoundDensity, string> =
     ROUND_DENSITY_OPTIONS.map((o) => [o.value, o.label]),
   ) as Record<RoundDensity, string>;
 
-function dayCategoryPool(plan: DayPlan): ExerciseCategory[] {
+function catalogDayCategoryPool(plan: DayPlan): ExerciseCategory[] {
   const out: ExerciseCategory[] = [];
   for (const c of plan.strengthFocus) {
     if (!out.includes(c)) out.push(c);
@@ -95,11 +127,23 @@ function dayCategoryPool(plan: DayPlan): ExerciseCategory[] {
   return out;
 }
 
+function dayCategoryPool(
+  plan: DayPlan,
+  profile: ProgramProfileInput,
+): ExerciseCategory[] {
+  if (profile.layoutMode && profile.weeklyCategoryLayout) {
+    const groups = profile.weeklyCategoryLayout[plan.dayOfWeek] ?? [];
+    return categoriesForDayLayout(plan, groups);
+  }
+  return catalogDayCategoryPool(plan);
+}
+
 function expandedCategoryPool(
   plan: DayPlan,
   profile: ProgramProfileInput,
 ): ExerciseCategory[] {
-  const out = dayCategoryPool(plan);
+  const out = dayCategoryPool(plan, profile);
+  if (profile.layoutMode) return out;
   for (const c of extraCategoriesForProfile(
     profile.preset,
     profile.scores,
@@ -188,7 +232,10 @@ function roundCategoriesForProfile(
   target: number,
   weights: TrainingPriorityWeights,
 ): ExerciseCategory[] {
-  if (isBalancedProfile(profile.scores, profile.customized)) {
+  if (
+    !profile.layoutMode &&
+    isBalancedProfile(profile.scores, profile.customized)
+  ) {
     return balancedRoundBudget(plan, roundNumber, target);
   }
   return buildRoundCategoriesFromDayBudget(
@@ -242,8 +289,14 @@ function rebuildRound(
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
 ): RoundExercise[] {
-  const weights = weightsFromScores(profile.scores);
+  const weights = profile.layoutMode
+    ? weightsFromScores(scoresFromPreset("balanced"))
+    : weightsFromScores(profile.scores);
   const target = Math.max(2, Math.min(8, ROUND_DENSITY_TARGETS[density]));
+  const pool = expandedCategoryPool(plan, profile);
+  if (profile.layoutMode && pool.length === 0) {
+    return [];
+  }
   const categories = roundCategoriesForProfile(
     plan,
     roundNumber,
@@ -290,6 +343,13 @@ export function applyProgramProfileToDayPlan(
   const dislikedIds = collectDislikedIds(prefs);
   const favoriteIds = collectFavoriteIds(prefs);
   const usedInDay = new Set<string>();
+
+  if (
+    profile.layoutMode &&
+    expandedCategoryPool(plan, profile).length === 0
+  ) {
+    return { ...plan, rounds: [] };
+  }
 
   return {
     ...plan,

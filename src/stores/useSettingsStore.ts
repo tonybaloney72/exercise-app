@@ -1,7 +1,6 @@
 "use client";
 
 import { create } from "zustand";
-import type { UserSettings } from "@/types";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import { DEFAULT_SETTINGS, getSettingsRepo } from "@/lib/repos";
@@ -12,7 +11,8 @@ import {
 } from "@/lib/stretchDefaults";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
-import type { ExerciseEquipment } from "@/types";
+import { layoutEqual } from "@/lib/weeklyCategoryLayout";
+import type { ExerciseEquipment, UserSettings } from "@/types";
 
 interface SettingsState extends UserSettings {
   /** True after first `loadSettings` for the current auth mode. */
@@ -27,10 +27,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   updateSettings: async (partial) => {
     const current = get();
-    const updated = normalizeUserSettings({
-      ...current,
-      ...partial,
-    });
+    const settingsPartial = pickUserSettingsFields({ ...current, ...partial });
+    const updated = normalizeUserSettings(settingsPartial);
     const equipmentChanged =
       partial.availableEquipment != null &&
       !equipmentListsEqual(
@@ -38,6 +36,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         partial.availableEquipment,
       );
     const programProfileChanged =
+      (partial.programMode != null &&
+        partial.programMode !== current.programMode) ||
       (partial.trainingPriorityPreset != null &&
         partial.trainingPriorityPreset !== current.trainingPriorityPreset) ||
       (partial.programFocus != null &&
@@ -47,6 +47,14 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           JSON.stringify(current.trainingPriorityScores)) ||
       (partial.trainingPriorityCustomized != null &&
         partial.trainingPriorityCustomized !== current.trainingPriorityCustomized) ||
+      (partial.weeklyCategoryLayout != null &&
+        !layoutEqual(
+          partial.weeklyCategoryLayout,
+          current.weeklyCategoryLayout,
+        )) ||
+      (partial.weeklyCategoryLayoutCustomized != null &&
+        partial.weeklyCategoryLayoutCustomized !==
+          current.weeklyCategoryLayoutCustomized) ||
       (partial.roundDensity != null &&
         partial.roundDensity !== current.roundDensity);
     const stretchDefaultsChanged =
@@ -55,7 +63,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       (partial.defaultCoolDown != null &&
         !stretchListsEqual(current.defaultCoolDown, partial.defaultCoolDown));
 
-    set(updated);
+    set((s) => ({ ...s, ...updated }));
     try {
       await getSettingsRepo().save(updated);
     } catch (err) {
@@ -111,6 +119,30 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     }
   },
 }));
+
+function pickUserSettingsFields(
+  state: SettingsState & Partial<UserSettings>,
+): Partial<UserSettings> {
+  return {
+    restBetweenRounds: state.restBetweenRounds,
+    weekStartDate: state.weekStartDate,
+    darkMode: state.darkMode,
+    restTimerAutoStart: state.restTimerAutoStart,
+    timerSoundsEnabled: state.timerSoundsEnabled,
+    timerVibrationEnabled: state.timerVibrationEnabled,
+    keepScreenAwake: state.keepScreenAwake,
+    availableEquipment: state.availableEquipment,
+    trainingPriorityPreset: state.trainingPriorityPreset,
+    trainingPriorityScores: state.trainingPriorityScores,
+    trainingPriorityCustomized: state.trainingPriorityCustomized,
+    programMode: state.programMode,
+    weeklyCategoryLayout: state.weeklyCategoryLayout,
+    weeklyCategoryLayoutCustomized: state.weeklyCategoryLayoutCustomized,
+    roundDensity: state.roundDensity,
+    defaultWarmUp: state.defaultWarmUp,
+    defaultCoolDown: state.defaultCoolDown,
+  };
+}
 
 function equipmentListsEqual(
   a: ExerciseEquipment[],

@@ -1,14 +1,16 @@
 import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
-  computePrefsFingerprint,
+  computePrefsFingerprintFromSettings,
   isUserCustomizedWeekSource,
   materializeTrainingWeek,
   TRAINING_WEEK_SOURCE_CUSTOM_V1,
   TRAINING_WEEK_SOURCE_GENERATED_V1,
 } from "@/lib/planGenerator";
-import { buildProgramProfileInput } from "@/lib/programProfile";
-import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
+import {
+  buildProgramProfileInput,
+  buildProgramProfileInputFromSettings,
+} from "@/lib/programProfile";
 import { rebuildDerivedStretches, resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import { buildVarietySeed } from "@/lib/planVariety";
 import { refreshTrainingWeekContaining, resolveTrainingWeekForAuth } from "@/lib/planResolver";
@@ -142,16 +144,7 @@ export async function saveCustomDayPlan(
     getExercisePreferenceRepo("authenticated").loadAll(),
     getSettingsRepo("authenticated").load(),
   ]);
-  const fingerprint = computePrefsFingerprint(
-    prefs,
-    settings.availableEquipment,
-    settings.trainingPriorityPreset,
-    settings.roundDensity,
-    settings.defaultWarmUp,
-    settings.defaultCoolDown,
-    resolveTrainingPriorityScores(settings),
-    settings.trainingPriorityCustomized ?? false,
-  );
+  const fingerprint = computePrefsFingerprintFromSettings(prefs, settings);
 
   await getTrainingWeekRepo("authenticated").saveSeededWeek(weekKey, merged, {
     source: TRAINING_WEEK_SOURCE_CUSTOM_V1,
@@ -220,11 +213,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
   const trainingPriorityPreset = settings.trainingPriorityPreset ?? "balanced";
   const roundDensity = settings.roundDensity ?? "standard";
 
-  const profile = buildProgramProfileInput(
-    trainingPriorityPreset,
-    resolveTrainingPriorityScores(settings),
-    settings.trainingPriorityCustomized ?? false,
-  );
+  const profile = buildProgramProfileInputFromSettings(settings);
   const freshDay = buildGeneratedDayPlan(
     dow,
     prefs,
@@ -242,16 +231,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
     [dow]: freshDay,
   };
 
-  const fingerprint = computePrefsFingerprint(
-    prefs,
-    availableEquipment,
-    trainingPriorityPreset,
-    roundDensity,
-    settings.defaultWarmUp,
-    settings.defaultCoolDown,
-    resolveTrainingPriorityScores(settings),
-    settings.trainingPriorityCustomized ?? false,
-  );
+  const fingerprint = computePrefsFingerprintFromSettings(prefs, settings);
 
   const row = await getTrainingWeekRepo("authenticated").loadWeek(weekKey);
   const source = isUserCustomizedWeekSource(row?.source)

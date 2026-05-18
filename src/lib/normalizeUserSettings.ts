@@ -6,6 +6,12 @@ import {
   scoresFromPreset,
   totalEmphasisScore,
 } from "@/lib/trainingPriorities";
+import {
+  layoutEqual,
+  sanitizeProgramMode,
+  sanitizeWeeklyCategoryLayout,
+  suggestLayoutFromCatalog,
+} from "@/lib/weeklyCategoryLayout";
 import type { UserSettings } from "@/types";
 
 /** Merge partial settings and migrate legacy `programFocus` → `trainingPriorityPreset`. */
@@ -39,11 +45,26 @@ export function normalizeUserSettings(
     scores = scoresFromPreset("balanced");
   }
 
+  const programMode = sanitizeProgramMode(partial.programMode);
+  const catalogLayout = suggestLayoutFromCatalog();
+  const weeklyCategoryLayout = sanitizeWeeklyCategoryLayout(
+    partial.weeklyCategoryLayout,
+    catalogLayout,
+  );
+  const layoutCustomizedExplicit = partial.weeklyCategoryLayoutCustomized;
+  const weeklyCategoryLayoutCustomized =
+    layoutCustomizedExplicit ??
+    (partial.weeklyCategoryLayout != null &&
+      !layoutEqual(weeklyCategoryLayout, catalogLayout));
+
   return {
     ...DEFAULT_SETTINGS,
     ...rest,
     trainingPriorityPreset: preset,
     trainingPriorityScores: scores,
     trainingPriorityCustomized: customized,
+    programMode,
+    weeklyCategoryLayout,
+    weeklyCategoryLayoutCustomized,
   };
 }

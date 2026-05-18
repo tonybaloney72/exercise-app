@@ -103,7 +103,7 @@ export const TRAINING_PRIORITY_OPTIONS: TrainingPriorityOption[] = [
   },
 ];
 
-const GROUP_TO_CATEGORIES: Record<EmphasisGroup, ExerciseCategory[]> = {
+export const GROUP_TO_CATEGORIES: Record<EmphasisGroup, ExerciseCategory[]> = {
   core: ["CF", "CL", "CR", "CS"],
   cardio: ["PC"],
   lower: ["LB"],

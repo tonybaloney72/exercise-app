@@ -22,7 +22,7 @@ export function useTrainingWeekPlans(weekDates: Date[]): {
   const equipmentKey = useSettingsStore((s) => s.availableEquipment.join(","));
   const programProfileKey = useSettingsStore(
     (s) =>
-      `${s.trainingPriorityPreset}:${s.trainingPriorityCustomized}:${JSON.stringify(s.trainingPriorityScores)}:${s.roundDensity}`,
+      `${s.programMode}:${s.trainingPriorityPreset}:${s.trainingPriorityCustomized}:${JSON.stringify(s.trainingPriorityScores)}:${JSON.stringify(s.weeklyCategoryLayout)}:${s.weeklyCategoryLayoutCustomized}:${s.roundDensity}`,
   );
 
   const anchorKey = useMemo(

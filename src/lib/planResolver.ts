@@ -2,7 +2,7 @@ import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   collectDislikedIds,
-  computePrefsFingerprint,
+  computePrefsFingerprintFromSettings,
   isUserCustomizedWeekSource,
   materializeTrainingWeek,
   TRAINING_WEEK_SOURCE_GENERATED_V1,
@@ -32,7 +32,11 @@ import type {
   RoundDensity,
   UserSettings,
 } from "@/types";
-import { buildProgramProfileInput } from "@/lib/programProfile";
+import {
+  buildProgramProfileInput,
+  buildProgramProfileInputFromSettings,
+  type ProgramProfileInput,
+} from "@/lib/programProfile";
 import { buildVarietySeed, varietySeedForCurrentWeek } from "@/lib/planVariety";
 import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
 import {
@@ -84,27 +88,12 @@ async function loadGeneratorInputs(mode: AuthMode): Promise<{
     availableEquipment,
     trainingPriorityPreset,
     roundDensity,
-    fingerprint: computePrefsFingerprint(
-      prefs,
-      availableEquipment,
-      trainingPriorityPreset,
-      roundDensity,
-      settings.defaultWarmUp,
-      settings.defaultCoolDown,
-      resolveTrainingPriorityScores(settings),
-      settings.trainingPriorityCustomized ?? false,
-    ),
+    fingerprint: computePrefsFingerprintFromSettings(prefs, settings),
   };
 }
 
 function programProfileFromSettings(settings: UserSettings) {
-  const preset = settings.trainingPriorityPreset ?? "balanced";
-  const scores = resolveTrainingPriorityScores(settings);
-  return buildProgramProfileInput(
-    preset,
-    scores,
-    settings.trainingPriorityCustomized ?? false,
-  );
+  return buildProgramProfileInputFromSettings(settings);
 }
 
 function materializeWeekFromCatalog(
@@ -114,7 +103,7 @@ function materializeWeekFromCatalog(
   roundDensity: RoundDensity,
   exerciseSettings: ExerciseSettingsMap,
   varietySeed: string,
-  profile: ReturnType<typeof buildProgramProfileInput>,
+  profile: ProgramProfileInput,
 ): TrainingWeekDays {
   return materializeTrainingWeek(
     buildCatalogWeek(),

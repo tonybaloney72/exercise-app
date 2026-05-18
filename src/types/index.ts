@@ -157,6 +157,10 @@ export interface WorkoutLog {
 }
 
 import type { TrainingPriorityScores } from "@/lib/trainingPriorities";
+import type {
+  ProgramMode,
+  WeeklyCategoryLayout,
+} from "@/lib/weeklyCategoryLayout";
 
 /** Training priority preset (replaces legacy “program focus” naming in UI). */
 export type TrainingPriorityPreset =
@@ -201,6 +205,12 @@ export interface UserSettings {
   trainingPriorityScores: TrainingPriorityScores;
   /** True when scores differ from the selected preset template. */
   trainingPriorityCustomized: boolean;
+  /** How automated weeks are built: priorities, per-day layout, or manual. */
+  programMode: ProgramMode;
+  /** Per-day enabled groups (layout mode). */
+  weeklyCategoryLayout: WeeklyCategoryLayout;
+  /** When false, layout is derived from catalog until user edits. */
+  weeklyCategoryLayoutCustomized: boolean;
   /** @deprecated Use {@link UserSettings.trainingPriorityPreset}. */
   programFocus?: TrainingPriorityPreset;
   roundDensity: RoundDensity;
