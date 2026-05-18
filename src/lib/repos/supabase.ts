@@ -12,6 +12,10 @@ import type {
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeStretchEntries } from "@/lib/stretchDefaults";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
+import {
+  sanitizeTrainingPriorityPreset,
+  sanitizeTrainingPriorityScores,
+} from "@/lib/trainingPriorities";
 import { DEFAULT_TIMER_SECONDS_FALLBACK } from "@/utils/effectiveExerciseSettings";
 import type {
   ExerciseSettingsMap,
@@ -82,6 +86,8 @@ interface SettingsRow {
   rest_timer_auto_start?: boolean;
   available_equipment?: unknown;
   program_focus?: string;
+  training_priority_customized?: boolean;
+  training_priority_scores?: unknown;
   round_density?: string;
   default_warm_up?: unknown;
   default_cool_down?: unknown;
@@ -270,10 +276,14 @@ function rowToSettings(row: SettingsRow): UserSettings {
     timerVibrationEnabled: row.timer_vibration_enabled ?? true,
     keepScreenAwake: row.keep_screen_awake ?? false,
     availableEquipment: sanitizeAvailableEquipment(row.available_equipment),
-    trainingPriorityPreset: row.program_focus,
-    roundDensity: row.round_density,
-    defaultWarmUp: row.default_warm_up,
-    defaultCoolDown: row.default_cool_down,
+    trainingPriorityPreset: sanitizeTrainingPriorityPreset(row.program_focus),
+    trainingPriorityCustomized: row.training_priority_customized ?? false,
+    trainingPriorityScores: sanitizeTrainingPriorityScores(
+      row.training_priority_scores,
+    ),
+    roundDensity: sanitizeRoundDensity(row.round_density),
+    defaultWarmUp: sanitizeStretchEntries(row.default_warm_up),
+    defaultCoolDown: sanitizeStretchEntries(row.default_cool_down),
   });
 }
 
@@ -289,6 +299,8 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     keep_screen_awake: s.keepScreenAwake,
     available_equipment: s.availableEquipment,
     program_focus: s.trainingPriorityPreset,
+    training_priority_customized: s.trainingPriorityCustomized,
+    training_priority_scores: s.trainingPriorityScores,
     round_density: s.roundDensity,
     default_warm_up: s.defaultWarmUp,
     default_cool_down: s.defaultCoolDown,
