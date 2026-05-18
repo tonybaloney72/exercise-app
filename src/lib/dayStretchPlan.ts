@@ -85,6 +85,8 @@ function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[]
   const recovery = isLightRecoveryDay(plan);
   const cats = categoriesInPlan(plan);
   const preset = ctx.trainingPriorityPreset;
+  const { trainingPriorityScores: scores, trainingPriorityCustomized: customized } =
+    ctx;
   const daySeed = `d${plan.dayOfWeek}-tp:${preset}`;
   const warmParts: StretchEntry[] = [...ctx.defaultWarmUp];
 
@@ -97,8 +99,9 @@ function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[]
   ];
 
   for (const id of poolIds) {
-    if (!shouldIncludeStretchPool(id, plan, cats, preset)) continue;
-    let quota = stretchWarmUpQuota(id, preset);
+    if (!shouldIncludeStretchPool(id, plan, cats, preset, scores, customized))
+      continue;
+    let quota = stretchWarmUpQuota(id, preset, scores, customized);
     if (recovery) quota = Math.max(1, Math.ceil(quota * 0.6));
     if (quota <= 0) continue;
     appendPickedPool(
@@ -117,6 +120,8 @@ function deriveCoolDown(plan: DayPlan, ctx: StretchResolveContext): StretchEntry
   const recovery = isLightRecoveryDay(plan);
   const cats = categoriesInPlan(plan);
   const preset = ctx.trainingPriorityPreset;
+  const { trainingPriorityScores: scores, trainingPriorityCustomized: customized } =
+    ctx;
   const daySeed = `d${plan.dayOfWeek}-tp:${preset}`;
   const coolParts: StretchEntry[] = [...ctx.defaultCoolDown];
 
@@ -128,8 +133,9 @@ function deriveCoolDown(plan: DayPlan, ctx: StretchResolveContext): StretchEntry
   ];
 
   for (const id of poolIds) {
-    if (!shouldIncludeStretchPool(id, plan, cats, preset)) continue;
-    let quota = stretchCoolDownQuota(id, preset);
+    if (!shouldIncludeStretchPool(id, plan, cats, preset, scores, customized))
+      continue;
+    let quota = stretchCoolDownQuota(id, preset, scores, customized);
     if (recovery) quota = Math.max(1, Math.ceil(quota * 0.6));
     if (quota <= 0) continue;
     appendPickedPool(

@@ -156,6 +156,8 @@ export interface WorkoutLog {
   endTime?: string;
 }
 
+import type { TrainingPriorityScores } from "@/lib/trainingPriorities";
+
 /** Training priority preset (replaces legacy “program focus” naming in UI). */
 export type TrainingPriorityPreset =
   | "balanced"
@@ -195,6 +197,10 @@ export interface UserSettings {
    */
   availableEquipment: ExerciseEquipment[];
   trainingPriorityPreset: TrainingPriorityPreset;
+  /** Per-group emphasis 0–4 (Skip … Peak). Drives week generation. */
+  trainingPriorityScores: TrainingPriorityScores;
+  /** True when scores differ from the selected preset template. */
+  trainingPriorityCustomized: boolean;
   /** @deprecated Use {@link UserSettings.trainingPriorityPreset}. */
   programFocus?: TrainingPriorityPreset;
   roundDensity: RoundDensity;

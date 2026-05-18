@@ -4,7 +4,6 @@ import {
   shouldIncludeStretchPool,
   stretchWarmUpQuota,
 } from "@/lib/trainingPriorityStretches";
-import { weightsForPreset } from "@/lib/trainingPriorities";
 import type { ExerciseCategory } from "@/types";
 
 function catsFromPlan(...categories: ExerciseCategory[]) {
@@ -14,14 +13,14 @@ function catsFromPlan(...categories: ExerciseCategory[]) {
 describe("trainingPriorityStretches", () => {
   it("upper_body omits lower pool on upper-only days", () => {
     const monday = buildCatalogWeek()[1]!;
-    const weights = weightsForPreset("upper_body");
     expect(
       shouldIncludeStretchPool(
         "lower",
         monday,
         catsFromPlan("UP", "CF"),
         "upper_body",
-        weights,
+        undefined,
+        false,
       ),
     ).toBe(false);
   });

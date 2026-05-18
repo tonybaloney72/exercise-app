@@ -6,6 +6,7 @@ import type {
   DayPlan,
 } from "@/types";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+import { scoresFromPreset } from "@/lib/trainingPriorities";
 import {
   GUEST_FALLBACK_COOL_DOWN,
   GUEST_FALLBACK_WARM_UP,
@@ -73,6 +74,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   keepScreenAwake: false,
   availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
   trainingPriorityPreset: "balanced",
+  trainingPriorityScores: scoresFromPreset("balanced"),
+  trainingPriorityCustomized: false,
   roundDensity: "standard",
   /** Signed-in users configure their own; guests get catalog fallbacks at resolve time. */
   defaultWarmUp: [],

@@ -10,7 +10,11 @@ import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
 import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import { ROUND_DENSITY_OPTIONS } from "@/lib/programProfile";
-import { TRAINING_PRIORITY_OPTIONS } from "@/lib/trainingPriorities";
+import TrainingPriorityCustomize from "@/components/settings/TrainingPriorityCustomize";
+import {
+  scoresFromPreset,
+  TRAINING_PRIORITY_OPTIONS,
+} from "@/lib/trainingPriorities";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
@@ -59,6 +63,8 @@ export default function SettingsPage() {
         keepScreenAwake: settings.keepScreenAwake,
         availableEquipment: settings.availableEquipment,
         trainingPriorityPreset: settings.trainingPriorityPreset,
+        trainingPriorityScores: settings.trainingPriorityScores,
+        trainingPriorityCustomized: settings.trainingPriorityCustomized,
         roundDensity: settings.roundDensity,
         defaultWarmUp: settings.defaultWarmUp,
         defaultCoolDown: settings.defaultCoolDown,
@@ -297,7 +303,9 @@ export default function SettingsPage() {
           </div>
           <div className="space-y-2" role="radiogroup" aria-label="Training priority preset">
             {TRAINING_PRIORITY_OPTIONS.map((option) => {
-              const selected = settings.trainingPriorityPreset === option.value;
+              const selected =
+                !settings.trainingPriorityCustomized &&
+                settings.trainingPriorityPreset === option.value;
               return (
                 <button
                   key={option.value}
@@ -307,6 +315,8 @@ export default function SettingsPage() {
                   onClick={() =>
                     void settings.updateSettings({
                       trainingPriorityPreset: option.value,
+                      trainingPriorityScores: scoresFromPreset(option.value),
+                      trainingPriorityCustomized: false,
                     })
                   }
                   className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
@@ -329,6 +339,24 @@ export default function SettingsPage() {
               );
             })}
           </div>
+          <TrainingPriorityCustomize
+            scores={settings.trainingPriorityScores}
+            customized={settings.trainingPriorityCustomized}
+            activePreset={settings.trainingPriorityPreset}
+            onPresetSelect={(preset) => {
+              void settings.updateSettings({
+                trainingPriorityPreset: preset,
+                trainingPriorityScores: scoresFromPreset(preset),
+                trainingPriorityCustomized: false,
+              });
+            }}
+            onScoresChange={(trainingPriorityScores, trainingPriorityCustomized) => {
+              void settings.updateSettings({
+                trainingPriorityScores,
+                trainingPriorityCustomized,
+              });
+            }}
+          />
           <div>
             <h3 className="text-xs font-semibold text-foreground">Round density</h3>
             <p className="text-xs text-muted mt-0.5 mb-2">

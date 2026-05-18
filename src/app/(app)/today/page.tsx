@@ -50,6 +50,12 @@ function TodayPageInner() {
   const trainingPriorityPreset = useSettingsStore(
     (s) => s.trainingPriorityPreset,
   );
+  const trainingPriorityScores = useSettingsStore(
+    (s) => s.trainingPriorityScores,
+  );
+  const trainingPriorityCustomized = useSettingsStore(
+    (s) => s.trainingPriorityCustomized,
+  );
   const todayKey = formatLocalDateKey();
   const { plan, loading: planLoading, error: planError } = useDayPlan(todayKey);
   const [customizing, setCustomizing] = useState(false);
@@ -194,6 +200,8 @@ function TodayPageInner() {
         <p className="text-sm text-muted">
           {planDaySubtitle(plan, trainingPriorityPreset, {
             preferMaterialized: isCustomWeek,
+            customized: trainingPriorityCustomized,
+            scores: trainingPriorityScores,
           })}
         </p>
       </motion.div>

@@ -1,5 +1,8 @@
 import { CATEGORIES } from "@/data/categories";
-import { isBalancedPreset } from "@/lib/trainingPriorities";
+import {
+  isBalancedScores,
+  resolveTrainingPriorityScores,
+} from "@/lib/trainingPriorities";
 import type { DayPlan, ExerciseCategory, TrainingPriorityPreset } from "@/types";
 
 const DISPLAY_ORDER: ExerciseCategory[] = [
@@ -45,10 +48,18 @@ function materializedSubtitle(plan: DayPlan): string {
 export function planDaySubtitle(
   plan: DayPlan,
   preset: TrainingPriorityPreset = "balanced",
-  options?: PlanDaySubtitleOptions,
+  options?: PlanDaySubtitleOptions & {
+    customized?: boolean;
+    scores?: ReturnType<typeof resolveTrainingPriorityScores>;
+  },
 ): string {
+  const scores =
+    options?.scores ??
+    resolveTrainingPriorityScores({ trainingPriorityPreset: preset });
   const useMaterialized =
-    options?.preferMaterialized === true || !isBalancedPreset(preset);
+    options?.preferMaterialized === true ||
+    options?.customized === true ||
+    !isBalancedScores(scores);
   if (!useMaterialized) return plan.theme;
   return materializedSubtitle(plan);
 }

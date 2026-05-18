@@ -88,6 +88,12 @@ export default function WeeklyPage() {
   const trainingPriorityPreset = useSettingsStore(
     (s) => s.trainingPriorityPreset,
   );
+  const trainingPriorityScores = useSettingsStore(
+    (s) => s.trainingPriorityScores,
+  );
+  const trainingPriorityCustomized = useSettingsStore(
+    (s) => s.trainingPriorityCustomized,
+  );
   const { weekByDow, loading: weekLoading, error: weekError } =
     useTrainingWeekPlans(weekDates);
 
@@ -221,6 +227,8 @@ export default function WeeklyPage() {
                       <p className="mt-0.5 text-xs text-muted">
                         {planDaySubtitle(plan, trainingPriorityPreset, {
                           preferMaterialized: isCustomWeek,
+                          customized: trainingPriorityCustomized,
+                          scores: trainingPriorityScores,
                         })}
                       </p>
                     </div>

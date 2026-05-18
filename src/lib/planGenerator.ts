@@ -11,7 +11,15 @@ import type { ExercisePreferenceMap, ExerciseSettingsMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { exerciseMap } from "@/data/exercises";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
-import { trainingPriorityFingerprint } from "@/lib/trainingPriorities";
+import {
+  buildProgramProfileInput,
+  type ProgramProfileInput,
+} from "@/lib/programProfile";
+import {
+  resolveTrainingPriorityScores,
+  trainingPriorityFingerprint,
+  type TrainingPriorityScores,
+} from "@/lib/trainingPriorities";
 import type {
   DayPlan,
   ExerciseEquipment,
@@ -40,6 +48,8 @@ export function computePrefsFingerprint(
   roundDensity: RoundDensity = "standard",
   defaultWarmUp: StretchEntry[] = [],
   defaultCoolDown: StretchEntry[] = [],
+  trainingPriorityScores?: TrainingPriorityScores,
+  trainingPriorityCustomized = false,
 ): string {
   const disliked = Object.entries(prefs)
     .filter(([, v]) => v === "disliked")
@@ -51,7 +61,10 @@ export function computePrefsFingerprint(
     .sort();
   const equip = [...availableEquipment].sort();
   const stretches = stretchDefaultsFingerprint(defaultWarmUp, defaultCoolDown);
-  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|${trainingPriorityFingerprint(trainingPriorityPreset)}|rd:${roundDensity}|${stretches}`;
+  const scores =
+    trainingPriorityScores ??
+    resolveTrainingPriorityScores({ trainingPriorityPreset });
+  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|${trainingPriorityFingerprint(trainingPriorityPreset, scores, trainingPriorityCustomized)}|rd:${roundDensity}|${stretches}`;
 }
 
 export {
@@ -173,7 +186,11 @@ export function materializeTrainingWeek(
   roundDensity: RoundDensity,
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
+  profileInput?: ProgramProfileInput,
 ): TrainingWeekDays {
+  const profile =
+    profileInput ??
+    buildProgramProfileInput(trainingPriorityPreset);
   const profiled = applyProgramProfileToWeek(
     catalogWeek,
     trainingPriorityPreset,
@@ -182,6 +199,7 @@ export function materializeTrainingWeek(
     prefs,
     exerciseSettings,
     varietySeed,
+    profile,
   );
   return applyDislikesToWeek(
     profiled,

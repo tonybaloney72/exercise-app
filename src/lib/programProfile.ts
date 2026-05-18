@@ -19,11 +19,32 @@ import type {
 } from "@/types";
 import {
   categoryPriorityScore,
-  extraCategoriesForPreset,
-  isBalancedPreset,
-  weightsForPreset,
+  extraCategoriesForProfile,
+  isBalancedProfile,
+  scoresFromPreset,
+  weightsFromScores,
+  type TrainingPriorityScores,
   type TrainingPriorityWeights,
 } from "@/lib/trainingPriorities";
+
+export type ProgramProfileInput = {
+  preset: TrainingPriorityPreset;
+  scores: TrainingPriorityScores;
+  customized: boolean;
+};
+
+export function buildProgramProfileInput(
+  preset: TrainingPriorityPreset,
+  scores?: TrainingPriorityScores,
+  customized = false,
+): ProgramProfileInput {
+  const resolved = scores ?? scoresFromPreset(preset);
+  return {
+    preset,
+    scores: resolved,
+    customized,
+  };
+}
 
 export const ROUND_DENSITY_TARGETS: Record<RoundDensity, number> = {
   compact: 3,
@@ -76,10 +97,14 @@ function dayCategoryPool(plan: DayPlan): ExerciseCategory[] {
 
 function expandedCategoryPool(
   plan: DayPlan,
-  preset: TrainingPriorityPreset,
+  profile: ProgramProfileInput,
 ): ExerciseCategory[] {
   const out = dayCategoryPool(plan);
-  for (const c of extraCategoriesForPreset(preset)) {
+  for (const c of extraCategoriesForProfile(
+    profile.preset,
+    profile.scores,
+    profile.customized,
+  )) {
     if (!out.includes(c)) out.push(c);
   }
   return out;
@@ -88,11 +113,14 @@ function expandedCategoryPool(
 function pickCategoryToAdd(
   current: RoundExercise[],
   plan: DayPlan,
-  preset: TrainingPriorityPreset,
+  profile: ProgramProfileInput,
   weights: TrainingPriorityWeights,
   roundNumber: number,
 ): ExerciseCategory | null {
-  const pool = expandedCategoryPool(plan, preset);
+  const pool = expandedCategoryPool(plan, profile).filter(
+    (cat) => categoryPriorityScore(cat, weights) > 0,
+  );
+  if (pool.length === 0) return null;
   const roundOffset = (roundNumber - 1) % Math.max(1, pool.length);
   const rotated = [...pool.slice(roundOffset), ...pool.slice(0, roundOffset)];
   const counts = new Map<ExerciseCategory, number>();
@@ -153,20 +181,20 @@ function stubSlots(categories: ExerciseCategory[]): RoundExercise[] {
   }));
 }
 
-function roundCategoriesForPreset(
+function roundCategoriesForProfile(
   plan: DayPlan,
   roundNumber: number,
-  preset: TrainingPriorityPreset,
+  profile: ProgramProfileInput,
   target: number,
   weights: TrainingPriorityWeights,
 ): ExerciseCategory[] {
-  if (isBalancedPreset(preset)) {
+  if (isBalancedProfile(profile.scores, profile.customized)) {
     return balancedRoundBudget(plan, roundNumber, target);
   }
   return buildRoundCategoriesFromDayBudget(
     plan,
     roundNumber,
-    preset,
+    profile,
     weights,
     target,
   );
@@ -176,7 +204,7 @@ function roundCategoriesForPreset(
 function buildRoundCategoriesFromDayBudget(
   plan: DayPlan,
   roundNumber: number,
-  preset: TrainingPriorityPreset,
+  profile: ProgramProfileInput,
   weights: TrainingPriorityWeights,
   target: number,
 ): ExerciseCategory[] {
@@ -189,7 +217,7 @@ function buildRoundCategoriesFromDayBudget(
     const category = pickCategoryToAdd(
       stubs,
       plan,
-      preset,
+      profile,
       weights,
       roundNumber,
     );
@@ -205,7 +233,7 @@ function buildRoundCategoriesFromDayBudget(
 function rebuildRound(
   roundNumber: number,
   plan: DayPlan,
-  preset: TrainingPriorityPreset,
+  profile: ProgramProfileInput,
   density: RoundDensity,
   availableEquipment: ExerciseEquipment[],
   dislikedIds: ReadonlySet<string>,
@@ -214,12 +242,12 @@ function rebuildRound(
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
 ): RoundExercise[] {
-  const weights = weightsForPreset(preset);
+  const weights = weightsFromScores(profile.scores);
   const target = Math.max(2, Math.min(8, ROUND_DENSITY_TARGETS[density]));
-  const categories = roundCategoriesForPreset(
+  const categories = roundCategoriesForProfile(
     plan,
     roundNumber,
-    preset,
+    profile,
     target,
     weights,
   );
@@ -235,7 +263,7 @@ function rebuildRound(
       availableEquipment,
       dislikedIds,
       favoriteIds,
-      `d${plan.dayOfWeek}-r${roundNumber}-i${i}-tp:${preset}-v:${variety}-u:${usedInDay.size}`,
+      `d${plan.dayOfWeek}-r${roundNumber}-i${i}-tp:${profile.preset}-v:${variety}-u:${usedInDay.size}`,
       exerciseSettings,
     );
     if (!filled) continue;
@@ -256,7 +284,9 @@ export function applyProgramProfileToDayPlan(
   prefs: ExercisePreferenceMap,
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
+  profileInput?: ProgramProfileInput,
 ): DayPlan {
+  const profile = profileInput ?? buildProgramProfileInput(preset);
   const dislikedIds = collectDislikedIds(prefs);
   const favoriteIds = collectFavoriteIds(prefs);
   const usedInDay = new Set<string>();
@@ -268,7 +298,7 @@ export function applyProgramProfileToDayPlan(
       exercises: rebuildRound(
         round.roundNumber,
         plan,
-        preset,
+        profile,
         density,
         availableEquipment,
         dislikedIds,
@@ -289,7 +319,9 @@ export function applyProgramProfileToWeek(
   prefs: ExercisePreferenceMap,
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
+  profileInput?: ProgramProfileInput,
 ): TrainingWeekDays {
+  const profile = profileInput ?? buildProgramProfileInput(preset);
   const out: TrainingWeekDays = {};
   for (let i = 0; i < 7; i++) {
     const day = week[i];
@@ -302,6 +334,7 @@ export function applyProgramProfileToWeek(
       prefs,
       exerciseSettings,
       varietySeed,
+      profile,
     );
   }
   return out;

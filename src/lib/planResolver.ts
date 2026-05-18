@@ -32,7 +32,9 @@ import type {
   RoundDensity,
   UserSettings,
 } from "@/types";
+import { buildProgramProfileInput } from "@/lib/programProfile";
 import { buildVarietySeed, varietySeedForCurrentWeek } from "@/lib/planVariety";
+import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
 import {
   parseLocalDateKey,
   weekAnchorFromDateKey,
@@ -89,8 +91,20 @@ async function loadGeneratorInputs(mode: AuthMode): Promise<{
       roundDensity,
       settings.defaultWarmUp,
       settings.defaultCoolDown,
+      resolveTrainingPriorityScores(settings),
+      settings.trainingPriorityCustomized ?? false,
     ),
   };
+}
+
+function programProfileFromSettings(settings: UserSettings) {
+  const preset = settings.trainingPriorityPreset ?? "balanced";
+  const scores = resolveTrainingPriorityScores(settings);
+  return buildProgramProfileInput(
+    preset,
+    scores,
+    settings.trainingPriorityCustomized ?? false,
+  );
 }
 
 function materializeWeekFromCatalog(
@@ -100,6 +114,7 @@ function materializeWeekFromCatalog(
   roundDensity: RoundDensity,
   exerciseSettings: ExerciseSettingsMap,
   varietySeed: string,
+  profile: ReturnType<typeof buildProgramProfileInput>,
 ): TrainingWeekDays {
   return materializeTrainingWeek(
     buildCatalogWeek(),
@@ -109,6 +124,7 @@ function materializeWeekFromCatalog(
     roundDensity,
     exerciseSettings,
     varietySeed,
+    profile,
   );
 }
 
@@ -138,6 +154,7 @@ async function refreshPersistedWeek(
 ): Promise<TrainingWeekDays> {
   const {
     prefs,
+    settings,
     availableEquipment,
     trainingPriorityPreset,
     roundDensity,
@@ -145,6 +162,7 @@ async function refreshPersistedWeek(
     fingerprint,
   } = await loadGeneratorInputs("authenticated");
 
+  const profile = programProfileFromSettings(settings);
   const materialized = materializeWeekFromCatalog(
     prefs,
     availableEquipment,
@@ -152,6 +170,7 @@ async function refreshPersistedWeek(
     roundDensity,
     exerciseSettings,
     buildVarietySeed(weekKey, "authenticated"),
+    profile,
   );
 
   const repo = getTrainingWeekRepo("authenticated");
@@ -195,8 +214,14 @@ async function refreshPersistedWeek(
 
 /** In-memory materialized week (guest / anonymous) from catalog + local settings. */
 async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays> {
-  const { prefs, availableEquipment, trainingPriorityPreset, roundDensity, exerciseSettings } =
-    await loadGeneratorInputs(mode);
+  const {
+    prefs,
+    settings,
+    availableEquipment,
+    trainingPriorityPreset,
+    roundDensity,
+    exerciseSettings,
+  } = await loadGeneratorInputs(mode);
   const scope = mode === "authenticated" ? "authenticated" : "guest";
   return materializeWeekFromCatalog(
     prefs,
@@ -205,6 +230,7 @@ async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays
     roundDensity,
     exerciseSettings,
     varietySeedForCurrentWeek(scope),
+    programProfileFromSettings(settings),
   );
 }
 

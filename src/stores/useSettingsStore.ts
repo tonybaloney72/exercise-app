@@ -42,6 +42,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         partial.trainingPriorityPreset !== current.trainingPriorityPreset) ||
       (partial.programFocus != null &&
         partial.programFocus !== current.trainingPriorityPreset) ||
+      (partial.trainingPriorityScores != null &&
+        JSON.stringify(partial.trainingPriorityScores) !==
+          JSON.stringify(current.trainingPriorityScores)) ||
+      (partial.trainingPriorityCustomized != null &&
+        partial.trainingPriorityCustomized !== current.trainingPriorityCustomized) ||
       (partial.roundDensity != null &&
         partial.roundDensity !== current.roundDensity);
     const stretchDefaultsChanged =

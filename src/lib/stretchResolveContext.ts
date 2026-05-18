@@ -1,4 +1,8 @@
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
+import {
+  resolveTrainingPriorityScores,
+  scoresFromPreset,
+} from "@/lib/trainingPriorities";
 import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import {
@@ -9,6 +13,7 @@ import { useAuthStore, type AuthMode } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { getWeekDateKeys } from "@/utils/weekCalendar";
+import type { TrainingPriorityScores } from "@/lib/trainingPriorities";
 import type { DayPlan, StretchEntry, TrainingPriorityPreset } from "@/types";
 
 export type StretchResolveContext = {
@@ -16,6 +21,8 @@ export type StretchResolveContext = {
   defaultCoolDown: StretchEntry[];
   dislikedExerciseIds: ReadonlySet<string>;
   trainingPriorityPreset: TrainingPriorityPreset;
+  trainingPriorityScores: TrainingPriorityScores;
+  trainingPriorityCustomized: boolean;
   /** Sunday date key for the active week — rotates catalog picks across weeks. */
   weekRotationKey: string;
 };
@@ -26,6 +33,8 @@ export function buildStretchResolveContextFromInputs(inputs: {
   authMode: AuthMode;
   exercisePreferences: ExercisePreferenceMap;
   trainingPriorityPreset?: TrainingPriorityPreset;
+  trainingPriorityScores?: TrainingPriorityScores;
+  trainingPriorityCustomized?: boolean;
   weekRotationKey?: string;
 }): StretchResolveContext {
   const dislikedExerciseIds = collectDislikedIds(inputs.exercisePreferences);
@@ -44,6 +53,10 @@ export function buildStretchResolveContextFromInputs(inputs: {
     dislikedExerciseIds,
     trainingPriorityPreset:
       inputs.trainingPriorityPreset ?? "balanced",
+    trainingPriorityScores:
+      inputs.trainingPriorityScores ??
+      scoresFromPreset(inputs.trainingPriorityPreset ?? "balanced"),
+    trainingPriorityCustomized: inputs.trainingPriorityCustomized ?? false,
     weekRotationKey: inputs.weekRotationKey ?? getWeekDateKeys()[0]!,
   };
 }
@@ -56,6 +69,9 @@ export function buildStretchResolveContext(): StretchResolveContext {
     authMode: useAuthStore.getState().mode,
     exercisePreferences: useExercisePreferencesStore.getState().byExerciseId,
     trainingPriorityPreset: useSettingsStore.getState().trainingPriorityPreset,
+    trainingPriorityScores: resolveTrainingPriorityScores(useSettingsStore.getState()),
+    trainingPriorityCustomized:
+      useSettingsStore.getState().trainingPriorityCustomized,
     weekRotationKey: getWeekDateKeys()[0],
   });
 }

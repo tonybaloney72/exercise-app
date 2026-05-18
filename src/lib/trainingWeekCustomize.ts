@@ -7,6 +7,8 @@ import {
   TRAINING_WEEK_SOURCE_CUSTOM_V1,
   TRAINING_WEEK_SOURCE_GENERATED_V1,
 } from "@/lib/planGenerator";
+import { buildProgramProfileInput } from "@/lib/programProfile";
+import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
 import { rebuildDerivedStretches, resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import { buildVarietySeed } from "@/lib/planVariety";
 import { refreshTrainingWeekContaining, resolveTrainingWeekForAuth } from "@/lib/planResolver";
@@ -147,6 +149,8 @@ export async function saveCustomDayPlan(
     settings.roundDensity,
     settings.defaultWarmUp,
     settings.defaultCoolDown,
+    resolveTrainingPriorityScores(settings),
+    settings.trainingPriorityCustomized ?? false,
   );
 
   await getTrainingWeekRepo("authenticated").saveSeededWeek(weekKey, merged, {
@@ -171,7 +175,10 @@ export function buildGeneratedDayPlan(
   roundDensity: RoundDensity,
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
+  profileInput?: ReturnType<typeof buildProgramProfileInput>,
 ): DayPlan {
+  const profile =
+    profileInput ?? buildProgramProfileInput(trainingPriorityPreset);
   const generated = materializeTrainingWeek(
     buildCatalogWeek(),
     prefs,
@@ -180,6 +187,7 @@ export function buildGeneratedDayPlan(
     roundDensity,
     exerciseSettings,
     varietySeed,
+    profile,
   );
   const day = generated[dayOfWeek];
   if (!day) {
@@ -212,6 +220,11 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
   const trainingPriorityPreset = settings.trainingPriorityPreset ?? "balanced";
   const roundDensity = settings.roundDensity ?? "standard";
 
+  const profile = buildProgramProfileInput(
+    trainingPriorityPreset,
+    resolveTrainingPriorityScores(settings),
+    settings.trainingPriorityCustomized ?? false,
+  );
   const freshDay = buildGeneratedDayPlan(
     dow,
     prefs,
@@ -220,6 +233,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
     roundDensity,
     exerciseSettings,
     buildVarietySeed(weekKey, "authenticated"),
+    profile,
   );
 
   const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");
@@ -235,6 +249,8 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
     roundDensity,
     settings.defaultWarmUp,
     settings.defaultCoolDown,
+    resolveTrainingPriorityScores(settings),
+    settings.trainingPriorityCustomized ?? false,
   );
 
   const row = await getTrainingWeekRepo("authenticated").loadWeek(weekKey);

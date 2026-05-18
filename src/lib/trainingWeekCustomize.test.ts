@@ -140,6 +140,14 @@ describe("resetDayToGenerated", () => {
     mockLoadSettings.mockResolvedValue({
       availableEquipment: EQUIP,
       trainingPriorityPreset: "balanced",
+      trainingPriorityScores: {
+        core: 2,
+        cardio: 2,
+        lower: 2,
+        upper_push: 2,
+        upper_pull: 2,
+      },
+      trainingPriorityCustomized: false,
       roundDensity: "standard",
       defaultWarmUp: [],
       defaultCoolDown: [],

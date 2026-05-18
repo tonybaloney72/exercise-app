@@ -111,6 +111,12 @@ export default function WeeklyDayPage() {
   const trainingPriorityPreset = useSettingsStore(
     (s) => s.trainingPriorityPreset,
   );
+  const trainingPriorityScores = useSettingsStore(
+    (s) => s.trainingPriorityScores,
+  );
+  const trainingPriorityCustomized = useSettingsStore(
+    (s) => s.trainingPriorityCustomized,
+  );
   const exercisePrefs = useExercisePreferencesStore((s) => s.byExerciseId);
   const [customizing, setCustomizing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -256,6 +262,8 @@ export default function WeeklyDayPage() {
           <p className="text-sm text-muted">
             {planDaySubtitle(plan, trainingPriorityPreset, {
               preferMaterialized: isCustomWeek,
+              customized: trainingPriorityCustomized,
+              scores: trainingPriorityScores,
             })}
           </p>
           {isCustomWeek && canCustomize && (

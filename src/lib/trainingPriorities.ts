@@ -18,7 +18,27 @@ export const EMPHASIS_GROUP_ORDER: EmphasisGroup[] = [
 
 export type TrainingPriorityWeights = Record<EmphasisGroup, number>;
 
-/** Internal scores (sum = 10). Not shown in UI for A1. */
+/** Per-group emphasis (0 = skip, 4 = peak). Drives generator and A2 customize UI. */
+export type TrainingPriorityScore = 0 | 1 | 2 | 3 | 4;
+export type TrainingPriorityScores = Record<EmphasisGroup, TrainingPriorityScore>;
+
+export const EMPHASIS_SCORE_LABELS = [
+  "Skip",
+  "Light",
+  "Moderate",
+  "Strong",
+  "Peak",
+] as const;
+
+export const EMPHASIS_GROUP_LABELS: Record<EmphasisGroup, string> = {
+  core: "Core",
+  cardio: "Cardio",
+  lower: "Lower body",
+  upper_push: "Push",
+  upper_pull: "Pull",
+};
+
+/** Preset weight table (sum = 10); maps 1:1 to 0–4 scores for presets. */
 export const TRAINING_PRIORITY_PRESET_WEIGHTS: Record<
   TrainingPriorityPreset,
   TrainingPriorityWeights
@@ -105,10 +125,81 @@ const EXTRA_CATEGORIES_BY_PRESET: Record<
   conditioning: ["PC"],
 };
 
+export function clampTrainingPriorityScore(raw: unknown): TrainingPriorityScore {
+  const n = typeof raw === "number" ? Math.round(raw) : Number(raw);
+  if (n <= 0) return 0;
+  if (n >= 4) return 4;
+  return n as TrainingPriorityScore;
+}
+
+export function sanitizeTrainingPriorityScores(
+  raw: unknown,
+  fallback?: TrainingPriorityScores,
+): TrainingPriorityScores {
+  const base = fallback ?? scoresFromPreset("balanced");
+  if (!raw || typeof raw !== "object") return { ...base };
+  const o = raw as Record<string, unknown>;
+  const out = { ...base };
+  for (const g of EMPHASIS_GROUP_ORDER) {
+    if (g in o) out[g] = clampTrainingPriorityScore(o[g]);
+  }
+  return out;
+}
+
+export function scoresFromWeights(
+  weights: TrainingPriorityWeights,
+): TrainingPriorityScores {
+  const out = {} as TrainingPriorityScores;
+  for (const g of EMPHASIS_GROUP_ORDER) {
+    out[g] = clampTrainingPriorityScore(weights[g]);
+  }
+  return out;
+}
+
+export function scoresFromPreset(
+  preset: TrainingPriorityPreset,
+): TrainingPriorityScores {
+  return scoresFromWeights(weightsForPreset(preset));
+}
+
+export function weightsFromScores(
+  scores: TrainingPriorityScores,
+): TrainingPriorityWeights {
+  return { ...scores };
+}
+
+export function scoresEqual(
+  a: TrainingPriorityScores,
+  b: TrainingPriorityScores,
+): boolean {
+  return EMPHASIS_GROUP_ORDER.every((g) => a[g] === b[g]);
+}
+
+export function totalEmphasisScore(scores: TrainingPriorityScores): number {
+  return EMPHASIS_GROUP_ORDER.reduce((sum, g) => sum + scores[g], 0);
+}
+
+export function isBalancedScores(scores: TrainingPriorityScores): boolean {
+  return EMPHASIS_GROUP_ORDER.every((g) => scores[g] === 2);
+}
+
 export function weightsForPreset(
   preset: TrainingPriorityPreset,
 ): TrainingPriorityWeights {
   return { ...TRAINING_PRIORITY_PRESET_WEIGHTS[preset] };
+}
+
+export function resolveTrainingPriorityScores(settings: {
+  trainingPriorityPreset: TrainingPriorityPreset;
+  trainingPriorityScores?: TrainingPriorityScores;
+}): TrainingPriorityScores {
+  const scores = settings.trainingPriorityScores
+    ? sanitizeTrainingPriorityScores(settings.trainingPriorityScores)
+    : scoresFromPreset(settings.trainingPriorityPreset);
+  if (totalEmphasisScore(scores) === 0) {
+    return scoresFromPreset("balanced");
+  }
+  return scores;
 }
 
 export function emphasisGroupForCategory(
@@ -136,8 +227,39 @@ export function extraCategoriesForPreset(
   return [...EXTRA_CATEGORIES_BY_PRESET[preset]];
 }
 
+/** Groups scored ≥ 3 may add categories beyond the day theme (custom / A2). */
+export function extraCategoriesForScores(
+  scores: TrainingPriorityScores,
+): ExerciseCategory[] {
+  const out: ExerciseCategory[] = [];
+  for (const group of EMPHASIS_GROUP_ORDER) {
+    if (scores[group] < 3) continue;
+    for (const cat of GROUP_TO_CATEGORIES[group]) {
+      if (!out.includes(cat)) out.push(cat);
+    }
+  }
+  return out;
+}
+
+export function extraCategoriesForProfile(
+  preset: TrainingPriorityPreset,
+  scores: TrainingPriorityScores,
+  customized: boolean,
+): ExerciseCategory[] {
+  if (!customized) return extraCategoriesForPreset(preset);
+  return extraCategoriesForScores(scores);
+}
+
 export function isBalancedPreset(preset: TrainingPriorityPreset): boolean {
   return preset === "balanced";
+}
+
+export function isBalancedProfile(
+  scores: TrainingPriorityScores,
+  customized: boolean,
+): boolean {
+  if (!customized) return isBalancedScores(scores);
+  return isBalancedScores(scores);
 }
 
 export function sanitizeTrainingPriorityPreset(
@@ -157,10 +279,57 @@ export function sanitizeTrainingPriorityPreset(
   return "balanced";
 }
 
-/** Fingerprint segment for prefs / week regen. */
+/** Fingerprint segment for prefs / week regen (includes 0–4 scores). */
 export function trainingPriorityFingerprint(
   preset: TrainingPriorityPreset,
+  scores: TrainingPriorityScores,
+  customized = false,
 ): string {
-  const w = weightsForPreset(preset);
-  return `tp:${preset}|${EMPHASIS_GROUP_ORDER.map((g) => w[g]).join(",")}`;
+  const seg = EMPHASIS_GROUP_ORDER.map((g) => scores[g]).join(",");
+  return customized ? `tp:custom|${seg}` : `tp:${preset}|${seg}`;
+}
+
+const GROUP_PREVIEW_NAMES: Record<EmphasisGroup, string> = {
+  core: "core",
+  cardio: "cardio",
+  lower: "legs",
+  upper_push: "push",
+  upper_pull: "pull",
+};
+
+/** Live preview line for Settings customize panel. */
+export function describeTrainingPriorityScores(
+  scores: TrainingPriorityScores,
+): string {
+  const ranked = EMPHASIS_GROUP_ORDER.filter((g) => scores[g] > 0).sort(
+    (a, b) => scores[b] - scores[a] || EMPHASIS_GROUP_ORDER.indexOf(a) - EMPHASIS_GROUP_ORDER.indexOf(b),
+  );
+  if (ranked.length === 0) {
+    return "No emphasis groups selected — using balanced defaults.";
+  }
+  const strong = ranked.filter((g) => scores[g] >= 3).map((g) => GROUP_PREVIEW_NAMES[g]);
+  const moderate = ranked.filter((g) => scores[g] === 2).map((g) => GROUP_PREVIEW_NAMES[g]);
+  const parts: string[] = [];
+  if (strong.length > 0) {
+    parts.push(`Stronger ${formatNameList(strong)} on mixed days`);
+  } else if (moderate.length > 0) {
+    parts.push(`Moderate ${formatNameList(moderate)} across the week`);
+  } else {
+    parts.push(`Light emphasis on ${formatNameList(ranked.map((g) => GROUP_PREVIEW_NAMES[g]))}`);
+  }
+  const skipped = EMPHASIS_GROUP_ORDER.filter((g) => scores[g] === 0).map(
+    (g) => GROUP_PREVIEW_NAMES[g],
+  );
+  if (skipped.length > 0 && skipped.length < EMPHASIS_GROUP_ORDER.length) {
+    parts.push(`less ${formatNameList(skipped)} unless the day theme includes it`);
+  }
+  parts.push("themed days still follow the weekly template");
+  return `${parts[0]}; ${parts.slice(1).join("; ")}.`;
+}
+
+function formatNameList(names: string[]): string {
+  if (names.length === 0) return "";
+  if (names.length === 1) return names[0]!;
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 }
