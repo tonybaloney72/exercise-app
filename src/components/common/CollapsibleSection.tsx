@@ -9,6 +9,10 @@ interface CollapsibleSectionProps {
   /** Subtitle under the title (shown open and collapsed). */
   hint?: string;
   defaultOpen?: boolean;
+  /** Nested panel inside another card (no outer SurfaceCard). */
+  embedded?: boolean;
+  /** Classes on the expanded content wrapper. */
+  contentClassName?: string;
   /** @deprecated Use `toolbar` — actions in the header crowd mobile layouts. */
   headerActions?: ReactNode;
   /** Actions in a row at the top of the expanded panel (e.g. Add exercise). */
@@ -17,10 +21,33 @@ interface CollapsibleSectionProps {
   className?: string;
 }
 
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`mt-0.5 shrink-0 text-muted transition-transform ${
+        open ? "rotate-180" : ""
+      }`}
+      aria-hidden
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+
 export default function CollapsibleSection({
   title,
   hint,
   defaultOpen = true,
+  embedded = false,
+  contentClassName,
   headerActions,
   toolbar,
   children,
@@ -29,32 +56,27 @@ export default function CollapsibleSection({
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const panelToolbar = toolbar ?? headerActions;
 
-  return (
-    <SurfaceCard className={`overflow-hidden p-0 ${className ?? ""}`}>
+  const titleClass = embedded
+    ? "text-xs font-semibold text-foreground"
+    : "text-sm font-semibold text-foreground";
+
+  const headerButtonClass = embedded
+    ? "flex w-full items-start gap-2 border-t border-border py-3 text-left"
+    : "flex w-full items-start gap-2 border-b border-border px-4 py-3 text-left";
+
+  const bodyClass = contentClassName ?? (embedded ? "space-y-3" : undefined);
+
+  const panel = (
+    <>
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
         aria-expanded={isOpen}
-        className="flex w-full items-start gap-2 border-b border-border px-4 py-3 text-left"
+        className={headerButtonClass}
       >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={`mt-0.5 shrink-0 text-muted transition-transform ${
-            isOpen ? "rotate-180" : ""
-          }`}
-          aria-hidden
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
+        <Chevron open={isOpen} />
         <span className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold text-foreground">{title}</span>
+          <span className={`block ${titleClass}`}>{title}</span>
           {hint ? (
             <span className="mt-0.5 block text-[11px] leading-snug text-muted">{hint}</span>
           ) : null}
@@ -72,17 +94,33 @@ export default function CollapsibleSection({
           >
             {panelToolbar ? (
               <motion.div
-                className="flex w-full flex-wrap items-center gap-2 border-b border-border bg-background/60 px-4 py-2.5"
+                className={`flex w-full flex-wrap items-center gap-2 border-b border-border bg-background/60 py-2.5 ${
+                  embedded ? "" : "px-4"
+                }`}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
               >
                 {panelToolbar}
               </motion.div>
             ) : null}
-            {children}
+            {bodyClass ? (
+              <motion.div className={bodyClass}>{children}</motion.div>
+            ) : (
+              children
+            )}
           </motion.div>
         )}
       </AnimatePresence>
+    </>
+  );
+
+  if (embedded) {
+    return <div className={className}>{panel}</div>;
+  }
+
+  return (
+    <SurfaceCard className={`overflow-hidden p-0 ${className ?? ""}`}>
+      {panel}
     </SurfaceCard>
   );
 }

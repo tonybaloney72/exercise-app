@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AnimatedSection from "@/components/common/AnimatedSection";
-import SurfaceCard from "@/components/common/SurfaceCard";
+import CollapsibleSection from "@/components/common/CollapsibleSection";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
@@ -104,9 +104,11 @@ export default function SettingsPage() {
 
       {/* Account */}
       <AnimatedSection>
-        <SurfaceCard className="p-4 space-y-3">
-        <h2 className="text-sm font-semibold text-foreground">Account</h2>
-
+        <CollapsibleSection
+          title="Account"
+          defaultOpen
+          contentClassName="space-y-3 p-4"
+        >
         {mode === "authenticated" && user && (
           <>
             <div>
@@ -157,13 +159,17 @@ export default function SettingsPage() {
         {(mode === "loading" || mode === "anonymous") && (
           <p className="text-xs text-muted">Loading account…</p>
         )}
-        </SurfaceCard>
+        </CollapsibleSection>
       </AnimatedSection>
 
       {/* Appearance */}
       <AnimatedSection delay={0.04}>
-        <SurfaceCard className="p-4">
-        <h2 className="text-sm font-semibold text-foreground mb-3">Appearance</h2>
+        <CollapsibleSection
+          title="Appearance"
+          hint="Theme and visual preferences"
+          defaultOpen={false}
+          contentClassName="p-4"
+        >
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-foreground">Dark mode</p>
@@ -188,17 +194,21 @@ export default function SettingsPage() {
             <span className="sr-only">{settings.darkMode ? "On" : "Off"}</span>
           </button>
         </div>
-        </SurfaceCard>
+        </CollapsibleSection>
       </AnimatedSection>
 
       {/* Timers & device */}
       <AnimatedSection delay={0.045}>
-        <SurfaceCard className="p-4 space-y-4">
-        <h2 className="text-sm font-semibold text-foreground">Timers &amp; device</h2>
+        <CollapsibleSection
+          title="Timers & device"
+          hint="Rest timers, sounds, vibration, and screen wake"
+          defaultOpen={false}
+          contentClassName="space-y-4 p-4"
+        >
         <div>
-          <h3 className="text-xs font-semibold text-foreground">
+          <p className="text-xs font-semibold text-foreground">
             Rest between rounds
-          </h3>
+          </p>
           <p className="text-xs text-muted mt-0.5 mb-2">
             Default countdown length when you start a rest timer.
           </p>
@@ -259,48 +269,46 @@ export default function SettingsPage() {
             })
           }
         />
-        </SurfaceCard>
+        </CollapsibleSection>
       </AnimatedSection>
 
       {/* Equipment */}
       <AnimatedSection delay={0.048}>
-        <SurfaceCard className="p-4 space-y-3">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">Your equipment</h2>
-          <p className="text-xs text-muted mt-1">
-            The library hides exercises that need gear you don&apos;t have. When signed in,
-            changing equipment updates this week&apos;s prescribed plan (finished workouts
-            stay as logged). Based on the{" "}
-            <a
-              href="https://www.hybridcalisthenics.com/exercise-library"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-accent hover:underline"
-            >
-              Hybrid Calisthenics
-            </a>{" "}
-            exercise reference.
-          </p>
-        </div>
+        <CollapsibleSection
+          title="Your equipment"
+          hint="Library and weekly plan only show exercises you can do with gear you have"
+          defaultOpen={false}
+          contentClassName="space-y-3 p-4"
+        >
+        <p className="text-xs text-muted">
+          When signed in, changing equipment updates this week&apos;s prescribed plan
+          (finished workouts stay as logged). Based on the{" "}
+          <a
+            href="https://www.hybridcalisthenics.com/exercise-library"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            Hybrid Calisthenics
+          </a>{" "}
+          exercise reference.
+        </p>
         <EquipmentPicker
           selected={settings.availableEquipment}
           onChange={(next) => void settings.updateSettings({ availableEquipment: next })}
         />
-        </SurfaceCard>
+        </CollapsibleSection>
       </AnimatedSection>
 
       {/* Training priorities (signed-in weekly plans) */}
       {mode === "authenticated" && (
         <AnimatedSection delay={0.049}>
-          <SurfaceCard className="p-4 space-y-4">
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">Training priorities</h2>
-            <p className="text-xs text-muted mt-1">
-              Chooses how much core, cardio, legs, and upper body appear when your week
-              is generated. Each day still follows the weekly template. Updates today
-              and upcoming days; finished workouts stay as logged.
-            </p>
-          </div>
+          <CollapsibleSection
+            title="Training priorities"
+            hint="How core, cardio, legs, and upper body appear when your week is generated. Updates today and upcoming days."
+            defaultOpen={false}
+            contentClassName="space-y-4 p-4"
+          >
           <div className="space-y-2" role="radiogroup" aria-label="Training priority preset">
             {TRAINING_PRIORITY_OPTIONS.map((option) => {
               const selected =
@@ -357,11 +365,12 @@ export default function SettingsPage() {
               });
             }}
           />
-          <div>
-            <h3 className="text-xs font-semibold text-foreground">Round density</h3>
-            <p className="text-xs text-muted mt-0.5 mb-2">
-              How many exercises per round when your week is generated.
-            </p>
+          <CollapsibleSection
+            embedded
+            title="Round density"
+            hint="How many exercises per round when your week is generated"
+            defaultOpen={false}
+          >
             <div className="space-y-2" role="radiogroup" aria-label="Round density">
               {ROUND_DENSITY_OPTIONS.map((option) => {
                 const selected = settings.roundDensity === option.value;
@@ -394,14 +403,17 @@ export default function SettingsPage() {
                 );
               })}
             </div>
-          </div>
-          <div>
-            <h3 className="text-xs font-semibold text-foreground">Default stretches</h3>
-            <p className="text-xs text-muted mt-0.5 mb-2">
-              Stretches you always want included when a day&apos;s warm-up or cool-down is
-              built. Start empty and add your own; disliked Library exercises are excluded.
+          </CollapsibleSection>
+          <CollapsibleSection
+            embedded
+            title="Default stretches"
+            hint="Always included in warm-up / cool-down when a day is built"
+            defaultOpen={false}
+          >
+            <p className="text-xs text-muted">
+              Start empty and add your own; disliked Library exercises are excluded.
             </p>
-            <p className="text-xs text-foreground mb-2">
+            <p className="text-xs text-foreground">
               {effectiveStretchDefaults.warm === 0 && effectiveStretchDefaults.cool === 0
                 ? "None selected — focus-based stretches still apply per day."
                 : `${effectiveStretchDefaults.warm} warm-up · ${effectiveStretchDefaults.cool} cool-down`}
@@ -413,8 +425,8 @@ export default function SettingsPage() {
             >
               Edit default stretches
             </button>
-          </div>
-          </SurfaceCard>
+          </CollapsibleSection>
+          </CollapsibleSection>
         </AnimatedSection>
       )}
 
@@ -425,8 +437,12 @@ export default function SettingsPage() {
 
       {/* Data management */}
       <AnimatedSection delay={0.1}>
-        <SurfaceCard className="p-4 space-y-3">
-        <h2 className="text-sm font-semibold text-foreground">Data</h2>
+        <CollapsibleSection
+          title="Data"
+          hint="Export a backup of settings and workout history"
+          defaultOpen={false}
+          contentClassName="space-y-3 p-4"
+        >
         <button
           onClick={handleExport}
           className="w-full rounded-lg border border-border bg-surface-hover py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-border/50"
@@ -436,7 +452,7 @@ export default function SettingsPage() {
         <p className="text-[10px] text-muted text-center">
           {workoutHistory.length} workout{workoutHistory.length !== 1 ? "s" : ""} saved locally
         </p>
-        </SurfaceCard>
+        </CollapsibleSection>
       </AnimatedSection>
     </div>
   );
