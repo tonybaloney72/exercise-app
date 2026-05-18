@@ -101,6 +101,26 @@ describe("materializeTrainingWeek", () => {
     expect(mondaySlots(compact)).toBeLessThan(mondaySlots(standard));
   });
 
+  it("materializes different exercises for different program focus", () => {
+    const upper = materializeTrainingWeek(
+      buildCatalogWeek(),
+      EMPTY_PREFS,
+      EQUIP,
+      "upper_body",
+      "standard",
+    );
+    const lower = materializeTrainingWeek(
+      buildCatalogWeek(),
+      EMPTY_PREFS,
+      EQUIP,
+      "lower_body",
+      "standard",
+    );
+    expect(weekExerciseIdsByDay(upper)[1].sort()).not.toEqual(
+      weekExerciseIdsByDay(lower)[1].sort(),
+    );
+  });
+
   it("removes disliked exercises from the materialized week", () => {
     const prefs: ExercisePreferenceMap = { "UP-1": "disliked" };
     const week = materializeTrainingWeek(
@@ -113,7 +133,12 @@ describe("materializeTrainingWeek", () => {
     expect(weekContainsDislikedExercise(week, new Set(["UP-1"]))).toBe(false);
     const mondayIds = weekExerciseIdsByDay(week)[1];
     expect(mondayIds).not.toContain("UP-1");
-    expect(mondayIds.some((id) => id.startsWith("UP-"))).toBe(true);
+    const monday = week[1]!;
+    expect(
+      monday.rounds.some((round) =>
+        round.exercises.some((slot) => slot.category === "UP"),
+      ),
+    ).toBe(true);
   });
 });
 
@@ -143,9 +168,15 @@ describe("weekNeedsMaterialization", () => {
       weekNeedsMaterialization(stored, "stale", null, fingerprint, new Set()),
     ).toBe(true);
 
+    const storedWithDislikedSlot = structuredClone(stored);
+    storedWithDislikedSlot[1]!.rounds[0]!.exercises[0] = {
+      exerciseId: "UP-1",
+      category: "UP",
+      targetReps: "10",
+    };
     expect(
       weekNeedsMaterialization(
-        stored,
+        storedWithDislikedSlot,
         fingerprint,
         null,
         fingerprint,

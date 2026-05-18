@@ -183,12 +183,93 @@ function dayCategoryPool(plan: DayPlan): ExerciseCategory[] {
   return out;
 }
 
+/** Categories a focus preset may pull into a day beyond its template pool. */
+function emphasisCategoriesForFocus(focus: ProgramFocusPreset): ExerciseCategory[] {
+  switch (focus) {
+    case "minimal_core":
+      return ["UP", "UPL", "LB", "PC"];
+    case "core_emphasis":
+      return ["CF", "CL", "CR", "CS"];
+    case "strength":
+      return ["UP", "UPL", "LB"];
+    case "lower_body":
+      return ["LB"];
+    case "upper_body":
+      return ["UP", "UPL"];
+    case "conditioning":
+      return ["PC"];
+    case "balanced":
+    default:
+      return [];
+  }
+}
+
+function expandedCategoryPool(
+  plan: DayPlan,
+  focus: ProgramFocusPreset,
+): ExerciseCategory[] {
+  const out = dayCategoryPool(plan);
+  for (const c of emphasisCategoriesForFocus(focus)) {
+    if (!out.includes(c)) out.push(c);
+  }
+  return out;
+}
+
+/** Swap low-priority template categories for emphasis categories at the same slot count. */
+function rebalanceCategoriesForFocus(
+  categories: ExerciseCategory[],
+  plan: DayPlan,
+  focus: ProgramFocusPreset,
+): ExerciseCategory[] {
+  if (focus === "balanced" || categories.length === 0) return categories;
+
+  const pool = expandedCategoryPool(plan, focus);
+  const out = [...categories];
+
+  for (let swap = 0; swap < out.length; swap++) {
+    let weakestIdx = -1;
+    let weakestScore = Infinity;
+    for (let i = 0; i < out.length; i++) {
+      const score = slotKeepPriority(out[i]!, focus);
+      if (score < weakestScore) {
+        weakestScore = score;
+        weakestIdx = i;
+      }
+    }
+    if (weakestIdx < 0 || weakestScore >= 3) break;
+
+    const counts = new Map<ExerciseCategory, number>();
+    for (const c of out) counts.set(c, (counts.get(c) ?? 0) + 1);
+
+    let replacement: ExerciseCategory | null = null;
+    let replacementScore = -1;
+    for (const candidate of pool) {
+      const score = slotKeepPriority(candidate, focus);
+      if (score <= weakestScore) continue;
+      const count = counts.get(candidate) ?? 0;
+      const repCount = replacement ? (counts.get(replacement) ?? 0) : Infinity;
+      if (
+        score > replacementScore ||
+        (score === replacementScore && count < repCount)
+      ) {
+        replacement = candidate;
+        replacementScore = score;
+      }
+    }
+
+    if (!replacement) break;
+    out[weakestIdx] = replacement;
+  }
+
+  return out;
+}
+
 function pickCategoryToAdd(
   current: RoundExercise[],
   plan: DayPlan,
   focus: ProgramFocusPreset,
 ): ExerciseCategory | null {
-  const pool = dayCategoryPool(plan);
+  const pool = expandedCategoryPool(plan, focus);
   const counts = new Map<ExerciseCategory, number>();
   for (const s of current) {
     counts.set(s.category, (counts.get(s.category) ?? 0) + 1);
@@ -228,7 +309,47 @@ function fillSlot(
   };
 }
 
-function reshapeRound(
+function stubSlots(categories: ExerciseCategory[]): RoundExercise[] {
+  return categories.map((category, index) => ({
+    exerciseId: `__stub-${index}`,
+    category,
+    targetReps: "1",
+  }));
+}
+
+/** Category mix for a round after focus + density (template is seed shape only). */
+function deriveRoundCategories(
+  templateExercises: RoundExercise[],
+  plan: DayPlan,
+  focus: ProgramFocusPreset,
+  target: number,
+): ExerciseCategory[] {
+  const scored = templateExercises.map((slot, index) => ({
+    category: slot.category,
+    index,
+    priority: slotKeepPriority(slot.category, focus),
+  }));
+  scored.sort((a, b) => b.priority - a.priority || a.index - b.index);
+
+  let categories = scored
+    .slice(0, Math.min(target, scored.length))
+    .map((x) => x.category);
+  let stubs = stubSlots(categories);
+
+  let guard = 0;
+  while (categories.length < target && guard < 12) {
+    guard += 1;
+    const category = pickCategoryToAdd(stubs, plan, focus);
+    if (!category) break;
+    categories.push(category);
+    stubs = stubSlots(categories);
+  }
+
+  return categories;
+}
+
+/** Pick fresh exercises per slot; catalog ids are not carried through. */
+function rebuildRound(
   roundNumber: number,
   exercises: RoundExercise[],
   plan: DayPlan,
@@ -239,39 +360,32 @@ function reshapeRound(
   favoriteIds: ReadonlySet<string>,
 ): RoundExercise[] {
   const target = Math.max(2, Math.min(8, ROUND_DENSITY_TARGETS[density]));
+  const categories = rebalanceCategoriesForFocus(
+    deriveRoundCategories(exercises, plan, focus, target),
+    plan,
+    focus,
+  );
+  const usedInRound = new Set<string>();
+  const rebuilt: RoundExercise[] = [];
 
-  const scored = exercises.map((slot, index) => ({
-    slot,
-    index,
-    priority: slotKeepPriority(slot.category, focus),
-  }));
-  scored.sort((a, b) => b.priority - a.priority || a.index - b.index);
-
-  let kept = scored.slice(0, Math.min(target, scored.length)).map((x) => ({ ...x.slot }));
-  const usedInRound = new Set(kept.map((s) => s.exerciseId));
-
-  let guard = 0;
-  while (kept.length < target && guard < 12) {
-    guard += 1;
-    const category = pickCategoryToAdd(kept, plan, focus);
-    if (!category) break;
+  for (let i = 0; i < categories.length; i++) {
     const filled = fillSlot(
-      category,
+      categories[i]!,
       usedInRound,
       availableEquipment,
       dislikedIds,
       favoriteIds,
-      `d${plan.dayOfWeek}-r${roundNumber}-s${kept.length}`,
+      `d${plan.dayOfWeek}-r${roundNumber}-i${i}-pf:${focus}`,
     );
-    if (!filled) break;
-    kept.push(filled);
+    if (!filled) continue;
+    rebuilt.push(filled);
     usedInRound.add(filled.exerciseId);
   }
 
-  return kept;
+  return rebuilt;
 }
 
-/** Rule-based reshape from catalog template (focus + density). */
+/** Rule-based materialization from catalog template (focus + density). */
 export function applyProgramProfileToDayPlan(
   plan: DayPlan,
   focus: ProgramFocusPreset,
@@ -286,7 +400,7 @@ export function applyProgramProfileToDayPlan(
     ...plan,
     rounds: plan.rounds.map((round) => ({
       ...round,
-      exercises: reshapeRound(
+      exercises: rebuildRound(
         round.roundNumber,
         round.exercises,
         plan,

@@ -552,7 +552,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                           onBlur={(e) =>
                             void commitCustomSecondsFromInput(e.currentTarget)
                           }
-                          className="w-full max-w-[8.5rem] rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
+                          className="w-full max-w-34 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
                         />
                       </div>
                     )}

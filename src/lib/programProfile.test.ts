@@ -78,4 +78,24 @@ describe("applyProgramProfileToDayPlan", () => {
     );
     expect(roundCategories(conditioning)).toContain("PC");
   });
+
+  it("re-picks exercises when program focus changes at standard density", () => {
+    const upper = applyProgramProfileToDayPlan(
+      monday,
+      "upper_body",
+      "standard",
+      EQUIP,
+      EMPTY_PREFS,
+    );
+    const lower = applyProgramProfileToDayPlan(
+      monday,
+      "lower_body",
+      "standard",
+      EQUIP,
+      EMPTY_PREFS,
+    );
+    const idsUpper = upper.rounds.flatMap((r) => r.exercises.map((e) => e.exerciseId));
+    const idsLower = lower.rounds.flatMap((r) => r.exercises.map((e) => e.exerciseId));
+    expect(idsUpper.sort()).not.toEqual(idsLower.sort());
+  });
 });
