@@ -14,6 +14,7 @@ import PostWorkoutSummary from "@/components/workout/PostWorkoutSummary";
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
+import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
 import {
   bumpTrainingWeekPlans,
   resetTrainingDayToGenerated,
@@ -127,7 +128,7 @@ function TodayPageInner() {
     );
   }
 
-  const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
+  const allCategories = categoriesPresentInPlan(plan);
   const isCustomWeek = isUserCustomizedWeekSource(weekSource);
   const showPlanEditor = customizing && canEditPlan;
 

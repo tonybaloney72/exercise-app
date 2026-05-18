@@ -79,6 +79,20 @@ describe("applyProgramProfileToDayPlan", () => {
     expect(roundCategories(conditioning)).toContain("PC");
   });
 
+  it("includes conditioning in rounds when the day has a jog", () => {
+    const shaped = applyProgramProfileToDayPlan(
+      monday,
+      "balanced",
+      "standard",
+      EQUIP,
+      EMPTY_PREFS,
+    );
+    const categories = shaped.rounds.flatMap((r) =>
+      r.exercises.map((e) => e.category),
+    );
+    expect(categories).toContain("PC");
+  });
+
   it("re-picks exercises when program focus changes at standard density", () => {
     const upper = applyProgramProfileToDayPlan(
       monday,

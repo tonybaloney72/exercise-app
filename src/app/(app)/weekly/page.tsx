@@ -14,6 +14,7 @@ import { getWeekSourceForDate } from "@/lib/trainingWeekCustomize";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
 
@@ -218,7 +219,7 @@ export default function WeeklyPage() {
                   </div>
 
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {[...plan.strengthFocus, ...plan.coreGroups].map((cat) => (
+                    {categoriesPresentInPlan(plan).map((cat) => (
                       <CategoryBadge key={cat} category={cat} />
                     ))}
                   </div>

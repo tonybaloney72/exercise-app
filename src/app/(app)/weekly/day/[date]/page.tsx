@@ -6,9 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import SurfaceCard from "@/components/common/SurfaceCard";
+import FrozenPastDayPlanNotice from "@/components/workout/FrozenPastDayPlanNotice";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
+import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
+import { getFrozenPastDayPlanCopy } from "@/lib/trainingWeekFrozenDay";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import {
   bumpTrainingWeekPlans,
@@ -20,6 +23,7 @@ import {
 } from "@/lib/trainingWeekCustomize";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
@@ -100,6 +104,7 @@ export default function WeeklyDayPage() {
     pausedWorkoutDate,
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
+  const exercisePrefs = useExercisePreferencesStore((s) => s.byExerciseId);
   const [customizing, setCustomizing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -137,6 +142,11 @@ export default function WeeklyDayPage() {
     () => findWorkoutLogForDate(workoutHistory, dateKey),
     [workoutHistory, dateKey],
   );
+
+  const frozenPastCopy = useMemo(() => {
+    if (when !== "past" || !plan) return null;
+    return getFrozenPastDayPlanCopy(plan, exercisePrefs);
+  }, [when, plan, exercisePrefs]);
 
   const continueWorkoutHere =
     when === "today" &&
@@ -186,7 +196,7 @@ export default function WeeklyDayPage() {
     );
   }
 
-  const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
+  const allCategories = categoriesPresentInPlan(plan);
   const isCustomWeek = isUserCustomizedWeekSource(weekSource);
   const showPlanEditor = customizing && canCustomize && !logForDay;
 
@@ -288,6 +298,10 @@ export default function WeeklyDayPage() {
           }}
           onResetDay={() => void handleResetDay()}
         />
+      )}
+
+      {frozenPastCopy && !showPlanEditor && (
+        <FrozenPastDayPlanNotice copy={frozenPastCopy} />
       )}
 
       {when === "future" && !showPlanEditor && (

@@ -6,6 +6,7 @@ import {
 import { stretchDefaultsFingerprint } from "@/lib/stretchDefaults";
 import type { StretchEntry } from "@/types";
 import { applyProgramProfileToWeek } from "@/lib/programProfile";
+import { dayPlanContainsDislikedExercise } from "@/lib/trainingWeekFrozenDay";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
 import type {
@@ -173,11 +174,7 @@ export function weekContainsDislikedExercise(
   for (let d = 0; d < 7; d++) {
     const plan = week[d];
     if (!plan) continue;
-    for (const round of plan.rounds) {
-      for (const ex of round.exercises) {
-        if (dislikedIds.has(ex.exerciseId)) return true;
-      }
-    }
+    if (dayPlanContainsDislikedExercise(plan, dislikedIds)) return true;
   }
   return false;
 }

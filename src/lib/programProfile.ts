@@ -179,6 +179,7 @@ function dayCategoryPool(plan: DayPlan): ExerciseCategory[] {
   for (const c of plan.coreGroups) {
     if (!out.includes(c)) out.push(c);
   }
+  if (plan.hasJog && !out.includes("PC")) out.push("PC");
   if (out.length === 0) out.push("CS");
   return out;
 }
@@ -317,24 +318,15 @@ function stubSlots(categories: ExerciseCategory[]): RoundExercise[] {
   }));
 }
 
-/** Category mix for a round after focus + density (template is seed shape only). */
-function deriveRoundCategories(
-  templateExercises: RoundExercise[],
+/** Category slots for a round from day theme + focus (not catalog exercise ids). */
+function buildRoundCategoriesFromDayBudget(
   plan: DayPlan,
+  roundNumber: number,
   focus: ProgramFocusPreset,
   target: number,
 ): ExerciseCategory[] {
-  const scored = templateExercises.map((slot, index) => ({
-    category: slot.category,
-    index,
-    priority: slotKeepPriority(slot.category, focus),
-  }));
-  scored.sort((a, b) => b.priority - a.priority || a.index - b.index);
-
-  let categories = scored
-    .slice(0, Math.min(target, scored.length))
-    .map((x) => x.category);
-  let stubs = stubSlots(categories);
+  let categories: ExerciseCategory[] = [];
+  let stubs: RoundExercise[] = [];
 
   let guard = 0;
   while (categories.length < target && guard < 12) {
@@ -345,13 +337,13 @@ function deriveRoundCategories(
     stubs = stubSlots(categories);
   }
 
-  return categories;
+  return rebalanceCategoriesForFocus(categories, plan, focus);
 }
 
 /** Pick fresh exercises per slot; catalog ids are not carried through. */
 function rebuildRound(
   roundNumber: number,
-  exercises: RoundExercise[],
+  _templateExercises: RoundExercise[],
   plan: DayPlan,
   focus: ProgramFocusPreset,
   density: RoundDensity,
@@ -360,10 +352,11 @@ function rebuildRound(
   favoriteIds: ReadonlySet<string>,
 ): RoundExercise[] {
   const target = Math.max(2, Math.min(8, ROUND_DENSITY_TARGETS[density]));
-  const categories = rebalanceCategoriesForFocus(
-    deriveRoundCategories(exercises, plan, focus, target),
+  const categories = buildRoundCategoriesFromDayBudget(
     plan,
+    roundNumber,
     focus,
+    target,
   );
   const usedInRound = new Set<string>();
   const rebuilt: RoundExercise[] = [];

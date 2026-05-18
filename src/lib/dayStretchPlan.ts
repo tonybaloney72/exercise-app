@@ -3,73 +3,84 @@ import {
   normalizeStretchList,
 } from "@/lib/stretchDefaults";
 import {
-  UNIVERSAL_COOL_DOWN_POOL,
-  UNIVERSAL_WARM_UP_POOL,
-} from "@/lib/stretchCatalogDefaults";
+  coolDownCatalogPool,
+  warmUpCatalogPool,
+  type StretchThemePoolId,
+} from "@/lib/stretchCatalogPools";
 import type { StretchResolveContext } from "@/lib/stretchResolveContext";
-import type { DayPlan, ExerciseCategory, StretchEntry } from "@/types";
+import type {
+  DayPlan,
+  ExerciseCategory,
+  ProgramFocusPreset,
+  StretchEntry,
+} from "@/types";
 
 export {
   CATALOG_DEFAULT_COOL_DOWN,
   CATALOG_DEFAULT_WARM_UP,
 } from "@/lib/stretchCatalogDefaults";
 
-/** Stretch pools keyed by training focus (see `DayPlan.strengthFocus` / `coreGroups`). */
-const WARM_UP_POOLS = {
-  universal: UNIVERSAL_WARM_UP_POOL,
-  upper: [
-    { exerciseId: "SW-3", targetReps: "10 each side" },
-    { exerciseId: "SW-31", targetReps: "10" },
-  ] satisfies StretchEntry[],
-  lower: [
-    { exerciseId: "SW-14", targetReps: "10 each direction" },
-    { exerciseId: "SW-12", targetReps: "10 each leg" },
-    { exerciseId: "SW-11", targetReps: "8 each leg" },
-    { exerciseId: "SW-15", targetReps: "10" },
-    { exerciseId: "SW-16", targetReps: "5 each side" },
-  ] satisfies StretchEntry[],
-  core: [
-    { exerciseId: "SW-8", targetReps: "8 each side" },
-  ] satisfies StretchEntry[],
-  conditioning: [
-    { exerciseId: "SW-33", targetReps: "20" },
-    { exerciseId: "SW-34", targetReps: "10 each side" },
-  ] satisfies StretchEntry[],
-} as const;
-
-const COOL_DOWN_POOLS = {
-  universal: UNIVERSAL_COOL_DOWN_POOL,
-  upper: [
-    { exerciseId: "SC-5", targetReps: "20–30 sec" },
-    { exerciseId: "SC-6", targetReps: "20 sec each arm" },
-    { exerciseId: "SC-7", targetReps: "20 sec each arm" },
-    { exerciseId: "SC-8", targetReps: "20–30 sec each side" },
-  ] satisfies StretchEntry[],
-  lower: [
-    { exerciseId: "SC-9", targetReps: "20–30 sec each leg" },
-    { exerciseId: "SC-10", targetReps: "20–30 sec each leg" },
-    { exerciseId: "SC-12", targetReps: "20–30 sec each leg" },
-    { exerciseId: "SC-14", targetReps: "20–30 sec" },
-  ] satisfies StretchEntry[],
-  core: [
-    { exerciseId: "SC-1", targetReps: "20–30 sec" },
-    { exerciseId: "SC-4", targetReps: "20–30 sec" },
-  ] satisfies StretchEntry[],
-} as const;
-
 const UPPER_STRENGTH: ExerciseCategory[] = ["UP", "UPL"];
 const LOWER_STRENGTH: ExerciseCategory[] = ["LB"];
 const CORE_GROUPS: ExerciseCategory[] = ["CF", "CL", "CR", "CS"];
 
-function appendPool(
+function seedOffset(seed: string, modulus: number): number {
+  if (modulus <= 0) return 0;
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (Math.imul(31, hash) + seed.charCodeAt(i)) >>> 0;
+  }
+  return hash % modulus;
+}
+
+/**
+ * Deterministic rotating subset from a catalog pool (uses full library, not just list head).
+ */
+export function pickStretchEntries(
+  pool: readonly StretchEntry[],
+  count: number,
+  seed: string,
+  dislikedExerciseIds: ReadonlySet<string>,
+): StretchEntry[] {
+  if (count <= 0) return [];
+  const available = pool.filter((e) => !dislikedExerciseIds.has(e.exerciseId));
+  if (available.length === 0) return [];
+
+  const take = Math.min(count, available.length);
+  const offset = seedOffset(seed, available.length);
+  const out: StretchEntry[] = [];
+  for (let i = 0; i < take; i++) {
+    out.push({ ...available[(offset + i) % available.length]! });
+  }
+  return out;
+}
+
+const BASE_WARM_QUOTAS: Record<StretchThemePoolId, number> = {
+  general: 2,
+  upper: 2,
+  lower: 3,
+  core: 2,
+  conditioning: 2,
+};
+
+const BASE_COOL_QUOTAS: Record<StretchThemePoolId, number> = {
+  general: 1,
+  upper: 3,
+  lower: 3,
+  core: 2,
+  conditioning: 0,
+};
+
+function appendPickedPool(
   parts: StretchEntry[],
   pool: readonly StretchEntry[],
+  count: number,
+  seed: string,
   ctx: StretchResolveContext,
 ): void {
-  for (const entry of pool) {
-    if (ctx.dislikedExerciseIds.has(entry.exerciseId)) continue;
-    parts.push({ ...entry });
-  }
+  parts.push(
+    ...pickStretchEntries(pool, count, seed, ctx.dislikedExerciseIds),
+  );
 }
 
 function categoriesInPlan(plan: DayPlan): Set<ExerciseCategory> {
@@ -90,52 +101,175 @@ function isLightRecoveryDay(plan: DayPlan): boolean {
   return slotCount <= 6;
 }
 
-function dayWantsUpper(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
-  return plan.strengthFocus.some((c) => UPPER_STRENGTH.includes(c)) || cats.has("UP") || cats.has("UPL");
-}
-
-function dayWantsLower(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
+function dayHasLowerStrength(
+  plan: DayPlan,
+  cats: Set<ExerciseCategory>,
+): boolean {
   return (
-    plan.hasJog ||
-    plan.strengthFocus.some((c) => LOWER_STRENGTH.includes(c) || c === "PC") ||
-    cats.has("LB") ||
-    cats.has("PC")
+    plan.strengthFocus.some((c) => LOWER_STRENGTH.includes(c)) || cats.has("LB")
   );
 }
 
-function dayWantsCore(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
-  return plan.coreGroups.length > 0 || CORE_GROUPS.some((c) => cats.has(c));
+function includeWarmPool(
+  pool: StretchThemePoolId,
+  plan: DayPlan,
+  cats: Set<ExerciseCategory>,
+  focus: ProgramFocusPreset,
+): boolean {
+  const hasUpper =
+    plan.strengthFocus.some((c) => UPPER_STRENGTH.includes(c)) ||
+    cats.has("UP") ||
+    cats.has("UPL");
+  const hasLower = dayHasLowerStrength(plan, cats);
+  const hasCore =
+    plan.coreGroups.length > 0 || CORE_GROUPS.some((c) => cats.has(c));
+  const hasPc = plan.strengthFocus.includes("PC") || cats.has("PC");
+
+  switch (pool) {
+    case "general":
+      return true;
+    case "upper":
+      return hasUpper || focus === "upper_body" || focus === "strength";
+    case "lower":
+      if (focus === "upper_body" && !hasLower) return false;
+      if (hasLower) return true;
+      if (focus === "lower_body") return true;
+      if (focus === "conditioning" && (hasPc || plan.hasJog)) return true;
+      if (focus === "balanced" && plan.hasJog) return true;
+      return false;
+    case "core":
+      if (focus === "minimal_core") return false;
+      if (focus === "core_emphasis") return true;
+      return hasCore;
+    case "conditioning":
+      if (focus === "conditioning") return true;
+      return hasPc;
+    default:
+      return false;
+  }
 }
 
-function dayWantsConditioning(plan: DayPlan, cats: Set<ExerciseCategory>): boolean {
-  return plan.strengthFocus.includes("PC") || cats.has("PC");
+function warmUpQuota(pool: StretchThemePoolId, focus: ProgramFocusPreset): number {
+  switch (focus) {
+    case "conditioning":
+      if (pool === "conditioning") return 4;
+      if (pool === "core") return 0;
+      if (pool === "lower") return 3;
+      if (pool === "upper") return 2;
+      if (pool === "general") return 2;
+      break;
+    case "minimal_core":
+      if (pool === "core") return 0;
+      if (pool === "general") return 2;
+      break;
+    case "core_emphasis":
+      if (pool === "core") return 4;
+      break;
+    case "upper_body":
+      if (pool === "upper") return 4;
+      if (pool === "lower") return 0;
+      break;
+    case "lower_body":
+      if (pool === "lower") return 5;
+      if (pool === "upper") return 2;
+      break;
+    case "strength":
+      if (pool === "upper" || pool === "lower") return 3;
+      break;
+    default:
+      break;
+  }
+  return BASE_WARM_QUOTAS[pool];
+}
+
+function coolDownQuota(pool: StretchThemePoolId, focus: ProgramFocusPreset): number {
+  if (pool === "conditioning") return 0;
+  switch (focus) {
+    case "minimal_core":
+      if (pool === "core") return 0;
+      break;
+    case "core_emphasis":
+      if (pool === "core") return 4;
+      break;
+    case "upper_body":
+      if (pool === "upper") return 4;
+      if (pool === "lower") return 1;
+      break;
+    case "lower_body":
+      if (pool === "lower") return 5;
+      if (pool === "upper") return 2;
+      break;
+    case "conditioning":
+      if (pool === "lower") return 3;
+      if (pool === "core") return 0;
+      break;
+    default:
+      break;
+  }
+  return BASE_COOL_QUOTAS[pool];
 }
 
 function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[] {
   const recovery = isLightRecoveryDay(plan);
   const cats = categoriesInPlan(plan);
-
+  const focus = ctx.programFocus;
+  const daySeed = `d${plan.dayOfWeek}-pf:${focus}`;
   const warmParts: StretchEntry[] = [...ctx.defaultWarmUp];
-  if (dayWantsUpper(plan, cats)) appendPool(warmParts, WARM_UP_POOLS.upper, ctx);
-  if (dayWantsLower(plan, cats)) appendPool(warmParts, WARM_UP_POOLS.lower, ctx);
-  if (dayWantsCore(plan, cats)) appendPool(warmParts, WARM_UP_POOLS.core, ctx);
-  if (dayWantsConditioning(plan, cats)) appendPool(warmParts, WARM_UP_POOLS.conditioning, ctx);
 
-  const warmCap = recovery ? 6 : 10;
-  return dedupeStretchEntries(warmParts).slice(0, warmCap);
+  const poolIds: StretchThemePoolId[] = [
+    "general",
+    "upper",
+    "lower",
+    "core",
+    "conditioning",
+  ];
+
+  for (const id of poolIds) {
+    if (!includeWarmPool(id, plan, cats, focus)) continue;
+    let quota = warmUpQuota(id, focus);
+    if (recovery) quota = Math.max(1, Math.ceil(quota * 0.6));
+    if (quota <= 0) continue;
+    appendPickedPool(
+      warmParts,
+      warmUpCatalogPool(id),
+      quota,
+      `${ctx.weekRotationKey}-${daySeed}-warm-${id}`,
+      ctx,
+    );
+  }
+
+  return dedupeStretchEntries(warmParts);
 }
 
 function deriveCoolDown(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[] {
   const recovery = isLightRecoveryDay(plan);
   const cats = categoriesInPlan(plan);
-
+  const focus = ctx.programFocus;
+  const daySeed = `d${plan.dayOfWeek}-pf:${focus}`;
   const coolParts: StretchEntry[] = [...ctx.defaultCoolDown];
-  if (dayWantsUpper(plan, cats)) appendPool(coolParts, COOL_DOWN_POOLS.upper, ctx);
-  if (dayWantsLower(plan, cats)) appendPool(coolParts, COOL_DOWN_POOLS.lower, ctx);
-  if (dayWantsCore(plan, cats)) appendPool(coolParts, COOL_DOWN_POOLS.core, ctx);
 
-  const coolCap = recovery ? 6 : 10;
-  return dedupeStretchEntries(coolParts).slice(0, coolCap);
+  const poolIds: StretchThemePoolId[] = [
+    "general",
+    "upper",
+    "lower",
+    "core",
+  ];
+
+  for (const id of poolIds) {
+    if (!includeWarmPool(id, plan, cats, focus)) continue;
+    let quota = coolDownQuota(id, focus);
+    if (recovery) quota = Math.max(1, Math.ceil(quota * 0.6));
+    if (quota <= 0) continue;
+    appendPickedPool(
+      coolParts,
+      coolDownCatalogPool(id),
+      quota,
+      `${ctx.weekRotationKey}-${daySeed}-cool-${id}`,
+      ctx,
+    );
+  }
+
+  return dedupeStretchEntries(coolParts);
 }
 
 /** Recompute warm-up / cool-down from settings defaults + day focus. */
