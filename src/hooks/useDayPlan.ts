@@ -17,7 +17,7 @@ export function useDayPlan(dateKey: string): {
   const planRevision = useTrainingWeekRefreshStore((s) => s.planRevision);
   const equipmentKey = useSettingsStore((s) => s.availableEquipment.join(","));
   const programProfileKey = useSettingsStore(
-    (s) => `${s.programFocus}:${s.roundDensity}`,
+    (s) => `${s.trainingPriorityPreset}:${s.roundDensity}`,
   );
   const stretchDefaultsKey = useSettingsStore((s) =>
     [...s.defaultWarmUp, ...s.defaultCoolDown]

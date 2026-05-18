@@ -25,7 +25,9 @@ export function useResolvedStretches(plan: DayPlan | null): {
   const defaultWarmUp = useSettingsStore((s) => s.defaultWarmUp);
   const defaultCoolDown = useSettingsStore((s) => s.defaultCoolDown);
   const exercisePreferences = useExercisePreferencesStore((s) => s.byExerciseId);
-  const programFocus = useSettingsStore((s) => s.programFocus);
+  const trainingPriorityPreset = useSettingsStore(
+    (s) => s.trainingPriorityPreset,
+  );
 
   const stretchDefaultsKey = useMemo(
     () =>
@@ -42,7 +44,7 @@ export function useResolvedStretches(plan: DayPlan | null): {
       defaultCoolDown,
       authMode,
       exercisePreferences,
-      programFocus,
+      trainingPriorityPreset,
     });
     return resolveStretchesForDay(plan, ctx);
   }, [
@@ -51,7 +53,7 @@ export function useResolvedStretches(plan: DayPlan | null): {
     defaultWarmUp,
     defaultCoolDown,
     exercisePreferences,
-    programFocus,
+    trainingPriorityPreset,
     stretchDefaultsKey,
   ]);
 }

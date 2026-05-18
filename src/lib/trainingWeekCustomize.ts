@@ -29,7 +29,7 @@ import {
 import type {
   DayPlan,
   ExerciseEquipment,
-  ProgramFocusPreset,
+  TrainingPriorityPreset,
   RoundDensity,
   StretchEntry,
 } from "@/types";
@@ -143,7 +143,7 @@ export async function saveCustomDayPlan(
   const fingerprint = computePrefsFingerprint(
     prefs,
     settings.availableEquipment,
-    settings.programFocus,
+    settings.trainingPriorityPreset,
     settings.roundDensity,
     settings.defaultWarmUp,
     settings.defaultCoolDown,
@@ -167,7 +167,7 @@ export function buildGeneratedDayPlan(
   dayOfWeek: number,
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
-  programFocus: ProgramFocusPreset,
+  trainingPriorityPreset: TrainingPriorityPreset,
   roundDensity: RoundDensity,
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
@@ -176,7 +176,7 @@ export function buildGeneratedDayPlan(
     buildCatalogWeek(),
     prefs,
     availableEquipment,
-    programFocus,
+    trainingPriorityPreset,
     roundDensity,
     exerciseSettings,
     varietySeed,
@@ -209,14 +209,14 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
     settings.availableEquipment?.length > 0
       ? settings.availableEquipment
       : [...DEFAULT_AVAILABLE_EQUIPMENT];
-  const programFocus = settings.programFocus ?? "balanced";
+  const trainingPriorityPreset = settings.trainingPriorityPreset ?? "balanced";
   const roundDensity = settings.roundDensity ?? "standard";
 
   const freshDay = buildGeneratedDayPlan(
     dow,
     prefs,
     availableEquipment,
-    programFocus,
+    trainingPriorityPreset,
     roundDensity,
     exerciseSettings,
     buildVarietySeed(weekKey, "authenticated"),
@@ -231,7 +231,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
   const fingerprint = computePrefsFingerprint(
     prefs,
     availableEquipment,
-    programFocus,
+    trainingPriorityPreset,
     roundDensity,
     settings.defaultWarmUp,
     settings.defaultCoolDown,

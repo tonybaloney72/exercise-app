@@ -1,4 +1,6 @@
-import type { DayPlan, ExerciseCategory } from "@/types";
+import { CATEGORIES } from "@/data/categories";
+import { isBalancedPreset } from "@/lib/trainingPriorities";
+import type { DayPlan, ExerciseCategory, TrainingPriorityPreset } from "@/types";
 
 const DISPLAY_ORDER: ExerciseCategory[] = [
   "UP",
@@ -13,7 +15,7 @@ const DISPLAY_ORDER: ExerciseCategory[] = [
 
 /**
  * Categories actually prescribed in the day's rounds (for Weekly pills / headers).
- * Unlike `strengthFocus` / `coreGroups`, this updates after materialization and program focus.
+ * Jog days do not add PC here — use a separate jog badge when `plan.hasJog`.
  */
 export function categoriesPresentInPlan(plan: DayPlan): ExerciseCategory[] {
   const present = new Set<ExerciseCategory>();
@@ -22,8 +24,31 @@ export function categoriesPresentInPlan(plan: DayPlan): ExerciseCategory[] {
       present.add(slot.category);
     }
   }
-  if (plan.hasJog && !present.has("PC")) {
-    present.add("PC");
-  }
   return DISPLAY_ORDER.filter((c) => present.has(c));
+}
+
+export type PlanDaySubtitleOptions = {
+  /** Custom-edited weeks: show what's prescribed, not the catalog theme line. */
+  preferMaterialized?: boolean;
+};
+
+function materializedSubtitle(plan: DayPlan): string {
+  const cats = categoriesPresentInPlan(plan);
+  if (cats.length === 0) return plan.theme;
+  return cats.map((c) => CATEGORIES[c].shortName).join(" + ");
+}
+
+/**
+ * Subtitle under the day name: catalog theme when balanced auto-generated;
+ * otherwise categories actually in the day's rounds.
+ */
+export function planDaySubtitle(
+  plan: DayPlan,
+  preset: TrainingPriorityPreset = "balanced",
+  options?: PlanDaySubtitleOptions,
+): string {
+  const useMaterialized =
+    options?.preferMaterialized === true || !isBalancedPreset(preset);
+  if (!useMaterialized) return plan.theme;
+  return materializedSubtitle(plan);
 }

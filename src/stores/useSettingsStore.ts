@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import type { UserSettings } from "@/types";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
+import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import { DEFAULT_SETTINGS, getSettingsRepo } from "@/lib/repos";
 import { refreshCurrentTrainingWeek } from "@/lib/trainingWeekRefresh";
 import {
@@ -26,24 +27,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   updateSettings: async (partial) => {
     const current = get();
-    const updated: UserSettings = {
-      restBetweenRounds: partial.restBetweenRounds ?? current.restBetweenRounds,
-      weekStartDate: partial.weekStartDate ?? current.weekStartDate,
-      darkMode: partial.darkMode ?? current.darkMode,
-      restTimerAutoStart:
-        partial.restTimerAutoStart ?? current.restTimerAutoStart,
-      timerSoundsEnabled:
-        partial.timerSoundsEnabled ?? current.timerSoundsEnabled,
-      timerVibrationEnabled:
-        partial.timerVibrationEnabled ?? current.timerVibrationEnabled,
-      keepScreenAwake: partial.keepScreenAwake ?? current.keepScreenAwake,
-      availableEquipment:
-        partial.availableEquipment ?? current.availableEquipment,
-      programFocus: partial.programFocus ?? current.programFocus,
-      roundDensity: partial.roundDensity ?? current.roundDensity,
-      defaultWarmUp: partial.defaultWarmUp ?? current.defaultWarmUp,
-      defaultCoolDown: partial.defaultCoolDown ?? current.defaultCoolDown,
-    };
+    const updated = normalizeUserSettings({
+      ...current,
+      ...partial,
+    });
     const equipmentChanged =
       partial.availableEquipment != null &&
       !equipmentListsEqual(
@@ -51,8 +38,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         partial.availableEquipment,
       );
     const programProfileChanged =
+      (partial.trainingPriorityPreset != null &&
+        partial.trainingPriorityPreset !== current.trainingPriorityPreset) ||
       (partial.programFocus != null &&
-        partial.programFocus !== current.programFocus) ||
+        partial.programFocus !== current.trainingPriorityPreset) ||
       (partial.roundDensity != null &&
         partial.roundDensity !== current.roundDensity);
     const stretchDefaultsChanged =
@@ -96,12 +85,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       loaded.defaultCoolDown ?? [],
       disliked,
     );
-    const merged: UserSettings = {
-      ...DEFAULT_SETTINGS,
+    const merged: UserSettings = normalizeUserSettings({
       ...loaded,
       defaultWarmUp,
       defaultCoolDown,
-    };
+    });
 
     const pruned =
       !stretchListsEqual(defaultWarmUp, loaded.defaultWarmUp ?? []) ||

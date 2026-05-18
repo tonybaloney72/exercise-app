@@ -72,7 +72,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   timerVibrationEnabled: true,
   keepScreenAwake: false,
   availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
-  programFocus: "balanced",
+  trainingPriorityPreset: "balanced",
   roundDensity: "standard",
   /** Signed-in users configure their own; guests get catalog fallbacks at resolve time. */
   defaultWarmUp: [],

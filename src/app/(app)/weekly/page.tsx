@@ -14,7 +14,11 @@ import { getWeekSourceForDate } from "@/lib/trainingWeekCustomize";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
+import {
+  categoriesPresentInPlan,
+  planDaySubtitle,
+} from "@/lib/planDisplayCategories";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
 
@@ -81,6 +85,9 @@ export default function WeeklyPage() {
     });
   }, []);
 
+  const trainingPriorityPreset = useSettingsStore(
+    (s) => s.trainingPriorityPreset,
+  );
   const { weekByDow, loading: weekLoading, error: weekError } =
     useTrainingWeekPlans(weekDates);
 
@@ -211,17 +218,23 @@ export default function WeeklyPage() {
                           </span>
                         )}
                       </div>
-                      <p className="mt-0.5 text-xs text-muted">{plan.theme}</p>
+                      <p className="mt-0.5 text-xs text-muted">
+                        {planDaySubtitle(plan, trainingPriorityPreset, {
+                          preferMaterialized: isCustomWeek,
+                        })}
+                      </p>
                     </div>
-                    {plan.hasJog && (
-                      <span className="text-xs text-sky-400">🏃</span>
-                    )}
                   </div>
 
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
                     {categoriesPresentInPlan(plan).map((cat) => (
                       <CategoryBadge key={cat} category={cat} />
                     ))}
+                    {plan.hasJog && (
+                      <span className="inline-flex items-center rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-medium text-sky-400">
+                        🏃 Jog
+                      </span>
+                    )}
                   </div>
 
                   <div className="mt-2 text-[10px] text-muted">

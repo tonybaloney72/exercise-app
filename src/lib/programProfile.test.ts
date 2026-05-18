@@ -70,7 +70,6 @@ describe("applyProgramProfileToDayPlan", () => {
       roundCategories(plan).filter((c) => coreCats.has(c)).length;
 
     expect(countCore(minimal)).toBeLessThan(countCore(coreHeavy));
-    expect(roundCategories(minimal).some((c) => c === "UP")).toBe(true);
   });
 
   it("adds slots up to full density when the template round is shorter", () => {
@@ -108,6 +107,22 @@ describe("applyProgramProfileToDayPlan", () => {
       r.exercises.map((e) => e.category),
     );
     expect(categories).toContain("PC");
+  });
+
+  it("upper_body on a lower-themed day mixes categories instead of filling with UP only", () => {
+    const tuesday = buildCatalogWeek()[2]!;
+    const shaped = applyProgramProfileToDayPlan(
+      tuesday,
+      "upper_body",
+      "standard",
+      EQUIP,
+      EMPTY_PREFS,
+    );
+    const round0 = shaped.rounds[0]!.exercises.map((e) => e.category);
+    const unique = new Set(round0);
+    expect(unique.size).toBeGreaterThan(1);
+    expect(unique.has("UP")).toBe(true);
+    expect(round0.every((c) => c === "UP")).toBe(false);
   });
 
   it("re-picks exercises when program focus changes at standard density", () => {

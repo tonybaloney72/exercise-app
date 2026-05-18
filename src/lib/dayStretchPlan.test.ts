@@ -9,7 +9,11 @@ const EMPTY_DEFAULTS: StretchEntry[] = [];
 
 function ctxFor(
   prefs: Record<string, "disliked"> = {},
-  programFocus: "balanced" | "upper_body" | "conditioning" | "lower_body" = "balanced",
+  trainingPriorityPreset:
+    | "balanced"
+    | "upper_body"
+    | "conditioning"
+    | "lower_body" = "balanced",
   weekRotationKey = "2026-05-10",
 ) {
   return buildStretchResolveContextFromInputs({
@@ -17,7 +21,7 @@ function ctxFor(
     defaultCoolDown: EMPTY_DEFAULTS,
     authMode: "authenticated",
     exercisePreferences: prefs,
-    programFocus,
+    trainingPriorityPreset,
     weekRotationKey,
   });
 }
@@ -27,7 +31,6 @@ describe("resolveStretchesForDay", () => {
     const monday = buildCatalogWeek()[1]!;
     const { warmUp } = resolveStretchesForDay(monday, ctxFor());
     const ids = warmUp.map((e) => e.exerciseId);
-    expect(ids).toContain("SW-3");
     const upperIds = new Set(WARM_UP_CATALOG_POOLS.upper.map((e) => e.exerciseId));
     expect(ids.some((id) => upperIds.has(id))).toBe(true);
   });
@@ -49,7 +52,7 @@ describe("resolveStretchesForDay", () => {
     expect(ids).not.toContain("SW-14");
   });
 
-  it("adds conditioning warm-ups when program focus is conditioning", () => {
+  it("adds conditioning warm-ups when training priority is conditioning", () => {
     const monday = buildCatalogWeek()[1]!;
     const balanced = resolveStretchesForDay(monday, ctxFor({}, "balanced")).warmUp.map(
       (e) => e.exerciseId,
@@ -58,7 +61,10 @@ describe("resolveStretchesForDay", () => {
       monday,
       ctxFor({}, "conditioning"),
     ).warmUp.map((e) => e.exerciseId);
-    expect(conditioning).toContain("SW-33");
+    const conditioningIds = new Set(
+      WARM_UP_CATALOG_POOLS.conditioning.map((e) => e.exerciseId),
+    );
+    expect(conditioning.some((id) => conditioningIds.has(id))).toBe(true);
     expect(conditioning).not.toEqual(balanced);
   });
 

@@ -9,10 +9,8 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
 import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
-import {
-  PROGRAM_FOCUS_OPTIONS,
-  ROUND_DENSITY_OPTIONS,
-} from "@/lib/programProfile";
+import { ROUND_DENSITY_OPTIONS } from "@/lib/programProfile";
+import { TRAINING_PRIORITY_OPTIONS } from "@/lib/trainingPriorities";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
@@ -60,7 +58,7 @@ export default function SettingsPage() {
         timerVibrationEnabled: settings.timerVibrationEnabled,
         keepScreenAwake: settings.keepScreenAwake,
         availableEquipment: settings.availableEquipment,
-        programFocus: settings.programFocus,
+        trainingPriorityPreset: settings.trainingPriorityPreset,
         roundDensity: settings.roundDensity,
         defaultWarmUp: settings.defaultWarmUp,
         defaultCoolDown: settings.defaultCoolDown,
@@ -285,21 +283,21 @@ export default function SettingsPage() {
         </SurfaceCard>
       </AnimatedSection>
 
-      {/* Program profile (signed-in weekly plans) */}
+      {/* Training priorities (signed-in weekly plans) */}
       {mode === "authenticated" && (
         <AnimatedSection delay={0.049}>
           <SurfaceCard className="p-4 space-y-4">
           <div>
-            <h2 className="text-sm font-semibold text-foreground">Program focus</h2>
+            <h2 className="text-sm font-semibold text-foreground">Training priorities</h2>
             <p className="text-xs text-muted mt-1">
-              Shapes how your generated training week balances strength, core, and
-              conditioning. Updates this week&apos;s prescribed plan; finished workouts
-              stay as logged.
+              Chooses how much core, cardio, legs, and upper body appear when your week
+              is generated. Each day still follows the weekly template. Updates today
+              and upcoming days; finished workouts stay as logged.
             </p>
           </div>
-          <div className="space-y-2" role="radiogroup" aria-label="Program focus">
-            {PROGRAM_FOCUS_OPTIONS.map((option) => {
-              const selected = settings.programFocus === option.value;
+          <div className="space-y-2" role="radiogroup" aria-label="Training priority preset">
+            {TRAINING_PRIORITY_OPTIONS.map((option) => {
+              const selected = settings.trainingPriorityPreset === option.value;
               return (
                 <button
                   key={option.value}
@@ -307,7 +305,9 @@ export default function SettingsPage() {
                   role="radio"
                   aria-checked={selected}
                   onClick={() =>
-                    void settings.updateSettings({ programFocus: option.value })
+                    void settings.updateSettings({
+                      trainingPriorityPreset: option.value,
+                    })
                   }
                   className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
                     selected

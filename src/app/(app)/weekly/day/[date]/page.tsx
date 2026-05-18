@@ -10,7 +10,11 @@ import FrozenPastDayPlanNotice from "@/components/workout/FrozenPastDayPlanNotic
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
-import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
+import {
+  categoriesPresentInPlan,
+  planDaySubtitle,
+} from "@/lib/planDisplayCategories";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { getFrozenPastDayPlanCopy } from "@/lib/trainingWeekFrozenDay";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import {
@@ -104,6 +108,9 @@ export default function WeeklyDayPage() {
     pausedWorkoutDate,
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
+  const trainingPriorityPreset = useSettingsStore(
+    (s) => s.trainingPriorityPreset,
+  );
   const exercisePrefs = useExercisePreferencesStore((s) => s.byExerciseId);
   const [customizing, setCustomizing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -246,7 +253,11 @@ export default function WeeklyDayPage() {
           <h1 className="text-2xl font-bold text-foreground">
             {formatPageTitle(dateKey)}
           </h1>
-          <p className="text-sm text-muted">{plan.theme}</p>
+          <p className="text-sm text-muted">
+            {planDaySubtitle(plan, trainingPriorityPreset, {
+              preferMaterialized: isCustomWeek,
+            })}
+          </p>
           {isCustomWeek && canCustomize && (
             <p className="text-xs text-accent/90 pt-1">
               This week has custom edits — reset the full week from Weekly overview.

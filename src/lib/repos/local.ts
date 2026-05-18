@@ -13,6 +13,7 @@ import type {
   TrainingWeekRepo,
 } from "./types";
 import { migrateExerciseId, migrateWorkoutLog } from "@/lib/cpToPcMigration";
+import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import { DEFAULT_SETTINGS } from "./types";
 
 export const LOCAL_HISTORY_KEY = "exercise-app-history";
@@ -58,7 +59,7 @@ export const localSettingsRepo: SettingsRepo = {
     try {
       const raw = localStorage.getItem(LOCAL_SETTINGS_KEY);
       return raw
-        ? { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<UserSettings>) }
+        ? normalizeUserSettings(JSON.parse(raw) as Partial<UserSettings>)
         : DEFAULT_SETTINGS;
     } catch {
       return DEFAULT_SETTINGS;

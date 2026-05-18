@@ -28,7 +28,7 @@ import type { AuthMode } from "@/stores/useAuthStore";
 import type {
   DayPlan,
   ExerciseEquipment,
-  ProgramFocusPreset,
+  TrainingPriorityPreset,
   RoundDensity,
   UserSettings,
 } from "@/types";
@@ -41,7 +41,7 @@ import {
 
 function settingsSlice(settings: UserSettings): {
   availableEquipment: ExerciseEquipment[];
-  programFocus: ProgramFocusPreset;
+  trainingPriorityPreset: TrainingPriorityPreset;
   roundDensity: RoundDensity;
 } {
   return {
@@ -49,7 +49,7 @@ function settingsSlice(settings: UserSettings): {
       settings.availableEquipment?.length > 0
         ? settings.availableEquipment
         : [...DEFAULT_AVAILABLE_EQUIPMENT],
-    programFocus: settings.programFocus ?? "balanced",
+    trainingPriorityPreset: settings.trainingPriorityPreset ?? "balanced",
     roundDensity: settings.roundDensity ?? "standard",
   };
 }
@@ -63,7 +63,7 @@ async function loadGeneratorInputs(mode: AuthMode): Promise<{
   settings: UserSettings;
   exerciseSettings: ExerciseSettingsMap;
   availableEquipment: ExerciseEquipment[];
-  programFocus: ProgramFocusPreset;
+  trainingPriorityPreset: TrainingPriorityPreset;
   roundDensity: RoundDensity;
   fingerprint: string;
 }> {
@@ -73,19 +73,19 @@ async function loadGeneratorInputs(mode: AuthMode): Promise<{
     getSettingsRepo(repoMode).load(),
     getExerciseSettingsRepo(repoMode).loadAll(),
   ]);
-  const { availableEquipment, programFocus, roundDensity } =
+  const { availableEquipment, trainingPriorityPreset, roundDensity } =
     settingsSlice(settings);
   return {
     prefs,
     settings,
     exerciseSettings,
     availableEquipment,
-    programFocus,
+    trainingPriorityPreset,
     roundDensity,
     fingerprint: computePrefsFingerprint(
       prefs,
       availableEquipment,
-      programFocus,
+      trainingPriorityPreset,
       roundDensity,
       settings.defaultWarmUp,
       settings.defaultCoolDown,
@@ -96,7 +96,7 @@ async function loadGeneratorInputs(mode: AuthMode): Promise<{
 function materializeWeekFromCatalog(
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
-  programFocus: ProgramFocusPreset,
+  trainingPriorityPreset: TrainingPriorityPreset,
   roundDensity: RoundDensity,
   exerciseSettings: ExerciseSettingsMap,
   varietySeed: string,
@@ -105,7 +105,7 @@ function materializeWeekFromCatalog(
     buildCatalogWeek(),
     prefs,
     availableEquipment,
-    programFocus,
+    trainingPriorityPreset,
     roundDensity,
     exerciseSettings,
     varietySeed,
@@ -139,7 +139,7 @@ async function refreshPersistedWeek(
   const {
     prefs,
     availableEquipment,
-    programFocus,
+    trainingPriorityPreset,
     roundDensity,
     exerciseSettings,
     fingerprint,
@@ -148,7 +148,7 @@ async function refreshPersistedWeek(
   const materialized = materializeWeekFromCatalog(
     prefs,
     availableEquipment,
-    programFocus,
+    trainingPriorityPreset,
     roundDensity,
     exerciseSettings,
     buildVarietySeed(weekKey, "authenticated"),
@@ -180,9 +180,11 @@ async function refreshPersistedWeek(
       : storedDays;
 
   const source =
-    persisted?.source && isUserCustomizedWeekSource(persisted.source)
-      ? persisted.source
-      : TRAINING_WEEK_SOURCE_GENERATED_V1;
+    indices.length > 0
+      ? TRAINING_WEEK_SOURCE_GENERATED_V1
+      : persisted?.source && isUserCustomizedWeekSource(persisted.source)
+        ? persisted.source
+        : TRAINING_WEEK_SOURCE_GENERATED_V1;
 
   await persistTrainingWeek(weekKey, merged, {
     source,
@@ -193,13 +195,13 @@ async function refreshPersistedWeek(
 
 /** In-memory materialized week (guest / anonymous) from catalog + local settings. */
 async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays> {
-  const { prefs, availableEquipment, programFocus, roundDensity, exerciseSettings } =
+  const { prefs, availableEquipment, trainingPriorityPreset, roundDensity, exerciseSettings } =
     await loadGeneratorInputs(mode);
   const scope = mode === "authenticated" ? "authenticated" : "guest";
   return materializeWeekFromCatalog(
     prefs,
     availableEquipment,
-    programFocus,
+    trainingPriorityPreset,
     roundDensity,
     exerciseSettings,
     varietySeedForCurrentWeek(scope),
@@ -214,7 +216,7 @@ async function loadOrSeedPersistedWeek(
   const {
     prefs,
     availableEquipment,
-    programFocus,
+    trainingPriorityPreset,
     roundDensity,
     fingerprint,
   } = await loadGeneratorInputs("authenticated");

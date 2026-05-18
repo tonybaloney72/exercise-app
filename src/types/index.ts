@@ -156,8 +156,8 @@ export interface WorkoutLog {
   endTime?: string;
 }
 
-/** How generated weeks bias strength vs core vs conditioning (Slice 5+). */
-export type ProgramFocusPreset =
+/** Training priority preset (replaces legacy “program focus” naming in UI). */
+export type TrainingPriorityPreset =
   | "balanced"
   | "minimal_core"
   | "core_emphasis"
@@ -165,6 +165,8 @@ export type ProgramFocusPreset =
   | "lower_body"
   | "upper_body"
   | "conditioning";
+
+/** @deprecated Use {@link TrainingPriorityPreset}. */
 
 /** Target exercises per round when materializing from templates (Slice 5). */
 export type RoundDensity = "compact" | "standard" | "full";
@@ -192,7 +194,9 @@ export interface UserSettings {
    * Exercises with an `equipment` tag require at least one matching entry.
    */
   availableEquipment: ExerciseEquipment[];
-  programFocus: ProgramFocusPreset;
+  trainingPriorityPreset: TrainingPriorityPreset;
+  /** @deprecated Use {@link UserSettings.trainingPriorityPreset}. */
+  programFocus?: TrainingPriorityPreset;
   roundDensity: RoundDensity;
   /** Always-included warm-up stretches (Settings). Merged first when deriving a day's warm-up. */
   defaultWarmUp: StretchEntry[];

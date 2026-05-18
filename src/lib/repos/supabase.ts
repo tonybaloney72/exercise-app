@@ -4,7 +4,6 @@ import type {
   ExerciseEquipment,
   ExerciseSettingsValues,
   ExerciseSetMode,
-  ProgramFocusPreset,
   RoundDensity,
   RoundLog,
   UserSettings,
@@ -12,6 +11,7 @@ import type {
 } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeStretchEntries } from "@/lib/stretchDefaults";
+import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import { DEFAULT_TIMER_SECONDS_FALLBACK } from "@/utils/effectiveExerciseSettings";
 import type {
   ExerciseSettingsMap,
@@ -243,21 +243,6 @@ function workoutToSavePayload(log: WorkoutLog) {
   return { workout, exerciseLogs };
 }
 
-function sanitizeProgramFocus(raw: unknown): ProgramFocusPreset {
-  if (
-    raw === "balanced" ||
-    raw === "minimal_core" ||
-    raw === "core_emphasis" ||
-    raw === "strength" ||
-    raw === "lower_body" ||
-    raw === "upper_body" ||
-    raw === "conditioning"
-  ) {
-    return raw;
-  }
-  return "balanced";
-}
-
 function sanitizeRoundDensity(raw: unknown): RoundDensity {
   if (raw === "compact" || raw === "full" || raw === "standard") {
     return raw;
@@ -276,7 +261,7 @@ function sanitizeAvailableEquipment(raw: unknown): ExerciseEquipment[] {
 }
 
 function rowToSettings(row: SettingsRow): UserSettings {
-  return {
+  return normalizeUserSettings({
     restBetweenRounds: row.rest_between_rounds,
     weekStartDate: row.week_start_date ?? undefined,
     darkMode: row.dark_mode,
@@ -285,11 +270,11 @@ function rowToSettings(row: SettingsRow): UserSettings {
     timerVibrationEnabled: row.timer_vibration_enabled ?? true,
     keepScreenAwake: row.keep_screen_awake ?? false,
     availableEquipment: sanitizeAvailableEquipment(row.available_equipment),
-    programFocus: sanitizeProgramFocus(row.program_focus),
-    roundDensity: sanitizeRoundDensity(row.round_density),
-    defaultWarmUp: sanitizeStretchEntries(row.default_warm_up),
-    defaultCoolDown: sanitizeStretchEntries(row.default_cool_down),
-  };
+    trainingPriorityPreset: row.program_focus,
+    roundDensity: row.round_density,
+    defaultWarmUp: row.default_warm_up,
+    defaultCoolDown: row.default_cool_down,
+  });
 }
 
 function settingsToRow(s: UserSettings, userId: string): SettingsRow {
@@ -303,7 +288,7 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     timer_vibration_enabled: s.timerVibrationEnabled,
     keep_screen_awake: s.keepScreenAwake,
     available_equipment: s.availableEquipment,
-    program_focus: s.programFocus,
+    program_focus: s.trainingPriorityPreset,
     round_density: s.roundDensity,
     default_warm_up: s.defaultWarmUp,
     default_cool_down: s.defaultCoolDown,

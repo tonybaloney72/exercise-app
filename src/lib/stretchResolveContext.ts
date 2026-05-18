@@ -9,13 +9,13 @@ import { useAuthStore, type AuthMode } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { getWeekDateKeys } from "@/utils/weekCalendar";
-import type { DayPlan, ProgramFocusPreset, StretchEntry } from "@/types";
+import type { DayPlan, StretchEntry, TrainingPriorityPreset } from "@/types";
 
 export type StretchResolveContext = {
   defaultWarmUp: StretchEntry[];
   defaultCoolDown: StretchEntry[];
   dislikedExerciseIds: ReadonlySet<string>;
-  programFocus: ProgramFocusPreset;
+  trainingPriorityPreset: TrainingPriorityPreset;
   /** Sunday date key for the active week — rotates catalog picks across weeks. */
   weekRotationKey: string;
 };
@@ -25,7 +25,7 @@ export function buildStretchResolveContextFromInputs(inputs: {
   defaultCoolDown: StretchEntry[];
   authMode: AuthMode;
   exercisePreferences: ExercisePreferenceMap;
-  programFocus?: ProgramFocusPreset;
+  trainingPriorityPreset?: TrainingPriorityPreset;
   weekRotationKey?: string;
 }): StretchResolveContext {
   const dislikedExerciseIds = collectDislikedIds(inputs.exercisePreferences);
@@ -42,7 +42,8 @@ export function buildStretchResolveContextFromInputs(inputs: {
       useCatalogIfEmpty,
     ),
     dislikedExerciseIds,
-    programFocus: inputs.programFocus ?? "balanced",
+    trainingPriorityPreset:
+      inputs.trainingPriorityPreset ?? "balanced",
     weekRotationKey: inputs.weekRotationKey ?? getWeekDateKeys()[0]!,
   };
 }
@@ -54,7 +55,7 @@ export function buildStretchResolveContext(): StretchResolveContext {
     defaultCoolDown: useSettingsStore.getState().defaultCoolDown,
     authMode: useAuthStore.getState().mode,
     exercisePreferences: useExercisePreferencesStore.getState().byExerciseId,
-    programFocus: useSettingsStore.getState().programFocus,
+    trainingPriorityPreset: useSettingsStore.getState().trainingPriorityPreset,
     weekRotationKey: getWeekDateKeys()[0],
   });
 }

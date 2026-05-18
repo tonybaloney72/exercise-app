@@ -139,7 +139,7 @@ describe("resetDayToGenerated", () => {
     mockLoadExerciseSettings.mockResolvedValue({});
     mockLoadSettings.mockResolvedValue({
       availableEquipment: EQUIP,
-      programFocus: "balanced",
+      trainingPriorityPreset: "balanced",
       roundDensity: "standard",
       defaultWarmUp: [],
       defaultCoolDown: [],

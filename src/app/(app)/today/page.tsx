@@ -14,7 +14,11 @@ import PostWorkoutSummary from "@/components/workout/PostWorkoutSummary";
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
-import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
+import {
+  categoriesPresentInPlan,
+  planDaySubtitle,
+} from "@/lib/planDisplayCategories";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import {
   bumpTrainingWeekPlans,
   resetTrainingDayToGenerated,
@@ -43,6 +47,9 @@ function TodayPageInner() {
     updateCompletedWorkoutNotes,
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
+  const trainingPriorityPreset = useSettingsStore(
+    (s) => s.trainingPriorityPreset,
+  );
   const todayKey = formatLocalDateKey();
   const { plan, loading: planLoading, error: planError } = useDayPlan(todayKey);
   const [customizing, setCustomizing] = useState(false);
@@ -184,7 +191,11 @@ function TodayPageInner() {
         <h1 className="text-2xl font-bold text-foreground">
           Today&apos;s Workout
         </h1>
-        <p className="text-sm text-muted">{plan.theme}</p>
+        <p className="text-sm text-muted">
+          {planDaySubtitle(plan, trainingPriorityPreset, {
+            preferMaterialized: isCustomWeek,
+          })}
+        </p>
       </motion.div>
 
       {/* Category chips */}

@@ -11,12 +11,13 @@ import type { ExercisePreferenceMap, ExerciseSettingsMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { exerciseMap } from "@/data/exercises";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
+import { trainingPriorityFingerprint } from "@/lib/trainingPriorities";
 import type {
   DayPlan,
   ExerciseEquipment,
-  ProgramFocusPreset,
   RoundDensity,
   RoundExercise,
+  TrainingPriorityPreset,
 } from "@/types";
 
 export const TRAINING_WEEK_SOURCE_GENERATED_V1 = "generated_week_v1";
@@ -35,7 +36,7 @@ export function isUserCustomizedWeekSource(source: string | null | undefined): b
 export function computePrefsFingerprint(
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
-  programFocus: ProgramFocusPreset = "balanced",
+  trainingPriorityPreset: TrainingPriorityPreset = "balanced",
   roundDensity: RoundDensity = "standard",
   defaultWarmUp: StretchEntry[] = [],
   defaultCoolDown: StretchEntry[] = [],
@@ -50,7 +51,7 @@ export function computePrefsFingerprint(
     .sort();
   const equip = [...availableEquipment].sort();
   const stretches = stretchDefaultsFingerprint(defaultWarmUp, defaultCoolDown);
-  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pf:${programFocus}|rd:${roundDensity}|${stretches}`;
+  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|${trainingPriorityFingerprint(trainingPriorityPreset)}|rd:${roundDensity}|${stretches}`;
 }
 
 export {
@@ -168,14 +169,14 @@ export function materializeTrainingWeek(
   catalogWeek: TrainingWeekDays,
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
-  programFocus: ProgramFocusPreset,
+  trainingPriorityPreset: TrainingPriorityPreset,
   roundDensity: RoundDensity,
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
 ): TrainingWeekDays {
   const profiled = applyProgramProfileToWeek(
     catalogWeek,
-    programFocus,
+    trainingPriorityPreset,
     roundDensity,
     availableEquipment,
     prefs,
