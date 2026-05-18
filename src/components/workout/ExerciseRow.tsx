@@ -14,6 +14,7 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { ExerciseLog, ExerciseSetMode, RoundExercise } from "@/types";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
+  parseRepTargetHint,
   resolveExerciseSettings,
 } from "@/utils/effectiveExerciseSettings";
 import TimerTargetControls from "./TimerTargetControls";
@@ -138,6 +139,22 @@ export default function ExerciseRow({
     roundExercise.targetReps,
     effectiveTargetSec,
     stored,
+  ]);
+
+  const actualRepsPlaceholder = useMemo(() => {
+    if (!effectiveExercise || mode !== "reps") return "—";
+    const r = resolveExerciseSettings(effectiveExercise, stored);
+    if (r.defaultTargetReps != null) return String(r.defaultTargetReps);
+    const hint = parseRepTargetHint(
+      resolvePrescriptionText(log) || roundExercise.targetReps,
+    );
+    return hint != null ? String(hint) : "—";
+  }, [
+    effectiveExercise,
+    mode,
+    stored,
+    log,
+    roundExercise.targetReps,
   ]);
 
   if (!plannedExercise || !effectiveExercise) return null;
@@ -393,18 +410,19 @@ export default function ExerciseRow({
                     inputMode="numeric"
                     value={log.actualReps != null ? String(log.actualReps) : ""}
                     onChange={(e) => {
-                      const val = e.target.value;
+                      const val = e.target.value.trim();
                       if (val === "") {
                         setActualReps(roundNumber, plannedId, undefined);
-                      } else {
-                        const num = parseInt(val, 10);
-                        if (!isNaN(num)) {
-                          setActualReps(roundNumber, plannedId, num);
-                        }
+                        return;
+                      }
+                      if (!/^\d+$/.test(val)) return;
+                      const num = parseInt(val, 10);
+                      if (!isNaN(num)) {
+                        setActualReps(roundNumber, plannedId, num);
                       }
                     }}
                     className="w-16 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground outline-none focus:border-accent"
-                    placeholder="—"
+                    placeholder={actualRepsPlaceholder}
                   />
                 </div>
               )}
@@ -427,24 +445,27 @@ export default function ExerciseRow({
                       Actual duration (optional)
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       inputMode="numeric"
-                      min={5}
-                      max={999}
-                      value={log.actualDuration ?? ""}
+                      value={
+                        log.actualDuration != null
+                          ? String(log.actualDuration)
+                          : ""
+                      }
                       onChange={(e) => {
-                        const v = e.target.value;
+                        const v = e.target.value.trim();
                         if (v === "") {
                           setActualDuration(roundNumber, plannedId, undefined);
                           return;
                         }
-                        const n = Math.round(Number(v));
+                        if (!/^\d+$/.test(v)) return;
+                        const n = parseInt(v, 10);
                         if (!Number.isNaN(n)) {
                           setActualDuration(roundNumber, plannedId, n);
                         }
                       }}
                       className="w-20 rounded-md border border-border bg-background px-2 py-1 font-mono text-sm text-foreground outline-none focus:border-accent"
-                      placeholder="—"
+                      placeholder={String(effectiveTargetSec)}
                     />
                   </div>
                 </div>

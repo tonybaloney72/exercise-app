@@ -10,6 +10,7 @@ import { CATEGORIES } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
+import PostWorkoutSummary from "@/components/workout/PostWorkoutSummary";
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
@@ -47,6 +48,7 @@ function TodayPageInner() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [weekSource, setWeekSource] = useState<string | null>(null);
+  const [showWorkoutDetails, setShowWorkoutDetails] = useState(false);
 
   const devForcePreWorkout =
     process.env.NODE_ENV === "development" &&
@@ -89,6 +91,10 @@ function TodayPageInner() {
       cancelled = true;
     };
   }, [canCustomize, todayKey]);
+
+  useEffect(() => {
+    setShowWorkoutDetails(false);
+  }, [todaysCompletedLog?.id]);
 
   if (planLoading) {
     return (
@@ -178,29 +184,26 @@ function TodayPageInner() {
           Today&apos;s Workout
         </h1>
         <p className="text-sm text-muted">{plan.theme}</p>
-        {isCustomWeek && canCustomize && (
-          <p className="text-xs text-accent/90 pt-1">
-            This week has custom edits — reset the full week from Weekly overview.
-          </p>
-        )}
       </motion.div>
 
       {/* Category chips */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="flex flex-wrap gap-2"
-      >
-        {allCategories.map((cat) => (
-          <CategoryBadge key={cat} category={cat} size="md" />
-        ))}
-        {plan.hasJog && (
-          <span className="inline-flex items-center rounded-full bg-sky-500/20 px-2.5 py-1 text-xs font-medium text-sky-400">
-            🏃 Jog
-          </span>
-        )}
-      </motion.div>
+      {!completedLogForUi && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="flex flex-wrap gap-2"
+        >
+          {allCategories.map((cat) => (
+            <CategoryBadge key={cat} category={cat} size="md" />
+          ))}
+          {plan.hasJog && (
+            <span className="inline-flex items-center rounded-full bg-sky-500/20 px-2.5 py-1 text-xs font-medium text-sky-400">
+              🏃 Jog
+            </span>
+          )}
+        </motion.div>
+      )}
 
       {canEditPlan && !showPlanEditor && (
         <button
@@ -240,15 +243,33 @@ function TodayPageInner() {
       {activeWorkout && <WorkoutSession plan={plan} />}
       {activeWorkout && <FloatingTimer />}
 
-      {/* Completed today — read-only summary + editable notes */}
-      {!activeWorkout && completedLogForUi && (
-        <WorkoutDayReview
+      {/* Completed today — summary first, full log on demand */}
+      {!activeWorkout && completedLogForUi && !showWorkoutDetails && (
+        <PostWorkoutSummary
           plan={plan}
           log={completedLogForUi}
-          onNotesChange={(notes) =>
-            updateCompletedWorkoutNotes(completedLogForUi.id, notes)
-          }
+          onMoreDetails={() => setShowWorkoutDetails(true)}
         />
+      )}
+
+      {!activeWorkout && completedLogForUi && showWorkoutDetails && (
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => setShowWorkoutDetails(false)}
+            className="text-sm font-medium text-accent hover:underline"
+          >
+            ← Back to summary
+          </button>
+          <WorkoutDayReview
+            plan={plan}
+            log={completedLogForUi}
+            hideCompletionBanner
+            onNotesChange={(notes) =>
+              updateCompletedWorkoutNotes(completedLogForUi.id, notes)
+            }
+          />
+        </div>
       )}
 
       {hasPausedDraftToday && (

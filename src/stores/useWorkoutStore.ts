@@ -25,7 +25,6 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import { exerciseMap } from "@/data/exercises";
 import {
   clearExerciseMetrics,
-  ensureExerciseMetrics,
   hydrateWorkoutLog,
 } from "@/utils/exerciseLogDefaults";
 import {
@@ -311,11 +310,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         if (!nextDone) {
           return { ...clearExerciseMetrics(ex), completed: false, skipped: false };
         }
-        return ensureExerciseMetrics({
-          ...ex,
-          completed: true,
-          skipped: false,
-        });
+        return { ...ex, completed: true, skipped: false };
       });
       const warmUpCompleted = warmUpExercises.every((ex) => ex.completed || ex.skipped);
       return {
@@ -332,11 +327,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         if (!nextDone) {
           return { ...clearExerciseMetrics(ex), completed: false, skipped: false };
         }
-        return ensureExerciseMetrics({
-          ...ex,
-          completed: true,
-          skipped: false,
-        });
+        return { ...ex, completed: true, skipped: false };
       });
       const coolDownCompleted = coolDownExercises.every((ex) => ex.completed || ex.skipped);
       return {
@@ -357,11 +348,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
             if (!nextDone) {
               return { ...clearExerciseMetrics(ex), completed: false, skipped: false };
             }
-            return ensureExerciseMetrics({
-              ...ex,
-              completed: true,
-              skipped: false,
-            });
+            return { ...ex, completed: true, skipped: false };
           }),
         };
       });
@@ -377,16 +364,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
           ...r,
           exercises: r.exercises.map((ex) => {
             if (ex.exerciseId !== exerciseId) return ex;
-            let next: ExerciseLog = { ...ex, actualReps: reps ?? undefined };
-            if (
-              next.completed &&
-              !next.skipped &&
-              next.actualReps == null &&
-              next.actualDuration == null
-            ) {
-              next = ensureExerciseMetrics(next);
-            }
-            return next;
+            return { ...ex, actualReps: reps ?? undefined };
           }),
         };
       });
@@ -402,19 +380,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
           ...r,
           exercises: r.exercises.map((ex) => {
             if (ex.exerciseId !== exerciseId) return ex;
-            let next: ExerciseLog = {
+            return {
               ...ex,
               actualDuration: seconds ?? undefined,
             };
-            if (
-              next.completed &&
-              !next.skipped &&
-              next.actualReps == null &&
-              next.actualDuration == null
-            ) {
-              next = ensureExerciseMetrics(next);
-            }
-            return next;
           }),
         };
       });
@@ -739,19 +708,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       if (!state.activeWorkout) return state;
       const warmUpExercises = state.activeWorkout.warmUpExercises.map((ex) => {
         if (ex.exerciseId !== exerciseId) return ex;
-        let next: ExerciseLog = {
+        return {
           ...ex,
           actualDuration: seconds ?? undefined,
         };
-        if (
-          next.completed &&
-          !next.skipped &&
-          next.actualReps == null &&
-          next.actualDuration == null
-        ) {
-          next = ensureExerciseMetrics(next);
-        }
-        return next;
       });
       return { activeWorkout: { ...state.activeWorkout, warmUpExercises } };
     }),
@@ -761,19 +721,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       if (!state.activeWorkout) return state;
       const coolDownExercises = state.activeWorkout.coolDownExercises.map((ex) => {
         if (ex.exerciseId !== exerciseId) return ex;
-        let next: ExerciseLog = {
+        return {
           ...ex,
           actualDuration: seconds ?? undefined,
         };
-        if (
-          next.completed &&
-          !next.skipped &&
-          next.actualReps == null &&
-          next.actualDuration == null
-        ) {
-          next = ensureExerciseMetrics(next);
-        }
-        return next;
       });
       return { activeWorkout: { ...state.activeWorkout, coolDownExercises } };
     }),

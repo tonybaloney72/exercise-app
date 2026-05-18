@@ -9,7 +9,6 @@ import {
   EQUIPMENT_LABELS,
   exerciseMatchesEquipment,
 } from "@/data/equipment";
-import CategoryBadge from "@/components/common/CategoryBadge";
 import EmptyState from "@/components/common/EmptyState";
 import type { Exercise, ExerciseCategory } from "@/types";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
@@ -294,18 +293,6 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     [exercise, stored],
   );
 
-  const collapsedSummary = useMemo(() => {
-    if (resolved.defaultSetMode === "timer") {
-      const sec =
-        resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK;
-      return `${sec}s`;
-    }
-    if (resolved.defaultTargetReps != null) {
-      return String(resolved.defaultTargetReps);
-    }
-    return exercise.defaultReps;
-  }, [resolved, exercise.defaultReps]);
-
   const effectiveSec: number =
     stored?.defaultTimerSeconds ??
     (resolved.defaultSetMode === "timer"
@@ -413,25 +400,34 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
               return !prev;
             });
           }}
-          className="flex min-w-0 flex-1 items-center gap-3 text-left"
+          className="flex min-w-0 flex-1 flex-col items-start gap-0.5 py-0.5 text-left"
         >
-          <span className="text-[10px] font-mono text-muted w-8 shrink-0">
-            {exercise.id}
+          <span className="text-sm font-medium text-foreground leading-snug">
+            {exercise.name}
           </span>
-          <span className="flex-1 min-w-0">
-            <span className="block text-sm font-medium text-foreground truncate">
-              {exercise.name}
+          {exercise.equipment && exercise.equipment.length > 0 ? (
+            <span className="text-xs text-muted leading-snug">
+              {exercise.equipment.map((eq) => EQUIPMENT_LABELS[eq]).join(" · ")}
             </span>
-            {exercise.equipment && exercise.equipment.length > 0 && (
-              <span className="block text-[10px] text-muted truncate">
-                {exercise.equipment.map((eq) => EQUIPMENT_LABELS[eq]).join(" · ")}
-              </span>
-            )}
-          </span>
+          ) : (
+            <span className="text-xs text-muted">Bodyweight</span>
+          )}
         </button>
         <ExercisePreferenceToggles exerciseId={exercise.id} />
-        <span className="text-xs text-muted shrink-0">{collapsedSummary}</span>
-        <CategoryBadge category={exercise.category} />
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={`shrink-0 text-muted transition-transform ${open ? "rotate-180" : ""}`}
+          aria-hidden
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
       </div>
 
       <AnimatePresence>
@@ -443,6 +439,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
             className="overflow-hidden"
           >
             <div className="border-t border-border px-3 py-3 space-y-2">
+              <p className="text-[10px] font-mono text-muted">{exercise.id}</p>
               <p className="text-xs text-muted">{exercise.notes}</p>
               {exercise.source && (
                 <p className="text-[10px] text-muted">

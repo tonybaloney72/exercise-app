@@ -3,6 +3,7 @@
 import { useState, useRef, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/common/AnimatedSection";
+import CollapsibleSection from "@/components/common/CollapsibleSection";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
@@ -16,6 +17,8 @@ interface WorkoutDayReviewProps {
   onNotesChange: (notes: string) => Promise<void>;
   /** Default: "Completed today" (use for other days, e.g. "Completed · Mon, May 12") */
   completedBannerTitle?: string;
+  /** Hide the green completion header when summary screen already showed it. */
+  hideCompletionBanner?: boolean;
 }
 
 function formatEndTime(iso: string | undefined): string | null {
@@ -48,11 +51,18 @@ function exerciseStatusLine(log: ExerciseLog | undefined): string {
   return parts.join(" · ");
 }
 
+function sectionProgressHint(logs: ExerciseLog[]): string | undefined {
+  if (logs.length === 0) return undefined;
+  const done = logs.filter((e) => e.completed || e.skipped).length;
+  return `${done}/${logs.length} logged`;
+}
+
 export default function WorkoutDayReview({
   plan,
   log,
   onNotesChange,
   completedBannerTitle = "Completed today",
+  hideCompletionBanner = false,
 }: WorkoutDayReviewProps) {
   const [saving, setSaving] = useState(false);
   const [saveHint, setSaveHint] = useState<"idle" | "saved" | "unchanged">("idle");
@@ -87,23 +97,30 @@ export default function WorkoutDayReview({
 
   return (
     <AnimatedSection className="space-y-4" delay={0.1}>
-      <motion.div
-        initial={{ opacity: 0, y: 10, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ type: "spring", stiffness: 320, damping: 26 }}
-      >
-        <SurfaceCard className="p-4 border-green-500/25 bg-green-500/5">
-          <p className="text-xs font-medium uppercase tracking-wider text-green-400">
-            {completedBannerTitle}
-          </p>
-          {endLabel && (
-            <p className="mt-1 text-sm text-muted">Finished {endLabel}</p>
-          )}
-        </SurfaceCard>
-      </motion.div>
+      {!hideCompletionBanner && (
+        <motion.div
+          initial={{ opacity: 0, y: 10, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: "spring", stiffness: 320, damping: 26 }}
+        >
+          <SurfaceCard className="p-4 border-green-500/25 bg-green-500/5">
+            <p className="text-xs font-medium uppercase tracking-wider text-green-400">
+              {completedBannerTitle}
+            </p>
+            {endLabel && (
+              <p className="mt-1 text-sm text-muted">Finished {endLabel}</p>
+            )}
+          </SurfaceCard>
+        </motion.div>
+      )}
 
-      <ReviewSection title="Warm-Up Stretches">
-        {log.warmUpExercises.map((entry) => {
+      <CollapsibleSection
+        title="Warm-Up Stretches"
+        defaultOpen={false}
+        hint={sectionProgressHint(log.warmUpExercises)}
+      >
+        <div className="divide-y divide-border px-2 py-1">
+          {log.warmUpExercises.map((entry) => {
           const ex = exerciseMap[entry.exerciseId];
           if (!ex) return null;
           return (
@@ -115,12 +132,13 @@ export default function WorkoutDayReview({
               exerciseNotes={entry.notes}
             />
           );
-        })}
-      </ReviewSection>
+          })}
+        </div>
+      </CollapsibleSection>
 
       {plan.hasJog && (
-        <ReviewSection title="Jog">
-          <div className="space-y-1 px-1 py-1">
+        <CollapsibleSection title="Jog" defaultOpen>
+          <div className="space-y-1 px-3 py-2">
             <p className="text-sm font-medium text-foreground">Run</p>
             {log.jogSkipped ? (
               <p className="text-xs text-muted">Skipped</p>
@@ -139,13 +157,19 @@ export default function WorkoutDayReview({
               <p className="text-xs text-muted">Not logged as completed</p>
             )}
           </div>
-        </ReviewSection>
+        </CollapsibleSection>
       )}
 
       {plan.rounds.map((round, i) => {
         const roundLog = log.rounds[i];
         return (
-          <ReviewSection key={round.roundNumber} title={`Round ${round.roundNumber}`}>
+          <CollapsibleSection
+            key={round.roundNumber}
+            title={`Round ${round.roundNumber}`}
+            defaultOpen
+            hint={roundLog ? sectionProgressHint(roundLog.exercises) : undefined}
+          >
+            <div className="divide-y divide-border px-2 py-1">
             {round.exercises.map((ex, j) => {
               const entry = roundLog?.exercises[j];
               const planned = exerciseMap[ex.exerciseId];
@@ -175,25 +199,32 @@ export default function WorkoutDayReview({
                 />
               );
             })}
-          </ReviewSection>
+            </div>
+          </CollapsibleSection>
         );
       })}
 
-      <ReviewSection title="Cool-Down Stretches">
-        {log.coolDownExercises.map((entry) => {
-          const ex = exerciseMap[entry.exerciseId];
-          if (!ex) return null;
-          return (
-            <ReviewRow
-              key={entry.exerciseId}
-              name={ex.name}
-              target={entry.targetPrescription ?? ex.defaultReps}
-              detail={exerciseStatusLine(entry)}
-              exerciseNotes={entry.notes}
-            />
-          );
-        })}
-      </ReviewSection>
+      <CollapsibleSection
+        title="Cool-Down Stretches"
+        defaultOpen={false}
+        hint={sectionProgressHint(log.coolDownExercises)}
+      >
+        <div className="divide-y divide-border px-2 py-1">
+          {log.coolDownExercises.map((entry) => {
+            const ex = exerciseMap[entry.exerciseId];
+            if (!ex) return null;
+            return (
+              <ReviewRow
+                key={entry.exerciseId}
+                name={ex.name}
+                target={entry.targetPrescription ?? ex.defaultReps}
+                detail={exerciseStatusLine(entry)}
+                exerciseNotes={entry.notes}
+              />
+            );
+          })}
+        </div>
+      </CollapsibleSection>
 
       <SurfaceCard className="p-4">
         <label className="text-xs font-medium text-muted" htmlFor="review-notes">
@@ -231,23 +262,6 @@ export default function WorkoutDayReview({
         )}
       </SurfaceCard>
     </AnimatedSection>
-  );
-}
-
-function ReviewSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <SurfaceCard className="overflow-hidden p-0">
-      <div className="border-b border-border px-4 py-3">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-      </div>
-      <div className="divide-y divide-border px-2 py-1">{children}</div>
-    </SurfaceCard>
   );
 }
 

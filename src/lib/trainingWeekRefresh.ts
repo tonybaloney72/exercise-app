@@ -6,7 +6,7 @@ import {
 } from "@/stores/useTrainingWeekRefreshStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
-/** Regenerate current Sun–Sat week (authenticated) and surface Slice 4 notice. */
+/** Regenerate current Sun–Sat week (authenticated) and toast + refetch plans. */
 export async function refreshCurrentTrainingWeek(
   reason: TrainingWeekRefreshReason,
 ): Promise<void> {

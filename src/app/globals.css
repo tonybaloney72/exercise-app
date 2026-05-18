@@ -20,6 +20,17 @@
   --border-color: #2a2e3a;
   --muted: #71717a;
   --accent: #6366f1;
+
+  --toast-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  --toast-info-bg: #22263a;
+  --toast-info-border: rgba(99, 102, 241, 0.45);
+  --toast-info-text: #e4e4e7;
+  --toast-success-bg: #1a2922;
+  --toast-success-border: rgba(52, 211, 153, 0.38);
+  --toast-success-text: #a7f3d0;
+  --toast-warning-bg: #2a2618;
+  --toast-warning-border: rgba(251, 191, 36, 0.42);
+  --toast-warning-text: #fde68a;
 }
 
 [data-theme="light"] {
@@ -30,6 +41,49 @@
   --border-color: #e2e8f0;
   --muted: #94a3b8;
   --accent: #6366f1;
+
+  /* Sonner — light */
+  --toast-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+  --toast-info-bg: #eef2ff;
+  --toast-info-border: #c7d2fe;
+  --toast-info-text: #312e81;
+  --toast-success-bg: #ecfdf5;
+  --toast-success-border: #a7f3d0;
+  --toast-success-text: #047857;
+  --toast-warning-bg: #fffbeb;
+  --toast-warning-border: #fcd34d;
+  --toast-warning-text: #b45309;
+}
+
+/* Sonner — use app surfaces instead of default bright white / pure black */
+[data-sonner-toaster][data-sonner-theme="dark"],
+[data-sonner-toaster][data-sonner-theme="light"] {
+  --normal-bg: var(--surface);
+  --normal-border: var(--border-color);
+  --normal-text: var(--foreground);
+  --normal-bg-hover: var(--surface-hover);
+  --normal-border-hover: var(--border-color);
+
+  --info-bg: var(--toast-info-bg);
+  --info-border: var(--toast-info-border);
+  --info-text: var(--toast-info-text);
+
+  --success-bg: var(--toast-success-bg);
+  --success-border: var(--toast-success-border);
+  --success-text: var(--toast-success-text);
+
+  --warning-bg: var(--toast-warning-bg);
+  --warning-border: var(--toast-warning-border);
+  --warning-text: var(--toast-warning-text);
+}
+
+[data-sonner-toast][data-styled="true"] {
+  border-radius: 0.75rem;
+  box-shadow: var(--toast-shadow);
+}
+
+[data-sonner-toast][data-styled="true"] [data-description] {
+  color: var(--muted);
 }
 
 body {

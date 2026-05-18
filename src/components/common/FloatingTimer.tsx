@@ -239,9 +239,6 @@ export default function FloatingTimer() {
                 <span className="font-mono text-sm font-bold tabular-nums">
                   {formatTimerDisplay(seconds)}
                 </span>
-                {!running && seconds === 0 && (mode === "rest" || mode === "setTimer") && (
-                  <span className="text-[10px] font-medium text-white/90">Done</span>
-                )}
               </button>
               <button
                 type="button"

@@ -361,24 +361,27 @@ function StretchRow({
                     Actual duration (optional)
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     inputMode="numeric"
-                    min={5}
-                    max={999}
-                    value={log.actualDuration ?? ""}
+                    value={
+                      log.actualDuration != null
+                        ? String(log.actualDuration)
+                        : ""
+                    }
                     onChange={(e) => {
-                      const v = e.target.value;
+                      const v = e.target.value.trim();
                       if (v === "") {
                         onSetActualDuration(undefined);
                         return;
                       }
-                      const n = Math.round(Number(v));
+                      if (!/^\d+$/.test(v)) return;
+                      const n = parseInt(v, 10);
                       if (!Number.isNaN(n)) {
                         onSetActualDuration(n);
                       }
                     }}
+                    placeholder={String(effectiveTargetSec)}
                     className="w-20 rounded-md border border-border bg-background px-2 py-1 font-mono text-sm text-foreground outline-none focus:border-accent"
-                    placeholder="—"
                   />
                 </div>
               )}
