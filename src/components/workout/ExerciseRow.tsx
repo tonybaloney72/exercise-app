@@ -8,7 +8,11 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
-import { getSwapCandidates } from "@/lib/exerciseSwap";
+import {
+  effectiveExerciseId,
+  getSwapCandidates,
+  laterRoundOccurrencesByExerciseId,
+} from "@/lib/exerciseSwap";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { ExerciseLog, ExerciseSetMode, RoundExercise } from "@/types";
@@ -50,7 +54,6 @@ export default function ExerciseRow({
     setRoundExerciseLoggingMode,
     swapRoundExercise,
     clearRoundExerciseSwap,
-    shuffleRoundExercise,
   } = useWorkoutStore();
 
   const plannedExercise = exerciseMap[roundExercise.exerciseId];
@@ -92,6 +95,17 @@ export default function ExerciseRow({
       swapPrefs,
     ],
   );
+
+  const laterRoundByExerciseId = useMemo(() => {
+    if (!activeWorkout) return new Map<string, number[]>();
+    return laterRoundOccurrencesByExerciseId(
+      activeWorkout.rounds.map((r) => ({
+        roundNumber: r.roundNumber,
+        exerciseIds: r.exercises.map((e) => effectiveExerciseId(e)),
+      })),
+      roundNumber,
+    );
+  }, [activeWorkout, roundNumber]);
 
   const mode: ExerciseSetMode = useMemo(() => {
     if (!plannedExercise || !effectiveExercise) return "reps";
@@ -337,13 +351,11 @@ export default function ExerciseRow({
         open={swapOpen}
         plannedName={plannedExercise.name}
         candidates={swapCandidates}
+        laterRoundByExerciseId={laterRoundByExerciseId}
         hasSwap={Boolean(log.swappedWith)}
         onClose={() => setSwapOpen(false)}
         onPick={(id) =>
           swapRoundExercise(roundNumber, slotIndex, id, roundExercise.category)
-        }
-        onRandom={() =>
-          shuffleRoundExercise(roundNumber, slotIndex, roundExercise.category)
         }
         onClearSwap={() => clearRoundExerciseSwap(roundNumber, slotIndex)}
       />

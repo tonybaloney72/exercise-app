@@ -7,7 +7,6 @@ import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
 import { exerciseMap } from "@/data/exercises";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
-import { pickRandomSwap } from "@/lib/exerciseSwap";
 import {
   buildStretchUsedExerciseIds,
   cloneStretchEntries,
@@ -207,10 +206,6 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
         hasSwap={pickTarget?.index != null}
         onClose={() => setPickTarget(null)}
         onPick={applyPick}
-        onRandom={() => {
-          const picked = pickRandomSwap(pickCandidates);
-          if (picked) applyPick(picked.id);
-        }}
         onClearSwap={() => {}}
       />
     </>

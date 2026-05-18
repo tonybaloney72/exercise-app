@@ -17,7 +17,7 @@ import { buildStretchUsedExerciseIds } from "@/lib/stretchDefaults";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getPlanAddCandidates, getPlanSlotCandidates } from "@/lib/planSlotCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
-import { pickRandomSwap } from "@/lib/exerciseSwap";
+import { laterRoundOccurrencesByExerciseId } from "@/lib/exerciseSwap";
 import { analyzeDayPlanBalance } from "@/lib/workoutBalanceAlerts";
 import { prepareDayPlanForEditor } from "@/lib/trainingWeekCustomize";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
@@ -118,6 +118,19 @@ export default function WorkoutPlanEditor({
       dislikedExerciseIds: dislikedIds,
     });
   }, [pickTarget, draft, availableEquipment, dislikedIds]);
+
+  const laterRoundByExerciseIdForSwap = useMemo(() => {
+    if (pickTarget?.kind !== "swap") return undefined;
+    const round = draft.rounds[pickTarget.roundIndex];
+    if (!round) return undefined;
+    return laterRoundOccurrencesByExerciseId(
+      draft.rounds.map((r) => ({
+        roundNumber: r.roundNumber,
+        exerciseIds: r.exercises.map((e) => e.exerciseId),
+      })),
+      round.roundNumber,
+    );
+  }, [pickTarget, draft.rounds]);
 
   const openPickModal = useCallback((target: PickTarget) => {
     setPickTarget(target);
@@ -554,13 +567,10 @@ export default function WorkoutPlanEditor({
         open={pickTarget !== null}
         plannedName={plannedNameForModal}
         candidates={pickCandidates}
+        laterRoundByExerciseId={laterRoundByExerciseIdForSwap}
         hasSwap={pickTarget?.kind === "swap"}
         onClose={() => setPickTarget(null)}
         onPick={applyPick}
-        onRandom={() => {
-          const picked = pickRandomSwap(pickCandidates);
-          if (picked) applyPick(picked.id);
-        }}
         onClearSwap={() => {
           if (pickTarget?.kind !== "swap") return;
           const original = initialPlan.rounds[pickTarget.roundIndex]?.exercises[

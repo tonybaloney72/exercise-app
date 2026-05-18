@@ -43,6 +43,50 @@ export function getSwapCandidates(
   });
 }
 
+export type RoundExerciseIds = {
+  roundNumber: number;
+  exerciseIds: readonly string[];
+};
+
+/**
+ * For each exercise id, round numbers **after** `currentRoundNumber` where it appears
+ * (prescribed or swapped-in). Used to warn on in-workout swaps, not to block picks.
+ */
+export function laterRoundOccurrencesByExerciseId(
+  rounds: readonly RoundExerciseIds[],
+  currentRoundNumber: number,
+): Map<string, number[]> {
+  const map = new Map<string, number[]>();
+  for (const round of rounds) {
+    if (round.roundNumber <= currentRoundNumber) continue;
+    for (const id of round.exerciseIds) {
+      const existing = map.get(id);
+      if (existing) {
+        if (!existing.includes(round.roundNumber)) {
+          existing.push(round.roundNumber);
+        }
+      } else {
+        map.set(id, [round.roundNumber]);
+      }
+    }
+  }
+  return map;
+}
+
+/** Short label for swap UI (e.g. "Also in Round 3" or "Also in Rounds 2 & 4"). */
+export function formatLaterRoundWarning(roundNumbers: readonly number[]): string {
+  if (roundNumbers.length === 0) return "";
+  const sorted = [...roundNumbers].sort((a, b) => a - b);
+  if (sorted.length === 1) {
+    return `Also scheduled in Round ${sorted[0]}`;
+  }
+  if (sorted.length === 2) {
+    return `Also scheduled in Rounds ${sorted[0]} & ${sorted[1]}`;
+  }
+  const last = sorted.pop()!;
+  return `Also scheduled in Rounds ${sorted.join(", ")}, & ${last}`;
+}
+
 export function pickRandomSwap(candidates: Exercise[]): Exercise | null {
   if (candidates.length === 0) return null;
   const i = Math.floor(Math.random() * candidates.length);

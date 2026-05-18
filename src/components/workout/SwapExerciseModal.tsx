@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
+import { formatLaterRoundWarning, pickRandomSwap } from "@/lib/exerciseSwap";
 import type { Exercise } from "@/types";
 
 interface SwapExerciseModalProps {
@@ -9,9 +10,10 @@ interface SwapExerciseModalProps {
   plannedName: string;
   candidates: Exercise[];
   hasSwap: boolean;
+  /** Exercise id → round numbers after the current round where it already appears. */
+  laterRoundByExerciseId?: ReadonlyMap<string, readonly number[]>;
   onClose: () => void;
   onPick: (exerciseId: string) => void;
-  onRandom: () => void;
   onClearSwap: () => void;
 }
 
@@ -20,12 +22,17 @@ export default function SwapExerciseModal({
   plannedName,
   candidates,
   hasSwap,
+  laterRoundByExerciseId,
   onClose,
   onPick,
-  onRandom,
   onClearSwap,
 }: SwapExerciseModalProps) {
   const [query, setQuery] = useState("");
+  const [pendingLaterRound, setPendingLaterRound] = useState<{
+    exerciseId: string;
+    name: string;
+    roundNumbers: readonly number[];
+  } | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -33,10 +40,50 @@ export default function SwapExerciseModal({
     return candidates.filter((c) => c.name.toLowerCase().includes(q));
   }, [candidates, query]);
 
+  function resetPending() {
+    setPendingLaterRound(null);
+  }
+
+  function handleClose() {
+    resetPending();
+    onClose();
+  }
+
+  function commitPick(exerciseId: string) {
+    onPick(exerciseId);
+    resetPending();
+    onClose();
+  }
+
+  function requestPick(exercise: Exercise) {
+    const laterRounds = laterRoundByExerciseId?.get(exercise.id);
+    if (laterRounds && laterRounds.length > 0) {
+      setPendingLaterRound({
+        exerciseId: exercise.id,
+        name: exercise.name,
+        roundNumbers: laterRounds,
+      });
+      return;
+    }
+    commitPick(exercise.id);
+  }
+
+  function handleRandom() {
+    const pick = pickRandomSwap(
+      filtered.length > 0 ? filtered : candidates,
+    );
+    if (!pick) return;
+    requestPick(pick);
+  }
+
+  const confirmHint = pendingLaterRound
+    ? formatLaterRoundWarning(pendingLaterRound.roundNumbers)
+    : "";
+
   return (
     <BottomSheetModal
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       title="Swap exercise"
       hint={`Same category as prescribed · planned: ${plannedName}`}
       ariaLabel="Swap exercise"
@@ -44,11 +91,8 @@ export default function SwapExerciseModal({
         <div className="flex flex-wrap gap-2 border-b border-border px-4 py-2">
           <button
             type="button"
-            onClick={() => {
-              onRandom();
-              onClose();
-            }}
-            disabled={candidates.length === 0}
+            onClick={handleRandom}
+            disabled={candidates.length === 0 || !!pendingLaterRound}
             className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover disabled:opacity-40"
           >
             Random pick
@@ -58,7 +102,7 @@ export default function SwapExerciseModal({
               type="button"
               onClick={() => {
                 onClearSwap();
-                onClose();
+                handleClose();
               }}
               className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted hover:bg-surface-hover hover:text-foreground"
             >
@@ -69,41 +113,89 @@ export default function SwapExerciseModal({
       }
       bodyClassName="overflow-hidden"
     >
-      <div className="px-4 py-2">
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by name…"
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-          autoComplete="off"
-        />
-      </div>
-      <ul className="max-h-[min(50vh,360px)] overflow-y-auto px-2 pb-4">
-        {filtered.length === 0 ? (
-          <li className="px-3 py-6 text-center text-sm text-muted">
-            {candidates.length === 0
-              ? "No other exercises in this category for this round."
-              : "No matches."}
-          </li>
-        ) : (
-          filtered.map((ex) => (
-            <li key={ex.id}>
-              <button
-                type="button"
-                onClick={() => {
-                  onPick(ex.id);
-                  onClose();
-                }}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-surface-hover"
-              >
-                <span className="flex-1 font-medium text-foreground">{ex.name}</span>
-                <span className="text-[10px] tabular-nums text-muted">{ex.defaultReps}</span>
-              </button>
-            </li>
-          ))
-        )}
-      </ul>
+      {pendingLaterRound ? (
+        <div className="space-y-4 px-4 py-4">
+          <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 space-y-2">
+            <p className="text-sm font-medium text-amber-200">
+              Already in a later round
+            </p>
+            <p className="text-sm text-foreground leading-snug">
+              <span className="font-semibold">{pendingLaterRound.name}</span>{" "}
+              {confirmHint}. You can still swap to it, but you&apos;ll repeat that
+              movement later unless you change those slots too.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => commitPick(pendingLaterRound.exerciseId)}
+              className="flex-1 rounded-xl bg-accent py-2.5 text-sm font-semibold text-white hover:bg-accent/90"
+            >
+              Swap anyway
+            </button>
+            <button
+              type="button"
+              onClick={resetPending}
+              className="flex-1 rounded-xl border border-border py-2.5 text-sm font-medium text-foreground hover:bg-surface-hover"
+            >
+              Choose another
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="px-4 py-2">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name…"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+              autoComplete="off"
+            />
+          </div>
+          <ul className="max-h-[min(50vh,360px)] overflow-y-auto px-2 pb-4">
+            {filtered.length === 0 ? (
+              <li className="px-3 py-6 text-center text-sm text-muted">
+                {candidates.length === 0
+                  ? "No other exercises in this category for this round."
+                  : "No matches."}
+              </li>
+            ) : (
+              filtered.map((ex) => {
+                const laterRounds = laterRoundByExerciseId?.get(ex.id);
+                const laterHint =
+                  laterRounds && laterRounds.length > 0
+                    ? formatLaterRoundWarning(laterRounds)
+                    : null;
+                return (
+                  <li key={ex.id}>
+                    <button
+                      type="button"
+                      onClick={() => requestPick(ex)}
+                      className="flex w-full flex-col items-stretch gap-0.5 rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-surface-hover"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className="flex-1 font-medium text-foreground">
+                          {ex.name}
+                        </span>
+                        <span className="text-[10px] tabular-nums text-muted shrink-0">
+                          {ex.defaultReps}
+                        </span>
+                      </span>
+                      {laterHint ? (
+                        <span className="text-[11px] font-medium text-amber-400/90">
+                          {laterHint}
+                        </span>
+                      ) : null}
+                    </button>
+                  </li>
+                );
+              })
+            )}
+          </ul>
+        </>
+      )}
     </BottomSheetModal>
   );
 }
