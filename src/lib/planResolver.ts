@@ -104,6 +104,7 @@ function materializeWeekFromCatalog(
   exerciseSettings: ExerciseSettingsMap,
   varietySeed: string,
   profile: ProgramProfileInput,
+  settings: UserSettings,
 ): TrainingWeekDays {
   return materializeTrainingWeek(
     buildCatalogWeek(),
@@ -114,6 +115,7 @@ function materializeWeekFromCatalog(
     exerciseSettings,
     varietySeed,
     profile,
+    settings,
   );
 }
 
@@ -160,6 +162,7 @@ async function refreshPersistedWeek(
     exerciseSettings,
     buildVarietySeed(weekKey, "authenticated"),
     profile,
+    settings,
   );
 
   const repo = getTrainingWeekRepo("authenticated");
@@ -220,6 +223,7 @@ async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays
     exerciseSettings,
     varietySeedForCurrentWeek(scope),
     programProfileFromSettings(settings),
+    settings,
   );
 }
 

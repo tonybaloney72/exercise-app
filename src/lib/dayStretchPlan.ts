@@ -13,6 +13,7 @@ import {
   stretchCoolDownQuota,
   stretchWarmUpQuota,
 } from "@/lib/trainingPriorityStretches";
+import { shouldSkipStretchesForPlan } from "@/lib/restDays";
 import type { DayPlan, ExerciseCategory, StretchEntry } from "@/types";
 
 export {
@@ -175,6 +176,9 @@ export function resolveStretchesForDay(
   warmUp: StretchEntry[];
   coolDown: StretchEntry[];
 } {
+  if (shouldSkipStretchesForPlan(plan)) {
+    return { warmUp: [], coolDown: [] };
+  }
   const { dislikedExerciseIds } = ctx;
   return {
     warmUp:

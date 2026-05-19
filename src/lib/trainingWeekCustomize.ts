@@ -36,25 +36,28 @@ import type {
   TrainingPriorityPreset,
   RoundDensity,
   StretchEntry,
+  UserSettings,
 } from "@/types";
 import type { ExercisePreferenceMap } from "@/lib/repos";
+import { normalizeDayPlanCardio } from "@/lib/cardioActivities";
 import { weekAnchorFromDateKey } from "@/utils/weekCalendar";
 
 export { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 
 /** Deep copy for editor draft state. */
 export function cloneDayPlan(plan: DayPlan): DayPlan {
-  return {
+  return normalizeDayPlanCardio({
     ...plan,
     strengthFocus: [...plan.strengthFocus],
     coreGroups: [...plan.coreGroups],
+    cardioActivities: plan.cardioActivities?.map((a) => ({ ...a })),
     rounds: plan.rounds.map((round) => ({
       ...round,
       exercises: round.exercises.map((ex) => ({ ...ex })),
     })),
     warmUp: plan.warmUp ? cloneStretchEntries(plan.warmUp) : undefined,
     coolDown: plan.coolDown ? cloneStretchEntries(plan.coolDown) : undefined,
-  };
+  });
 }
 
 /** Seed editor lists from resolved stretches (respects dislikes; matches day preview). */
@@ -111,11 +114,11 @@ export function dayPlanForCustomSave(
       ? normalizedCool
       : undefined;
 
-  return {
+  return normalizeDayPlanCardio({
     ...basePlan,
     warmUp,
     coolDown,
-  };
+  });
 }
 
 /**
@@ -169,6 +172,7 @@ export function buildGeneratedDayPlan(
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
   profileInput?: ReturnType<typeof buildProgramProfileInput>,
+  userSettings?: UserSettings,
 ): DayPlan {
   const profile =
     profileInput ?? buildProgramProfileInput(trainingPriorityPreset);
@@ -181,6 +185,7 @@ export function buildGeneratedDayPlan(
     exerciseSettings,
     varietySeed,
     profile,
+    userSettings,
   );
   const day = generated[dayOfWeek];
   if (!day) {
@@ -223,6 +228,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
     exerciseSettings,
     buildVarietySeed(weekKey, "authenticated"),
     profile,
+    settings,
   );
 
   const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");

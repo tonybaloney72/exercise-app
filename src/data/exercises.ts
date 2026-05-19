@@ -1,4 +1,5 @@
 import type { Exercise } from "@/types";
+import { enduranceExercises } from "./enduranceExercises";
 import { hybridCalisthenicsExercises } from "./hybridCalisthenicsExercises";
 
 const catalogExercises: Exercise[] = [
@@ -3361,8 +3362,9 @@ const catalogExercises: Exercise[] = [
 ];
 
 export const exercises: Exercise[] = [
-  ...catalogExercises,
-  ...hybridCalisthenicsExercises,
+	...catalogExercises,
+	...enduranceExercises,
+	...hybridCalisthenicsExercises,
 ];
 
 function buildExerciseMap(): Record<string, Exercise> {

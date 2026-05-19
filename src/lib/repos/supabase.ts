@@ -38,11 +38,18 @@ import {
   ALL_EXERCISE_EQUIPMENT,
   DEFAULT_AVAILABLE_EQUIPMENT,
 } from "@/data/equipment";
+import { sanitizeWeeklyCardioByDay } from "@/lib/cardioActivities";
 import {
   migrateExerciseId,
   migrateTrainingWeekDays,
   migrateWorkoutLog,
 } from "@/lib/cpToPcMigration";
+import { sanitizeWeeklyRestDays } from "@/lib/restDays";
+import {
+  hydrateCardioFromNotes,
+  userFacingWorkoutNotes,
+  workoutLogForPersistence,
+} from "@/lib/workoutCardioPersistence";
 
 type Section = "warm_up" | "round" | "cool_down";
 
@@ -98,6 +105,10 @@ interface SettingsRow {
   round_density?: string;
   default_warm_up?: unknown;
   default_cool_down?: unknown;
+  weekly_rest_days?: unknown;
+  weekly_rest_days_customized?: boolean;
+  weekly_cardio_by_day?: unknown;
+  weekly_cardio_customized?: boolean;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -150,7 +161,7 @@ function rowToWorkout(row: WorkoutRow): WorkoutLog {
     .map(rowToExerciseLog);
   const rounds = rowsToRounds(exerciseLogs.filter((r) => r.section === "round"));
 
-  return {
+  const log: WorkoutLog = {
     id: row.id,
     date: row.date,
     dayOfWeek: row.day_of_week,
@@ -163,10 +174,11 @@ function rowToWorkout(row: WorkoutRow): WorkoutLog {
     coolDownCompleted: row.cool_down_completed,
     coolDownExercises: coolDown,
     rounds,
-    notes: row.notes ?? undefined,
+    notes: userFacingWorkoutNotes(row.notes ?? undefined),
     startTime: row.start_time ?? undefined,
     endTime: row.end_time ?? undefined,
   };
+  return hydrateCardioFromNotes(log);
 }
 
 /**
@@ -174,19 +186,20 @@ function rowToWorkout(row: WorkoutRow): WorkoutLog {
  * `save_workout` RPC expects. The RPC handles the user_id and ids itself.
  */
 function workoutToSavePayload(log: WorkoutLog) {
+  const persisted = workoutLogForPersistence(log);
   const workout = {
-    id: log.id,
-    date: log.date,
-    day_of_week: log.dayOfWeek,
-    jog_completed: log.jogCompleted,
-    jog_skipped: log.jogSkipped ?? false,
-    jog_distance: log.jogDistance ?? null,
-    jog_duration_seconds: log.jogDurationSeconds ?? null,
-    warm_up_completed: log.warmUpCompleted,
-    cool_down_completed: log.coolDownCompleted,
-    notes: log.notes ?? null,
-    start_time: log.startTime ?? null,
-    end_time: log.endTime ?? null,
+    id: persisted.id,
+    date: persisted.date,
+    day_of_week: persisted.dayOfWeek,
+    jog_completed: persisted.jogCompleted,
+    jog_skipped: persisted.jogSkipped ?? false,
+    jog_distance: persisted.jogDistance ?? null,
+    jog_duration_seconds: persisted.jogDurationSeconds ?? null,
+    warm_up_completed: persisted.warmUpCompleted,
+    cool_down_completed: persisted.coolDownCompleted,
+    notes: persisted.notes ?? null,
+    start_time: persisted.startTime ?? null,
+    end_time: persisted.endTime ?? null,
   };
 
   const exerciseLogs: Array<{
@@ -203,7 +216,7 @@ function workoutToSavePayload(log: WorkoutLog) {
     notes: string | null;
   }> = [];
 
-  log.warmUpExercises.forEach((ex, i) =>
+  persisted.warmUpExercises.forEach((ex, i) =>
     exerciseLogs.push({
       section: "warm_up",
       round_number: null,
@@ -219,7 +232,7 @@ function workoutToSavePayload(log: WorkoutLog) {
     }),
   );
 
-  log.rounds.forEach((round) =>
+  persisted.rounds.forEach((round) =>
     round.exercises.forEach((ex, i) =>
       exerciseLogs.push({
         section: "round",
@@ -237,7 +250,7 @@ function workoutToSavePayload(log: WorkoutLog) {
     ),
   );
 
-  log.coolDownExercises.forEach((ex, i) =>
+  persisted.coolDownExercises.forEach((ex, i) =>
     exerciseLogs.push({
       section: "cool_down",
       round_number: null,
@@ -297,6 +310,10 @@ function rowToSettings(row: SettingsRow): UserSettings {
     roundDensity: sanitizeRoundDensity(row.round_density),
     defaultWarmUp: sanitizeStretchEntries(row.default_warm_up),
     defaultCoolDown: sanitizeStretchEntries(row.default_cool_down),
+    weeklyRestDays: sanitizeWeeklyRestDays(row.weekly_rest_days),
+    weeklyRestDaysCustomized: row.weekly_rest_days_customized ?? false,
+    weeklyCardioByDay: sanitizeWeeklyCardioByDay(row.weekly_cardio_by_day),
+    weeklyCardioCustomized: row.weekly_cardio_customized ?? false,
   });
 }
 
@@ -320,6 +337,10 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     round_density: s.roundDensity,
     default_warm_up: s.defaultWarmUp,
     default_cool_down: s.defaultCoolDown,
+    weekly_rest_days: s.weeklyRestDays,
+    weekly_rest_days_customized: s.weeklyRestDaysCustomized,
+    weekly_cardio_by_day: s.weeklyCardioByDay,
+    weekly_cardio_customized: s.weeklyCardioCustomized,
   };
 }
 
@@ -567,11 +588,14 @@ export const supabaseExercisePreferenceRepo: ExercisePreferenceRepo = {
 function isDayPlanShape(v: unknown): v is DayPlan {
   if (!v || typeof v !== "object") return false;
   const o = v as Record<string, unknown>;
+  const hasJogOk =
+    typeof o.hasJog === "boolean" ||
+    (Array.isArray(o.cardioActivities) && o.cardioActivities.length >= 0);
   return (
     typeof o.dayOfWeek === "number" &&
     typeof o.name === "string" &&
     typeof o.theme === "string" &&
-    typeof o.hasJog === "boolean" &&
+    hasJogOk &&
     Array.isArray(o.strengthFocus) &&
     Array.isArray(o.coreGroups) &&
     Array.isArray(o.rounds)

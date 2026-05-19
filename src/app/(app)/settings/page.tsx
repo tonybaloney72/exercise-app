@@ -14,6 +14,8 @@ import ProgramModeSelector from "@/components/settings/ProgramModeSelector";
 import WeekModeOptionsPanel from "@/components/settings/WeekModeOptionsPanel";
 import TrainingPriorityCustomize from "@/components/settings/TrainingPriorityCustomize";
 import WeeklyCategoryLayoutEditor from "@/components/settings/WeeklyCategoryLayoutEditor";
+import WeeklyRestDaysEditor from "@/components/settings/WeeklyRestDaysEditor";
+import WeeklyCardioEditor from "@/components/settings/WeeklyCardioEditor";
 import type { ProgramMode } from "@/lib/weeklyCategoryLayout";
 import {
   scoresFromPreset,
@@ -72,6 +74,10 @@ export default function SettingsPage() {
         programMode: settings.programMode,
         weeklyCategoryLayout: settings.weeklyCategoryLayout,
         weeklyCategoryLayoutCustomized: settings.weeklyCategoryLayoutCustomized,
+        weeklyRestDays: settings.weeklyRestDays,
+        weeklyRestDaysCustomized: settings.weeklyRestDaysCustomized,
+        weeklyCardioByDay: settings.weeklyCardioByDay,
+        weeklyCardioCustomized: settings.weeklyCardioCustomized,
         roundDensity: settings.roundDensity,
         defaultWarmUp: settings.defaultWarmUp,
         defaultCoolDown: settings.defaultCoolDown,
@@ -378,25 +384,28 @@ export default function SettingsPage() {
               );
             })}
           </div>
-          <TrainingPriorityCustomize
-            scores={settings.trainingPriorityScores}
-            customized={settings.trainingPriorityCustomized}
-            activePreset={settings.trainingPriorityPreset}
-            onPresetSelect={(preset) => {
-              void settings.updateSettings({
-                trainingPriorityPreset: preset,
-                trainingPriorityScores: scoresFromPreset(preset),
-                trainingPriorityCustomized: false,
-              });
-            }}
-            onScoresChange={(trainingPriorityScores, trainingPriorityCustomized) => {
-              void settings.updateSettings({
-                trainingPriorityScores,
-                trainingPriorityCustomized,
-              });
-            }}
-          />
             </WeekModeOptionsPanel>
+          )}
+
+          {settings.programMode === "priorities" && (
+            <TrainingPriorityCustomize
+              scores={settings.trainingPriorityScores}
+              customized={settings.trainingPriorityCustomized}
+              activePreset={settings.trainingPriorityPreset}
+              onPresetSelect={(preset) => {
+                void settings.updateSettings({
+                  trainingPriorityPreset: preset,
+                  trainingPriorityScores: scoresFromPreset(preset),
+                  trainingPriorityCustomized: false,
+                });
+              }}
+              onScoresChange={(trainingPriorityScores, trainingPriorityCustomized) => {
+                void settings.updateSettings({
+                  trainingPriorityScores,
+                  trainingPriorityCustomized,
+                });
+              }}
+            />
           )}
 
           {settings.programMode === "layout" && (
@@ -418,11 +427,43 @@ export default function SettingsPage() {
 
           {settings.programMode !== "custom" && (
           <>
-          <div className="border-t border-border pt-4">
+          <CollapsibleSection
+            embedded
+            title="Day type"
+            hint="Workout, active recovery, stretches-only, or full rest — per weekday."
+            defaultOpen={false}
+          >
+            <WeeklyRestDaysEditor
+              value={settings.weeklyRestDays}
+              onChange={(weeklyRestDays, weeklyRestDaysCustomized) => {
+                void settings.updateSettings({
+                  weeklyRestDays,
+                  weeklyRestDaysCustomized,
+                });
+              }}
+            />
+          </CollapsibleSection>
+          <CollapsibleSection
+            embedded
+            title="Cardio & endurance"
+            hint="Jog, walk, cycle, hike, or swim per day — log time and distance in the workout."
+            defaultOpen={false}
+          >
+            <WeeklyCardioEditor
+              value={settings.weeklyCardioByDay}
+              onChange={(weeklyCardioByDay, weeklyCardioCustomized) => {
+                void settings.updateSettings({
+                  weeklyCardioByDay,
+                  weeklyCardioCustomized,
+                });
+              }}
+            />
+          </CollapsibleSection>
+          <section className="border-t border-border pt-4">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted mb-3">
               Generated week options
             </p>
-          </div>
+          </section>
           <CollapsibleSection
             embedded
             title="Round density"

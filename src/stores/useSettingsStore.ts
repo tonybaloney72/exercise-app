@@ -11,6 +11,10 @@ import {
 } from "@/lib/stretchDefaults";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
+import {
+  weeklyCardioSettingsChanged,
+  weeklyRestSettingsChanged,
+} from "@/lib/weekPlanPreferences";
 import { layoutEqual } from "@/lib/weeklyCategoryLayout";
 import type { ExerciseEquipment, UserSettings } from "@/types";
 
@@ -62,6 +66,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         !stretchListsEqual(current.defaultWarmUp, partial.defaultWarmUp)) ||
       (partial.defaultCoolDown != null &&
         !stretchListsEqual(current.defaultCoolDown, partial.defaultCoolDown));
+    const weekScheduleChanged =
+      weeklyRestSettingsChanged(partial, current) ||
+      weeklyCardioSettingsChanged(partial, current);
 
     set((s) => ({ ...s, ...updated }));
     try {
@@ -74,7 +81,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     if (useAuthStore.getState().mode !== "authenticated") return;
 
     try {
-      if (programProfileChanged) {
+      if (programProfileChanged || weekScheduleChanged) {
         await refreshCurrentTrainingWeek("program");
       } else if (equipmentChanged) {
         await refreshCurrentTrainingWeek("equipment");
@@ -141,6 +148,10 @@ function pickUserSettingsFields(
     roundDensity: state.roundDensity,
     defaultWarmUp: state.defaultWarmUp,
     defaultCoolDown: state.defaultCoolDown,
+    weeklyRestDays: state.weeklyRestDays,
+    weeklyRestDaysCustomized: state.weeklyRestDaysCustomized,
+    weeklyCardioByDay: state.weeklyCardioByDay,
+    weeklyCardioCustomized: state.weeklyCardioCustomized,
   };
 }
 

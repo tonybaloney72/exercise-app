@@ -1,3 +1,4 @@
+import { planHasJog } from "@/lib/cardioActivities";
 import { TRAINING_WEEK_CATALOG } from "@/data/trainingWeekCatalog";
 import {
   EMPHASIS_GROUP_ORDER,
@@ -48,7 +49,8 @@ export function groupsForCatalogDay(plan: DayPlan): EmphasisGroup[] {
     if (group) found.add(group);
   }
   const hasPc =
-    plan.hasJog ||
+    planHasJog(plan) ||
+    (plan.cardioActivities?.length ?? 0) > 0 ||
     plan.strengthFocus.includes("PC") ||
     plan.coreGroups.includes("PC");
   if (hasPc) found.add("cardio");
@@ -121,7 +123,7 @@ export function categoriesForDayLayout(
   const out: ExerciseCategory[] = [];
   for (const group of groups) {
     for (const cat of GROUP_TO_CATEGORIES[group]) {
-      if (cat === "PC" && !plan.hasJog && group === "cardio") continue;
+      if (cat === "PC" && !planHasJog(plan) && group === "cardio") continue;
       if (!out.includes(cat)) out.push(cat);
     }
   }

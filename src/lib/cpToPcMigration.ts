@@ -6,6 +6,11 @@ import type {
   WorkoutLog,
 } from "@/types";
 import type { TrainingWeekDays } from "@/lib/repos";
+import {
+  CARDIO_KIND_TO_EXERCISE_ID,
+  normalizeDayPlanCardio,
+} from "@/lib/cardioActivities";
+import { hydrateCardioFromNotes } from "@/lib/workoutCardioPersistence";
 import { migrateConsolidatedExerciseId } from "@/lib/exerciseIdConsolidation";
 
 /** Legacy cardio/plyo category code (renamed to {@link PC_CATEGORY}). */
@@ -38,7 +43,7 @@ function migrateRoundExercise(slot: RoundExercise): RoundExercise {
 
 /** Normalize persisted or in-flight plans that still use `CP`. */
 export function migrateDayPlan(plan: DayPlan): DayPlan {
-  return {
+  return normalizeDayPlanCardio({
     ...plan,
     strengthFocus: plan.strengthFocus.map((c) => migrateCategory(c)),
     coreGroups: plan.coreGroups.map((c) => migrateCategory(c)),
@@ -46,7 +51,7 @@ export function migrateDayPlan(plan: DayPlan): DayPlan {
       ...round,
       exercises: round.exercises.map(migrateRoundExercise),
     })),
-  };
+  });
 }
 
 export function migrateTrainingWeekDays(days: TrainingWeekDays): TrainingWeekDays {
@@ -69,13 +74,26 @@ export function migrateExerciseLog(log: ExerciseLog): ExerciseLog {
 }
 
 export function migrateWorkoutLog(log: WorkoutLog): WorkoutLog {
-  return {
+  let cardioExercises = log.cardioExercises?.map(migrateExerciseLog);
+  if (!cardioExercises?.length && (log.jogCompleted || log.jogSkipped || log.jogDistance != null)) {
+    cardioExercises = [
+      {
+        exerciseId: CARDIO_KIND_TO_EXERCISE_ID.jog,
+        completed: log.jogCompleted,
+        skipped: log.jogSkipped,
+        actualDistanceMi: log.jogDistance,
+        actualDuration: log.jogDurationSeconds,
+      },
+    ];
+  }
+  return hydrateCardioFromNotes({
     ...log,
+    cardioExercises,
     warmUpExercises: log.warmUpExercises.map(migrateExerciseLog),
     coolDownExercises: log.coolDownExercises.map(migrateExerciseLog),
     rounds: log.rounds.map((round) => ({
       ...round,
       exercises: round.exercises.map(migrateExerciseLog),
     })),
-  };
+  });
 }

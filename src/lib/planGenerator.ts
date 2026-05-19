@@ -27,6 +27,7 @@ import {
   type ProgramMode,
   type WeeklyCategoryLayout,
 } from "@/lib/weeklyCategoryLayout";
+import { prepareCatalogWeekForUser } from "@/lib/weekPlanPreferences";
 import type {
   DayPlan,
   ExerciseEquipment,
@@ -61,6 +62,10 @@ export function computePrefsFingerprint(
   programMode: ProgramMode = "priorities",
   weeklyCategoryLayout?: WeeklyCategoryLayout,
   weeklyCategoryLayoutCustomized = false,
+  weeklyRestDays?: UserSettings["weeklyRestDays"],
+  weeklyRestDaysCustomized = false,
+  weeklyCardioByDay?: UserSettings["weeklyCardioByDay"],
+  weeklyCardioCustomized = false,
 ): string {
   const disliked = Object.entries(prefs)
     .filter(([, v]) => v === "disliked")
@@ -94,7 +99,13 @@ export function computePrefsFingerprint(
           trainingPriorityCustomized,
         )
       : "tp:layout";
-  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pm:${mode}|${prioritySeg}|${layoutSeg}|rd:${roundDensity}|${stretches}`;
+  const restSeg = weeklyRestDaysCustomized
+    ? `wrd:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${weeklyRestDays?.[d] ?? "workout"}`).join(",")}`
+    : "wrd:default";
+  const cardioSeg = weeklyCardioCustomized
+    ? `wc:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${(weeklyCardioByDay?.[d] ?? []).join("+") || "-"}`).join(",")}`
+    : "wc:default";
+  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pm:${mode}|${prioritySeg}|${layoutSeg}|rd:${roundDensity}|${restSeg}|${cardioSeg}|${stretches}`;
 }
 
 export function computePrefsFingerprintFromSettings(
@@ -113,6 +124,10 @@ export function computePrefsFingerprintFromSettings(
     settings.programMode ?? "priorities",
     settings.weeklyCategoryLayout,
     settings.weeklyCategoryLayoutCustomized ?? false,
+    settings.weeklyRestDays,
+    settings.weeklyRestDaysCustomized ?? false,
+    settings.weeklyCardioByDay,
+    settings.weeklyCardioCustomized ?? false,
   );
 }
 
@@ -236,12 +251,16 @@ export function materializeTrainingWeek(
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
   profileInput?: ProgramProfileInput,
+  userSettings?: UserSettings,
 ): TrainingWeekDays {
   const profile =
     profileInput ??
     buildProgramProfileInput(trainingPriorityPreset);
+  const seedWeek = userSettings
+    ? prepareCatalogWeekForUser(catalogWeek, userSettings, availableEquipment)
+    : catalogWeek;
   const profiled = applyProgramProfileToWeek(
-    catalogWeek,
+    seedWeek,
     trainingPriorityPreset,
     roundDensity,
     availableEquipment,

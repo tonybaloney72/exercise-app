@@ -31,11 +31,11 @@ export const TRAINING_WEEK_CATALOG: DayPlan[] = [
   buildDayTheme({
     dayOfWeek: 0,
     name: "Sunday",
-    theme: "Active Recovery",
+    theme: "Lower Body + Core",
     hasJog: false,
-    strengthFocus: [],
-    coreGroups: ["CS"],
-    roundCount: 1,
+    strengthFocus: ["LB"],
+    coreGroups: ["CR", "CS"],
+    roundCount: 3,
   }),
   buildDayTheme({
     dayOfWeek: 1,

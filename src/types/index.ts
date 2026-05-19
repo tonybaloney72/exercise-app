@@ -34,7 +34,8 @@ export type ExerciseEquipment =
   | "medicine_ball"
   | "plyo_box"
   | "stability_ball"
-  | "pull_up_bar";
+  | "pull_up_bar"
+  | "bicycle";
 
 /** Planned: ExRx-style plyometric intensity (low → high). Not used in UI yet. */
 export type PlyometricIntensity = "low" | "low_medium" | "medium" | "medium_high" | "high";
@@ -87,11 +88,35 @@ export interface Round {
   exercises: RoundExercise[];
 }
 
+export type CardioActivityKind = "jog" | "walk" | "cycle" | "hike" | "swim";
+
+export interface CardioActivity {
+  kind: CardioActivityKind;
+  exerciseId: string;
+  defaultPrescription?: string;
+}
+
+/** How a weekday is scheduled (Sun=0 … Sat=6). */
+export type RestDayMode =
+  | "workout"
+  | "active_recovery"
+  | "stretches"
+  | "full_rest";
+
+export type WeeklyRestDays = Record<number, RestDayMode>;
+
+export type WeeklyCardioByDay = Record<number, CardioActivityKind[]>;
+
 export interface DayPlan {
   dayOfWeek: number; // 0=Sunday, 1=Monday, ...
   name: string;
   theme: string;
+  /** @deprecated Prefer {@link cardioActivities}; kept for persisted weeks + badges. */
   hasJog: boolean;
+  /** Endurance block for this day (jog, walk, cycle, etc.). */
+  cardioActivities?: CardioActivity[];
+  /** Set when user rest settings or layout cleared strength work. */
+  restDayMode?: RestDayMode;
   strengthFocus: ExerciseCategory[];
   coreGroups: ExerciseCategory[];
   rounds: Round[];
@@ -125,6 +150,8 @@ export interface ExerciseLog {
    * the server), UI falls back to `exercise_settings` + catalog `isTimeBased`.
    */
   loggingMode?: ExerciseSetMode;
+  /** Miles (endurance / cardio block). */
+  actualDistanceMi?: number;
 }
 
 export interface RoundLog {
@@ -146,6 +173,8 @@ export interface WorkoutLog {
   jogSkipped: boolean;
   jogDistance?: number;
   jogDurationSeconds?: number; // stored as total seconds for MM:SS support
+  /** In-session cardio rows (Phase 3 → exercise_logs); guests persist in localStorage. */
+  cardioExercises?: ExerciseLog[];
   warmUpCompleted: boolean;
   warmUpExercises: ExerciseLog[];
   coolDownCompleted: boolean;
@@ -218,6 +247,12 @@ export interface UserSettings {
   defaultWarmUp: StretchEntry[];
   /** Always-included cool-down stretches (Settings). Merged first when deriving cool-down. */
   defaultCoolDown: StretchEntry[];
+  /** Per weekday rest (full = no work; light = stretches only). */
+  weeklyRestDays: WeeklyRestDays;
+  weeklyRestDaysCustomized: boolean;
+  /** Per weekday cardio kinds (when customized). */
+  weeklyCardioByDay: WeeklyCardioByDay;
+  weeklyCardioCustomized: boolean;
 }
 
 export interface ProgressEntry {

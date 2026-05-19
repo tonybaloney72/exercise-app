@@ -5,6 +5,7 @@ import {
   buildBalancedFullBudget,
   trimBalancedBudget,
 } from "@/lib/balancedRoundBudget";
+import { activeRecoveryDayPlan } from "@/lib/restDays";
 import { ROUND_DENSITY_TARGETS } from "@/lib/programProfile";
 import type { ExerciseCategory } from "@/types";
 
@@ -19,9 +20,9 @@ function cats(
 describe("balancedRoundBudget", () => {
   const monday = getCatalogPlanForDay(1);
 
-  it("Sunday recovery is all CS at standard density", () => {
-    const sunday = getCatalogPlanForDay(0);
-    const r1 = cats(sunday, 1);
+  it("active recovery day budget is all CS at standard density", () => {
+    const recovery = activeRecoveryDayPlan(getCatalogPlanForDay(1));
+    const r1 = cats(recovery, 1);
     expect(r1).toHaveLength(5);
     expect(r1.every((c) => c === "CS")).toBe(true);
   });

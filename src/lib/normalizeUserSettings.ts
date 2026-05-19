@@ -7,6 +7,15 @@ import {
   totalEmphasisScore,
 } from "@/lib/trainingPriorities";
 import {
+  sanitizeWeeklyCardioByDay,
+  suggestWeeklyCardioFromCatalog,
+  weeklyCardioEqual,
+} from "@/lib/cardioActivities";
+import {
+  sanitizeWeeklyRestDays,
+  weeklyRestDaysEqual,
+} from "@/lib/restDays";
+import {
   layoutEqual,
   sanitizeProgramMode,
   sanitizeWeeklyCategoryLayout,
@@ -57,6 +66,23 @@ export function normalizeUserSettings(
     (partial.weeklyCategoryLayout != null &&
       !layoutEqual(weeklyCategoryLayout, catalogLayout));
 
+  const catalogCardio = suggestWeeklyCardioFromCatalog();
+  const weeklyCardioByDay = sanitizeWeeklyCardioByDay(
+    partial.weeklyCardioByDay,
+    catalogCardio,
+  );
+  const weeklyCardioCustomized =
+    partial.weeklyCardioCustomized ??
+    (partial.weeklyCardioByDay != null &&
+      !weeklyCardioEqual(weeklyCardioByDay, catalogCardio));
+
+  const defaultRest = sanitizeWeeklyRestDays(undefined);
+  const weeklyRestDays = sanitizeWeeklyRestDays(partial.weeklyRestDays);
+  const weeklyRestDaysCustomized =
+    partial.weeklyRestDaysCustomized ??
+    (partial.weeklyRestDays != null &&
+      !weeklyRestDaysEqual(weeklyRestDays, defaultRest));
+
   return {
     ...DEFAULT_SETTINGS,
     ...rest,
@@ -66,5 +92,9 @@ export function normalizeUserSettings(
     programMode,
     weeklyCategoryLayout,
     weeklyCategoryLayoutCustomized,
+    weeklyRestDays,
+    weeklyRestDaysCustomized,
+    weeklyCardioByDay,
+    weeklyCardioCustomized,
   };
 }

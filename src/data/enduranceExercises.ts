@@ -1,0 +1,55 @@
+import type { Exercise } from "@/types";
+
+/** Endurance / cardio block activities (logged like exercises; Phase 3 → exercise_logs). */
+export const enduranceExercises: Exercise[] = [
+  {
+    id: "END-JOG",
+    name: "Jog",
+    category: "PC",
+    equipment: ["bodyweight"],
+    muscleGroups: ["Mobility"],
+    defaultReps: "20 min",
+    notes: "Easy pace; log time and optional distance (miles).",
+    isTimeBased: true,
+  },
+  {
+    id: "END-WALK",
+    name: "Walk",
+    category: "PC",
+    equipment: ["bodyweight"],
+    muscleGroups: ["Mobility"],
+    defaultReps: "30 min",
+    notes: "Brisk walk; log time and optional distance (miles).",
+    isTimeBased: true,
+  },
+  {
+    id: "END-CYCLE",
+    name: "Cycle",
+    category: "PC",
+    equipment: ["bicycle"],
+    muscleGroups: ["Mobility"],
+    defaultReps: "30 min",
+    notes: "Road, stationary, or indoor bike; log time and optional distance (miles).",
+    isTimeBased: true,
+  },
+  {
+    id: "END-HIKE",
+    name: "Hike",
+    category: "PC",
+    equipment: ["bodyweight"],
+    muscleGroups: ["Mobility"],
+    defaultReps: "45 min",
+    notes: "Trail or incline walk; log time and optional distance (miles).",
+    isTimeBased: true,
+  },
+  {
+    id: "END-SWIM",
+    name: "Swim",
+    category: "PC",
+    equipment: ["bodyweight"],
+    muscleGroups: ["Mobility"],
+    defaultReps: "20 min",
+    notes: "Pool or open water; log time and optional distance (miles) if known.",
+    isTimeBased: true,
+  },
+];

@@ -7,6 +7,8 @@ import type {
 } from "@/types";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import { scoresFromPreset } from "@/lib/trainingPriorities";
+import { suggestWeeklyCardioFromCatalog } from "@/lib/cardioActivities";
+import { DEFAULT_WEEKLY_REST_DAYS } from "@/lib/restDays";
 import { suggestLayoutFromCatalog } from "@/lib/weeklyCategoryLayout";
 import {
   GUEST_FALLBACK_COOL_DOWN,
@@ -84,6 +86,10 @@ export const DEFAULT_SETTINGS: UserSettings = {
   /** Signed-in users configure their own; guests get catalog fallbacks at resolve time. */
   defaultWarmUp: [],
   defaultCoolDown: [],
+  weeklyRestDays: { ...DEFAULT_WEEKLY_REST_DAYS },
+  weeklyRestDaysCustomized: false,
+  weeklyCardioByDay: suggestWeeklyCardioFromCatalog(),
+  weeklyCardioCustomized: false,
 };
 
 /** Stretch defaults seeded for guest localStorage when none are stored. */

@@ -344,6 +344,13 @@ export function applyProgramProfileToDayPlan(
   const favoriteIds = collectFavoriteIds(prefs);
   const usedInDay = new Set<string>();
 
+  if (plan.restDayMode === "full_rest" || plan.restDayMode === "stretches") {
+    return {
+      ...plan,
+      rounds: plan.rounds.map((round) => ({ ...round, exercises: [] })),
+    };
+  }
+
   if (
     profile.layoutMode &&
     expandedCategoryPool(plan, profile).length === 0

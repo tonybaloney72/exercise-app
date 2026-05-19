@@ -9,6 +9,7 @@ import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
+import { cardioBadgesForPlan, restBadgeForPlan } from "@/lib/planCardioDisplay";
 import { resetTrainingWeekToGenerated } from "@/lib/trainingWeekRefresh";
 import { getWeekSourceForDate } from "@/lib/trainingWeekCustomize";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
@@ -238,11 +239,19 @@ export default function WeeklyPage() {
                     {categoriesPresentInPlan(plan).map((cat) => (
                       <CategoryBadge key={cat} category={cat} />
                     ))}
-                    {plan.hasJog && (
-                      <span className="inline-flex items-center rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-medium text-sky-400">
-                        🏃 Jog
+                    {restBadgeForPlan(plan) ? (
+                      <span className="inline-flex items-center rounded-full bg-muted/30 px-2 py-0.5 text-[10px] font-medium text-muted">
+                        {restBadgeForPlan(plan)}
                       </span>
-                    )}
+                    ) : null}
+                    {cardioBadgesForPlan(plan).map((label) => (
+                      <span
+                        key={label}
+                        className="inline-flex items-center rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-medium text-sky-400"
+                      >
+                        {label}
+                      </span>
+                    ))}
                   </div>
 
                   <div className="mt-2 text-[10px] text-muted">

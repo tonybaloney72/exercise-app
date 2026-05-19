@@ -7,6 +7,7 @@ import CollapsibleSection from "@/components/common/CollapsibleSection";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import CategoryPickModal from "@/components/workout/CategoryPickModal";
+import DayPlanCardioEditor from "@/components/workout/DayPlanCardioEditor";
 import StretchPlanSection from "@/components/workout/StretchPlanSection";
 import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
@@ -313,6 +314,8 @@ export default function WorkoutPlanEditor({
           <p className="text-xs text-muted leading-snug">Saving marks this week as customized.</p>
         )}
       </SurfaceCard>
+
+      <DayPlanCardioEditor plan={draft} onChange={setDraft} />
 
       <div className="flex items-center justify-between gap-2 px-1">
         <p className="text-xs font-medium uppercase tracking-wider text-muted">
