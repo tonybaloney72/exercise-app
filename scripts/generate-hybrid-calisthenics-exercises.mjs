@@ -517,12 +517,32 @@ const PULL_UP_BAR_MULTI = {
   "Band Resisted Hanging Leg Raise": ["pull_up_bar", "resistance_band"],
 };
 
+/** Bench, box, or sturdy chair/couch for anchoring or elevation. */
+const PLYO_BOX_NAMES = new Set([
+  "Copenhagen Plank",
+  "Decline Pushup",
+  "Nordic Curl",
+  "Reverse Nordic",
+  "Sissy Squat",
+]);
+
+const DIP_NAMES = new Set(["Dip", "Dips"]);
+
 function inferEquipmentList(name, baseEquip) {
   if (PULL_UP_BAR_MULTI[name]) return PULL_UP_BAR_MULTI[name];
-  let eq = baseEquip;
-  if (eq === "bodyweight" && /\bring\b/i.test(name)) eq = "rings";
-  if (eq === "bodyweight" && PULL_UP_BAR_NAMES.has(name)) eq = "pull_up_bar";
-  return [eq];
+  if (baseEquip === "bodyweight" && DIP_NAMES.has(name)) {
+    return ["pull_up_bar", "plyo_box"];
+  }
+  if (baseEquip === "bodyweight" && PLYO_BOX_NAMES.has(name)) {
+    return ["plyo_box"];
+  }
+  if (baseEquip === "bodyweight" && /\brings?\b/i.test(name)) {
+    return ["rings"];
+  }
+  if (baseEquip === "bodyweight" && PULL_UP_BAR_NAMES.has(name)) {
+    return ["pull_up_bar"];
+  }
+  return [baseEquip];
 }
 
 function isTimeBased(name) {

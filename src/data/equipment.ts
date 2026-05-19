@@ -23,7 +23,7 @@ export const EQUIPMENT_LABELS: Record<ExerciseEquipment, string> = {
   machine: "Machines",
   cable: "Cables",
   medicine_ball: "Medicine ball",
-  plyo_box: "Plyo box / bench",
+  plyo_box: "Bench / box / sturdy chair or couch",
   stability_ball: "Stability ball / Bosu",
   pull_up_bar: "Pull-up bar",
 };
