@@ -7,6 +7,7 @@ import type { ExercisePreferenceMap } from "@/lib/repos";
 import { refreshCurrentTrainingWeek } from "@/lib/trainingWeekRefresh";
 import { useAuthStore } from "@/stores/useAuthStore";
 import type { TrainingWeekRefreshReason } from "@/stores/useTrainingWeekRefreshStore";
+import { toastSaveError, toastSavePartialWarning } from "@/utils/saveErrorToast";
 
 type ExercisePreferencesState = {
   byExerciseId: ExercisePreferenceMap;
@@ -54,7 +55,7 @@ export const useExercisePreferencesStore = create<ExercisePreferencesState>(
           preference,
         );
       } catch (err) {
-        console.error("[useExercisePreferencesStore.setPreference]", err);
+        toastSaveError("exercise preference", err);
         set({ byExerciseId: prev });
         return;
       }
@@ -72,7 +73,7 @@ export const useExercisePreferencesStore = create<ExercisePreferencesState>(
         try {
           await refreshCurrentTrainingWeek(reason);
         } catch (err) {
-          console.error("[useExercisePreferencesStore.refreshWeek]", err);
+          toastSavePartialWarning("Preference", err);
         }
       }
     },

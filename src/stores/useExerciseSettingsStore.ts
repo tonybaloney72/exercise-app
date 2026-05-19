@@ -9,6 +9,7 @@ import {
   resolveExerciseSettings,
   type ResolvedExerciseSettings,
 } from "@/utils/effectiveExerciseSettings";
+import { toastSaveError } from "@/utils/saveErrorToast";
 
 type ExerciseSettingsState = {
   byExerciseId: ExerciseSettingsMap;
@@ -55,7 +56,7 @@ export const useExerciseSettingsStore = create<ExerciseSettingsState>(
       try {
         await getExerciseSettingsRepo(mode).upsert(exerciseId, values);
       } catch (err) {
-        console.error("[useExerciseSettingsStore.upsert]", err);
+        toastSaveError("exercise settings", err);
         try {
           const map = await getExerciseSettingsRepo(mode).loadAll();
           set({ byExerciseId: map });

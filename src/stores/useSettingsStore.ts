@@ -11,6 +11,10 @@ import {
 } from "@/lib/stretchDefaults";
 import { readLegacyLocalEquipmentOnboardingDone } from "@/lib/equipmentOnboarding";
 import { useAuthStore } from "@/stores/useAuthStore";
+import {
+  toastSaveError,
+  toastSavePartialWarning,
+} from "@/utils/saveErrorToast";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import {
   weeklyCardioSettingsChanged,
@@ -32,6 +36,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   updateSettings: async (partial) => {
     const current = get();
+    const snapshot = pickUserSettingsFields(current);
     const settingsPartial = pickUserSettingsFields({ ...current, ...partial });
     const updated = normalizeUserSettings(settingsPartial);
     const equipmentChanged =
@@ -75,7 +80,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     try {
       await getSettingsRepo().save(updated);
     } catch (err) {
-      console.error("[useSettingsStore.updateSettings]", err);
+      set((s) => ({ ...s, ...snapshot }));
+      toastSaveError("settings", err);
       return;
     }
 
@@ -90,7 +96,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         await refreshCurrentTrainingWeek("program");
       }
     } catch (err) {
-      console.error("[useSettingsStore.refreshWeek]", err);
+      toastSavePartialWarning("Settings", err);
     }
   },
 

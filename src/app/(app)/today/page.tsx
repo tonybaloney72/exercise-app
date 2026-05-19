@@ -30,6 +30,7 @@ import {
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
+import { toastSaveError } from "@/utils/saveErrorToast";
 import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
@@ -155,7 +156,10 @@ function TodayPageInner() {
       const source = await getWeekSourceForDate(todayKey);
       setWeekSource(source);
     } catch (e: unknown) {
-      setSaveError(e instanceof Error ? e.message : "Could not save changes");
+      const message =
+        e instanceof Error ? e.message : "Could not save changes";
+      setSaveError(message);
+      toastSaveError("workout plan", e);
     } finally {
       setSaving(false);
     }

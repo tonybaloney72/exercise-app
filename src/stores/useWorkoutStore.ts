@@ -41,6 +41,7 @@ import {
   resolveStretchTimerTargetSeconds,
 } from "@/utils/effectiveExerciseSettings";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { toastSaveError } from "@/utils/saveErrorToast";
 import {
   cancelScheduledPersistActiveWorkoutDraft,
   clearActiveWorkoutDraft,
@@ -780,30 +781,37 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     const state = get();
     if (!state.activeWorkout) return null;
 
+    const inProgress = state.activeWorkout;
     const finished: WorkoutLog = {
-      ...state.activeWorkout,
+      ...inProgress,
       endTime: new Date().toISOString(),
     };
     const completed = hydrateWorkoutLog(workoutLogForPersistence(finished));
+    const historyBefore = state.workoutHistory;
 
     cancelScheduledPersistActiveWorkoutDraft();
     clearActiveWorkoutDraft(draftScope());
 
     // Optimistic UI: update store first so the user gets immediate feedback.
-    set((s) => ({
+    set({
       activeWorkout: null,
       pausedWorkoutDate: null,
-      workoutHistory: [completed, ...s.workoutHistory],
-    }));
+      workoutHistory: [completed, ...historyBefore],
+    });
 
     try {
       await getWorkoutRepo().saveWorkout(completed);
+      return completed;
     } catch (err) {
-      console.error("[useWorkoutStore.completeWorkout]", err);
-      // The optimistic state stays — surface errors via a toast in a later slice.
+      toastSaveError("workout", err);
+      set({
+        activeWorkout: inProgress,
+        pausedWorkoutDate: state.pausedWorkoutDate,
+        workoutHistory: historyBefore,
+      });
+      schedulePersistActiveWorkoutDraft(draftScope(), inProgress);
+      return null;
     }
-
-    return completed;
   },
 
   discardWorkout: () => {
@@ -838,15 +846,17 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     const existing = state.workoutHistory.find((w) => w.id === workoutId);
     if (!existing) return;
     const updated = hydrateWorkoutLog({ ...existing, notes });
+    const historyBefore = state.workoutHistory;
     set({
-      workoutHistory: state.workoutHistory.map((w) =>
+      workoutHistory: historyBefore.map((w) =>
         w.id === workoutId ? updated : w,
       ),
     });
     try {
       await getWorkoutRepo().saveWorkout(updated);
     } catch (err) {
-      console.error("[useWorkoutStore.updateCompletedWorkoutNotes]", err);
+      toastSaveError("workout notes", err);
+      set({ workoutHistory: historyBefore });
     }
   },
 

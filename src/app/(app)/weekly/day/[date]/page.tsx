@@ -29,6 +29,7 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
+import { toastSaveError } from "@/utils/saveErrorToast";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
 import {
@@ -223,7 +224,10 @@ export default function WeeklyDayPage() {
       const source = await getWeekSourceForDate(dateKey);
       setWeekSource(source);
     } catch (e: unknown) {
-      setSaveError(e instanceof Error ? e.message : "Could not save changes");
+      const message =
+        e instanceof Error ? e.message : "Could not save changes";
+      setSaveError(message);
+      toastSaveError("workout plan", e);
     } finally {
       setSaving(false);
     }
