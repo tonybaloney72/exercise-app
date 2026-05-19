@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -19,6 +19,7 @@ import { formatSecondsToMMSS } from "@/utils/time";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
+import ExportChartButton from "@/components/progress/ExportChartButton";
 
 const tooltipStyle = {
   backgroundColor: "var(--surface)",
@@ -61,6 +62,7 @@ export default function ExerciseProgressChart({ history }: Props) {
   );
 
   const [sessionsOpen, setSessionsOpen] = useState(false);
+  const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!sessionsOpen) return;
@@ -82,14 +84,21 @@ export default function ExerciseProgressChart({ history }: Props) {
 
   return (
     <div className="space-y-3">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">
-          Exercise over time
-        </h2>
-        <p className="text-xs text-muted mt-0.5">
-          Reps or logged duration per workout (summed if the exercise appears in
-          multiple rounds)
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-foreground">
+            Exercise over time
+          </h2>
+          <p className="text-xs text-muted mt-0.5">
+            Reps or logged duration per workout (summed if the exercise appears in
+            multiple rounds)
+          </p>
+        </div>
+        <ExportChartButton
+          containerRef={chartRef}
+          filename={exerciseName || exerciseId}
+          disabled={series.length === 0}
+        />
       </div>
 
       <div className="flex gap-2">
@@ -177,7 +186,7 @@ export default function ExerciseProgressChart({ history }: Props) {
         )}
       </BottomSheetModal>
 
-      <SurfaceCard className="h-56 w-full p-2 pt-3">
+      <SurfaceCard ref={chartRef} className="h-56 w-full p-2 pt-3">
         {series.length === 0 ? (
           <div className="flex h-full items-center justify-center px-4">
             <EmptyState

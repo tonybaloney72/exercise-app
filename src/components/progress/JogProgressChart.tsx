@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useRef, type CSSProperties, type ReactNode } from "react";
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -23,6 +23,7 @@ import {
   type CardioChartPoint,
 } from "@/utils/cardioProgressStats";
 import { formatSecondsToMMSS } from "@/utils/time";
+import ExportChartButton from "@/components/progress/ExportChartButton";
 
 const tooltipStyle: CSSProperties = {
   backgroundColor: "var(--surface)",
@@ -63,14 +64,37 @@ function CardioTooltipBody({ point }: { point: CardioChartPoint }) {
   );
 }
 
-function ChartShell({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
+function ChartShell({
+  title,
+  subtitle,
+  exportFilename,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  exportFilename: string;
+  children: ReactNode;
+}) {
+  const chartRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="space-y-3">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-        <p className="text-xs text-muted mt-0.5">{subtitle}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+          <p className="text-xs text-muted mt-0.5">{subtitle}</p>
+        </div>
+        <ExportChartButton
+          containerRef={chartRef}
+          filename={exportFilename}
+        />
       </div>
-      <div className="h-56 w-full rounded-xl border border-border bg-surface p-2 pt-3">{children}</div>
+      <div
+        ref={chartRef}
+        className="h-56 w-full rounded-xl border border-border bg-surface p-2 pt-3"
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -81,6 +105,7 @@ export default function CardioProgressChart({
   title,
 }: Props) {
   const activityTitle = title ?? cardioExerciseTitle(exerciseId);
+  const exportFilename = exerciseId.toLowerCase();
   const series = useMemo(
     () => buildCardioChartSeries(history, exerciseId),
     [history, exerciseId],
@@ -125,6 +150,7 @@ export default function CardioProgressChart({
       <ChartShell
         title={activityTitle}
         subtitle="Distance (bars) and session time (line). Tooltip shows pace per mile when both are logged."
+        exportFilename={exportFilename}
       >
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={composedData} margin={{ top: 28, right: 8, left: 0, bottom: 4 }}>
@@ -215,6 +241,7 @@ export default function CardioProgressChart({
       <ChartShell
         title={activityTitle}
         subtitle={`Distance per completed session (log time as well to see pace).`}
+        exportFilename={exportFilename}
       >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={series} margin={{ top: 28, right: 8, left: 0, bottom: 4 }}>
@@ -259,6 +286,7 @@ export default function CardioProgressChart({
     <ChartShell
       title={activityTitle}
       subtitle="Session time per completed session (add distance to see pace per mile)."
+      exportFilename={exportFilename}
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={series} margin={{ top: 28, right: 8, left: 0, bottom: 4 }}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -18,6 +18,7 @@ import { CATEGORIES } from "@/data/categories";
 import { weeklyWorkoutCounts, trainingCategoryTotals } from "@/utils/progressStats";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
+import ExportChartButton from "@/components/progress/ExportChartButton";
 
 const tooltipStyle = {
   backgroundColor: "var(--surface)",
@@ -34,6 +35,8 @@ interface Props {
 }
 
 export default function ProgressChartsSection({ history }: Props) {
+  const weeklyChartRef = useRef<HTMLDivElement>(null);
+  const categoryChartRef = useRef<HTMLDivElement>(null);
   const weekly = useMemo(() => weeklyWorkoutCounts(history, 8), [history]);
   const categoryData = useMemo(() => {
     const rows = trainingCategoryTotals(history);
@@ -54,11 +57,21 @@ export default function ProgressChartsSection({ history }: Props) {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-sm font-semibold text-foreground">Workouts per week</h2>
-        <p className="text-xs text-muted mt-0.5">
-          Sunday–Saturday weeks; label is the week&apos;s start date
-        </p>
-        <SurfaceCard className="mt-3 h-56 w-full p-2 pt-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold text-foreground">
+              Workouts per week
+            </h2>
+            <p className="text-xs text-muted mt-0.5">
+              Sunday–Saturday weeks; label is the week&apos;s start date
+            </p>
+          </div>
+          <ExportChartButton
+            containerRef={weeklyChartRef}
+            filename="workouts-per-week"
+          />
+        </div>
+        <SurfaceCard ref={weeklyChartRef} className="mt-3 h-56 w-full p-2 pt-3">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={weekly} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
               <CartesianGrid
@@ -93,12 +106,27 @@ export default function ProgressChartsSection({ history }: Props) {
       </div>
 
       <div>
-        <h2 className="text-sm font-semibold text-foreground">Training focus</h2>
-        <p className="text-xs text-muted mt-0.5">
-          Completed strength exercises by category (stretches excluded)
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold text-foreground">
+              Training focus
+            </h2>
+            <p className="text-xs text-muted mt-0.5">
+              Completed strength exercises by category (stretches excluded)
+            </p>
+          </div>
+          {hasCategoryData && (
+            <ExportChartButton
+              containerRef={categoryChartRef}
+              filename="training-focus"
+            />
+          )}
+        </div>
         {hasCategoryData ? (
-          <SurfaceCard className="mt-3 w-full overflow-hidden p-0">
+          <SurfaceCard
+            ref={categoryChartRef}
+            className="mt-3 w-full overflow-hidden p-0"
+          >
             <div className="h-[220px] w-full px-4 pt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
