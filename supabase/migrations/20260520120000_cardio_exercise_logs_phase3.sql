@@ -1,0 +1,136 @@
+-- Phase 3: cardio rows in exercise_logs; drop workout_logs.jog_* columns.
+
+alter type public.exercise_log_section add value if not exists 'cardio';
+
+alter table public.exercise_logs
+  add column if not exists actual_distance_mi numeric(5, 2)
+    constraint exercise_logs_actual_distance_mi_chk
+      check (actual_distance_mi is null or actual_distance_mi >= 0);
+
+-- Backfill jog from legacy workout_logs columns (idempotent).
+insert into public.exercise_logs (
+  workout_log_id,
+  user_id,
+  section,
+  round_number,
+  position,
+  exercise_id,
+  completed,
+  actual_reps,
+  actual_duration,
+  actual_distance_mi,
+  target_duration_seconds,
+  skipped,
+  swapped_with,
+  notes
+)
+select
+  w.id,
+  w.user_id,
+  'cardio'::public.exercise_log_section,
+  null,
+  0,
+  'END-JOG',
+  w.jog_completed,
+  null,
+  w.jog_duration_seconds,
+  w.jog_distance,
+  null,
+  coalesce(w.jog_skipped, false),
+  null,
+  null
+from public.workout_logs w
+where (
+  w.jog_completed
+  or coalesce(w.jog_skipped, false)
+  or w.jog_distance is not null
+  or w.jog_duration_seconds is not null
+)
+and not exists (
+  select 1
+  from public.exercise_logs e
+  where e.workout_log_id = w.id
+    and e.section = 'cardio'
+    and e.exercise_id = 'END-JOG'
+);
+
+create or replace function public.save_workout(
+  p_workout_log jsonb,
+  p_exercise_logs jsonb
+)
+returns void
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+  v_workout_id uuid;
+  v_user_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then
+    raise exception 'not authenticated';
+  end if;
+
+  v_workout_id := (p_workout_log->>'id')::uuid;
+
+  insert into public.workout_logs (
+    id, user_id, date, day_of_week,
+    warm_up_completed, cool_down_completed,
+    notes, start_time, end_time
+  ) values (
+    v_workout_id,
+    v_user_id,
+    (p_workout_log->>'date')::date,
+    (p_workout_log->>'day_of_week')::smallint,
+    coalesce((p_workout_log->>'warm_up_completed')::bool, false),
+    coalesce((p_workout_log->>'cool_down_completed')::bool, false),
+    p_workout_log->>'notes',
+    nullif(p_workout_log->>'start_time', '')::timestamptz,
+    nullif(p_workout_log->>'end_time', '')::timestamptz
+  )
+  on conflict (id) do update set
+    date = excluded.date,
+    day_of_week = excluded.day_of_week,
+    warm_up_completed = excluded.warm_up_completed,
+    cool_down_completed = excluded.cool_down_completed,
+    notes = excluded.notes,
+    start_time = excluded.start_time,
+    end_time = excluded.end_time,
+    updated_at = now();
+
+  delete from public.exercise_logs where workout_log_id = v_workout_id;
+
+  insert into public.exercise_logs (
+    workout_log_id, user_id, section, round_number, position,
+    exercise_id, completed, actual_reps, actual_duration,
+    actual_distance_mi,
+    target_duration_seconds,
+    skipped, swapped_with, notes
+  )
+  select
+    v_workout_id,
+    v_user_id,
+    (el->>'section')::public.exercise_log_section,
+    nullif(el->>'round_number', '')::smallint,
+    (el->>'position')::smallint,
+    el->>'exercise_id',
+    coalesce((el->>'completed')::bool, false),
+    nullif(el->>'actual_reps', '')::int,
+    nullif(el->>'actual_duration', '')::int,
+    nullif(el->>'actual_distance_mi', '')::numeric,
+    nullif(el->>'target_duration_seconds', '')::int,
+    coalesce((el->>'skipped')::bool, false),
+    el->>'swapped_with',
+    el->>'notes'
+  from jsonb_array_elements(p_exercise_logs) as el;
+end;
+$$;
+
+grant execute on function public.save_workout(jsonb, jsonb) to authenticated;
+
+alter table public.workout_logs
+  drop column if exists jog_completed,
+  drop column if exists jog_skipped,
+  drop column if exists jog_distance,
+  drop column if exists jog_duration_seconds;
