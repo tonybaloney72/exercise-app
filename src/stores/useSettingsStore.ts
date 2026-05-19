@@ -9,6 +9,7 @@ import {
   pruneStoredStretchDefaults,
   stretchListsEqual,
 } from "@/lib/stretchDefaults";
+import { readLegacyLocalEquipmentOnboardingDone } from "@/lib/equipmentOnboarding";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import {
@@ -105,11 +106,18 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       loaded.defaultCoolDown ?? [],
       disliked,
     );
-    const merged: UserSettings = normalizeUserSettings({
+    let merged: UserSettings = normalizeUserSettings({
       ...loaded,
       defaultWarmUp,
       defaultCoolDown,
     });
+
+    if (
+      !merged.equipmentOnboardingCompleted &&
+      readLegacyLocalEquipmentOnboardingDone()
+    ) {
+      merged = { ...merged, equipmentOnboardingCompleted: true };
+    }
 
     const pruned =
       !stretchListsEqual(defaultWarmUp, loaded.defaultWarmUp ?? []) ||
@@ -117,11 +125,15 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
     set({ ...merged, hydrated: true });
 
-    if (mode === "authenticated" && pruned) {
+    const upgradedOnboardingFromLegacy =
+      merged.equipmentOnboardingCompleted &&
+      loaded.equipmentOnboardingCompleted !== true;
+
+    if (mode === "authenticated" && (pruned || upgradedOnboardingFromLegacy)) {
       try {
         await getSettingsRepo(mode).save(merged);
       } catch (err) {
-        console.error("[useSettingsStore.pruneStretchDefaults]", err);
+        console.error("[useSettingsStore.loadSettings.persist]", err);
       }
     }
   },
@@ -139,6 +151,7 @@ function pickUserSettingsFields(
     timerVibrationEnabled: state.timerVibrationEnabled,
     keepScreenAwake: state.keepScreenAwake,
     availableEquipment: state.availableEquipment,
+    equipmentOnboardingCompleted: state.equipmentOnboardingCompleted,
     trainingPriorityPreset: state.trainingPriorityPreset,
     trainingPriorityScores: state.trainingPriorityScores,
     trainingPriorityCustomized: state.trainingPriorityCustomized,

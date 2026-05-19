@@ -4,17 +4,11 @@ import { useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
-import { markEquipmentOnboardingCompleted } from "@/lib/equipmentOnboarding";
+import { clearLegacyLocalEquipmentOnboardingFlag } from "@/lib/equipmentOnboarding";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { ExerciseEquipment } from "@/types";
 
-type EquipmentOnboardingModalProps = {
-  onDone: () => void;
-};
-
-export default function EquipmentOnboardingModal({
-  onDone,
-}: EquipmentOnboardingModalProps) {
+export default function EquipmentOnboardingModal() {
   const updateSettings = useSettingsStore((s) => s.updateSettings);
   const savedEquipment = useSettingsStore((s) => s.availableEquipment);
   const [selected, setSelected] = useState<ExerciseEquipment[]>(() =>
@@ -25,9 +19,11 @@ export default function EquipmentOnboardingModal({
   const finish = async (equipment: ExerciseEquipment[]) => {
     setSaving(true);
     try {
-      await updateSettings({ availableEquipment: equipment });
-      markEquipmentOnboardingCompleted();
-      onDone();
+      await updateSettings({
+        availableEquipment: equipment,
+        equipmentOnboardingCompleted: true,
+      });
+      clearLegacyLocalEquipmentOnboardingFlag();
     } finally {
       setSaving(false);
     }

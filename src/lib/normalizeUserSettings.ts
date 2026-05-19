@@ -86,6 +86,8 @@ export function normalizeUserSettings(
   return {
     ...DEFAULT_SETTINGS,
     ...rest,
+    equipmentOnboardingCompleted:
+      partial.equipmentOnboardingCompleted ?? DEFAULT_SETTINGS.equipmentOnboardingCompleted,
     trainingPriorityPreset: preset,
     trainingPriorityScores: scores,
     trainingPriorityCustomized: customized,

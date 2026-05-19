@@ -107,6 +107,7 @@ interface SettingsRow {
   weekly_rest_days_customized?: boolean;
   weekly_cardio_by_day?: unknown;
   weekly_cardio_customized?: boolean;
+  equipment_onboarding_completed?: boolean;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -331,6 +332,7 @@ function rowToSettings(row: SettingsRow): UserSettings {
     weeklyRestDaysCustomized: row.weekly_rest_days_customized ?? false,
     weeklyCardioByDay: sanitizeWeeklyCardioByDay(row.weekly_cardio_by_day),
     weeklyCardioCustomized: row.weekly_cardio_customized ?? false,
+    equipmentOnboardingCompleted: row.equipment_onboarding_completed ?? false,
   });
 }
 
@@ -358,6 +360,7 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     weekly_rest_days_customized: s.weeklyRestDaysCustomized,
     weekly_cardio_by_day: s.weeklyCardioByDay,
     weekly_cardio_customized: s.weeklyCardioCustomized,
+    equipment_onboarding_completed: s.equipmentOnboardingCompleted,
   };
 }
 

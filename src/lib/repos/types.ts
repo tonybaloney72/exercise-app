@@ -76,6 +76,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   timerVibrationEnabled: true,
   keepScreenAwake: false,
   availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
+  equipmentOnboardingCompleted: false,
   trainingPriorityPreset: "balanced",
   trainingPriorityScores: scoresFromPreset("balanced"),
   trainingPriorityCustomized: false,
