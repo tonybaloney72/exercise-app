@@ -3,8 +3,10 @@
  * exercise library pages (https://www.hybridcalisthenics.com/exercise-library).
  *
  * Run: node scripts/generate-hybrid-calisthenics-exercises.mjs
+ * (also runs prune-consolidated-exercises.mjs to drop merged HC/SW rows)
  */
 
+import { spawnSync } from "node:child_process";
 import { writeFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -528,6 +530,12 @@ const PLYO_BOX_NAMES = new Set([
 
 const DIP_NAMES = new Set(["Dip", "Dips"]);
 
+/** Inverted hang or box/chair shrug — not floor-only bodyweight. */
+const INVERTED_SHRUG_NAMES = new Set(["Upside Down Shrug"]);
+
+/** HC "bodyweight" moves that require gymnastic rings (name has no "ring"). */
+const RINGS_BODYWEIGHT_NAMES = new Set(["Pelican Curl"]);
+
 function inferEquipmentList(name, baseEquip) {
   if (PULL_UP_BAR_MULTI[name]) return PULL_UP_BAR_MULTI[name];
   if (baseEquip === "bodyweight" && DIP_NAMES.has(name)) {
@@ -536,11 +544,17 @@ function inferEquipmentList(name, baseEquip) {
   if (baseEquip === "bodyweight" && PLYO_BOX_NAMES.has(name)) {
     return ["plyo_box"];
   }
+  if (baseEquip === "bodyweight" && RINGS_BODYWEIGHT_NAMES.has(name)) {
+    return ["rings"];
+  }
   if (baseEquip === "bodyweight" && /\brings?\b/i.test(name)) {
     return ["rings"];
   }
   if (baseEquip === "bodyweight" && PULL_UP_BAR_NAMES.has(name)) {
     return ["pull_up_bar"];
+  }
+  if (baseEquip === "bodyweight" && INVERTED_SHRUG_NAMES.has(name)) {
+    return ["pull_up_bar", "rings", "plyo_box"];
   }
   return [baseEquip];
 }
@@ -620,3 +634,10 @@ ${lines.join("\n")}
 
 writeFileSync(OUT, file, "utf8");
 console.log(`Wrote ${sorted.length} exercises to ${OUT}`);
+
+const prune = join(__dirname, "prune-consolidated-exercises.mjs");
+const pr = spawnSync(process.execPath, [prune], {
+  stdio: "inherit",
+  cwd: join(__dirname, ".."),
+});
+if (pr.status !== 0) process.exit(pr.status ?? 1);

@@ -1,5 +1,5 @@
 /**
- * One-off maintainer: remove consolidated exercise objects from source files.
+ * Removes consolidated exercise objects from source files (whole `{ … },` blocks).
  * Run: node scripts/prune-consolidated-exercises.mjs
  */
 import { readFileSync, writeFileSync } from "fs";
@@ -13,42 +13,16 @@ const REMOVED_HC = new Set([
 
 const REMOVED_SW = new Set(["SW-15", "SW-17", "SW-20", "SW-25"]);
 
-function parseAndFilter(text, removedIds) {
-  const lines = text.split("\n");
-  const out = [];
-  let skip = false;
-  let depth = 0;
-  for (const line of lines) {
-    const idMatch = line.match(/^\s*id:\s*"([^"]+)"/);
-    if (idMatch && !skip) {
-      if (removedIds.has(idMatch[1])) {
-        skip = true;
-        depth = 0;
-        continue;
-      }
-    }
-    if (skip) {
-      if (line.includes("{")) depth += (line.match(/\{/g) || []).length;
-      if (line.includes("}")) depth -= (line.match(/\}/g) || []).length;
-      if (depth <= 0 && (line.trim() === "}," || line.trim() === "}")) {
-        skip = false;
-        continue;
-      }
-      if (depth <= 0 && line.trim() === "{") {
-        skip = false;
-        continue;
-      }
-      continue;
-    }
-    out.push(line);
-  }
-  return out.join("\n");
+/** @param {string} text @param {Set<string>} removedIds */
+function removeExerciseBlocks(text, removedIds) {
+  const blockRe = /\t\{\n\t\tid: "([^"]+)"[\s\S]*?\n\t\},/g;
+  return text.replace(blockRe, (match, id) => (removedIds.has(id) ? "" : match));
 }
 
 const hybridPath = "src/data/hybridCalisthenicsExercises.ts";
 let hybrid = readFileSync(hybridPath, "utf8");
 const beforeH = (hybrid.match(/^\s*id:/gm) || []).length;
-hybrid = parseAndFilter(hybrid, REMOVED_HC);
+hybrid = removeExerciseBlocks(hybrid, REMOVED_HC);
 const afterH = (hybrid.match(/^\s*id:/gm) || []).length;
 
 const catalogPath = "src/data/exercises.ts";
@@ -57,7 +31,7 @@ const hybridImport = catalog.indexOf("import { hybridCalisthenicsExercises }");
 const catalogOnly = catalog.slice(0, hybridImport);
 const afterHybrid = catalog.slice(hybridImport);
 const beforeC = (catalogOnly.match(/^\s*id:/gm) || []).length;
-const catalogFiltered = parseAndFilter(catalogOnly, REMOVED_SW);
+const catalogFiltered = removeExerciseBlocks(catalogOnly, REMOVED_SW);
 const afterC = (catalogFiltered.match(/^\s*id:/gm) || []).length;
 writeFileSync(catalogPath, catalogFiltered + afterHybrid);
 

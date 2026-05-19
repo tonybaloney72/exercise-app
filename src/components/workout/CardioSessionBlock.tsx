@@ -94,7 +94,7 @@ export default function CardioSessionBlock({
                   </button>
                 ) : null}
               </span>
-              <span className="pl-10 pr-1 pb-3 flex gap-3 block">
+              <span className="flex gap-3 pl-10 pr-1 pb-3">
                 <label className="flex-1 block">
                   <span className="text-[10px] text-muted uppercase tracking-wider">
                     Distance (mi)

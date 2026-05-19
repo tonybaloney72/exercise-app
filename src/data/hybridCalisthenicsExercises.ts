@@ -392,7 +392,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		id: "HC-033",
 		name: "Band Resisted Hanging Leg Raise",
 		category: "CL",
-		equipment: ["pull_up_bar", "resistance_band"],
+		equipment: ["pull_up_bar","resistance_band"],
 		muscleGroups: ["Hip Flexors"],
 		defaultReps: "10",
 		notes: "Muscle focus: Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
@@ -736,6 +736,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-063",
 		name: "Barbell Bent-Over Row",
@@ -904,6 +905,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-078",
 		name: "Barbell Straight Legged Deadlift",
@@ -976,6 +978,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-085",
 		name: "Cable Chest Fly",
@@ -1420,6 +1423,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-123",
 		name: "Close Grip Bench Press",
@@ -1516,6 +1520,8 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
+
 	{
 		id: "HC-133",
 		name: "Deadlift",
@@ -1580,7 +1586,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		id: "HC-138",
 		name: "Dip",
 		category: "UP",
-		equipment: ["pull_up_bar", "plyo_box"],
+		equipment: ["pull_up_bar","plyo_box"],
 		muscleGroups: ["Pectoralis Major"],
 		defaultReps: "10",
 		notes: "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
@@ -1592,7 +1598,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		id: "HC-139",
 		name: "Dips",
 		category: "UP",
-		equipment: ["pull_up_bar", "plyo_box"],
+		equipment: ["pull_up_bar","plyo_box"],
 		muscleGroups: ["Triceps"],
 		defaultReps: "10",
 		notes: "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
@@ -2020,6 +2026,8 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
+
 	{
 		id: "HC-177",
 		name: "Front Squat",
@@ -2032,6 +2040,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-179",
 		name: "Glute Kickback Machine",
@@ -2104,6 +2113,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-186",
 		name: "Heel Walk",
@@ -2152,6 +2162,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-191",
 		name: "Hip Thrust Machine",
@@ -2164,6 +2175,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-193",
 		name: "Incline Cable Chest Press",
@@ -2584,6 +2596,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-229",
 		name: "Reverse Hyperextension",
@@ -2728,6 +2741,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-242",
 		name: "Seated Toe Raise",
@@ -2752,6 +2766,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-245",
 		name: "Side-Lying Dumbbell Lateral Raise",
@@ -2968,6 +2983,8 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
+
 	{
 		id: "HC-265",
 		name: "T Bar Row",
@@ -3020,7 +3037,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		id: "HC-269",
 		name: "Upside Down Shrug",
 		category: "UPL",
-		equipment: ["bodyweight"],
+		equipment: ["pull_up_bar","rings","plyo_box"],
 		muscleGroups: ["Traps"],
 		defaultReps: "10",
 		notes: "Muscle focus: Traps. Reference: Hybrid Calisthenics exercise library.",
@@ -3112,6 +3129,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-278",
 		name: "Weighted Crunch",
@@ -3124,6 +3142,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-280",
 		name: "Weighted Dead Bug",
@@ -3148,6 +3167,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-283",
 		name: "Weighted Deep Squat",
@@ -3160,6 +3180,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-285",
 		name: "Weighted Hollow Body Hold",
@@ -3172,6 +3193,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: true,
 	},
+
 	{
 		id: "HC-287",
 		name: "Weighted Jefferson Curl",
@@ -3184,6 +3206,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-289",
 		name: "Weighted Lunge",
@@ -3220,6 +3243,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-293",
 		name: "Weighted Side Plank",
@@ -3244,6 +3268,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-296",
 		name: "Weighted Sumo Squat",
@@ -3280,6 +3305,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
 		videoUrl: undefined,
 		isTimeBased: false,
 	},
+
 	{
 		id: "HC-300",
 		name: "Zottman Curl",
