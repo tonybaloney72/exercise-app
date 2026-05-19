@@ -2643,20 +2643,6 @@ const catalogExercises: Exercise[] = [
 		secondaryCategory: "LB",
 	},
 	{
-		id: "SW-15",
-		name: "Glute Bridges",
-		category: "SW",
-		equipment: ["bodyweight"],
-		muscleGroups: ["Calves","Glutes","Hamstrings","Mobility","Quadriceps"],
-		defaultReps: "10",
-		notes:
-			"On back, knees bent, drive hips up squeezing glutes at top, lower with control",
-		source: "BarBend",
-		videoUrl: "https://barbend.com/best-dynamic-warm-up-exercises/",
-		isTimeBased: false,
-		secondaryCategory: "LB",
-	},
-	{
 		id: "SW-16",
 		name: "World's Greatest Stretch",
 		category: "SW",
@@ -2668,19 +2654,6 @@ const catalogExercises: Exercise[] = [
 		source: "Muscle & Strength",
 		videoUrl: "https://www.youtube.com/watch?v=kk8RnOLzngc",
 		isTimeBased: false,
-	},
-	{
-		id: "SW-17",
-		name: "High Knees",
-		category: "SW",
-		equipment: ["bodyweight"],
-		muscleGroups: ["Glutes","Mobility","Quadriceps"],
-		defaultReps: "20 each leg",
-		notes: "Jog in place driving knees high, pump arms, stay on balls of feet",
-		source: "BarBend",
-		videoUrl: "https://barbend.com/best-dynamic-warm-up-exercises/",
-		isTimeBased: false,
-		secondaryCategory: "PC",
 	},
 	{
 		id: "SW-18",
@@ -2707,20 +2680,6 @@ const catalogExercises: Exercise[] = [
 		source: "ACE",
 		videoUrl: "https://www.youtube.com/watch?v=3Zd9O1q8k8Y",
 		isTimeBased: false,
-	},
-	{
-		id: "SW-20",
-		name: "Bodyweight Squats",
-		category: "SW",
-		equipment: ["bodyweight"],
-		muscleGroups: ["Glutes", "Mobility", "Quadriceps"],
-		defaultReps: "10",
-		notes:
-			"Feet shoulder-width, sit hips back and down, chest up, drive through mid-foot to stand",
-		source: "BarBend",
-		videoUrl: "https://www.youtube.com/watch?v=Dy28X2e3cRs",
-		isTimeBased: false,
-		secondaryCategory: "LB",
 	},
 	{
 		id: "SW-21",
@@ -2777,20 +2736,6 @@ const catalogExercises: Exercise[] = [
 		isTimeBased: false,
 		secondaryCategory: "CS",
 	},
-	{
-		id: "SW-25",
-		name: "Jumping Jacks",
-		category: "SW",
-		equipment: ["bodyweight"],
-		muscleGroups: ["Mobility"],
-		defaultReps: "30 sec",
-		notes: "Light bouncing jacks to raise heart rate; land softly through the whole foot",
-		source: "ACE",
-		videoUrl: "https://www.youtube.com/watch?v=2W4ZNSwoWDA",
-		isTimeBased: true,
-		secondaryCategory: "PC",
-	},
-
 	// ── DAREBEE warm-ups (Universal, Quick, Classic, 2-Min, 4-Min, Fighter's) ──
 	{
 		id: "SW-26",

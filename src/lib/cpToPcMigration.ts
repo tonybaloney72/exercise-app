@@ -6,6 +6,7 @@ import type {
   WorkoutLog,
 } from "@/types";
 import type { TrainingWeekDays } from "@/lib/repos";
+import { migrateConsolidatedExerciseId } from "@/lib/exerciseIdConsolidation";
 
 /** Legacy cardio/plyo category code (renamed to {@link PC_CATEGORY}). */
 export const LEGACY_CP_CATEGORY = "CP" as const;
@@ -18,7 +19,8 @@ const CP_ID_PREFIX = /^CP-(\d+.*)$/;
 /** Map legacy `CP-*` exercise ids to `PC-*`. */
 export function migrateExerciseId(id: string): string {
   const m = id.match(CP_ID_PREFIX);
-  return m ? `PC-${m[1]}` : id;
+  const afterCp = m ? `PC-${m[1]}` : id;
+  return migrateConsolidatedExerciseId(afterCp);
 }
 
 export function migrateCategory(category: string): ExerciseCategory {

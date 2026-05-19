@@ -15,7 +15,7 @@ export const DEFAULT_WARM_UP: StretchEntry[] = [
   { exerciseId: "SW-14", targetReps: "10 each direction" },  // Hip Circles
   { exerciseId: "SW-12", targetReps: "10 each leg" },        // Leg Swings (Front-Back)
   { exerciseId: "SW-11", targetReps: "8 each leg" },         // Walking Lunges
-  { exerciseId: "SW-15", targetReps: "10" },                 // Glute Bridges
+  { exerciseId: "CS-5", targetReps: "10" },                  // Glute Bridge
   { exerciseId: "SW-16", targetReps: "5 each side" },        // World's Greatest Stretch
 ];
 

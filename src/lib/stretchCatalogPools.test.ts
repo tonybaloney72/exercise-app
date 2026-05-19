@@ -10,7 +10,7 @@ describe("stretch catalog pools", () => {
       (n, pool) => n + pool.length,
       0,
     );
-    expect(total).toBeGreaterThanOrEqual(40);
+    expect(total).toBeGreaterThanOrEqual(39);
   });
 
   it("includes the full SC library across themed pools", () => {
