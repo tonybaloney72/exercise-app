@@ -17,7 +17,6 @@ import {
   buildEmptyCardioLogs,
   CARDIO_KIND_TO_EXERCISE_ID,
   resolveCardioActivities,
-  syncLegacyJogFieldsFromCardioLogs,
 } from "@/lib/cardioActivities";
 import { workoutLogForPersistence } from "@/lib/workoutCardioPersistence";
 import { getCardioLog, patchCardioLog } from "@/lib/cardioWorkoutLog";
@@ -267,8 +266,6 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         id: uuidv4(),
         date: formatLocalDateKey(now),
         dayOfWeek: now.getDay(),
-        jogCompleted: false,
-        jogSkipped: false,
         cardioExercises,
         warmUpCompleted: false,
         warmUpExercises,
@@ -787,7 +784,6 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       ...state.activeWorkout,
       endTime: new Date().toISOString(),
     };
-    syncLegacyJogFieldsFromCardioLogs(finished);
     const completed = hydrateWorkoutLog(workoutLogForPersistence(finished));
 
     cancelScheduledPersistActiveWorkoutDraft();

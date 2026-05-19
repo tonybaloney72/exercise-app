@@ -1,3 +1,6 @@
+import { resolveCardioActivities } from "@/lib/cardioActivities";
+import { exerciseMap } from "@/data/exercises";
+import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
 
 export type ExerciseSlotCounts = {
@@ -6,14 +9,19 @@ export type ExerciseSlotCounts = {
   skipped: number;
 };
 
+export type CardioSummaryLine = {
+  exerciseId: string;
+  label: string;
+  completed: boolean;
+  skipped: boolean;
+  distanceMi?: number;
+  durationSeconds?: number;
+};
+
 export type WorkoutLogSummary = {
   strength: ExerciseSlotCounts;
   stretches: ExerciseSlotCounts;
-  hasJog: boolean;
-  jogCompleted: boolean;
-  jogSkipped: boolean;
-  jogDistance?: number;
-  jogDurationSeconds?: number;
+  cardio: CardioSummaryLine[];
   startTimeLabel: string | null;
   endTimeLabel: string | null;
   durationLabel: string | null;
@@ -35,15 +43,25 @@ export function summarizeWorkoutLog(
 ): WorkoutLogSummary {
   const strengthLogs = log.rounds.flatMap((r) => r.exercises);
   const stretchLogs = [...log.warmUpExercises, ...log.coolDownExercises];
+  const logged = resolveWorkoutCardioExercises(log);
+
+  const cardio: CardioSummaryLine[] = resolveCardioActivities(plan).map((activity) => {
+    const row = logged.find((r) => r.exerciseId === activity.exerciseId);
+    const label = exerciseMap[activity.exerciseId]?.name ?? activity.kind;
+    return {
+      exerciseId: activity.exerciseId,
+      label,
+      completed: row?.completed ?? false,
+      skipped: row?.skipped ?? false,
+      distanceMi: row?.actualDistanceMi,
+      durationSeconds: row?.actualDuration,
+    };
+  });
 
   return {
     strength: countExerciseSlots(strengthLogs),
     stretches: countExerciseSlots(stretchLogs),
-    hasJog: plan.hasJog,
-    jogCompleted: log.jogCompleted,
-    jogSkipped: log.jogSkipped,
-    jogDistance: log.jogDistance,
-    jogDurationSeconds: log.jogDurationSeconds,
+    cardio,
     startTimeLabel: formatClockTime(log.startTime),
     endTimeLabel: formatClockTime(log.endTime),
     durationLabel: formatWorkoutDuration(log.startTime, log.endTime),

@@ -45,23 +45,20 @@ import {
   migrateWorkoutLog,
 } from "@/lib/cpToPcMigration";
 import { sanitizeWeeklyRestDays } from "@/lib/restDays";
+import { ensureCardioExercises } from "@/lib/resolveWorkoutCardio";
 import {
   hydrateCardioFromNotes,
   userFacingWorkoutNotes,
   workoutLogForPersistence,
 } from "@/lib/workoutCardioPersistence";
 
-type Section = "warm_up" | "round" | "cool_down";
+type Section = "warm_up" | "round" | "cool_down" | "cardio";
 
 interface WorkoutRow {
   id: string;
   user_id: string;
   date: string;
   day_of_week: number;
-  jog_completed: boolean;
-  jog_skipped: boolean;
-  jog_distance: number | null;
-  jog_duration_seconds: number | null;
   warm_up_completed: boolean;
   cool_down_completed: boolean;
   notes: string | null;
@@ -80,6 +77,7 @@ interface ExerciseRow {
   completed: boolean;
   actual_reps: number | null;
   actual_duration: number | null;
+  actual_distance_mi: number | null;
   target_duration_seconds: number | null;
   skipped: boolean;
   swapped_with: string | null;
@@ -117,6 +115,7 @@ function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
     completed: r.completed,
     actualReps: r.actual_reps ?? undefined,
     actualDuration: r.actual_duration ?? undefined,
+    actualDistanceMi: r.actual_distance_mi ?? undefined,
     targetDurationSeconds: r.target_duration_seconds ?? undefined,
     skipped: r.skipped,
     swappedWith: r.swapped_with
@@ -160,19 +159,20 @@ function rowToWorkout(row: WorkoutRow): WorkoutLog {
     .sort((a, b) => a.position - b.position)
     .map(rowToExerciseLog);
   const rounds = rowsToRounds(exerciseLogs.filter((r) => r.section === "round"));
+  const cardio = exerciseLogs
+    .filter((r) => r.section === "cardio")
+    .sort((a, b) => a.position - b.position)
+    .map(rowToExerciseLog);
 
   const log: WorkoutLog = {
     id: row.id,
     date: row.date,
     dayOfWeek: row.day_of_week,
-    jogCompleted: row.jog_completed,
-    jogSkipped: row.jog_skipped ?? false,
-    jogDistance: row.jog_distance ?? undefined,
-    jogDurationSeconds: row.jog_duration_seconds ?? undefined,
     warmUpCompleted: row.warm_up_completed,
     warmUpExercises: warmUp,
     coolDownCompleted: row.cool_down_completed,
     coolDownExercises: coolDown,
+    cardioExercises: cardio.length > 0 ? cardio : undefined,
     rounds,
     notes: userFacingWorkoutNotes(row.notes ?? undefined),
     startTime: row.start_time ?? undefined,
@@ -191,10 +191,6 @@ function workoutToSavePayload(log: WorkoutLog) {
     id: persisted.id,
     date: persisted.date,
     day_of_week: persisted.dayOfWeek,
-    jog_completed: persisted.jogCompleted,
-    jog_skipped: persisted.jogSkipped ?? false,
-    jog_distance: persisted.jogDistance ?? null,
-    jog_duration_seconds: persisted.jogDurationSeconds ?? null,
     warm_up_completed: persisted.warmUpCompleted,
     cool_down_completed: persisted.coolDownCompleted,
     notes: persisted.notes ?? null,
@@ -210,6 +206,7 @@ function workoutToSavePayload(log: WorkoutLog) {
     completed: boolean;
     actual_reps: number | null;
     actual_duration: number | null;
+    actual_distance_mi: number | null;
     target_duration_seconds: number | null;
     skipped: boolean;
     swapped_with: string | null;
@@ -225,6 +222,7 @@ function workoutToSavePayload(log: WorkoutLog) {
       completed: ex.completed,
       actual_reps: ex.actualReps ?? null,
       actual_duration: ex.actualDuration ?? null,
+      actual_distance_mi: ex.actualDistanceMi ?? null,
       target_duration_seconds: ex.targetDurationSeconds ?? null,
       skipped: ex.skipped,
       swapped_with: ex.swappedWith ?? null,
@@ -242,6 +240,7 @@ function workoutToSavePayload(log: WorkoutLog) {
         completed: ex.completed,
         actual_reps: ex.actualReps ?? null,
         actual_duration: ex.actualDuration ?? null,
+        actual_distance_mi: ex.actualDistanceMi ?? null,
         target_duration_seconds: ex.targetDurationSeconds ?? null,
         skipped: ex.skipped,
         swapped_with: ex.swappedWith ?? null,
@@ -259,6 +258,24 @@ function workoutToSavePayload(log: WorkoutLog) {
       completed: ex.completed,
       actual_reps: ex.actualReps ?? null,
       actual_duration: ex.actualDuration ?? null,
+      actual_distance_mi: ex.actualDistanceMi ?? null,
+      target_duration_seconds: ex.targetDurationSeconds ?? null,
+      skipped: ex.skipped,
+      swapped_with: ex.swappedWith ?? null,
+      notes: ex.notes ?? null,
+    }),
+  );
+
+  ensureCardioExercises(persisted).forEach((ex, i) =>
+    exerciseLogs.push({
+      section: "cardio",
+      round_number: null,
+      position: i,
+      exercise_id: ex.exerciseId,
+      completed: ex.completed,
+      actual_reps: ex.actualReps ?? null,
+      actual_duration: ex.actualDuration ?? null,
+      actual_distance_mi: ex.actualDistanceMi ?? null,
       target_duration_seconds: ex.targetDurationSeconds ?? null,
       skipped: ex.skipped,
       swapped_with: ex.swappedWith ?? null,

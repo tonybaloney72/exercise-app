@@ -8,6 +8,8 @@ import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
+import { resolveCardioActivities } from "@/lib/cardioActivities";
+import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import { formatLoggedDuration } from "@/utils/time";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
 
@@ -136,29 +138,36 @@ export default function WorkoutDayReview({
         </div>
       </CollapsibleSection>
 
-      {plan.hasJog && (
-        <CollapsibleSection title="Jog" defaultOpen>
-          <div className="space-y-1 px-3 py-2">
-            <p className="text-sm font-medium text-foreground">Run</p>
-            {log.jogSkipped ? (
-              <p className="text-xs text-muted">Skipped</p>
-            ) : log.jogCompleted ? (
-              <p className="text-xs text-muted">
-                {[
-                  log.jogDistance != null ? `${log.jogDistance} mi` : null,
-                  log.jogDurationSeconds != null
-                    ? formatLoggedDuration(log.jogDurationSeconds)
-                    : null,
-                ]
-                  .filter(Boolean)
-                  .join(" · ") || "Logged complete"}
-              </p>
-            ) : (
-              <p className="text-xs text-muted">Not logged as completed</p>
-            )}
-          </div>
-        </CollapsibleSection>
-      )}
+      {resolveCardioActivities(plan).map((activity) => {
+        const entry = resolveWorkoutCardioExercises(log).find(
+          (r) => r.exerciseId === activity.exerciseId,
+        );
+        const title = exerciseMap[activity.exerciseId]?.name ?? activity.kind;
+        return (
+          <CollapsibleSection key={activity.exerciseId} title={title} defaultOpen>
+            <div className="space-y-1 px-3 py-2">
+              {entry?.skipped ? (
+                <p className="text-xs text-muted">Skipped</p>
+              ) : entry?.completed ? (
+                <p className="text-xs text-muted">
+                  {[
+                    entry.actualDistanceMi != null
+                      ? `${entry.actualDistanceMi} mi`
+                      : null,
+                    entry.actualDuration != null
+                      ? formatLoggedDuration(entry.actualDuration)
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ") || "Logged complete"}
+                </p>
+              ) : (
+                <p className="text-xs text-muted">Not logged as completed</p>
+              )}
+            </div>
+          </CollapsibleSection>
+        );
+      })}
 
       {plan.rounds.map((round, i) => {
         const roundLog = log.rounds[i];

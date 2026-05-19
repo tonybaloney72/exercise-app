@@ -81,31 +81,26 @@ export default function PostWorkoutSummary({
           />
         )}
 
-        {summary.hasJog && (
+        {summary.cardio.map((line, i) => (
           <motion.div
+            key={line.exerciseId}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.28, duration: 0.25 }}
+            transition={{ delay: 0.28 + i * 0.06, duration: 0.25 }}
             className="space-y-1.5 pt-1 border-t border-border"
           >
             <div className="flex items-baseline justify-between gap-2">
-              <span className="text-sm font-medium text-foreground">Jog</span>
+              <span className="text-sm font-medium text-foreground">{line.label}</span>
               <span className="text-sm font-semibold text-foreground">
-                {summary.jogSkipped
-                  ? "Skipped"
-                  : summary.jogCompleted
-                    ? "Done"
-                    : "—"}
+                {line.skipped ? "Skipped" : line.completed ? "Done" : "—"}
               </span>
             </div>
-            {summary.jogCompleted && !summary.jogSkipped && (
+            {line.completed && !line.skipped && (
               <p className="text-[11px] text-muted">
                 {[
-                  summary.jogDistance != null
-                    ? `${summary.jogDistance} mi`
-                    : null,
-                  summary.jogDurationSeconds != null
-                    ? formatLoggedDuration(summary.jogDurationSeconds)
+                  line.distanceMi != null ? `${line.distanceMi} mi` : null,
+                  line.durationSeconds != null
+                    ? formatLoggedDuration(line.durationSeconds)
                     : null,
                 ]
                   .filter(Boolean)
@@ -113,7 +108,7 @@ export default function PostWorkoutSummary({
               </p>
             )}
           </motion.div>
-        )}
+        ))}
       </SurfaceCard>
 
       <button

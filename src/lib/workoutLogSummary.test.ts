@@ -23,6 +23,7 @@ const minimalPlan: DayPlan = {
   strengthFocus: ["UP"],
   coreGroups: [],
   hasJog: true,
+  cardioActivities: [{ kind: "jog", exerciseId: "END-JOG" }],
   rounds: [{ roundNumber: 1, exercises: [] }],
 };
 
@@ -30,9 +31,14 @@ const minimalLog: WorkoutLog = {
   id: "1",
   date: "2026-05-16",
   dayOfWeek: 1,
-  jogCompleted: true,
-  jogSkipped: false,
-  jogDistance: 1.5,
+  cardioExercises: [
+    {
+      exerciseId: "END-JOG",
+      completed: true,
+      skipped: false,
+      actualDistanceMi: 1.5,
+    },
+  ],
   warmUpCompleted: true,
   warmUpExercises: [slot({ exerciseId: "w1", completed: true })],
   coolDownCompleted: true,
@@ -82,8 +88,9 @@ describe("summarizeWorkoutLog", () => {
     const summary = summarizeWorkoutLog(minimalLog, minimalPlan);
     expect(summary.strength).toEqual({ total: 3, completed: 2, skipped: 1 });
     expect(summary.stretches).toEqual({ total: 3, completed: 2, skipped: 1 });
-    expect(summary.hasJog).toBe(true);
-    expect(summary.jogCompleted).toBe(true);
+    expect(summary.cardio).toHaveLength(1);
+    expect(summary.cardio[0]?.completed).toBe(true);
+    expect(summary.cardio[0]?.distanceMi).toBe(1.5);
     expect(summary.durationLabel).toBe("45m");
   });
 });

@@ -1,6 +1,6 @@
 import type { Exercise } from "@/types";
 
-/** Endurance / cardio block activities (logged like exercises; Phase 3 → exercise_logs). */
+/** Endurance / cardio block activities (logged in exercise_logs with section cardio). */
 export const enduranceExercises: Exercise[] = [
   {
     id: "END-JOG",

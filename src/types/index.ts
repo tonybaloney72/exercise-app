@@ -169,11 +169,7 @@ export interface WorkoutLog {
   id: string;
   date: string; // YYYY-MM-DD
   dayOfWeek: number;
-  jogCompleted: boolean;
-  jogSkipped: boolean;
-  jogDistance?: number;
-  jogDurationSeconds?: number; // stored as total seconds for MM:SS support
-  /** In-session cardio rows (Phase 3 → exercise_logs); guests persist in localStorage. */
+  /** Endurance block rows (persisted in exercise_logs with section cardio when signed in). */
   cardioExercises?: ExerciseLog[];
   warmUpCompleted: boolean;
   warmUpExercises: ExerciseLog[];

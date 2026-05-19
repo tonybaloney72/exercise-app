@@ -17,10 +17,11 @@ import {
 } from "recharts";
 import type { WorkoutLog } from "@/types";
 import {
-  buildJogChartSeries,
+  buildCardioChartSeries,
+  cardioExerciseTitle,
   formatPacePerMile,
-  type JogChartPoint,
-} from "@/utils/jogProgressStats";
+  type CardioChartPoint,
+} from "@/utils/cardioProgressStats";
 import { formatSecondsToMMSS } from "@/utils/time";
 
 const tooltipStyle: CSSProperties = {
@@ -35,9 +36,11 @@ const axisTick = { fill: "var(--muted)", fontSize: 11 };
 
 interface Props {
   history: WorkoutLog[];
+  exerciseId: string;
+  title?: string;
 }
 
-function JogTooltipBody({ point }: { point: JogChartPoint }) {
+function CardioTooltipBody({ point }: { point: CardioChartPoint }) {
   const dist =
     point.distanceMi != null && point.distanceMi > 0
       ? `${point.distanceMi} mi`
@@ -55,7 +58,7 @@ function JogTooltipBody({ point }: { point: JogChartPoint }) {
       {dist && <p className="mt-1 text-muted">Distance: {dist}</p>}
       {time && <p className="text-muted">Time: {time}</p>}
       {paceLine && <p className="text-muted">{paceLine}</p>}
-      {!dist && !time && <p className="text-muted">No jog metrics</p>}
+      {!dist && !time && <p className="text-muted">No metrics logged</p>}
     </div>
   );
 }
@@ -72,8 +75,16 @@ function ChartShell({ title, subtitle, children }: { title: string; subtitle: st
   );
 }
 
-export default function JogProgressChart({ history }: Props) {
-  const series = useMemo(() => buildJogChartSeries(history), [history]);
+export default function CardioProgressChart({
+  history,
+  exerciseId,
+  title,
+}: Props) {
+  const activityTitle = title ?? cardioExerciseTitle(exerciseId);
+  const series = useMemo(
+    () => buildCardioChartSeries(history, exerciseId),
+    [history, exerciseId],
+  );
   const hasDistance = useMemo(
     () => series.some((p) => p.distanceMi != null && p.distanceMi > 0),
     [series],
@@ -102,9 +113,9 @@ export default function JogProgressChart({ history }: Props) {
       cursor={{ fill: "var(--surface-hover)" }}
       content={({ active, payload }) => {
         if (!active || !payload?.length) return null;
-        const p = payload[0]?.payload as JogChartPoint | undefined;
+        const p = payload[0]?.payload as CardioChartPoint | undefined;
         if (!p) return null;
-        return <JogTooltipBody point={p} />;
+        return <CardioTooltipBody point={p} />;
       }}
     />
   );
@@ -112,7 +123,7 @@ export default function JogProgressChart({ history }: Props) {
   if (hasDistance && hasDuration) {
     return (
       <ChartShell
-        title="Jog"
+        title={activityTitle}
         subtitle="Distance (bars) and session time (line). Tooltip shows pace per mile when both are logged."
       >
         <ResponsiveContainer width="100%" height="100%">
@@ -201,7 +212,10 @@ export default function JogProgressChart({ history }: Props) {
 
   if (hasDistance && !hasDuration) {
     return (
-      <ChartShell title="Jog" subtitle="Distance per completed jog (log time as well to see pace).">
+      <ChartShell
+        title={activityTitle}
+        subtitle={`Distance per completed session (log time as well to see pace).`}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={series} margin={{ top: 28, right: 8, left: 0, bottom: 4 }}>
             <CartesianGrid stroke="var(--border-color)" strokeDasharray="4 4" vertical={false} />
@@ -242,7 +256,10 @@ export default function JogProgressChart({ history }: Props) {
   }
 
   return (
-    <ChartShell title="Jog" subtitle="Session time per completed jog (add distance to see pace per mile).">
+    <ChartShell
+      title={activityTitle}
+      subtitle="Session time per completed session (add distance to see pace per mile)."
+    >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={series} margin={{ top: 28, right: 8, left: 0, bottom: 4 }}>
           <CartesianGrid stroke="var(--border-color)" strokeDasharray="4 4" vertical={false} />

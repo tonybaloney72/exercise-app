@@ -73,27 +73,48 @@ export function migrateExerciseLog(log: ExerciseLog): ExerciseLog {
   };
 }
 
+type LegacyWorkoutLog = WorkoutLog & {
+  jogCompleted?: boolean;
+  jogSkipped?: boolean;
+  jogDistance?: number;
+  jogDurationSeconds?: number;
+};
+
 export function migrateWorkoutLog(log: WorkoutLog): WorkoutLog {
+  const legacy = log as LegacyWorkoutLog;
   let cardioExercises = log.cardioExercises?.map(migrateExerciseLog);
-  if (!cardioExercises?.length && (log.jogCompleted || log.jogSkipped || log.jogDistance != null)) {
+  if (
+    !cardioExercises?.length &&
+    (legacy.jogCompleted ||
+      legacy.jogSkipped ||
+      legacy.jogDistance != null ||
+      legacy.jogDurationSeconds != null)
+  ) {
     cardioExercises = [
       {
         exerciseId: CARDIO_KIND_TO_EXERCISE_ID.jog,
-        completed: log.jogCompleted,
-        skipped: log.jogSkipped,
-        actualDistanceMi: log.jogDistance,
-        actualDuration: log.jogDurationSeconds,
+        completed: legacy.jogCompleted ?? false,
+        skipped: legacy.jogSkipped ?? false,
+        actualDistanceMi: legacy.jogDistance,
+        actualDuration: legacy.jogDurationSeconds,
       },
     ];
   }
   return hydrateCardioFromNotes({
-    ...log,
+    id: log.id,
+    date: log.date,
+    dayOfWeek: log.dayOfWeek,
     cardioExercises,
+    warmUpCompleted: log.warmUpCompleted,
     warmUpExercises: log.warmUpExercises.map(migrateExerciseLog),
+    coolDownCompleted: log.coolDownCompleted,
     coolDownExercises: log.coolDownExercises.map(migrateExerciseLog),
     rounds: log.rounds.map((round) => ({
       ...round,
       exercises: round.exercises.map(migrateExerciseLog),
     })),
+    notes: log.notes,
+    startTime: log.startTime,
+    endTime: log.endTime,
   });
 }

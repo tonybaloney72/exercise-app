@@ -11,7 +11,17 @@ import type { TrainingWeekDays } from "@/lib/repos";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import ProgressChartsSection from "@/components/progress/ProgressChartsSection";
 import ExerciseProgressChart from "@/components/progress/ExerciseProgressChart";
-import JogProgressChart from "@/components/progress/JogProgressChart";
+import CardioProgressSection from "@/components/progress/CardioProgressSection";
+import {
+  buildCardioMilesTotals,
+  formatCardioRecentLine,
+} from "@/lib/resolveWorkoutCardio";
+import {
+  CARDIO_ACTIVITY_ORDER,
+  CARDIO_KIND_TO_EXERCISE_ID,
+  CARDIO_ACTIVITY_LABELS,
+  CARDIO_ACTIVITY_EMOJI,
+} from "@/lib/cardioActivities";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard, { surfaceCardClassName } from "@/components/common/SurfaceCard";
 import { weekToDatePlanAdherence } from "@/utils/progressStats";
@@ -68,26 +78,45 @@ export default function ProgressPage() {
       }
     }
 
-    const totalJogMiles = workoutHistory.reduce(
-      (acc, w) => acc + (w.jogDistance ?? 0),
-      0
-    );
-
+    const cardioMiles = buildCardioMilesTotals(workoutHistory);
     const weekPlan = weekToDatePlanAdherence(workoutHistory, weekByDow);
 
-    return { totalWorkouts, currentStreak, totalJogMiles, weekPlan };
+    return { totalWorkouts, currentStreak, cardioMiles, weekPlan };
   }, [workoutHistory, weekByDow]);
 
-  const statCards = [
-    { label: "Total Workouts", value: stats.totalWorkouts, icon: "💪" },
-    { label: "Current Streak", value: `${stats.currentStreak} day${stats.currentStreak !== 1 ? "s" : ""}`, icon: "🔥" },
-    {
-      label: `Completed / planned (so far) · ${stats.weekPlan.spanShort}`,
-      value: `${stats.weekPlan.completed} / ${stats.weekPlan.planned}`,
-      icon: "✅",
-    },
-    { label: "Miles Jogged", value: stats.totalJogMiles.toFixed(1), icon: "🏃" },
-  ];
+  const statCards = useMemo(() => {
+    const base = [
+      { label: "Total Workouts", value: String(stats.totalWorkouts), icon: "💪" },
+      {
+        label: "Current Streak",
+        value: `${stats.currentStreak} day${stats.currentStreak !== 1 ? "s" : ""}`,
+        icon: "🔥",
+      },
+      {
+        label: `Completed / planned (so far) · ${stats.weekPlan.spanShort}`,
+        value: `${stats.weekPlan.completed} / ${stats.weekPlan.planned}`,
+        icon: "✅",
+      },
+    ];
+
+    const cardioStats = CARDIO_ACTIVITY_ORDER.flatMap((kind) => {
+      const id = CARDIO_KIND_TO_EXERCISE_ID[kind];
+      const bucket = stats.cardioMiles[id];
+      if (!bucket || (bucket.totalMiles <= 0 && bucket.sessionCount === 0)) {
+        return [];
+      }
+      if (bucket.totalMiles <= 0) return [];
+      return [
+        {
+          label: `Miles ${CARDIO_ACTIVITY_LABELS[kind]}`,
+          value: bucket.totalMiles.toFixed(1),
+          icon: CARDIO_ACTIVITY_EMOJI[kind],
+        },
+      ];
+    });
+
+    return [...base, ...cardioStats];
+  }, [stats]);
 
   return (
     <div className="py-6 space-y-5">
@@ -119,7 +148,7 @@ export default function ProgressPage() {
 
       <ExerciseProgressChart history={workoutHistory} />
 
-      <JogProgressChart history={workoutHistory} />
+      <CardioProgressSection history={workoutHistory} />
 
       {/* Recent workouts */}
       {workoutHistory.length > 0 && (
@@ -134,6 +163,7 @@ export default function ProgressPage() {
               (a, r) => a + r.exercises.length,
               0
             );
+            const cardioLine = formatCardioRecentLine(log);
             return (
               <div
                 key={log.id}
@@ -143,7 +173,7 @@ export default function ProgressPage() {
                   <p className="text-sm font-medium text-foreground">{log.date}</p>
                   <p className="text-xs text-muted">
                     {exercisesDone}/{exercisesTotal} exercises
-                    {log.jogCompleted && ` · ${log.jogDistance ?? "?"}mi jog`}
+                    {cardioLine ? ` · ${cardioLine}` : ""}
                   </p>
                 </div>
                 <span className="text-xs text-green-400 font-medium">✓ Done</span>

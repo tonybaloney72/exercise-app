@@ -49,10 +49,10 @@ export function hydrateCardioFromNotes(log: WorkoutLog): WorkoutLog {
   };
 }
 
+/** Strip legacy embedded cardio JSON; cardio persists in exercise_logs (signed in). */
 export function workoutLogForPersistence(log: WorkoutLog): WorkoutLog {
-  const cardio = log.cardioExercises ?? [];
   return {
     ...log,
-    notes: embedCardioInNotes(log.notes, cardio.length > 0 ? cardio : undefined),
+    notes: userFacingWorkoutNotes(log.notes),
   };
 }

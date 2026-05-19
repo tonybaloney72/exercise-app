@@ -1,16 +1,14 @@
+import { exerciseMap } from "@/data/exercises";
+import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import type { WorkoutLog } from "@/types";
 
-export interface JogChartPoint {
+export interface CardioChartPoint {
   date: string;
   xLabel: string;
   sortKey: number;
-  /** Miles; undefined if not logged */
   distanceMi?: number;
-  /** Total seconds; undefined if not logged */
   durationSec?: number;
-  /** Minutes, for chart axis */
   durationMin?: number;
-  /** Seconds per mile when distance & duration both known */
   paceSecondsPerMile?: number;
 }
 
@@ -24,16 +22,21 @@ function shortLabel(dateKey: string): string {
   return `${m ?? 1}/${d ?? 1}`;
 }
 
-/**
- * Completed jogs with at least distance or duration logged (skipped jogs excluded).
- */
-export function buildJogChartSeries(history: WorkoutLog[]): JogChartPoint[] {
-  const rows: JogChartPoint[] = [];
+/** Completed sessions for one endurance exercise with distance and/or duration. */
+export function buildCardioChartSeries(
+  history: WorkoutLog[],
+  exerciseId: string,
+): CardioChartPoint[] {
+  const rows: CardioChartPoint[] = [];
 
   for (const w of history) {
-    if (!w.jogCompleted || w.jogSkipped) continue;
-    const dist = w.jogDistance;
-    const dur = w.jogDurationSeconds;
+    const entry = resolveWorkoutCardioExercises(w).find(
+      (r) => r.exerciseId === exerciseId,
+    );
+    if (!entry?.completed || entry.skipped) continue;
+
+    const dist = entry.actualDistanceMi;
+    const dur = entry.actualDuration;
     if (dist == null && dur == null) continue;
 
     let pace: number | undefined;
@@ -54,6 +57,10 @@ export function buildJogChartSeries(history: WorkoutLog[]): JogChartPoint[] {
 
   rows.sort((a, b) => a.sortKey - b.sortKey);
   return rows;
+}
+
+export function cardioExerciseTitle(exerciseId: string): string {
+  return exerciseMap[exerciseId]?.name ?? exerciseId;
 }
 
 /** e.g. `10:33/mi` */
