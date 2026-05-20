@@ -127,6 +127,26 @@ export interface DayPlan {
   coolDown?: StretchEntry[];
 }
 
+/** Portable day structure saved in workout day templates (no calendar metadata). */
+export interface WorkoutDayTemplateSnapshot {
+  restDayMode?: RestDayMode;
+  strengthFocus: ExerciseCategory[];
+  coreGroups: ExerciseCategory[];
+  rounds: Round[];
+  warmUp?: StretchEntry[];
+  coolDown?: StretchEntry[];
+  cardioActivities?: CardioActivity[];
+  hasJog?: boolean;
+}
+
+export interface WorkoutDayTemplate {
+  id: string;
+  name: string;
+  plan: WorkoutDayTemplateSnapshot;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface ExerciseLog {
   exerciseId: string;
   completed: boolean;

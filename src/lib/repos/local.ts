@@ -3,6 +3,12 @@ import type {
   WorkoutLog,
   ExerciseSettingsValues,
 } from "@/types";
+import { v4 as uuidv4 } from "uuid";
+import {
+  MAX_WORKOUT_DAY_TEMPLATES,
+  sanitizeTemplateSnapshot,
+} from "@/lib/workoutDayTemplates";
+import type { WorkoutDayTemplate } from "@/types";
 import type {
   ExerciseSettingsMap,
   ExerciseSettingsRepo,
@@ -11,6 +17,8 @@ import type {
   SettingsRepo,
   WorkoutRepo,
   TrainingWeekRepo,
+  WorkoutDayTemplateRepo,
+  SaveWorkoutDayTemplateInput,
 } from "./types";
 import { migrateExerciseId, migrateWorkoutLog } from "@/lib/cpToPcMigration";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
@@ -19,6 +27,7 @@ import { DEFAULT_SETTINGS } from "./types";
 export const LOCAL_HISTORY_KEY = "exercise-app-history";
 export const LOCAL_SETTINGS_KEY = "exercise-app-settings";
 export const LOCAL_EXERCISE_SETTINGS_KEY = "exercise-app-exercise-settings";
+export const LOCAL_WORKOUT_TEMPLATES_KEY = "exercise-app-workout-day-templates";
 
 function isBrowser(): boolean {
   return typeof window !== "undefined";
@@ -144,9 +153,87 @@ export const localTrainingWeekRepo: TrainingWeekRepo = {
   },
 };
 
+function loadLocalTemplates(): WorkoutDayTemplate[] {
+  if (!isBrowser()) return [];
+  try {
+    const raw = localStorage.getItem(LOCAL_WORKOUT_TEMPLATES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    const out: WorkoutDayTemplate[] = [];
+    for (const row of parsed) {
+      if (!row || typeof row !== "object") continue;
+      const r = row as Record<string, unknown>;
+      const name = typeof r.name === "string" ? r.name.trim() : "";
+      const id = typeof r.id === "string" ? r.id : "";
+      const plan = sanitizeTemplateSnapshot(r.plan);
+      if (!name || !id || !plan) continue;
+      out.push({
+        id,
+        name,
+        plan,
+        createdAt: typeof r.createdAt === "string" ? r.createdAt : undefined,
+        updatedAt: typeof r.updatedAt === "string" ? r.updatedAt : undefined,
+      });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+function persistLocalTemplates(templates: WorkoutDayTemplate[]): void {
+  if (!isBrowser()) return;
+  localStorage.setItem(LOCAL_WORKOUT_TEMPLATES_KEY, JSON.stringify(templates));
+}
+
+export const localWorkoutDayTemplateRepo: WorkoutDayTemplateRepo = {
+  async listAll() {
+    return loadLocalTemplates();
+  },
+
+  async save(input: SaveWorkoutDayTemplateInput) {
+    const templates = loadLocalTemplates();
+    const now = new Date().toISOString();
+    if (input.id) {
+      const index = templates.findIndex((t) => t.id === input.id);
+      if (index < 0) {
+        throw new Error("Template not found");
+      }
+      const next = {
+        ...templates[index],
+        name: input.name,
+        plan: input.plan,
+        updatedAt: now,
+      };
+      templates[index] = next;
+      persistLocalTemplates(templates);
+      return next;
+    }
+    if (templates.length >= MAX_WORKOUT_DAY_TEMPLATES) {
+      throw new Error("Template limit reached");
+    }
+    const created: WorkoutDayTemplate = {
+      id: uuidv4(),
+      name: input.name,
+      plan: input.plan,
+      createdAt: now,
+      updatedAt: now,
+    };
+    persistLocalTemplates([created, ...templates]);
+    return created;
+  },
+
+  async delete(id: string) {
+    const templates = loadLocalTemplates().filter((t) => t.id !== id);
+    persistLocalTemplates(templates);
+  },
+};
+
 export function clearLocalData(): void {
   if (!isBrowser()) return;
   localStorage.removeItem(LOCAL_HISTORY_KEY);
   localStorage.removeItem(LOCAL_SETTINGS_KEY);
   localStorage.removeItem(LOCAL_EXERCISE_SETTINGS_KEY);
+  localStorage.removeItem(LOCAL_WORKOUT_TEMPLATES_KEY);
 }

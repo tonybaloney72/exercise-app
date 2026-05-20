@@ -32,7 +32,14 @@ import type {
   TrainingWeekRepo,
   PersistedTrainingWeek,
   SaveTrainingWeekOptions,
+  WorkoutDayTemplateRepo,
+  SaveWorkoutDayTemplateInput,
 } from "./types";
+import type { WorkoutDayTemplate } from "@/types";
+import {
+  MAX_WORKOUT_DAY_TEMPLATES,
+  sanitizeTemplateSnapshot,
+} from "@/lib/workoutDayTemplates";
 import { DEFAULT_SETTINGS } from "./types";
 import {
   ALL_EXERCISE_EQUIPMENT,
@@ -697,6 +704,156 @@ export const supabaseTrainingWeekRepo: TrainingWeekRepo = {
 
     if (error) {
       console.error("[supabaseTrainingWeekRepo.saveSeededWeek]", error);
+      throw error;
+    }
+  },
+};
+
+export const supabaseWorkoutDayTemplateRepo: WorkoutDayTemplateRepo = {
+  async listAll(): Promise<WorkoutDayTemplate[]> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from("workout_day_templates")
+      .select("id, name, plan, created_at, updated_at")
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false });
+
+    if (error) {
+      console.error("[supabaseWorkoutDayTemplateRepo.listAll]", error);
+      return [];
+    }
+
+    const out: WorkoutDayTemplate[] = [];
+    for (const row of data ?? []) {
+      const plan = sanitizeTemplateSnapshot(
+        (row as { plan: unknown }).plan,
+      );
+      if (!plan) continue;
+      const r = row as {
+        id: string;
+        name: string;
+        created_at: string;
+        updated_at: string;
+      };
+      out.push({
+        id: r.id,
+        name: r.name.trim(),
+        plan,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      });
+    }
+    return out;
+  },
+
+  async save(input: SaveWorkoutDayTemplateInput): Promise<WorkoutDayTemplate> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    const now = new Date().toISOString();
+
+    if (input.id) {
+      const { data, error } = await supabase
+        .from("workout_day_templates")
+        .update({
+          name: input.name,
+          plan: input.plan,
+          updated_at: now,
+        })
+        .eq("id", input.id)
+        .eq("user_id", user.id)
+        .select("id, name, plan, created_at, updated_at")
+        .single();
+
+      if (error) {
+        console.error("[supabaseWorkoutDayTemplateRepo.save]", error);
+        throw error;
+      }
+      const plan = sanitizeTemplateSnapshot((data as { plan: unknown }).plan);
+      if (!plan) throw new Error("Invalid template plan");
+      const row = data as {
+        id: string;
+        name: string;
+        created_at: string;
+        updated_at: string;
+      };
+      return {
+        id: row.id,
+        name: row.name.trim(),
+        plan,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      };
+    }
+
+    const { count, error: countError } = await supabase
+      .from("workout_day_templates")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    if (countError) {
+      console.error("[supabaseWorkoutDayTemplateRepo.save count]", countError);
+      throw countError;
+    }
+    if ((count ?? 0) >= MAX_WORKOUT_DAY_TEMPLATES) {
+      throw new Error("Template limit reached");
+    }
+
+    const { data, error } = await supabase
+      .from("workout_day_templates")
+      .insert({
+        user_id: user.id,
+        name: input.name,
+        plan: input.plan,
+        updated_at: now,
+      })
+      .select("id, name, plan, created_at, updated_at")
+      .single();
+
+    if (error) {
+      console.error("[supabaseWorkoutDayTemplateRepo.save insert]", error);
+      throw error;
+    }
+    const plan = sanitizeTemplateSnapshot((data as { plan: unknown }).plan);
+    if (!plan) throw new Error("Invalid template plan");
+    const row = data as {
+      id: string;
+      name: string;
+      created_at: string;
+      updated_at: string;
+    };
+    return {
+      id: row.id,
+      name: row.name.trim(),
+      plan,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  },
+
+  async delete(id: string): Promise<void> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    const { error } = await supabase
+      .from("workout_day_templates")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error("[supabaseWorkoutDayTemplateRepo.delete]", error);
       throw error;
     }
   },

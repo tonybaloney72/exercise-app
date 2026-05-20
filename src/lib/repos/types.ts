@@ -4,6 +4,8 @@ import type {
   ExerciseSettingsValues,
   ExercisePreferenceKind,
   DayPlan,
+  WorkoutDayTemplate,
+  WorkoutDayTemplateSnapshot,
 } from "@/types";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import { scoresFromPreset } from "@/lib/trainingPriorities";
@@ -66,6 +68,18 @@ export interface TrainingWeekRepo {
     days: TrainingWeekDays,
     options?: SaveTrainingWeekOptions,
   ): Promise<void>;
+}
+
+export interface SaveWorkoutDayTemplateInput {
+  id?: string;
+  name: string;
+  plan: WorkoutDayTemplateSnapshot;
+}
+
+export interface WorkoutDayTemplateRepo {
+  listAll(): Promise<WorkoutDayTemplate[]>;
+  save(input: SaveWorkoutDayTemplateInput): Promise<WorkoutDayTemplate>;
+  delete(id: string): Promise<void>;
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {

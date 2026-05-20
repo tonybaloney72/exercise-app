@@ -10,6 +10,7 @@ import CategoryPickModal from "@/components/workout/CategoryPickModal";
 import DayPlanCardioEditor from "@/components/workout/DayPlanCardioEditor";
 import RoundExerciseSortableList from "@/components/workout/RoundExerciseSortableList";
 import StretchPlanSection from "@/components/workout/StretchPlanSection";
+import WorkoutDayTemplateToolbar from "@/components/workout/WorkoutDayTemplateToolbar";
 import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
 import { exerciseMap } from "@/data/exercises";
@@ -480,6 +481,12 @@ export default function WorkoutPlanEditor({
         onChange={(index) => openPickModal({ kind: "stretch", section: "coolDown", index })}
         onRemove={(index) => removeStretch("coolDown", index)}
         onUpdateTarget={(index, target) => updateStretchTarget("coolDown", index, target)}
+      />
+
+      <WorkoutDayTemplateToolbar
+        draft={draft}
+        disabled={saving}
+        onApply={(next) => setDraft(prepareDayPlanForEditor(next))}
       />
 
       <SurfaceCard className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
