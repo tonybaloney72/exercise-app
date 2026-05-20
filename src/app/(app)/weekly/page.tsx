@@ -55,7 +55,9 @@ export default function WeeklyPage() {
     };
   }, [mode, todayKey]);
 
-  const isCustomWeek = isUserCustomizedWeekSource(weekSource);
+  const programMode = useSettingsStore((s) => s.programMode);
+  const isCustomWeek =
+    programMode === "custom" || isUserCustomizedWeekSource(weekSource);
 
   async function handleResetWeek() {
     setResettingWeek(true);
@@ -175,6 +177,21 @@ export default function WeeklyPage() {
             description="Finish a session on Today and it will show up here."
             action={{ label: "Go to Today", href: "/today" }}
           />
+        </SurfaceCard>
+      )}
+
+      {mode === "authenticated" && isCustomWeek && !weekLoading && (
+        <SurfaceCard className="border-accent/40 bg-accent/10 p-4">
+          <h2 className="text-sm font-semibold text-foreground">Custom week builder</h2>
+          <p className="mt-1 text-xs text-muted leading-snug">
+            Walk through Sun–Sat and add rounds, exercises, and stretches for each day.
+          </p>
+          <Link
+            href="/weekly/build"
+            className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-accent py-3 text-sm font-semibold text-white hover:bg-accent/90"
+          >
+            Open week builder
+          </Link>
         </SurfaceCard>
       )}
 

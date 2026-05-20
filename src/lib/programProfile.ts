@@ -40,6 +40,8 @@ export type ProgramProfileInput = {
   /** Layout mode: per-day group allowlist, equal fill weights, no preset extras. */
   layoutMode?: boolean;
   weeklyCategoryLayout?: WeeklyCategoryLayout;
+  /** Custom week mode: keep day shells; do not auto-fill strength exercises. */
+  customMode?: boolean;
 };
 
 export function buildProgramProfileInput(
@@ -49,6 +51,7 @@ export function buildProgramProfileInput(
   options?: {
     layoutMode?: boolean;
     weeklyCategoryLayout?: WeeklyCategoryLayout;
+    customMode?: boolean;
   },
 ): ProgramProfileInput {
   const resolved = scores ?? scoresFromPreset(preset);
@@ -58,12 +61,18 @@ export function buildProgramProfileInput(
     customized,
     layoutMode: options?.layoutMode,
     weeklyCategoryLayout: options?.weeklyCategoryLayout,
+    customMode: options?.customMode,
   };
 }
 
 export function buildProgramProfileInputFromSettings(
   settings: UserSettings,
 ): ProgramProfileInput {
+  if (settings.programMode === "custom") {
+    return buildProgramProfileInput("balanced", scoresFromPreset("balanced"), false, {
+      customMode: true,
+    });
+  }
   if (settings.programMode === "layout") {
     return buildProgramProfileInput("balanced", scoresFromPreset("balanced"), false, {
       layoutMode: true,
@@ -343,6 +352,16 @@ export function applyProgramProfileToDayPlan(
   const dislikedIds = collectDislikedIds(prefs);
   const favoriteIds = collectFavoriteIds(prefs);
   const usedInDay = new Set<string>();
+
+  if (profile.customMode) {
+    if (plan.restDayMode === "full_rest") {
+      return { ...plan, rounds: [] };
+    }
+    return {
+      ...plan,
+      rounds: plan.rounds.map((round) => ({ ...round, exercises: [] })),
+    };
+  }
 
   if (plan.restDayMode === "full_rest" || plan.restDayMode === "stretches") {
     return {

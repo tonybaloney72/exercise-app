@@ -1,4 +1,8 @@
-import { refreshTrainingWeekContaining } from "@/lib/planResolver";
+import {
+  refreshCustomWeekSchedule,
+  refreshTrainingWeekContaining,
+} from "@/lib/planResolver";
+import type { RefreshTrainingWeekScope } from "@/lib/planResolver";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import {
@@ -10,11 +14,19 @@ import { formatLocalDateKey } from "@/utils/localDateKey";
 /** Regenerate current Sun–Sat week (authenticated) and toast + refetch plans. */
 export async function refreshCurrentTrainingWeek(
   reason: TrainingWeekRefreshReason,
+  scope: RefreshTrainingWeekScope = "prefs",
 ): Promise<void> {
   if (useAuthStore.getState().mode !== "authenticated") return;
   await useWorkoutStore.getState().loadHistory();
-  await refreshTrainingWeekContaining(formatLocalDateKey());
+  await refreshTrainingWeekContaining(formatLocalDateKey(), scope);
   useTrainingWeekRefreshStore.getState().notifyRefreshed(reason);
+}
+
+/** Rest / cardio schedule only — preserves custom week exercise picks. */
+export async function refreshCurrentCustomWeekSchedule(): Promise<void> {
+  if (useAuthStore.getState().mode !== "authenticated") return;
+  await refreshCustomWeekSchedule(formatLocalDateKey());
+  useTrainingWeekRefreshStore.getState().bumpPlanRevision();
 }
 
 /** Regenerate week containing `dateKey` and notify (drops custom edits). */

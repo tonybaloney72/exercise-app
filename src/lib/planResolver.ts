@@ -5,14 +5,17 @@ import {
   computePrefsFingerprintFromSettings,
   isUserCustomizedWeekSource,
   materializeTrainingWeek,
+  TRAINING_WEEK_SOURCE_CUSTOM_V1,
   TRAINING_WEEK_SOURCE_GENERATED_V1,
   weekDaysComplete,
   weekNeedsMaterialization,
 } from "@/lib/planGenerator";
+import { mergeWeekScheduleIntoStoredWeek } from "@/lib/customWeekPlan";
 import {
   mergeRegeneratedDays,
   regenDayIndicesForPrefsChange,
 } from "@/lib/trainingWeekRegen";
+import { sanitizeProgramMode } from "@/lib/weeklyCategoryLayout";
 import { isPrescribedPlanFrozenForDate } from "@/lib/workoutSessionGuard";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import {
@@ -153,6 +156,9 @@ async function refreshPersistedWeek(
     fingerprint,
   } = await loadGeneratorInputs("authenticated");
 
+  const programMode = sanitizeProgramMode(settings.programMode);
+  const isCustomProgram = programMode === "custom";
+
   const profile = programProfileFromSettings(settings);
   const materialized = materializeWeekFromCatalog(
     prefs,
@@ -168,13 +174,31 @@ async function refreshPersistedWeek(
   const repo = getTrainingWeekRepo("authenticated");
   const persisted = await repo.loadWeek(weekKey);
   const storedDays = persisted?.days ?? null;
+  const customWeekSource =
+    isCustomProgram || isUserCustomizedWeekSource(persisted?.source);
 
   if (scope === "full" || !weekDaysComplete(storedDays)) {
+    const source = isCustomProgram
+      ? TRAINING_WEEK_SOURCE_CUSTOM_V1
+      : TRAINING_WEEK_SOURCE_GENERATED_V1;
     await persistTrainingWeek(weekKey, materialized, {
-      source: TRAINING_WEEK_SOURCE_GENERATED_V1,
+      source,
       prefsFingerprint: fingerprint,
     });
     return materialized;
+  }
+
+  if (
+    scope === "prefs" &&
+    isCustomProgram &&
+    customWeekSource &&
+    weekDaysComplete(storedDays)
+  ) {
+    await persistTrainingWeek(weekKey, storedDays, {
+      source: TRAINING_WEEK_SOURCE_CUSTOM_V1,
+      prefsFingerprint: fingerprint,
+    });
+    return storedDays;
   }
 
   const todayKey = formatLocalDateKey();
@@ -190,8 +214,9 @@ async function refreshPersistedWeek(
       ? mergeRegeneratedDays(storedDays, materialized, indices)
       : storedDays;
 
-  const source =
-    indices.length > 0
+  const source = isCustomProgram
+    ? TRAINING_WEEK_SOURCE_CUSTOM_V1
+    : indices.length > 0
       ? TRAINING_WEEK_SOURCE_GENERATED_V1
       : persisted?.source && isUserCustomizedWeekSource(persisted.source)
         ? persisted.source
@@ -202,6 +227,59 @@ async function refreshPersistedWeek(
     prefsFingerprint: fingerprint,
   });
   return merged;
+}
+
+/** Update rest-day / cardio metadata on a custom week without clearing user-built rounds. */
+export async function refreshCustomWeekSchedule(
+  dateKey: string,
+): Promise<void> {
+  const weekKey = weekKeyFromDateKey(dateKey);
+  if (!weekKey) return;
+
+  const {
+    prefs,
+    settings,
+    availableEquipment,
+    trainingPriorityPreset,
+    roundDensity,
+    exerciseSettings,
+    fingerprint,
+  } = await loadGeneratorInputs("authenticated");
+
+  if (sanitizeProgramMode(settings.programMode) !== "custom") {
+    await refreshPersistedWeek(weekKey, "prefs");
+    return;
+  }
+
+  const profile = programProfileFromSettings(settings);
+  const shells = materializeWeekFromCatalog(
+    prefs,
+    availableEquipment,
+    trainingPriorityPreset,
+    roundDensity,
+    exerciseSettings,
+    buildVarietySeed(weekKey, "authenticated"),
+    profile,
+    settings,
+  );
+
+  const repo = getTrainingWeekRepo("authenticated");
+  const persisted = await repo.loadWeek(weekKey);
+  const storedDays = persisted?.days ?? null;
+
+  if (!weekDaysComplete(storedDays)) {
+    await persistTrainingWeek(weekKey, shells, {
+      source: TRAINING_WEEK_SOURCE_CUSTOM_V1,
+      prefsFingerprint: fingerprint,
+    });
+    return;
+  }
+
+  const merged = mergeWeekScheduleIntoStoredWeek(storedDays, shells);
+  await persistTrainingWeek(weekKey, merged, {
+    source: TRAINING_WEEK_SOURCE_CUSTOM_V1,
+    prefsFingerprint: fingerprint,
+  });
 }
 
 /** In-memory materialized week (guest / anonymous) from catalog + local settings. */

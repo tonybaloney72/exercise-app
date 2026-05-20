@@ -30,7 +30,7 @@ export const PROGRAM_MODE_LABELS: Record<
   custom: {
     label: "Custom week",
     description:
-      "Build each day yourself on Weekly (full week builder coming soon).",
+      "You build every day on Weekly — empty round slots, no auto-filled exercises.",
   },
 };
 

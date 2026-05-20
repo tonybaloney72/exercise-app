@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { isDayPlanDraftDirty } from "@/lib/dayPlanDraft";
 import { useBalanceAlertToasts } from "@/hooks/useBalanceAlertToasts";
 import AnimatedSection from "@/components/common/AnimatedSection";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
@@ -60,6 +61,10 @@ interface WorkoutPlanEditorProps {
   onSave: (plan: DayPlan) => void;
   onCancel: () => void;
   onResetDay: () => void;
+  /** Hide intro + cancel (e.g. week builder wizard). */
+  embedded?: boolean;
+  saveLabel?: string;
+  onDirtyChange?: (dirty: boolean, draft: DayPlan) => void;
 }
 
 export default function WorkoutPlanEditor({
@@ -69,6 +74,9 @@ export default function WorkoutPlanEditor({
   onSave,
   onCancel,
   onResetDay,
+  embedded = false,
+  saveLabel = "Save this day",
+  onDirtyChange,
 }: WorkoutPlanEditorProps) {
   const [draft, setDraft] = useState(() => prepareDayPlanForEditor(initialPlan));
   const [pickTarget, setPickTarget] = useState<PickTarget | null>(null);
@@ -81,6 +89,10 @@ export default function WorkoutPlanEditor({
   const balanceAlerts = useMemo(() => analyzeDayPlanBalance(draft), [draft]);
   const hasBalanceWarning = balanceAlerts.some((a) => a.severity === "warning");
   useBalanceAlertToasts(balanceAlerts);
+
+  useEffect(() => {
+    onDirtyChange?.(isDayPlanDraftDirty(initialPlan, draft), draft);
+  }, [initialPlan, draft, onDirtyChange]);
 
   const pickCandidates = useMemo(() => {
     if (!pickTarget) return [];
@@ -299,21 +311,25 @@ export default function WorkoutPlanEditor({
 
   return (
     <AnimatedSection className="space-y-4" delay={0}>
-      <SurfaceCard className="border-accent/40 bg-accent/10 p-4 space-y-1.5">
-        <p className="text-sm font-semibold text-foreground">Customize workout</p>
-        <p className="text-sm text-muted leading-snug">
-          Change exercises and targets for this day. Pick any category when adding slots;
-          change keeps the same category.
-        </p>
-        {isCustomWeek ? (
-          <p className="text-xs text-muted leading-snug">
-            This week is customized — settings updates change today and upcoming days only
-            (not past days). Reset from Weekly restores the full auto-generated week.
+      {!embedded && (
+        <SurfaceCard className="border-accent/40 bg-accent/10 p-4 space-y-1.5">
+          <p className="text-sm font-semibold text-foreground">Customize workout</p>
+          <p className="text-sm text-muted leading-snug">
+            Change exercises and targets for this day. Pick any category when adding slots;
+            change keeps the same category.
           </p>
-        ) : (
-          <p className="text-xs text-muted leading-snug">Saving marks this week as customized.</p>
-        )}
-      </SurfaceCard>
+          {isCustomWeek ? (
+            <p className="text-xs text-muted leading-snug">
+              This week is customized — settings updates change today and upcoming days only
+              (not past days). Reset from Weekly restores the full auto-generated week.
+            </p>
+          ) : (
+            <p className="text-xs text-muted leading-snug">
+              Saving marks this week as customized.
+            </p>
+          )}
+        </SurfaceCard>
+      )}
 
       <DayPlanCardioEditor plan={draft} onChange={setDraft} />
 
@@ -453,63 +469,6 @@ export default function WorkoutPlanEditor({
         </SurfaceCard>
       )}
 
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <button
-          type="button"
-          disabled={saving}
-          onClick={() => onSave(draft)}
-          className="flex-1 rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 disabled:opacity-50"
-        >
-          {saving ? "Saving…" : "Save this day"}
-        </button>
-        <button
-          type="button"
-          disabled={saving}
-          onClick={onCancel}
-          className="flex-1 rounded-xl border border-border bg-surface py-3.5 text-sm font-medium text-foreground hover:bg-surface-hover disabled:opacity-50"
-        >
-          Cancel
-        </button>
-      </div>
-
-      <div className="rounded-xl border border-border bg-surface px-4 py-3 space-y-2">
-        <p className="text-xs text-muted">
-          Discard unsaved edits and restore this day&apos;s auto-generated workout.
-        </p>
-        {resetConfirm ? (
-          <div className="flex flex-wrap gap-2 pt-1">
-            <button
-              type="button"
-              disabled={saving}
-              onClick={() => {
-                setResetConfirm(false);
-                onResetDay();
-              }}
-              className="rounded-lg bg-red-600/90 px-3 py-2 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50"
-            >
-              Yes, reset this day
-            </button>
-            <button
-              type="button"
-              disabled={saving}
-              onClick={() => setResetConfirm(false)}
-              className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-foreground"
-            >
-              Keep editing
-            </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            disabled={saving}
-            onClick={() => setResetConfirm(true)}
-            className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-50"
-          >
-            Reset this day
-          </button>
-        )}
-      </div>
-
       <p className="px-1 pt-2 text-xs font-medium uppercase tracking-wider text-muted">
         Stretches (optional)
       </p>
@@ -552,6 +511,65 @@ export default function WorkoutPlanEditor({
           Rebuild stretch lists
         </button>
       </SurfaceCard>
+
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <button
+          type="button"
+          disabled={saving}
+          onClick={() => onSave(draft)}
+          className="flex-1 rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 disabled:opacity-50"
+        >
+          {saving ? "Saving…" : saveLabel}
+        </button>
+        {!embedded && (
+          <button
+            type="button"
+            disabled={saving}
+            onClick={onCancel}
+            className="flex-1 rounded-xl border border-border bg-surface py-3.5 text-sm font-medium text-foreground hover:bg-surface-hover disabled:opacity-50"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+
+      <div className="rounded-xl border border-border bg-surface px-4 py-3 space-y-2">
+        <p className="text-xs text-muted">
+          Discard unsaved edits and restore this day&apos;s auto-generated workout.
+        </p>
+        {resetConfirm ? (
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => {
+                setResetConfirm(false);
+                onResetDay();
+              }}
+              className="rounded-lg bg-red-600/90 px-3 py-2 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50"
+            >
+              Yes, reset this day
+            </button>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => setResetConfirm(false)}
+              className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-foreground"
+            >
+              Keep editing
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            disabled={saving}
+            onClick={() => setResetConfirm(true)}
+            className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-50"
+          >
+            Reset this day
+          </button>
+        )}
+      </div>
 
       <CategoryPickModal
         open={categoryPickRound !== null}

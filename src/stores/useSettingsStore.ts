@@ -4,7 +4,10 @@ import { create } from "zustand";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import { DEFAULT_SETTINGS, getSettingsRepo } from "@/lib/repos";
-import { refreshCurrentTrainingWeek } from "@/lib/trainingWeekRefresh";
+import {
+  refreshCurrentCustomWeekSchedule,
+  refreshCurrentTrainingWeek,
+} from "@/lib/trainingWeekRefresh";
 import {
   pruneStoredStretchDefaults,
   stretchListsEqual,
@@ -75,6 +78,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const weekScheduleChanged =
       weeklyRestSettingsChanged(partial, current) ||
       weeklyCardioSettingsChanged(partial, current);
+    const programModeChanged =
+      partial.programMode != null && partial.programMode !== current.programMode;
 
     set((s) => ({ ...s, ...updated }));
     try {
@@ -88,7 +93,14 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     if (useAuthStore.getState().mode !== "authenticated") return;
 
     try {
-      if (programProfileChanged || weekScheduleChanged) {
+      if (programModeChanged) {
+        await refreshCurrentTrainingWeek("program", "full");
+      } else if (
+        weekScheduleChanged &&
+        updated.programMode === "custom"
+      ) {
+        await refreshCurrentCustomWeekSchedule();
+      } else if (programProfileChanged || weekScheduleChanged) {
         await refreshCurrentTrainingWeek("program");
       } else if (equipmentChanged) {
         await refreshCurrentTrainingWeek("equipment");

@@ -331,13 +331,21 @@ export default function SettingsPage() {
 
           {settings.programMode === "custom" && (
             <WeekModeOptionsPanel
-              title="Step 2 · Build on Weekly"
-              hint="Edit each day’s plan yourself. A dedicated custom-week flow is coming soon."
+              title="Step 2 · Build your week"
+              hint="Walk through Sun–Sat with the week builder, or edit one day at a time on Weekly."
             >
-              <p className="text-xs text-muted">
-                Open <strong className="text-foreground">Weekly</strong>, tap a day, then
-                customize rounds and exercises. Changes save to that day only.
-              </p>
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/weekly/build"
+                  className="w-full rounded-xl bg-accent py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+                >
+                  Open week builder
+                </Link>
+                <p className="text-xs text-muted leading-snug">
+                  Or open <strong className="text-foreground">Weekly</strong> and customize
+                  individual days. Your week stays manual until you reset it or switch mode.
+                </p>
+              </div>
             </WeekModeOptionsPanel>
           )}
 
@@ -425,8 +433,6 @@ export default function SettingsPage() {
             </WeekModeOptionsPanel>
           )}
 
-          {settings.programMode !== "custom" && (
-          <>
           <CollapsibleSection
             embedded
             title="Day type"
@@ -459,6 +465,8 @@ export default function SettingsPage() {
               }}
             />
           </CollapsibleSection>
+          {settings.programMode !== "custom" && (
+            <>
           <section className="border-t border-border pt-4">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted mb-3">
               Generated week options
@@ -503,6 +511,8 @@ export default function SettingsPage() {
               })}
             </div>
           </CollapsibleSection>
+            </>
+          )}
           <CollapsibleSection
             embedded
             title="Default stretches"
@@ -525,8 +535,6 @@ export default function SettingsPage() {
               Edit default stretches
             </button>
           </CollapsibleSection>
-          </>
-          )}
           </CollapsibleSection>
         </AnimatedSection>
       )}

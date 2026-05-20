@@ -118,6 +118,7 @@ export default function WeeklyDayPage() {
   const trainingPriorityCustomized = useSettingsStore(
     (s) => s.trainingPriorityCustomized,
   );
+  const programMode = useSettingsStore((s) => s.programMode);
   const exercisePrefs = useExercisePreferencesStore((s) => s.byExerciseId);
   const [customizing, setCustomizing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -149,6 +150,9 @@ export default function WeeklyDayPage() {
       cancelled = true;
     };
   }, [canCustomize, dateKey, plan]);
+
+  const isCustomWeek =
+    programMode === "custom" || isUserCustomizedWeekSource(weekSource);
 
   const when = compareDateKeyToToday(dateKey);
 
@@ -211,7 +215,6 @@ export default function WeeklyDayPage() {
   }
 
   const allCategories = categoriesPresentInPlan(plan);
-  const isCustomWeek = isUserCustomizedWeekSource(weekSource);
   const showPlanEditor = customizing && canCustomize && !logForDay;
 
   async function handleSaveDay(editedPlan: DayPlan) {

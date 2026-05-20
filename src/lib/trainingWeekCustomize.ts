@@ -240,9 +240,11 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
   const fingerprint = computePrefsFingerprintFromSettings(prefs, settings);
 
   const row = await getTrainingWeekRepo("authenticated").loadWeek(weekKey);
-  const source = isUserCustomizedWeekSource(row?.source)
-    ? TRAINING_WEEK_SOURCE_CUSTOM_V1
-    : TRAINING_WEEK_SOURCE_GENERATED_V1;
+  const source =
+    settings.programMode === "custom" ||
+    isUserCustomizedWeekSource(row?.source)
+      ? TRAINING_WEEK_SOURCE_CUSTOM_V1
+      : TRAINING_WEEK_SOURCE_GENERATED_V1;
 
   await getTrainingWeekRepo("authenticated").saveSeededWeek(weekKey, merged, {
     source,
