@@ -16,20 +16,32 @@ if (!fs.existsSync(src)) {
   process.exit(1);
 }
 
-const sizes = [
+const appDir = path.join(root, "src/app");
+
+async function writeIcon(outPath, size) {
+  await sharp(src)
+    .resize(size, size, { fit: "contain", background: "#0f1117" })
+    .png()
+    .toFile(outPath);
+}
+
+const publicSizes = [
   { name: "icon-192.png", size: 192 },
   { name: "icon-512.png", size: 512 },
   { name: "apple-touch-icon.png", size: 180 },
 ];
 
-for (const { name, size } of sizes) {
+for (const { name, size } of publicSizes) {
   const out = path.join(publicDir, name);
-  await sharp(src)
-    .resize(size, size, { fit: "contain", background: "#0f1117" })
-    .png()
-    .toFile(out);
-  console.log("Wrote", name);
+  await writeIcon(out, size);
+  console.log("Wrote public/", name);
 }
+
+// Next.js App Router favicon / apple-icon (Chrome & Android fall back here if manifest icons 404)
+await writeIcon(path.join(appDir, "icon.png"), 512);
+console.log("Wrote src/app/icon.png");
+await writeIcon(path.join(appDir, "apple-icon.png"), 180);
+console.log("Wrote src/app/apple-icon.png");
 
 // Simple splash (portrait phone) — brand mark centered on theme background
 const splashPath = path.join(publicDir, "apple-splash-1170x2532.png");

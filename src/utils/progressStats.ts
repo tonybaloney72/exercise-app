@@ -6,6 +6,10 @@ import {
   getSundayOfWeekContaining,
   parseLocalDateKey,
 } from "@/utils/weekCalendar";
+import {
+  countCompletedRoundExercises,
+  countRoundExerciseSlots,
+} from "@/utils/workoutLogCounts";
 
 const exerciseCategoryById = new Map(
   exercises.map((e) => [e.id, e.category] as const),
@@ -114,14 +118,6 @@ function countPlannedRoundExercises(plan: DayPlan): number {
   return plan.rounds.reduce((sum, r) => sum + r.exercises.length, 0);
 }
 
-function countCompletedRoundExercises(log: WorkoutLog): number {
-  return log.rounds.reduce(
-    (sum, r) =>
-      sum + r.exercises.filter((e) => e.completed && !e.skipped).length,
-    0,
-  );
-}
-
 export interface WeekToDatePlanAdherence {
   planned: number;
   completed: number;
@@ -154,9 +150,16 @@ export function weekToDatePlanAdherence(
     d.setDate(weekStart.getDate() + dow);
     const dateStr = formatLocalDateKey(d);
     const plan = weekByDow?.[dow];
-    if (plan) planned += countPlannedRoundExercises(plan);
     const log = history.find((w) => w.date === dateStr);
-    if (log) completed += countCompletedRoundExercises(log);
+    const planSlots = plan ? countPlannedRoundExercises(plan) : 0;
+    if (log) {
+      // Session edits (extra rounds/exercises) live on the log; don't show 59/47.
+      const logSlots = countRoundExerciseSlots(log);
+      planned += Math.max(planSlots, logSlots);
+      completed += countCompletedRoundExercises(log);
+    } else if (plan) {
+      planned += planSlots;
+    }
   }
 
   const spanShort =

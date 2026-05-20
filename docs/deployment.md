@@ -37,8 +37,11 @@ npm install
 npm run icons
 ```
 
-Commit updated PNGs under `public/`.
+Commit **all** of these after `npm run icons` (if they are not in git, production still shows the default Next/Vercel “V” on Add to Home Screen):
 
-**Verify:** Chrome DevTools → Application → Manifest; on iOS Safari → Share → **Add to Home Screen** and check icon + launch screen.
+- `public/icon-192.png`, `public/icon-512.png`, `public/apple-touch-icon.png`, `public/apple-splash-1170x2532.png`
+- `src/app/icon.png`, `src/app/apple-icon.png` (Next.js `/icon` route — Android often uses this when manifest icons are missing)
 
-`src/app/icon.png` and `src/app/apple-icon.png` remain Next.js favicon / metadata fallbacks.
+**Verify (Android):** deploy → Chrome → `https://your-domain/icon-192.png` should show your logo, not 404. DevTools → **Application** → **Manifest** → Icons. Then remove the old shortcut and **Install app** / **Add to Home screen** again (Android caches the old icon).
+
+**Verify (iOS):** Safari → Share → **Add to Home Screen** (splash + `apple-touch-icon`).

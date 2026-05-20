@@ -8,7 +8,6 @@ import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
-import { resolveCardioActivities } from "@/lib/cardioActivities";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import { formatLoggedDuration } from "@/utils/time";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
@@ -150,17 +149,15 @@ export default function WorkoutDayReview({
         </div>
       </CollapsibleSection>
 
-      {resolveCardioActivities(plan).map((activity) => {
-        const entry = resolveWorkoutCardioExercises(log).find(
-          (r) => r.exerciseId === activity.exerciseId,
-        );
-        const title = exerciseMap[activity.exerciseId]?.name ?? activity.kind;
+      {resolveWorkoutCardioExercises(log).map((entry) => {
+        const title =
+          exerciseMap[entry.exerciseId]?.name ?? entry.exerciseId;
         return (
-          <CollapsibleSection key={activity.exerciseId} title={title} defaultOpen>
+          <CollapsibleSection key={entry.exerciseId} title={title} defaultOpen>
             <div className="space-y-1 px-3 py-2">
-              {entry?.skipped ? (
+              {entry.skipped ? (
                 <p className="text-xs text-muted">Skipped</p>
-              ) : entry?.completed ? (
+              ) : entry.completed ? (
                 <p className="text-xs text-muted">
                   {[
                     entry.actualDistanceMi != null
@@ -181,49 +178,56 @@ export default function WorkoutDayReview({
         );
       })}
 
-      {plan.rounds.map((round, i) => {
-        const roundLog = log.rounds[i];
-        return (
-          <CollapsibleSection
-            key={round.roundNumber}
-            title={`Round ${round.roundNumber}`}
-            defaultOpen
-            hint={roundLog ? sectionProgressHint(roundLog.exercises) : undefined}
-          >
-            <div className="divide-y divide-border px-2 py-1">
-            {round.exercises.map((ex, j) => {
-              const entry = roundLog?.exercises[j];
-              const planned = exerciseMap[ex.exerciseId];
-              const effectiveId =
-                entry?.swappedWith ?? entry?.exerciseId ?? ex.exerciseId;
-              const effective = exerciseMap[effectiveId];
-              if (!planned || !effective) return null;
-              return (
-                <ReviewRow
-                  key={`${round.roundNumber}-${ex.exerciseId}`}
-                  name={effective.name}
-                  prescribedLabel={
-                    entry?.swappedWith
-                      ? `Prescribed: ${planned.name}`
-                      : undefined
-                  }
-                  target={
-                    entry
-                      ? resolvePrescriptionText(entry) || ex.targetReps
-                      : ex.targetReps
-                  }
-                  detail={exerciseStatusLine(entry)}
-                  exerciseNotes={entry?.notes}
-                  badge={
-                    <CategoryBadge category={effective.category} size="sm" />
-                  }
-                />
-              );
-            })}
-            </div>
-          </CollapsibleSection>
-        );
-      })}
+      {[...log.rounds]
+        .sort((a, b) => a.roundNumber - b.roundNumber)
+        .map((roundLog) => {
+          const plannedRound = plan.rounds.find(
+            (r) => r.roundNumber === roundLog.roundNumber,
+          );
+          return (
+            <CollapsibleSection
+              key={roundLog.roundNumber}
+              title={`Round ${roundLog.roundNumber}`}
+              defaultOpen
+              hint={sectionProgressHint(roundLog.exercises)}
+            >
+              <div className="divide-y divide-border px-2 py-1">
+                {roundLog.exercises.map((entry) => {
+                  const effectiveId = entry.swappedWith ?? entry.exerciseId;
+                  const effective = exerciseMap[effectiveId];
+                  if (!effective) return null;
+                  const plannedSlot = plannedRound?.exercises.find(
+                    (ex) => ex.exerciseId === entry.exerciseId,
+                  );
+                  const plannedMeta = plannedSlot
+                    ? exerciseMap[plannedSlot.exerciseId]
+                    : undefined;
+                  return (
+                    <ReviewRow
+                      key={`${roundLog.roundNumber}-${entry.exerciseId}-${effectiveId}`}
+                      name={effective.name}
+                      prescribedLabel={
+                        entry.swappedWith && plannedMeta
+                          ? `Prescribed: ${plannedMeta.name}`
+                          : undefined
+                      }
+                      target={
+                        resolvePrescriptionText(entry) ||
+                        plannedSlot?.targetReps ||
+                        effective.name
+                      }
+                      detail={exerciseStatusLine(entry)}
+                      exerciseNotes={entry.notes}
+                      badge={
+                        <CategoryBadge category={effective.category} size="sm" />
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </CollapsibleSection>
+          );
+        })}
 
       <CollapsibleSection
         title="Cool-Down Stretches"

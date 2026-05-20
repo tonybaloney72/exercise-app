@@ -22,6 +22,9 @@ import {
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
+import {
+  countRoundExerciseSlots,
+} from "@/utils/workoutLogCounts";
 
 const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 /** Same Sun–Sat order as the week strip and `weekDates`. */
@@ -209,6 +212,17 @@ export default function WeeklyPage() {
               ? formatLocalDateKey(weekDates[plan.dayOfWeek])
               : undefined;
             const isCompleted = dateStr ? completedDates.has(dateStr) : false;
+            const completedLog =
+              dateStr && isCompleted
+                ? findCompletedWorkoutForDate(workoutHistory, dateStr)
+                : null;
+            const planExerciseCount = plan.rounds.reduce(
+              (a, r) => a + r.exercises.length,
+              0,
+            );
+            const loggedExerciseCount = completedLog
+              ? countRoundExerciseSlots(completedLog)
+              : null;
 
             return (
               <AnimatedSection
@@ -272,8 +286,25 @@ export default function WeeklyPage() {
                   </div>
 
                   <div className="mt-2 text-[10px] text-muted">
-                    {plan.rounds.length} round{plan.rounds.length > 1 ? "s" : ""} ·{" "}
-                    {plan.rounds.reduce((a, r) => a + r.exercises.length, 0)} exercises
+                    {completedLog ? (
+                      <>
+                        {completedLog.rounds.length} round
+                        {completedLog.rounds.length !== 1 ? "s" : ""} ·{" "}
+                        {loggedExerciseCount} logged
+                        {loggedExerciseCount !== planExerciseCount ? (
+                          <span className="text-muted/80">
+                            {" "}
+                            (plan had {planExerciseCount})
+                          </span>
+                        ) : null}
+                      </>
+                    ) : (
+                      <>
+                        {plan.rounds.length} round
+                        {plan.rounds.length !== 1 ? "s" : ""} · {planExerciseCount}{" "}
+                        exercises
+                      </>
+                    )}
                   </div>
                 </Link>
               </AnimatedSection>
