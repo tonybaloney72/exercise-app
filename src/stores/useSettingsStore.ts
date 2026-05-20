@@ -13,6 +13,7 @@ import {
   stretchListsEqual,
 } from "@/lib/stretchDefaults";
 import { readLegacyLocalEquipmentOnboardingDone } from "@/lib/equipmentOnboarding";
+import { settingsHydrationKey } from "@/lib/settingsHydration";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
   toastSaveError,
@@ -27,8 +28,10 @@ import { layoutEqual } from "@/lib/weeklyCategoryLayout";
 import type { ExerciseEquipment, UserSettings } from "@/types";
 
 interface SettingsState extends UserSettings {
-  /** True after first `loadSettings` for the current auth mode. */
+  /** True after a successful `loadSettings` (see `hydratedForAuthKey`). */
   hydrated: boolean;
+  /** Auth context the in-memory settings were loaded for (`user:<id>`, `guest`, `anonymous`). */
+  hydratedForAuthKey: string | null;
   updateSettings: (partial: Partial<UserSettings>) => Promise<void>;
   loadSettings: () => Promise<void>;
 }
@@ -36,6 +39,7 @@ interface SettingsState extends UserSettings {
 export const useSettingsStore = create<SettingsState>((set, get) => ({
   ...DEFAULT_SETTINGS,
   hydrated: false,
+  hydratedForAuthKey: null,
 
   updateSettings: async (partial) => {
     const current = get();
@@ -113,8 +117,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
 
   loadSettings: async () => {
-    const mode = useAuthStore.getState().mode;
+    const auth = useAuthStore.getState();
+    const mode = auth.mode;
     if (mode === "loading") return;
+    const authKey = settingsHydrationKey(mode, auth.user?.id);
+    if (!authKey) return;
+
     const loaded = await getSettingsRepo(mode).load();
     const disliked = collectDislikedIds(
       useExercisePreferencesStore.getState().byExerciseId,
@@ -141,7 +149,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       !stretchListsEqual(defaultWarmUp, loaded.defaultWarmUp ?? []) ||
       !stretchListsEqual(defaultCoolDown, loaded.defaultCoolDown ?? []);
 
-    set({ ...merged, hydrated: true });
+    const currentKey = settingsHydrationKey(
+      useAuthStore.getState().mode,
+      useAuthStore.getState().user?.id,
+    );
+    if (currentKey !== authKey) return;
+
+    set({ ...merged, hydrated: true, hydratedForAuthKey: authKey });
 
     const upgradedOnboardingFromLegacy =
       merged.equipmentOnboardingCompleted &&

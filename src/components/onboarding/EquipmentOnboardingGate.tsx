@@ -1,6 +1,7 @@
 "use client";
 
 import EquipmentOnboardingModal from "@/components/onboarding/EquipmentOnboardingModal";
+import { settingsHydrationMatchesAuth } from "@/lib/settingsHydration";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
@@ -9,10 +10,18 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
  */
 export default function EquipmentOnboardingGate() {
   const mode = useAuthStore((s) => s.mode);
+  const userId = useAuthStore((s) => s.user?.id);
   const hydrated = useSettingsStore((s) => s.hydrated);
+  const hydratedForAuthKey = useSettingsStore((s) => s.hydratedForAuthKey);
   const completed = useSettingsStore((s) => s.equipmentOnboardingCompleted);
 
-  if (mode === "loading" || !hydrated || completed) {
+  const settingsReady = settingsHydrationMatchesAuth(
+    mode,
+    userId,
+    hydratedForAuthKey,
+  );
+
+  if (mode === "loading" || !hydrated || !settingsReady || completed) {
     return null;
   }
 

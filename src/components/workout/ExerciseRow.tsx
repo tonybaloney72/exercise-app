@@ -2,11 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
-import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import {
   effectiveExerciseId,
@@ -25,6 +23,8 @@ import TimerTargetControls from "./TimerTargetControls";
 import { formatLoggedDuration } from "@/utils/time";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import SwapExerciseModal from "./SwapExerciseModal";
+import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
+import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 
 interface ExerciseRowProps {
@@ -182,16 +182,45 @@ export default function ExerciseRow({
         ? ` → did ${formatLoggedDuration(log.actualDuration)}`
         : "";
 
+  const overflowItems: WorkoutRowMenuItem[] = [];
+  if (!log.skipped) {
+    overflowItems.push({
+      label: "Swap exercise",
+      onClick: () => {
+        setSwapModalKey((k) => k + 1);
+        setSwapOpen(true);
+      },
+    });
+  }
+  if (!log.completed && !log.skipped) {
+    overflowItems.push({
+      label: "Skip",
+      onClick: () => skipExercise(roundNumber, plannedId),
+    });
+  }
+  if (log.skipped) {
+    overflowItems.push({
+      label: "Undo skip",
+      onClick: () => unskipExercise(roundNumber, plannedId),
+    });
+  }
+
+  const showTimerPill =
+    mode === "timer" && !log.completed && !log.skipped;
+  const detailText = showTimerPill
+    ? didLine.replace(/^\s*→\s*/, "").trim() || null
+    : `${prescriptionLine}${didLine}`.trim() || null;
+
   return (
     <div className={`transition-colors ${log.skipped ? "opacity-40" : ""}`}>
-      <div className="flex items-center gap-2 px-1">
+      <div className="flex items-start gap-2 px-1">
         <button
           type="button"
           onClick={() => {
             if (!log.completed && !log.skipped) vibrateOnExerciseComplete();
             toggleExercise(roundNumber, plannedId);
           }}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
+          className="mt-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
           style={{
             borderColor: log.completed ? "var(--accent)" : "var(--border-color)",
             backgroundColor: log.completed ? "var(--accent)" : "transparent",
@@ -216,134 +245,25 @@ export default function ExerciseRow({
           )}
         </button>
 
-        <div className="flex flex-1 items-center gap-2 min-h-[44px] min-w-0">
-          <button
-            type="button"
-            onClick={() => setExpanded(!expanded)}
-            className="flex min-w-0 flex-1 flex-col items-start py-2 text-left"
-          >
-            <p
-              className={`text-sm font-medium transition-all ${
-                log.completed ? "text-muted line-through" : "text-foreground"
-              }`}
-            >
-              {effectiveExercise.name}
-            </p>
-            {log.swappedWith && (
-              <p className="text-[10px] text-muted">
+        <WorkoutRowMetaLine
+          name={effectiveExercise.name}
+          nameClassName={
+            log.completed ? "text-muted line-through" : "text-foreground"
+          }
+          subName={
+            log.swappedWith ? (
+              <p className="mt-0.5 text-[10px] text-muted">
                 Instead of {plannedExercise.name}
               </p>
-            )}
-            <p className="text-xs text-muted">
-              {prescriptionLine}
-              {didLine}
-            </p>
-          </button>
-          {mode === "timer" && !log.completed && !log.skipped && (
-            <button
-              type="button"
-              onClick={() =>
-                useFloatingTimerStore
-                  .getState()
-                  .startSetCountdown(effectiveTargetSec)
-              }
-              className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-lg shadow-accent/30 transition-transform active:scale-95"
-              title={`Start set timer (${effectiveTargetSec}s)`}
-              aria-label={`Start set timer, ${effectiveTargetSec} seconds`}
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <circle cx="12" cy="12" r="9" />
-                <polyline points="12 7 12 12 15 14" />
-              </svg>
-              <span className="tabular-nums">{effectiveTargetSec}s</span>
-            </button>
-          )}
-          <CategoryBadge category={effectiveExercise.category} />
-        </div>
-
-        {!log.skipped && (
-          <button
-            type="button"
-            onClick={() => {
-              setSwapModalKey((k) => k + 1);
-              setSwapOpen(true);
-            }}
-            className="p-1.5 text-muted hover:text-foreground transition-colors shrink-0"
-            title="Swap exercise"
-            aria-label="Swap exercise"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="16 3 21 3 21 8" />
-              <line x1="13" y1="11" x2="21" y2="3" />
-              <polyline points="8 21 3 21 3 16" />
-              <line x1="11" y1="13" x2="3" y2="21" />
-            </svg>
-          </button>
-        )}
-
-        {!log.completed && !log.skipped && (
-          <button
-            type="button"
-            onClick={() => skipExercise(roundNumber, plannedId)}
-            className="p-1.5 text-muted hover:text-foreground transition-colors shrink-0"
-            title="Skip"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="5 4 15 12 5 20 5 4" />
-              <line x1="19" y1="5" x2="19" y2="19" />
-            </svg>
-          </button>
-        )}
-        {log.skipped && (
-          <button
-            type="button"
-            onClick={() => unskipExercise(roundNumber, plannedId)}
-            className="p-1.5 text-muted hover:text-foreground transition-colors shrink-0"
-            title="Undo skip"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="1 4 1 10 7 10" />
-              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-            </svg>
-          </button>
-        )}
+            ) : undefined
+          }
+          onNameClick={() => setExpanded(!expanded)}
+          category={effectiveExercise.category}
+          menuItems={overflowItems}
+          detailText={detailText}
+          showTimerPill={showTimerPill}
+          timerSeconds={effectiveTargetSec}
+        />
       </div>
 
       <SwapExerciseModal

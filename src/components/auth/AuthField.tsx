@@ -6,6 +6,7 @@ type AuthFieldProps = {
   label: string;
   type?: string;
   autoComplete?: string;
+  autoFocus?: boolean;
   required?: boolean;
   value: string;
   onChange: (value: string) => void;
@@ -17,6 +18,7 @@ export default function AuthField({
   label,
   type = "text",
   autoComplete,
+  autoFocus,
   required,
   value,
   onChange,
@@ -32,6 +34,7 @@ export default function AuthField({
         name={id}
         type={type}
         autoComplete={autoComplete}
+        autoFocus={autoFocus}
         required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}

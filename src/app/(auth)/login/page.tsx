@@ -63,6 +63,7 @@ function LoginForm() {
           label="Email"
           type="email"
           autoComplete="email"
+          autoFocus
           required
           value={email}
           onChange={setEmail}

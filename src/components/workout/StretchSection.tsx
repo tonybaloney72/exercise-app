@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { exerciseMap } from "@/data/exercises";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
-import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
+import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
+import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
 import type { ExerciseLog, ExerciseSetMode, StretchEntry } from "@/types";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
@@ -203,13 +204,27 @@ function StretchRow({
 
   if (!exercise) return null;
 
+  const overflowItems: WorkoutRowMenuItem[] = [];
+  if (!log.completed && !log.skipped) {
+    overflowItems.push({ label: "Skip", onClick: onSkip });
+  }
+  if (log.skipped) {
+    overflowItems.push({ label: "Undo skip", onClick: onUnskip });
+  }
+
+  const showTimerPill =
+    mode === "timer" && !log.completed && !log.skipped;
+  const detailText = showTimerPill
+    ? didLine.replace(/^\s*→\s*/, "").trim() || null
+    : `${prescriptionLine}${didLine}`.trim() || null;
+
   return (
     <div className={`transition-colors ${log.skipped ? "opacity-40" : ""}`}>
-      <div className="flex items-center gap-2 px-1">
+      <div className="flex items-start gap-2 px-1">
         <button
           type="button"
           onClick={onToggle}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
+          className="mt-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
           style={{
             borderColor: log.completed ? "var(--accent)" : "var(--border-color)",
             backgroundColor: log.completed ? "var(--accent)" : "transparent",
@@ -234,104 +249,20 @@ function StretchRow({
           )}
         </button>
 
-        <motion.div className="flex flex-1 items-center gap-2 min-h-[44px] min-w-0">
-          <button
-            type="button"
-            onClick={() => setExpanded(!expanded)}
-            className="flex min-w-0 flex-1 flex-col items-start py-2 text-left"
-          >
-            <p
-              className={`text-sm font-medium transition-all ${
-                log.completed
-                  ? "text-muted line-through"
-                  : log.skipped
-                    ? "text-muted line-through"
-                    : "text-foreground"
-              }`}
-            >
-              {exercise.name}
-            </p>
-            <p className="text-xs text-muted">
-              {prescriptionLine}
-              {didLine}
-            </p>
-          </button>
-
-          {mode === "timer" && !log.completed && !log.skipped && (
-            <button
-              type="button"
-              onClick={() =>
-                useFloatingTimerStore
-                  .getState()
-                  .startSetCountdown(effectiveTargetSec)
-              }
-              className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-lg shadow-accent/30 transition-transform active:scale-95"
-              title={`Start stretch timer (${effectiveTargetSec}s)`}
-              aria-label={`Start stretch timer, ${effectiveTargetSec} seconds`}
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <circle cx="12" cy="12" r="9" />
-                <polyline points="12 7 12 12 15 14" />
-              </svg>
-              <span className="tabular-nums">{effectiveTargetSec}s</span>
-            </button>
-          )}
-        </motion.div>
-
-        {!log.completed && !log.skipped && (
-          <button
-            type="button"
-            onClick={onSkip}
-            className="p-1.5 text-muted hover:text-foreground transition-colors"
-            title="Skip"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="5 4 15 12 5 20 5 4" />
-              <line x1="19" y1="5" x2="19" y2="19" />
-            </svg>
-          </button>
-        )}
-        {log.skipped && (
-          <button
-            type="button"
-            onClick={onUnskip}
-            className="p-1.5 text-muted hover:text-foreground transition-colors"
-            title="Undo skip"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="1 4 1 10 7 10" />
-              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-            </svg>
-          </button>
-        )}
+        <WorkoutRowMetaLine
+          name={exercise.name}
+          nameClassName={
+            log.completed || log.skipped
+              ? "text-muted line-through"
+              : "text-foreground"
+          }
+          onNameClick={() => setExpanded(!expanded)}
+          menuItems={overflowItems}
+          detailText={detailText}
+          showTimerPill={showTimerPill}
+          timerSeconds={effectiveTargetSec}
+          timerTitle={`Start stretch timer (${effectiveTargetSec}s)`}
+        />
       </div>
 
       <AnimatePresence>
