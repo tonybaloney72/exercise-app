@@ -496,15 +496,7 @@ export default function WorkoutPlanEditor({
         </button>
       </SurfaceCard>
 
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <button
-          type="button"
-          disabled={saving}
-          onClick={() => onSave(draft)}
-          className="flex-1 rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 disabled:opacity-50"
-        >
-          {saving ? "Saving…" : saveLabel}
-        </button>
+      <div className="flex gap-3">
         {!embedded && (
           <button
             type="button"
@@ -515,6 +507,14 @@ export default function WorkoutPlanEditor({
             Cancel
           </button>
         )}
+        <button
+          type="button"
+          disabled={saving}
+          onClick={() => onSave(draft)}
+          className="flex-1 rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 disabled:opacity-50"
+        >
+          {saving ? "Saving…" : saveLabel}
+        </button>
       </div>
 
       <div className="rounded-xl border border-border bg-surface px-4 py-3 space-y-2">

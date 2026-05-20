@@ -1,15 +1,17 @@
 import { exerciseMap } from "@/data/exercises";
-import {
-  CARDIO_KIND_TO_EXERCISE_ID,
-  type CardioActivityKind,
-} from "@/lib/cardioActivities";
+import { CARDIO_KIND_TO_EXERCISE_ID } from "@/lib/cardioActivities";
 import { ensureCardioExercises } from "@/lib/resolveWorkoutCardio";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   formatPlanTargetPrescription,
   resolveExerciseSettings,
 } from "@/utils/effectiveExerciseSettings";
-import type { ExerciseCategory, ExerciseLog, WorkoutLog } from "@/types";
+import type {
+  CardioActivityKind,
+  ExerciseCategory,
+  ExerciseLog,
+  WorkoutLog,
+} from "@/types";
 
 function seedTimerTargetSeconds(
   resolved: ReturnType<typeof resolveExerciseSettings>,
