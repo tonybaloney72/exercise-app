@@ -1,10 +1,11 @@
+import { seededCandidateRank } from "@/lib/exerciseCandidates";
 import {
   dedupeStretchEntries,
   normalizeStretchList,
 } from "@/lib/stretchDefaults";
 import {
   coolDownCatalogPool,
-  warmUpCatalogPool,
+  warmSessionCatalogPool,
   type StretchThemePoolId,
 } from "@/lib/stretchCatalogPools";
 import type { StretchResolveContext } from "@/lib/stretchResolveContext";
@@ -21,35 +22,34 @@ export {
   CATALOG_DEFAULT_WARM_UP,
 } from "@/lib/stretchCatalogDefaults";
 
-function seedOffset(seed: string, modulus: number): number {
-  if (modulus <= 0) return 0;
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = (Math.imul(31, hash) + seed.charCodeAt(i)) >>> 0;
-  }
-  return hash % modulus;
-}
-
 /**
- * Deterministic rotating subset from a catalog pool (uses full library, not just list head).
+ * Deterministic pseudo-random subset: seed shuffles the pool (not catalog id order).
+ * Same seed → same picks; different day/pool seeds → different spreads.
  */
 export function pickStretchEntries(
   pool: readonly StretchEntry[],
   count: number,
   seed: string,
   dislikedExerciseIds: ReadonlySet<string>,
+  excludeExerciseIds: ReadonlySet<string> = new Set(),
 ): StretchEntry[] {
   if (count <= 0) return [];
-  const available = pool.filter((e) => !dislikedExerciseIds.has(e.exerciseId));
+  const available = pool.filter(
+    (e) =>
+      !dislikedExerciseIds.has(e.exerciseId) &&
+      !excludeExerciseIds.has(e.exerciseId),
+  );
   if (available.length === 0) return [];
 
   const take = Math.min(count, available.length);
-  const offset = seedOffset(seed, available.length);
-  const out: StretchEntry[] = [];
-  for (let i = 0; i < take; i++) {
-    out.push({ ...available[(offset + i) % available.length]! });
-  }
-  return out;
+  const ranked = [...available].sort((a, b) => {
+    const bySeed = seededCandidateRank(seed, a.exerciseId).localeCompare(
+      seededCandidateRank(seed, b.exerciseId),
+    );
+    if (bySeed !== 0) return bySeed;
+    return a.exerciseId.localeCompare(b.exerciseId);
+  });
+  return ranked.slice(0, take).map((entry) => ({ ...entry }));
 }
 
 function appendPickedPool(
@@ -58,9 +58,16 @@ function appendPickedPool(
   count: number,
   seed: string,
   ctx: StretchResolveContext,
+  excludeExerciseIds: ReadonlySet<string> = new Set(),
 ): void {
   parts.push(
-    ...pickStretchEntries(pool, count, seed, ctx.dislikedExerciseIds),
+    ...pickStretchEntries(
+      pool,
+      count,
+      seed,
+      ctx.dislikedExerciseIds,
+      excludeExerciseIds,
+    ),
   );
 }
 
@@ -92,7 +99,6 @@ function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[]
   const warmParts: StretchEntry[] = [...ctx.defaultWarmUp];
 
   const poolIds: StretchThemePoolId[] = [
-    "general",
     "upper",
     "lower",
     "core",
@@ -107,7 +113,7 @@ function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[]
     if (quota <= 0) continue;
     appendPickedPool(
       warmParts,
-      warmUpCatalogPool(id),
+      warmSessionCatalogPool(id),
       quota,
       `${ctx.weekRotationKey}-${daySeed}-warm-${id}`,
       ctx,
@@ -117,7 +123,11 @@ function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[]
   return dedupeStretchEntries(warmParts);
 }
 
-function deriveCoolDown(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[] {
+function deriveCoolDown(
+  plan: DayPlan,
+  ctx: StretchResolveContext,
+  warmExerciseIds: ReadonlySet<string>,
+): StretchEntry[] {
   const recovery = isLightRecoveryDay(plan);
   const cats = categoriesInPlan(plan);
   const preset = ctx.trainingPriorityPreset;
@@ -126,12 +136,7 @@ function deriveCoolDown(plan: DayPlan, ctx: StretchResolveContext): StretchEntry
   const daySeed = `d${plan.dayOfWeek}-tp:${preset}`;
   const coolParts: StretchEntry[] = [...ctx.defaultCoolDown];
 
-  const poolIds: StretchThemePoolId[] = [
-    "general",
-    "upper",
-    "lower",
-    "core",
-  ];
+  const poolIds: StretchThemePoolId[] = ["upper", "lower", "core"];
 
   for (const id of poolIds) {
     if (!shouldIncludeStretchPool(id, plan, cats, preset, scores, customized))
@@ -145,10 +150,15 @@ function deriveCoolDown(plan: DayPlan, ctx: StretchResolveContext): StretchEntry
       quota,
       `${ctx.weekRotationKey}-${daySeed}-cool-${id}`,
       ctx,
+      warmExerciseIds,
     );
   }
 
   return dedupeStretchEntries(coolParts);
+}
+
+function warmIdsFromEntries(entries: StretchEntry[]): ReadonlySet<string> {
+  return new Set(entries.map((e) => e.exerciseId));
 }
 
 /** Recompute warm-up / cool-down from settings defaults + day focus. */
@@ -159,10 +169,9 @@ export function rebuildDerivedStretches(
   warmUp: StretchEntry[];
   coolDown: StretchEntry[];
 } {
-  return {
-    warmUp: deriveWarmUp(plan, ctx),
-    coolDown: deriveCoolDown(plan, ctx),
-  };
+  const warmUp = deriveWarmUp(plan, ctx);
+  const coolDown = deriveCoolDown(plan, ctx, warmIdsFromEntries(warmUp));
+  return { warmUp, coolDown };
 }
 
 /**
@@ -180,14 +189,28 @@ export function resolveStretchesForDay(
     return { warmUp: [], coolDown: [] };
   }
   const { dislikedExerciseIds } = ctx;
-  return {
-    warmUp:
-      plan.warmUp != null
-        ? normalizeStretchList(plan.warmUp, dislikedExerciseIds)
-        : deriveWarmUp(plan, ctx),
-    coolDown:
-      plan.coolDown != null
-        ? normalizeStretchList(plan.coolDown, dislikedExerciseIds)
-        : deriveCoolDown(plan, ctx),
-  };
+
+  if (plan.warmUp != null && plan.coolDown != null) {
+    return {
+      warmUp: normalizeStretchList(plan.warmUp, dislikedExerciseIds),
+      coolDown: normalizeStretchList(plan.coolDown, dislikedExerciseIds),
+    };
+  }
+
+  if (plan.warmUp != null) {
+    const warmUp = normalizeStretchList(plan.warmUp, dislikedExerciseIds);
+    return {
+      warmUp,
+      coolDown: deriveCoolDown(plan, ctx, warmIdsFromEntries(warmUp)),
+    };
+  }
+
+  if (plan.coolDown != null) {
+    return {
+      warmUp: deriveWarmUp(plan, ctx),
+      coolDown: normalizeStretchList(plan.coolDown, dislikedExerciseIds),
+    };
+  }
+
+  return rebuildDerivedStretches(plan, ctx);
 }

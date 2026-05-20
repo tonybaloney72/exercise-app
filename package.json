@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "generate-week-audit": "vitest run src/lib/generateWeekAudit.export.test.ts",
     "supabase": "supabase",
     "db:push": "supabase db push",
     "db:push:dry": "supabase db push --dry-run",

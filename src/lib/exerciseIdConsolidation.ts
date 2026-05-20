@@ -39,7 +39,21 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "SW-17": "PC-5",
   // D — glute bridge: keep CS-5
   "SW-15": "CS-5",
+  // F — duplicate in-place bounce (keep Hops on the Spot)
+  "SW-40": "SW-33",
+  // G — duplicate bird dog (keep Bird-Dog)
+  "SW-51": "SW-8",
+  // H — strict duplicates of workout entries (keep CS-3 / PC-1)
+  "SW-52": "CS-3",
+  "SW-44": "PC-1",
+  // E — duplicate mountain climber variants
+  "PC-3": "CR-10",
 };
+
+/** Ids that redirect to a canonical entry; excluded from generator / swap pools. */
+export function isDeprecatedExerciseId(id: string): boolean {
+  return Object.prototype.hasOwnProperty.call(CONSOLIDATED_EXERCISE_ID_MAP, id);
+}
 
 /** HC ids removed from the merged library (not exported in exerciseMap). */
 export const REMOVED_HYBRID_EXERCISE_IDS = new Set<string>([
@@ -77,6 +91,10 @@ export const REMOVED_CATALOG_STRETCH_IDS = new Set<string>([
   "SW-17",
   "SW-20",
   "SW-25",
+  "SW-40",
+  "SW-51",
+  "SW-52",
+  "SW-44",
 ]);
 
 export function migrateConsolidatedExerciseId(id: string): string {

@@ -21,6 +21,7 @@
 /build
 
 # misc
+week-audit.json
 .DS_Store
 *.pem
 

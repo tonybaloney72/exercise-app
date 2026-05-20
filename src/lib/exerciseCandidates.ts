@@ -3,6 +3,8 @@ import {
   ALL_EXERCISE_EQUIPMENT,
   exerciseMatchesEquipment,
 } from "@/data/equipment";
+import { isEnduranceBlockExerciseId } from "@/lib/enduranceBlockExercises";
+import { isDeprecatedExerciseId } from "@/lib/exerciseIdConsolidation";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import type { Exercise, ExerciseCategory, ExerciseEquipment } from "@/types";
 
@@ -38,6 +40,8 @@ export function getReplacementCandidates(options: {
   return exercises.filter(
     (ex) =>
       ex.category === category &&
+      !isEnduranceBlockExerciseId(ex.id) &&
+      !isDeprecatedExerciseId(ex.id) &&
       !excludeExerciseIds.has(ex.id) &&
       !dislikedExerciseIds?.has(ex.id) &&
       exerciseMatchesEquipment(ex.equipment, availableEquipment),

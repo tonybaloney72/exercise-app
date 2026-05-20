@@ -12,7 +12,6 @@ const LOWER_CATS: ExerciseCategory[] = ["LB"];
 const CORE_CATS: ExerciseCategory[] = ["CF", "CL", "CR", "CS"];
 
 const BASE_WARM_QUOTAS: Record<StretchThemePoolId, number> = {
-  general: 2,
   upper: 2,
   lower: 3,
   core: 2,
@@ -20,10 +19,9 @@ const BASE_WARM_QUOTAS: Record<StretchThemePoolId, number> = {
 };
 
 const BASE_COOL_QUOTAS: Record<StretchThemePoolId, number> = {
-  general: 1,
-  upper: 3,
-  lower: 3,
-  core: 2,
+  upper: 2,
+  lower: 2,
+  core: 1,
   conditioning: 0,
 };
 
@@ -44,8 +42,10 @@ function poolWeight(
       return weights.core;
     case "conditioning":
       return weights.cardio;
-    default:
-      return 2;
+    default: {
+      const _exhaustive: never = pool;
+      return _exhaustive;
+    }
   }
 }
 
@@ -74,8 +74,6 @@ export function shouldIncludeStretchPool(
 
   if (customized && scores) {
     switch (pool) {
-      case "general":
-        return true;
       case "upper":
         return (
           hasUpper || scores.upper_push >= 3 || scores.upper_pull >= 3
@@ -101,14 +99,14 @@ export function shouldIncludeStretchPool(
         return hasCore;
       case "conditioning":
         return scores.cardio >= 3 || hasPc;
-      default:
-        return false;
+      default: {
+        const _exhaustive: never = pool;
+        return _exhaustive;
+      }
     }
   }
 
   switch (pool) {
-    case "general":
-      return true;
     case "upper":
       return (
         hasUpper ||
@@ -128,8 +126,10 @@ export function shouldIncludeStretchPool(
       return hasCore;
     case "conditioning":
       return weights.cardio >= 4 || hasPc;
-    default:
-      return false;
+    default: {
+      const _exhaustive: never = pool;
+      return _exhaustive;
+    }
   }
 }
 
@@ -156,11 +156,8 @@ export function stretchWarmUpQuota(
           ? w.lower
           : pool === "core"
             ? w.core
-            : pool === "conditioning"
-              ? w.cardio
-              : 2;
+            : w.cardio;
     if (groupScore === 0) return 0;
-    if (pool === "general") return Math.min(2, groupScore);
     return Math.min(5, groupScore + 1);
   }
   if (preset === "conditioning") {
@@ -168,7 +165,6 @@ export function stretchWarmUpQuota(
     if (pool === "core") return 0;
     if (pool === "lower") return 3;
     if (pool === "upper") return 2;
-    if (pool === "general") return 2;
   }
   if (preset === "minimal_core" && pool === "core") return 0;
   if (preset === "core_emphasis" && pool === "core") return 4;
@@ -204,11 +200,8 @@ export function stretchCoolDownQuota(
         ? Math.max(w.upper_push, w.upper_pull)
         : pool === "lower"
           ? w.lower
-          : pool === "core"
-            ? w.core
-            : 2;
+          : w.core;
     if (groupScore === 0) return 0;
-    if (pool === "general") return 1;
     return Math.min(5, groupScore + 1);
   }
 

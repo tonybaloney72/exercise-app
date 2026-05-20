@@ -28,6 +28,7 @@ export type ExerciseEquipment =
   | "rings"
   | "resistance_band"
   | "dumbbell"
+  | "kettlebell"
   | "barbell"
   | "machine"
   | "cable"
