@@ -33,10 +33,13 @@ import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStor
 import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
 import { toastSaveError } from "@/utils/saveErrorToast";
 import { useDayPlan } from "@/hooks/useDayPlan";
+import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import type { DayPlan } from "@/types";
+import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 import {
   compareDateKeyToToday,
   isDateKeyInCurrentCalendarWeek,
+  getWeekDateKeys,
   parseLocalDateKey,
 } from "@/utils/weekCalendar";
 
@@ -138,6 +141,13 @@ export default function WeeklyDayPage() {
   const planKey = parsed && inWeek ? dateKey : "";
   const { plan, loading: planLoading, error: planError } = useDayPlan(planKey);
 
+  const weekDates = useMemo(
+    () =>
+      getWeekDateKeys().map((key) => parseLocalDateKey(key)).filter((d): d is Date => d != null),
+    [],
+  );
+  const { weekByDow } = useTrainingWeekPlans(weekDates);
+
   const canCustomize = mode === "authenticated" && !!planKey;
 
   useEffect(() => {
@@ -182,6 +192,13 @@ export default function WeeklyDayPage() {
     !logForDay &&
     ((activeWorkout && activeWorkout.date === dateKey) ||
       pausedWorkoutDate === dateKey);
+
+  const showCustomizeSlot =
+    !!planKey &&
+    !logForDay &&
+    when !== "future" &&
+    !continueWorkoutHere &&
+    !editingCompletedHere;
 
   if (!parsed) {
     return (
@@ -303,7 +320,7 @@ export default function WeeklyDayPage() {
         )}
       </div>
 
-      {canCustomize && !logForDay && !showPlanEditor && (
+      {canCustomize && showCustomizeSlot && !showPlanEditor && (
         <button
           type="button"
           onClick={() => {
@@ -314,6 +331,13 @@ export default function WeeklyDayPage() {
         >
           Customize this day&apos;s workout
         </button>
+      )}
+
+      {mode === "guest" && showCustomizeSlot && !customizing && (
+        <AccountFeatureGate
+          feature="customizeDay"
+          title="Customize this day&apos;s workout"
+        />
       )}
 
       {saveError && (
@@ -344,6 +368,7 @@ export default function WeeklyDayPage() {
       {when === "future" && !showPlanEditor && (
         <WorkoutPlanPreview
           plan={plan}
+          weekByDow={weekByDow}
           bannerTitle={formatScheduledBannerTitle(dateKey)}
           bannerHint="Read-only preview of the prescribed plan."
           isFutureDay
@@ -409,6 +434,7 @@ export default function WeeklyDayPage() {
           {!showPlanEditor && (
             <WorkoutPlanPreview
               plan={plan}
+              weekByDow={weekByDow}
               bannerTitle={
                 when === "today"
                   ? "Today’s prescribed plan"

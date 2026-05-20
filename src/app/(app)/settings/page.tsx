@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AnimatedSection from "@/components/common/AnimatedSection";
@@ -21,16 +21,12 @@ import {
   scoresFromPreset,
   TRAINING_PRIORITY_OPTIONS,
 } from "@/lib/trainingPriorities";
-import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { createClient } from "@/lib/supabase/client";
-import { formatLocalDateKey } from "@/utils/localDateKey";
-
 export default function SettingsPage() {
   const router = useRouter();
   const settings = useSettingsStore();
-  const { workoutHistory, loadHistory } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
   const user = useAuthStore((s) => s.user);
   const setGuest = useAuthStore((s) => s.setGuest);
@@ -52,47 +48,6 @@ export default function SettingsPage() {
     settings.availableEquipment,
     exercisePrefs,
   ]);
-  useEffect(() => {
-    if (mode === "loading") return;
-    loadHistory();
-  }, [mode, loadHistory]);
-
-  const handleExport = () => {
-    const data = {
-      settings: {
-        restBetweenRounds: settings.restBetweenRounds,
-        weekStartDate: settings.weekStartDate,
-        darkMode: settings.darkMode,
-        restTimerAutoStart: settings.restTimerAutoStart,
-        timerSoundsEnabled: settings.timerSoundsEnabled,
-        timerVibrationEnabled: settings.timerVibrationEnabled,
-        keepScreenAwake: settings.keepScreenAwake,
-        availableEquipment: settings.availableEquipment,
-        trainingPriorityPreset: settings.trainingPriorityPreset,
-        trainingPriorityScores: settings.trainingPriorityScores,
-        trainingPriorityCustomized: settings.trainingPriorityCustomized,
-        programMode: settings.programMode,
-        weeklyCategoryLayout: settings.weeklyCategoryLayout,
-        weeklyCategoryLayoutCustomized: settings.weeklyCategoryLayoutCustomized,
-        weeklyRestDays: settings.weeklyRestDays,
-        weeklyRestDaysCustomized: settings.weeklyRestDaysCustomized,
-        weeklyCardioByDay: settings.weeklyCardioByDay,
-        weeklyCardioCustomized: settings.weeklyCardioCustomized,
-        roundDensity: settings.roundDensity,
-        defaultWarmUp: settings.defaultWarmUp,
-        defaultCoolDown: settings.defaultCoolDown,
-      },
-      workoutHistory,
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `exercise-app-backup-${formatLocalDateKey()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   async function handleSignOut() {
     await fetch("/api/auth/signout", { method: "POST" });
     const supabase = createClient();
@@ -294,8 +249,19 @@ export default function SettingsPage() {
           contentClassName="space-y-3 p-4"
         >
         <p className="text-xs text-muted">
-          When signed in, changing equipment updates this week&apos;s prescribed plan
-          (finished workouts stay as logged). Based on the{" "}
+          {mode === "guest" ? (
+            <>
+              As a guest, equipment changes regenerate this device&apos;s current
+              week in memory only (not saved across devices). Sign in to persist
+              your week.{" "}
+            </>
+          ) : (
+            <>
+              When signed in, changing equipment updates this week&apos;s prescribed
+              plan (finished workouts stay as logged).{" "}
+            </>
+          )}
+          Based on the{" "}
           <a
             href="https://www.hybridcalisthenics.com/exercise-library"
             target="_blank"
@@ -543,26 +509,6 @@ export default function SettingsPage() {
         open={stretchModalOpen}
         onClose={() => setStretchModalOpen(false)}
       />
-
-      {/* Data management */}
-      <AnimatedSection delay={0.1}>
-        <CollapsibleSection
-          title="Data"
-          hint="Export a backup of settings and workout history"
-          defaultOpen={false}
-          contentClassName="space-y-3 p-4"
-        >
-        <button
-          onClick={handleExport}
-          className="w-full rounded-lg border border-border bg-surface-hover py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-border/50"
-        >
-          Export Data (JSON)
-        </button>
-        <p className="text-[10px] text-muted text-center">
-          {workoutHistory.length} workout{workoutHistory.length !== 1 ? "s" : ""} saved locally
-        </p>
-        </CollapsibleSection>
-      </AnimatedSection>
     </div>
   );
 }

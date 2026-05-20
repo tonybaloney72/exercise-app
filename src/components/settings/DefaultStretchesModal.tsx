@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import StretchPlanSection from "@/components/workout/StretchPlanSection";
-import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
+import StretchPickModal from "@/components/workout/StretchPickModal";
 import { exerciseMap } from "@/data/exercises";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
@@ -66,6 +66,7 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
       usedExerciseIds: used,
       availableEquipment: settings.availableEquipment,
       dislikedExerciseIds: dislikedIds,
+      exercisePreferences: prefs,
     });
   }, [
     pickTarget,
@@ -199,14 +200,19 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
         )}
       </BottomSheetModal>
 
-      <SwapExerciseModal
+      <StretchPickModal
         open={pickTarget !== null}
+        title={
+          pickTarget?.list === "defaultCoolDown"
+            ? "Choose cool-down stretch"
+            : "Choose warm-up stretch"
+        }
+        hint="Saved defaults are merged into each day's stretch lists."
         plannedName={plannedName}
         candidates={pickCandidates}
         hasSwap={pickTarget?.index != null}
         onClose={() => setPickTarget(null)}
         onPick={applyPick}
-        onClearSwap={() => {}}
       />
     </>
   );

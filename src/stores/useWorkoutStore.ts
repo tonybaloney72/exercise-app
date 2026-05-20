@@ -12,7 +12,7 @@ import type {
   ExerciseSetMode,
   StretchEntry,
 } from "@/types";
-import { resolveStretchesForPlan } from "@/lib/stretchResolveContext";
+import { resolveStretchesForWorkoutStart } from "@/lib/stretchResolveContext";
 import { getWorkoutRepo } from "@/lib/repos";
 import {
   buildEmptyCardioLogs,
@@ -290,6 +290,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   workoutHistory: [],
   pausedWorkoutDate: null,
   startWorkout: (plan) => {
+    void (async () => {
     const now = new Date();
     const dateKey = formatLocalDateKey(now);
     const state = get();
@@ -310,7 +311,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       return;
     }
 
-    const { warmUp, coolDown } = resolveStretchesForPlan(plan);
+    const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(plan);
     const warmUpExercises: ExerciseLog[] = warmUp.map(buildStretchExerciseLog);
     const coolDownExercises: ExerciseLog[] = coolDown.map(buildStretchExerciseLog);
     const cardioExercises = buildEmptyCardioLogs(resolveCardioActivities(plan));
@@ -335,6 +336,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         ? { workoutHistory: upsertWorkoutInHistory(state.workoutHistory, log) }
         : {}),
     });
+    if (mode === "authenticated") {
+      void flushPersistInProgressWorkout(log, { paused: false });
+    }
+    })();
   },
 
   toggleJog: () => get().toggleCardio(CARDIO_KIND_TO_EXERCISE_ID.jog),

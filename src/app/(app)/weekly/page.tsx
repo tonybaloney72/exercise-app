@@ -15,6 +15,7 @@ import { getWeekSourceForDate } from "@/lib/trainingWeekCustomize";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 import {
   categoriesPresentInPlan,
   planDaySubtitle,
@@ -127,6 +128,18 @@ export default function WeeklyPage() {
         <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-foreground">
           {weekError}
         </p>
+      )}
+
+      {mode === "guest" && !weekLoading && (
+        <p className="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-muted leading-relaxed">
+          <span className="font-medium text-foreground">Guest mode: </span>
+          This week is generated for this device only and won&apos;t sync. Sign in
+          to save a custom week and customize individual days.
+        </p>
+      )}
+
+      {mode === "guest" && !weekLoading && (
+        <AccountFeatureGate feature="customWeek" />
       )}
 
       {/* Week strip */}

@@ -13,6 +13,7 @@ import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   isPresetTimerSeconds,
@@ -72,24 +73,7 @@ export default function LibraryPage() {
       </div>
 
       {authMode === "guest" && (
-        <div className="rounded-xl border border-border bg-surface px-4 py-3 text-sm text-muted leading-relaxed">
-          <span className="text-foreground font-medium">Guest mode: </span>
-          Prescribed workouts use the default plan.{" "}
-          <Link
-            href="/signup"
-            className="font-medium text-accent hover:underline"
-          >
-            Create an account
-          </Link>{" "}
-          or{" "}
-          <Link
-            href="/login"
-            className="font-medium text-accent hover:underline"
-          >
-            log in
-          </Link>{" "}
-          to save favorites and dislikes and get a personalized weekly plan.
-        </div>
+        <AccountFeatureGate feature="libraryPreferences" />
       )}
 
       <label className="flex items-start gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 cursor-pointer">

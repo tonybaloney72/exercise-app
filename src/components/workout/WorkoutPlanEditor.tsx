@@ -11,6 +11,7 @@ import DayPlanCardioEditor from "@/components/workout/DayPlanCardioEditor";
 import RoundExerciseSortableList from "@/components/workout/RoundExerciseSortableList";
 import StretchPlanSection from "@/components/workout/StretchPlanSection";
 import WorkoutDayTemplateToolbar from "@/components/workout/WorkoutDayTemplateToolbar";
+import StretchPickModal from "@/components/workout/StretchPickModal";
 import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
 import { exerciseMap } from "@/data/exercises";
@@ -107,6 +108,7 @@ export default function WorkoutPlanEditor({
         usedExerciseIds: used,
         availableEquipment,
         dislikedExerciseIds: dislikedIds,
+        exercisePreferences: prefs,
       });
     }
 
@@ -575,8 +577,24 @@ export default function WorkoutPlanEditor({
         }}
       />
 
+      <StretchPickModal
+        open={pickTarget?.kind === "stretch"}
+        title={
+          pickTarget?.kind === "stretch"
+            ? stretchCategory(pickTarget.section) === "SW"
+              ? "Choose warm-up stretch"
+              : "Choose cool-down stretch"
+            : "Choose stretch"
+        }
+        plannedName={plannedNameForModal}
+        candidates={pickCandidates}
+        hasSwap={pickTarget?.kind === "stretch" && pickTarget.index != null}
+        onClose={() => setPickTarget(null)}
+        onPick={applyPick}
+      />
+
       <SwapExerciseModal
-        open={pickTarget !== null}
+        open={pickTarget != null && pickTarget.kind !== "stretch"}
         plannedName={plannedNameForModal}
         candidates={pickCandidates}
         laterRoundByExerciseId={laterRoundByExerciseIdForSwap}

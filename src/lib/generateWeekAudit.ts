@@ -1,7 +1,7 @@
 import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import { exerciseMap } from "@/data/exercises";
-import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
+import { resolveStretchesForWeekSequential } from "@/lib/dayStretchPlan";
 import { isEnduranceBlockExerciseId } from "@/lib/enduranceBlockExercises";
 import { materializeTrainingWeek } from "@/lib/planGenerator";
 import { buildStretchResolveContextFromInputs } from "@/lib/stretchResolveContext";
@@ -104,13 +104,13 @@ function repeatsWithinDay(
 
 function auditDay(
   plan: DayPlan,
-  stretchCtx: ReturnType<typeof buildStretchResolveContextFromInputs>,
+  stretches: { warmUp: StretchEntry[]; coolDown: StretchEntry[] },
 ): DayAuditRow {
   const dayName = DAY_NAMES[plan.dayOfWeek] ?? `Day ${plan.dayOfWeek}`;
   const roundExerciseIds = plan.rounds.flatMap((r) =>
     r.exercises.map((e) => e.exerciseId),
   );
-  const { warmUp, coolDown } = resolveStretchesForDay(plan, stretchCtx);
+  const { warmUp, coolDown } = stretches;
   const warmUpIds = warmUp.map((e) => e.exerciseId);
   const coolDownIds = coolDown.map((e) => e.exerciseId);
 
@@ -159,14 +159,18 @@ export function buildWeekAuditReport(options: WeekAuditOptions = {}): WeekAuditR
     weekRotationKey,
   });
 
+  const weekPlans = Array.from({ length: 7 }, (_, d) => week[d] ?? null);
+  const stretchesByDay = resolveStretchesForWeekSequential(weekPlans, stretchCtx);
+
   const days: DayAuditRow[] = [];
   const stretchFlat: { dayName: string; id: string }[] = [];
   const strengthFlat: { dayName: string; id: string }[] = [];
 
   for (let d = 0; d < 7; d++) {
     const plan = week[d];
-    if (!plan) continue;
-    const row = auditDay(plan, stretchCtx);
+    const stretches = stretchesByDay[d];
+    if (!plan || !stretches) continue;
+    const row = auditDay(plan, stretches);
     days.push(row);
     for (const id of row.warmUpIds) {
       stretchFlat.push({ dayName: row.dayName, id });

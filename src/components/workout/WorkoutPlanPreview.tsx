@@ -8,11 +8,14 @@ import { exerciseMap } from "@/data/exercises";
 import { CATEGORIES } from "@/data/categories";
 import { useResolvedStretches } from "@/hooks/useResolvedStretches";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan } from "@/types";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 
 interface WorkoutPlanPreviewProps {
   plan: DayPlan;
+  /** When set, stretch lists use week-aware variety (same as workout start). */
+  weekByDow?: TrainingWeekDays | null;
   /** e.g. "Scheduled for Thursday, May 15" or "Today’s prescribed plan" */
   bannerTitle: string;
   /** Secondary line under banner */
@@ -25,13 +28,14 @@ interface WorkoutPlanPreviewProps {
 
 export default function WorkoutPlanPreview({
   plan,
+  weekByDow,
   bannerTitle,
   bannerHint,
   isFutureDay,
   showTargetMuscleList,
 }: WorkoutPlanPreviewProps) {
   const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
-  const { warmUp, coolDown } = useResolvedStretches(plan);
+  const { warmUp, coolDown } = useResolvedStretches(plan, weekByDow);
   const exerciseSettings = useExerciseSettingsStore((s) => s.byExerciseId);
 
   const roundTargetLabel = (exerciseId: string, fallback: string) => {

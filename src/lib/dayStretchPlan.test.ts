@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
-import { pickStretchEntries, resolveStretchesForDay } from "@/lib/dayStretchPlan";
+import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+import { materializeTrainingWeek } from "@/lib/planGenerator";
+import {
+  pickStretchEntries,
+  resolveStretchesForDay,
+  resolveStretchesForWeekSequential,
+} from "@/lib/dayStretchPlan";
 import {
   COOL_DOWN_CATALOG_POOLS,
   WARM_SESSION_CATALOG_POOLS,
@@ -151,6 +157,30 @@ describe("resolveStretchesForDay", () => {
       (e) => e.exerciseId,
     );
     expect(monday.sort()).not.toEqual(tuesday.sort());
+  });
+
+  it("limits stretch repeats across the week when resolved sequentially", () => {
+    const week = materializeTrainingWeek(
+      buildCatalogWeek(),
+      {},
+      [...DEFAULT_AVAILABLE_EQUIPMENT],
+      "balanced",
+      "standard",
+      undefined,
+      "audit-variety-week",
+    );
+    const weekPlans = Array.from({ length: 7 }, (_, d) => week[d] ?? null);
+    const ctx = ctxFor({}, "balanced", "2026-05-18");
+    const perDay = resolveStretchesForWeekSequential(weekPlans, ctx);
+    const counts = new Map<string, number>();
+    for (const day of perDay) {
+      if (!day) continue;
+      for (const e of [...day.warmUp, ...day.coolDown]) {
+        counts.set(e.exerciseId, (counts.get(e.exerciseId) ?? 0) + 1);
+      }
+    }
+    const maxRepeat = Math.max(0, ...counts.values());
+    expect(maxRepeat).toBeLessThanOrEqual(5);
   });
 
   it("rotates catalog picks across weeks for the same day", () => {

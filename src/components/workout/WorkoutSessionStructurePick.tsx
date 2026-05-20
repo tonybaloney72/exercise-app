@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import CategoryPickModal from "@/components/workout/CategoryPickModal";
+import StretchPickModal from "@/components/workout/StretchPickModal";
 import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
 import { exerciseMap } from "@/data/exercises";
@@ -57,6 +58,7 @@ export default function WorkoutSessionStructurePick({
         usedExerciseIds: used,
         availableEquipment,
         dislikedExerciseIds: dislikedIds,
+        exercisePreferences: prefs,
       });
     }
     if (pickTarget.kind === "addCoolDown") {
@@ -68,6 +70,7 @@ export default function WorkoutSessionStructurePick({
         usedExerciseIds: used,
         availableEquipment,
         dislikedExerciseIds: dislikedIds,
+        exercisePreferences: prefs,
       });
     }
     const round = activeWorkout.rounds.find(
@@ -109,8 +112,18 @@ export default function WorkoutSessionStructurePick({
           onCategoryPicked(categoryPickRound, category);
         }}
       />
+      <StretchPickModal
+        open={
+          pickTarget?.kind === "addWarmUp" || pickTarget?.kind === "addCoolDown"
+        }
+        title={modalTitle}
+        candidates={candidates}
+        onClose={onClosePick}
+        onPick={onExercisePicked}
+      />
+
       <SwapExerciseModal
-        open={pickTarget != null}
+        open={pickTarget?.kind === "addStrength"}
         plannedName={plannedName}
         candidates={candidates}
         laterRoundByExerciseId={new Map()}

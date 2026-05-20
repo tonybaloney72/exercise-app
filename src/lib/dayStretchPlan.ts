@@ -17,6 +17,29 @@ import {
 import { shouldSkipStretchesForPlan } from "@/lib/restDays";
 import type { DayPlan, ExerciseCategory, StretchEntry } from "@/types";
 
+export type ResolvedDayStretches = {
+  warmUp: StretchEntry[];
+  coolDown: StretchEntry[];
+};
+
+function mergeExcludeIds(
+  ...sets: (ReadonlySet<string> | undefined)[]
+): ReadonlySet<string> {
+  const merged = new Set<string>();
+  for (const s of sets) {
+    if (!s) continue;
+    for (const id of s) merged.add(id);
+  }
+  return merged;
+}
+
+function recordStretchUsage(
+  weekUsed: Set<string>,
+  entries: readonly StretchEntry[],
+): void {
+  for (const e of entries) weekUsed.add(e.exerciseId);
+}
+
 export {
   CATALOG_DEFAULT_COOL_DOWN,
   CATALOG_DEFAULT_WARM_UP,
@@ -43,6 +66,9 @@ export function pickStretchEntries(
 
   const take = Math.min(count, available.length);
   const ranked = [...available].sort((a, b) => {
+    const aExcluded = excludeExerciseIds.has(a.exerciseId) ? 1 : 0;
+    const bExcluded = excludeExerciseIds.has(b.exerciseId) ? 1 : 0;
+    if (aExcluded !== bExcluded) return aExcluded - bExcluded;
     const bySeed = seededCandidateRank(seed, a.exerciseId).localeCompare(
       seededCandidateRank(seed, b.exerciseId),
     );
@@ -117,6 +143,7 @@ function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[]
       quota,
       `${ctx.weekRotationKey}-${daySeed}-warm-${id}`,
       ctx,
+      mergeExcludeIds(ctx.weekUsedStretchIds),
     );
   }
 
@@ -150,11 +177,41 @@ function deriveCoolDown(
       quota,
       `${ctx.weekRotationKey}-${daySeed}-cool-${id}`,
       ctx,
-      warmExerciseIds,
+      mergeExcludeIds(ctx.weekUsedStretchIds, warmExerciseIds),
     );
   }
 
   return dedupeStretchEntries(coolParts);
+}
+
+/**
+ * Resolve warm-up / cool-down for Sun–Sat in order so catalog picks avoid repeats
+ * across the week when possible.
+ */
+export function resolveStretchesForWeekSequential(
+  weekPlans: readonly (DayPlan | null | undefined)[],
+  ctx: StretchResolveContext,
+): (ResolvedDayStretches | null)[] {
+  const weekUsed = new Set<string>();
+  const out: (ResolvedDayStretches | null)[] = [];
+
+  for (let d = 0; d < 7; d++) {
+    const plan = weekPlans[d];
+    if (!plan) {
+      out.push(null);
+      continue;
+    }
+    const dayCtx: StretchResolveContext = {
+      ...ctx,
+      weekUsedStretchIds: weekUsed,
+    };
+    const result = resolveStretchesForDay(plan, dayCtx);
+    recordStretchUsage(weekUsed, result.warmUp);
+    recordStretchUsage(weekUsed, result.coolDown);
+    out.push(result);
+  }
+
+  return out;
 }
 
 function warmIdsFromEntries(entries: StretchEntry[]): ReadonlySet<string> {

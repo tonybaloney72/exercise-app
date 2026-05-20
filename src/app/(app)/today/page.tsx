@@ -34,6 +34,7 @@ import { toastSaveError } from "@/utils/saveErrorToast";
 import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
+import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 
 function TodayPageInner() {
   const searchParams = useSearchParams();
@@ -95,12 +96,15 @@ function TodayPageInner() {
     pausedWorkoutDate === todayKey;
 
   const canCustomize = mode === "authenticated" && !!plan;
-  const canEditPlan =
-    canCustomize &&
+  const showCustomizeSlot =
+    !!plan &&
     !activeWorkout &&
     !devForcePreWorkout &&
     !todaysCompletedLog &&
     pausedWorkoutDate !== todayKey;
+  const canEditPlan = canCustomize && showCustomizeSlot;
+  const showGuestCustomizeGate =
+    mode === "guest" && showCustomizeSlot && !customizing;
 
   useEffect(() => {
     if (!canCustomize) {
@@ -249,6 +253,13 @@ function TodayPageInner() {
         >
           Customize this workout
         </button>
+      )}
+
+      {showGuestCustomizeGate && (
+        <AccountFeatureGate
+          feature="customizeDay"
+          title="Customize this workout"
+        />
       )}
 
       {saveError && (
