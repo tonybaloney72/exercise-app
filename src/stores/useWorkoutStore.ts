@@ -7,6 +7,7 @@ import type {
   RoundLog,
   ExerciseLog,
   DayPlan,
+  CardioActivityKind,
   ExerciseCategory,
   ExerciseSetMode,
   StretchEntry,
@@ -64,6 +65,14 @@ import {
   getPausedWorkoutDateFromHistory,
   shouldAutoRestoreInProgressFromHistory,
 } from "@/utils/workoutLogLookup";
+import {
+  addCardioKind,
+  addRoundAt,
+  removeCardioAt,
+  removeCoolDownStretchAt,
+  removeRoundExerciseAt,
+  removeWarmUpStretchAt,
+} from "@/lib/workoutLogStructure";
 
 function draftScope(): DraftAuthScope {
   const auth = useAuthStore.getState();
@@ -224,6 +233,15 @@ interface WorkoutState {
   startEditingCompletedWorkout: (workoutId: string) => boolean;
   saveEditedWorkout: () => Promise<WorkoutLog | null>;
   cancelEditingWorkout: () => void;
+  addRoundToWorkout: () => void;
+  removeRoundExercise: (roundNumber: number, slotIndex: number) => void;
+  addRoundExercise: (roundNumber: number, exerciseId: string) => void;
+  removeWarmUpStretchFromWorkout: (exerciseId: string) => void;
+  addWarmUpStretchToWorkout: (exerciseId: string) => void;
+  removeCoolDownStretchFromWorkout: (exerciseId: string) => void;
+  addCoolDownStretchToWorkout: (exerciseId: string) => void;
+  removeCardioFromWorkout: (exerciseId: string) => void;
+  addCardioToWorkout: (kind: CardioActivityKind) => void;
 
   loadHistory: () => Promise<void>;
   /** Re-apply Library timer defaults to warm-up / cool-down on an active workout. */
@@ -661,6 +679,146 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     if (!pick) return;
     get().swapRoundExercise(roundNumber, slotIndex, pick.id, category);
   },
+
+  addRoundToWorkout: () =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog(addRoundAt(state.activeWorkout)),
+      };
+    }),
+
+  removeRoundExercise: (roundNumber, slotIndex) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog(
+          removeRoundExerciseAt(state.activeWorkout, roundNumber, slotIndex),
+        ),
+      };
+    }),
+
+  addRoundExercise: (roundNumber, exerciseId) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const byId = useExerciseSettingsStore.getState().byExerciseId;
+      const meta = exerciseMap[exerciseId];
+      if (!meta) return state;
+      const resolved = resolveExerciseSettings(meta, byId[exerciseId]);
+      const targetPrescription = formatPlanTargetPrescription(meta, byId[exerciseId]);
+      const loggingMode = resolved.defaultSetMode;
+      const targetDurationSeconds = seedTimerTargetSecondsFromResolved(resolved);
+      const rounds = state.activeWorkout.rounds.map((r) => {
+        if (r.roundNumber !== roundNumber) return r;
+        if (r.exercises.some((e) => e.exerciseId === exerciseId && !e.swappedWith)) {
+          return r;
+        }
+        return {
+          ...r,
+          exercises: [
+            ...r.exercises,
+            {
+              exerciseId,
+              completed: false,
+              skipped: false,
+              targetPrescription,
+              loggingMode,
+              targetDurationSeconds,
+            },
+          ],
+        };
+      });
+      return {
+        activeWorkout: hydrateWorkoutLog({
+          ...state.activeWorkout,
+          rounds,
+        }),
+      };
+    }),
+
+  removeWarmUpStretchFromWorkout: (exerciseId) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog(
+          removeWarmUpStretchAt(state.activeWorkout, exerciseId),
+        ),
+      };
+    }),
+
+  addWarmUpStretchToWorkout: (exerciseId) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const entry: StretchEntry = {
+        exerciseId,
+        targetReps: exerciseMap[exerciseId]?.defaultReps ?? "",
+      };
+      const log = buildStretchExerciseLog(entry);
+      if (state.activeWorkout.warmUpExercises.some((e) => e.exerciseId === exerciseId)) {
+        return state;
+      }
+      const warmUpExercises = [...state.activeWorkout.warmUpExercises, log];
+      return {
+        activeWorkout: hydrateWorkoutLog({
+          ...state.activeWorkout,
+          warmUpExercises,
+          warmUpCompleted: warmUpExercises.every(
+            (e) => e.completed || e.skipped,
+          ),
+        }),
+      };
+    }),
+
+  removeCoolDownStretchFromWorkout: (exerciseId) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog(
+          removeCoolDownStretchAt(state.activeWorkout, exerciseId),
+        ),
+      };
+    }),
+
+  addCoolDownStretchToWorkout: (exerciseId) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const entry: StretchEntry = {
+        exerciseId,
+        targetReps: exerciseMap[exerciseId]?.defaultReps ?? "",
+      };
+      const log = buildStretchExerciseLog(entry);
+      if (state.activeWorkout.coolDownExercises.some((e) => e.exerciseId === exerciseId)) {
+        return state;
+      }
+      const coolDownExercises = [...state.activeWorkout.coolDownExercises, log];
+      return {
+        activeWorkout: hydrateWorkoutLog({
+          ...state.activeWorkout,
+          coolDownExercises,
+          coolDownCompleted: coolDownExercises.every(
+            (e) => e.completed || e.skipped,
+          ),
+        }),
+      };
+    }),
+
+  removeCardioFromWorkout: (exerciseId) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog(
+          removeCardioAt(state.activeWorkout, exerciseId),
+        ),
+      };
+    }),
+
+  addCardioToWorkout: (kind) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog(addCardioKind(state.activeWorkout, kind)),
+      };
+    }),
 
   skipExercise: (roundNumber, exerciseId) =>
     set((state) => {

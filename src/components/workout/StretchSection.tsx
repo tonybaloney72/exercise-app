@@ -28,6 +28,8 @@ interface StretchSectionProps {
     exerciseId: string,
     seconds: number | undefined,
   ) => void;
+  onAddStretch?: () => void;
+  onRemoveStretch?: (exerciseId: string) => void;
 }
 
 export default function StretchSection({
@@ -39,6 +41,8 @@ export default function StretchSection({
   onUnskip,
   onSetTargetDuration,
   onSetActualDuration,
+  onAddStretch,
+  onRemoveStretch,
 }: StretchSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -68,6 +72,18 @@ export default function StretchSection({
           )}
         </motion.div>
         <div className="flex items-center gap-2">
+          {onAddStretch ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddStretch();
+              }}
+              className="rounded-md border border-border px-2 py-0.5 text-[10px] font-medium text-foreground hover:bg-surface-hover"
+            >
+              + Add
+            </button>
+          ) : null}
           <span className="text-xs text-muted">
             {completedCount}/{total}
           </span>
@@ -134,6 +150,11 @@ export default function StretchSection({
                     onSetActualDuration={(sec) =>
                       onSetActualDuration(stretch.exerciseId, sec)
                     }
+                    onRemoveFromWorkout={
+                      onRemoveStretch
+                        ? () => onRemoveStretch(stretch.exerciseId)
+                        : undefined
+                    }
                   />
                 );
               })}
@@ -154,6 +175,7 @@ interface StretchRowProps {
   onUnskip: () => void;
   onSetTargetDuration: (seconds: number) => void;
   onSetActualDuration: (seconds: number | undefined) => void;
+  onRemoveFromWorkout?: () => void;
 }
 
 function StretchRow({
@@ -165,6 +187,7 @@ function StretchRow({
   onUnskip,
   onSetTargetDuration,
   onSetActualDuration,
+  onRemoveFromWorkout,
 }: StretchRowProps) {
   const [expanded, setExpanded] = useState(false);
   const exercise = exerciseMap[exerciseId];
@@ -210,6 +233,12 @@ function StretchRow({
   }
   if (log.skipped) {
     overflowItems.push({ label: "Undo skip", onClick: onUnskip });
+  }
+  if (onRemoveFromWorkout) {
+    overflowItems.push({
+      label: "Remove from workout",
+      onClick: onRemoveFromWorkout,
+    });
   }
 
   const showTimerPill =

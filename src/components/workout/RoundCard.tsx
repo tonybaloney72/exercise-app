@@ -13,12 +13,16 @@ interface RoundCardProps {
   roundLog: RoundLog;
   /** No rest countdown when editing a finished workout. */
   disableRestTimer?: boolean;
+  onAddExercise?: () => void;
+  onRemoveExercise?: (slotIndex: number) => void;
 }
 
 export default function RoundCard({
   round,
   roundLog,
   disableRestTimer = false,
+  onAddExercise,
+  onRemoveExercise,
 }: RoundCardProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [showRestPrompt, setShowRestPrompt] = useState(false);
@@ -79,6 +83,18 @@ export default function RoundCard({
           )}
         </div>
         <div className="flex items-center gap-2">
+          {onAddExercise ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddExercise();
+              }}
+              className="rounded-md border border-border px-2 py-0.5 text-[10px] font-medium text-foreground hover:bg-surface-hover"
+            >
+              + Add
+            </button>
+          ) : null}
           <span className="text-xs text-muted">
             {completedCount}/{total}
           </span>
@@ -142,11 +158,16 @@ export default function RoundCard({
                 if (!log) return null;
                 return (
                   <ExerciseRow
-                    key={`${round.roundNumber}-${ex.exerciseId}`}
+                    key={`${round.roundNumber}-${ex.exerciseId}-${i}`}
                     roundExercise={ex}
                     log={log}
                     roundNumber={round.roundNumber}
                     slotIndex={i}
+                    onRemoveFromWorkout={
+                      onRemoveExercise
+                        ? () => onRemoveExercise(i)
+                        : undefined
+                    }
                   />
                 );
               })}

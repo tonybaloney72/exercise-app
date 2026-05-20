@@ -32,6 +32,7 @@ interface ExerciseRowProps {
   log: ExerciseLog;
   roundNumber: number;
   slotIndex: number;
+  onRemoveFromWorkout?: () => void;
 }
 
 export default function ExerciseRow({
@@ -39,6 +40,7 @@ export default function ExerciseRow({
   log,
   roundNumber,
   slotIndex,
+  onRemoveFromWorkout,
 }: ExerciseRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
@@ -202,6 +204,12 @@ export default function ExerciseRow({
     overflowItems.push({
       label: "Undo skip",
       onClick: () => unskipExercise(roundNumber, plannedId),
+    });
+  }
+  if (onRemoveFromWorkout) {
+    overflowItems.push({
+      label: "Remove from workout",
+      onClick: onRemoveFromWorkout,
     });
   }
 
