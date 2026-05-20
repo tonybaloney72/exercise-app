@@ -18,7 +18,7 @@ import {
 import { useAuthStore, type AuthMode } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { getWeekDateKeys } from "@/utils/weekCalendar";
+import { getWeekDateKeys, weekKeyFromDateKey } from "@/utils/weekCalendar";
 import type { TrainingPriorityScores } from "@/lib/trainingPriorities";
 import type { DayPlan, StretchEntry, TrainingPriorityPreset } from "@/types";
 
@@ -104,15 +104,28 @@ export function resolveStretchesForPlan(
   return resolveStretchesForDay(plan, ctx);
 }
 
-/** Week-aware resolve for workout start (loads current week when possible). */
+/** Week-aware resolve for workout start (loads week containing `weekAnchorDateKey` when set). */
 export async function resolveStretchesForWorkoutStart(
   plan: DayPlan,
+  weekAnchorDateKey?: string,
 ): Promise<ResolvedDayStretches> {
-  const ctx = buildStretchResolveContext();
+  const anchor =
+    (weekAnchorDateKey ? weekKeyFromDateKey(weekAnchorDateKey) : null) ??
+    getWeekDateKeys()[0]!;
+  const ctx = buildStretchResolveContextFromInputs({
+    defaultWarmUp: useSettingsStore.getState().defaultWarmUp,
+    defaultCoolDown: useSettingsStore.getState().defaultCoolDown,
+    authMode: useAuthStore.getState().mode,
+    exercisePreferences: useExercisePreferencesStore.getState().byExerciseId,
+    trainingPriorityPreset: useSettingsStore.getState().trainingPriorityPreset,
+    trainingPriorityScores: resolveTrainingPriorityScores(useSettingsStore.getState()),
+    trainingPriorityCustomized:
+      useSettingsStore.getState().trainingPriorityCustomized,
+    weekRotationKey: anchor,
+  });
   const mode = useAuthStore.getState().mode;
   if (mode === "loading") return resolveStretchesForDay(plan, ctx);
   try {
-    const anchor = getWeekDateKeys()[0]!;
     const week = await resolveTrainingWeekForAuth(anchor, mode);
     if (week) return stretchesForPlanInWeek(plan, week, ctx);
   } catch {

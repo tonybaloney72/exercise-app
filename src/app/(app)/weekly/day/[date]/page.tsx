@@ -30,7 +30,11 @@ import {
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
-import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
+import { getBackfillEligibility } from "@/lib/backfillWorkout";
+import {
+  findCompletedWorkoutForDate,
+  findInProgressWorkoutForDate,
+} from "@/utils/workoutLogLookup";
 import { toastSaveError } from "@/utils/saveErrorToast";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
@@ -171,6 +175,21 @@ export default function WeeklyDayPage() {
 
   const logForDay = useMemo(
     () => findCompletedWorkoutForDate(workoutHistory, dateKey),
+    [workoutHistory, dateKey],
+  );
+
+  const backfillLogHref = `/progress/history/${dateKey}/log`;
+  const backfillEligibility = useMemo(
+    () =>
+      getBackfillEligibility({
+        dateKey,
+        workoutHistory,
+        activeWorkout,
+      }),
+    [dateKey, workoutHistory, activeWorkout],
+  );
+  const inProgressLog = useMemo(
+    () => findInProgressWorkoutForDate(workoutHistory, dateKey),
     [workoutHistory, dateKey],
   );
 
@@ -398,10 +417,27 @@ export default function WeeklyDayPage() {
       {when !== "future" && !logForDay && (
         <>
           {when === "past" ? (
-            <SurfaceCard className="px-4 py-3">
+            <SurfaceCard className="px-4 py-3 text-center space-y-3">
               <p className="text-sm text-muted">
                 No workout was logged on this day.
               </p>
+              {inProgressLog || activeWorkout?.date === dateKey ? (
+                <Link
+                  href={backfillLogHref}
+                  className="inline-block rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-white hover:bg-accent/90"
+                >
+                  Continue logging
+                </Link>
+              ) : backfillEligibility.ok ? (
+                <Link
+                  href={backfillLogHref}
+                  className="inline-block rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-white hover:bg-accent/90"
+                >
+                  Log workout for this day
+                </Link>
+              ) : (
+                <p className="text-xs text-muted">{backfillEligibility.reason}</p>
+              )}
             </SurfaceCard>
           ) : continueWorkoutHere ? (
             <SurfaceCard className="border-accent/30 bg-accent/10 px-4 py-3">

@@ -22,8 +22,14 @@ import {
   CARDIO_ACTIVITY_LABELS,
   CARDIO_ACTIVITY_EMOJI,
 } from "@/lib/cardioActivities";
+import Link from "next/link";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard, { surfaceCardClassName } from "@/components/common/SurfaceCard";
+import { ProgressHistoryLink } from "@/components/progress/ProgressSubnavLink";
+import {
+  formatWorkoutHistoryDayLabel,
+  workoutHistoryRowMeta,
+} from "@/lib/workoutHistoryGroups";
 import { weekToDatePlanAdherence } from "@/utils/progressStats";
 import { filterCompletedWorkouts } from "@/utils/workoutLogLookup";
 
@@ -150,42 +156,56 @@ export default function ProgressPage() {
         ))}
       </div>
 
+      {completedHistory.length > 0 && <ProgressHistoryLink />}
+
       <ProgressChartsSection history={completedHistory} />
 
       <ExerciseProgressChart history={completedHistory} />
 
       <CardioProgressSection history={completedHistory} />
 
-      {/* Recent workouts */}
       {completedHistory.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">Recent Workouts</h2>
-          {completedHistory.slice(0, 5).map((log) => {
-            const exercisesDone = log.rounds.reduce(
-              (a, r) => a + r.exercises.filter((e) => e.completed).length,
-              0
-            );
-            const exercisesTotal = log.rounds.reduce(
-              (a, r) => a + r.exercises.length,
-              0
-            );
-            const cardioLine = formatCardioRecentLine(log);
-            return (
-              <div
-                key={log.id}
-                className="rounded-lg border border-border bg-surface px-4 py-3 flex items-center justify-between"
-              >
-                <div>
-                  <p className="text-sm font-medium text-foreground">{log.date}</p>
-                  <p className="text-xs text-muted">
-                    {exercisesDone}/{exercisesTotal} exercises
-                    {cardioLine ? ` · ${cardioLine}` : ""}
-                  </p>
-                </div>
-                <span className="text-xs text-green-400 font-medium">✓ Done</span>
-              </div>
-            );
-          })}
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-foreground">Recent</h2>
+            <Link
+              href="/progress/history"
+              className="text-xs font-medium text-accent hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+          <ul className="space-y-2">
+            {[...completedHistory]
+              .sort((a, b) => b.date.localeCompare(a.date))
+              .slice(0, 5)
+              .map((log) => {
+                const meta = workoutHistoryRowMeta(log);
+                const cardioLine = formatCardioRecentLine(log);
+                return (
+                  <li key={log.id}>
+                    <Link
+                      href={`/progress/history/${log.date}`}
+                      className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-accent/40 hover:bg-surface-hover"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground">
+                          {formatWorkoutHistoryDayLabel(log.date)}
+                        </p>
+                        <p className="text-xs text-muted truncate">
+                          {meta.exercisesDone}/{meta.exercisesTotal} exercises
+                          {meta.durationLabel ? ` · ${meta.durationLabel}` : ""}
+                          {cardioLine ? ` · ${cardioLine}` : ""}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-xs font-medium text-green-400">
+                        Done
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+          </ul>
         </div>
       )}
 

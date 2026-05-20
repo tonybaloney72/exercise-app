@@ -26,6 +26,19 @@ export function stretchEntriesFromLogs(logs: ExerciseLog[]): StretchEntry[] {
 }
 
 /** Plan shape for `WorkoutSession` when editing a finished log (slots match stored logs). */
+/** Minimal prescribed plan reconstructed from a saved log (history / edit). */
+export function planFromWorkoutLog(log: WorkoutLog): DayPlan {
+  const template: DayPlan = {
+    dayOfWeek: log.dayOfWeek,
+    name: "Workout",
+    strengthFocus: [],
+    coreGroups: [],
+    hasJog: false,
+    rounds: [],
+  };
+  return sessionPlanForWorkoutEdit(log, template);
+}
+
 export function sessionPlanForWorkoutEdit(
   log: WorkoutLog,
   template: DayPlan,

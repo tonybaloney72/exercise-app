@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import CardioSection from "./CardioSection";
 import RoundCard from "./RoundCard";
@@ -19,13 +19,23 @@ import {
   sessionPlanForWorkoutEdit,
 } from "@/lib/workoutEditSession";
 import { toast } from "sonner";
-import type { DayPlan } from "@/types";
+import type { DayPlan, WorkoutLog } from "@/types";
 
 interface WorkoutSessionProps {
   plan: DayPlan;
+  /** Hide "Save for later" (e.g. retroactive log on a past day). */
+  hideSaveForLater?: boolean;
+  /** Optional banner above progress (e.g. backfill context). */
+  sessionBanner?: ReactNode;
+  onAfterComplete?: (log: WorkoutLog) => void;
 }
 
-export default function WorkoutSession({ plan }: WorkoutSessionProps) {
+export default function WorkoutSession({
+  plan,
+  hideSaveForLater = false,
+  sessionBanner,
+  onAfterComplete,
+}: WorkoutSessionProps) {
   const {
     activeWorkout,
     toggleCardio,
@@ -122,6 +132,7 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
       description: "Nice work — your session is saved.",
       duration: 4000,
     });
+    onAfterComplete?.(log);
   };
 
   const handleExercisePicked = (exerciseId: string) => {
@@ -150,6 +161,8 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
         }}
         onExercisePicked={handleExercisePicked}
       />
+
+      {sessionBanner}
 
       {isEditing && (
         <div className="rounded-xl border border-accent/30 bg-accent/10 px-4 py-3">
@@ -273,7 +286,7 @@ export default function WorkoutSession({ plan }: WorkoutSessionProps) {
         </p>
       </div>
 
-      {!isEditing && (
+      {!isEditing && !hideSaveForLater && (
         <button
           type="button"
           onClick={pauseWorkout}

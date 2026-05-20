@@ -13,6 +13,11 @@ import type {
   StretchEntry,
 } from "@/types";
 import { resolveStretchesForWorkoutStart } from "@/lib/stretchResolveContext";
+import {
+  getBackfillEligibility,
+  localNoonIsoForDateKey,
+} from "@/lib/backfillWorkout";
+import { parseLocalDateKey, weekKeyFromDateKey } from "@/utils/weekCalendar";
 import { getWorkoutRepo } from "@/lib/repos";
 import {
   buildEmptyCardioLogs,
@@ -152,6 +157,8 @@ interface WorkoutState {
   /** Calendar date (`YYYY-MM-DD`) of a paused draft, if any. */
   pausedWorkoutDate: string | null;
   startWorkout: (plan: DayPlan) => void;
+  /** Retroactive log for a past calendar day (`YYYY-MM-DD`). */
+  startWorkoutForDate: (plan: DayPlan, dateKey: string) => boolean;
   toggleJog: () => void;
   skipJog: () => void;
   unskipJog: () => void;
@@ -285,14 +292,14 @@ function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
   }));
 }
 
-export const useWorkoutStore = create<WorkoutState>((set, get) => ({
-  activeWorkout: null,
-  workoutHistory: [],
-  pausedWorkoutDate: null,
-  startWorkout: (plan) => {
-    void (async () => {
-    const now = new Date();
-    const dateKey = formatLocalDateKey(now);
+export const useWorkoutStore = create<WorkoutState>((set, get) => {
+  const beginWorkoutSession = async (
+    plan: DayPlan,
+    dateKey: string,
+    startTimeIso: string,
+    dayOfWeek: number,
+    weekAnchorDateKey?: string,
+  ) => {
     const state = get();
     const existing = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
     if (existing) {
@@ -311,21 +318,26 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       return;
     }
 
-    const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(plan);
+    const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(
+      plan,
+      weekAnchorDateKey,
+    );
     const warmUpExercises: ExerciseLog[] = warmUp.map(buildStretchExerciseLog);
-    const coolDownExercises: ExerciseLog[] = coolDown.map(buildStretchExerciseLog);
+    const coolDownExercises: ExerciseLog[] = coolDown.map(
+      buildStretchExerciseLog,
+    );
     const cardioExercises = buildEmptyCardioLogs(resolveCardioActivities(plan));
     const log: WorkoutLog = {
       id: uuidv4(),
       date: dateKey,
-      dayOfWeek: now.getDay(),
+      dayOfWeek,
       cardioExercises,
       warmUpCompleted: false,
       warmUpExercises,
       coolDownCompleted: false,
       coolDownExercises,
       rounds: buildEmptyRoundLogs(plan),
-      startTime: now.toISOString(),
+      startTime: startTimeIso,
       paused: false,
     };
     const mode = useAuthStore.getState().mode;
@@ -339,7 +351,44 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     if (mode === "authenticated") {
       void flushPersistInProgressWorkout(log, { paused: false });
     }
-    })();
+  };
+
+  return {
+  activeWorkout: null,
+  workoutHistory: [],
+  pausedWorkoutDate: null,
+  startWorkout: (plan) => {
+    const now = new Date();
+    void beginWorkoutSession(
+      plan,
+      formatLocalDateKey(now),
+      now.toISOString(),
+      now.getDay(),
+    );
+  },
+
+  startWorkoutForDate: (plan, dateKey) => {
+    const state = get();
+    const eligibility = getBackfillEligibility({
+      dateKey,
+      workoutHistory: state.workoutHistory,
+      activeWorkout: state.activeWorkout,
+    });
+    if (!eligibility.ok) return false;
+
+    const parsed = parseLocalDateKey(dateKey);
+    const startIso = localNoonIsoForDateKey(dateKey);
+    if (!parsed || !startIso) return false;
+
+    const weekAnchor = weekKeyFromDateKey(dateKey);
+    void beginWorkoutSession(
+      plan,
+      dateKey,
+      startIso,
+      parsed.getDay(),
+      weekAnchor ?? undefined,
+    );
+    return true;
   },
 
   toggleJog: () => get().toggleCardio(CARDIO_KIND_TO_EXERCISE_ID.jog),
@@ -1282,7 +1331,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       ...(activeWorkout && !current.activeWorkout ? { activeWorkout } : {}),
     });
   },
-}));
+  };
+});
 
 if (typeof window !== "undefined") {
   useWorkoutStore.subscribe((state, prevState) => {
