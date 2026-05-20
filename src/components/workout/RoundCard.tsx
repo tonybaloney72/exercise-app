@@ -11,9 +11,15 @@ import { formatTimerDisplay } from "@/utils/time";
 interface RoundCardProps {
   round: Round;
   roundLog: RoundLog;
+  /** No rest countdown when editing a finished workout. */
+  disableRestTimer?: boolean;
 }
 
-export default function RoundCard({ round, roundLog }: RoundCardProps) {
+export default function RoundCard({
+  round,
+  roundLog,
+  disableRestTimer = false,
+}: RoundCardProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [showRestPrompt, setShowRestPrompt] = useState(false);
   const restBetweenRounds = useSettingsStore((s) => s.restBetweenRounds);
@@ -30,6 +36,7 @@ export default function RoundCard({ round, roundLog }: RoundCardProps) {
   // so we trigger regardless of whether this is the last round.
   const wasDoneRef = useRef(allDone);
   useEffect(() => {
+    if (disableRestTimer) return;
     if (!allDone) {
       setShowRestPrompt(false);
     } else if (!wasDoneRef.current && allDone) {
@@ -42,7 +49,7 @@ export default function RoundCard({ round, roundLog }: RoundCardProps) {
       }
     }
     wasDoneRef.current = allDone;
-  }, [allDone, restBetweenRounds, restTimerAutoStart]);
+  }, [allDone, restBetweenRounds, restTimerAutoStart, disableRestTimer]);
 
   function handleStartRest() {
     setShowRestPrompt(false);

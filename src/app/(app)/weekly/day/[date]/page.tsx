@@ -7,8 +7,10 @@ import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import FrozenPastDayPlanNotice from "@/components/workout/FrozenPastDayPlanNotice";
+import FloatingTimer from "@/components/common/FloatingTimer";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
+import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
 import {
   categoriesPresentInPlan,
@@ -105,6 +107,7 @@ export default function WeeklyDayPage() {
     loadHistory,
     startWorkout,
     updateCompletedWorkoutNotes,
+    startEditingCompletedWorkout,
     activeWorkout,
     pausedWorkoutDate,
   } = useWorkoutStore();
@@ -160,6 +163,14 @@ export default function WeeklyDayPage() {
     () => findCompletedWorkoutForDate(workoutHistory, dateKey),
     [workoutHistory, dateKey],
   );
+
+  const editingCompletedHere =
+    activeWorkout?.endTime != null && activeWorkout.date === dateKey;
+
+  const handleEditCompletedWorkout = () => {
+    if (!logForDay) return;
+    startEditingCompletedWorkout(logForDay.id);
+  };
 
   const frozenPastCopy = useMemo(() => {
     if (when !== "past" || !plan) return null;
@@ -340,11 +351,19 @@ export default function WeeklyDayPage() {
         />
       )}
 
-      {when !== "future" && logForDay && (
+      {editingCompletedHere && plan && (
+        <>
+          <WorkoutSession plan={plan} />
+          <FloatingTimer />
+        </>
+      )}
+
+      {when !== "future" && logForDay && !editingCompletedHere && (
         <WorkoutDayReview
           plan={plan}
           log={logForDay}
           completedBannerTitle={formatCompletedBannerTitle(dateKey)}
+          onEditWorkout={handleEditCompletedWorkout}
           onNotesChange={(notes) =>
             updateCompletedWorkoutNotes(logForDay.id, notes)
           }

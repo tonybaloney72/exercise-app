@@ -13,12 +13,14 @@ interface PostWorkoutSummaryProps {
   plan: DayPlan;
   log: WorkoutLog;
   onMoreDetails: () => void;
+  onEditWorkout?: () => void;
 }
 
 export default function PostWorkoutSummary({
   plan,
   log,
   onMoreDetails,
+  onEditWorkout,
 }: PostWorkoutSummaryProps) {
   const summary = useMemo(() => summarizeWorkoutLog(log, plan), [log, plan]);
 
@@ -111,13 +113,26 @@ export default function PostWorkoutSummary({
         ))}
       </SurfaceCard>
 
-      <button
-        type="button"
-        onClick={onMoreDetails}
-        className="w-full rounded-xl border border-border bg-surface py-3.5 text-sm font-semibold text-foreground transition-colors hover:border-accent/40 hover:bg-surface-hover"
-      >
-        More details
-      </button>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        {onEditWorkout ? (
+          <button
+            type="button"
+            onClick={onEditWorkout}
+            className="flex-1 rounded-xl bg-accent py-3.5 text-sm font-semibold text-white shadow-md shadow-accent/20 transition-colors hover:bg-accent/90"
+          >
+            Edit workout
+          </button>
+        ) : null}
+        <button
+          type="button"
+          onClick={onMoreDetails}
+          className={`rounded-xl border border-border bg-surface py-3.5 text-sm font-semibold text-foreground transition-colors hover:border-accent/40 hover:bg-surface-hover ${
+            onEditWorkout ? "flex-1" : "w-full"
+          }`}
+        >
+          More details
+        </button>
+      </div>
     </AnimatedSection>
   );
 }

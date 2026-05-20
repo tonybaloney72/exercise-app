@@ -46,6 +46,7 @@ function TodayPageInner() {
     discardWorkout,
     loadHistory,
     updateCompletedWorkoutNotes,
+    startEditingCompletedWorkout,
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
   const trainingPriorityPreset = useSettingsStore(
@@ -80,6 +81,14 @@ function TodayPageInner() {
   );
 
   const completedLogForUi = devForcePreWorkout ? null : todaysCompletedLog;
+  const editingCompletedToday =
+    activeWorkout?.endTime != null && activeWorkout.date === todayKey;
+
+  const handleEditCompletedWorkout = () => {
+    if (!completedLogForUi) return;
+    setShowWorkoutDetails(false);
+    startEditingCompletedWorkout(completedLogForUi.id);
+  };
   const hasPausedDraftToday =
     !activeWorkout &&
     !completedLogForUi &&
@@ -268,15 +277,16 @@ function TodayPageInner() {
       {activeWorkout && <FloatingTimer />}
 
       {/* Completed today — summary first, full log on demand */}
-      {!activeWorkout && completedLogForUi && !showWorkoutDetails && (
+      {!editingCompletedToday && completedLogForUi && !showWorkoutDetails && (
         <PostWorkoutSummary
           plan={plan}
           log={completedLogForUi}
           onMoreDetails={() => setShowWorkoutDetails(true)}
+          onEditWorkout={handleEditCompletedWorkout}
         />
       )}
 
-      {!activeWorkout && completedLogForUi && showWorkoutDetails && (
+      {!editingCompletedToday && completedLogForUi && showWorkoutDetails && (
         <div className="space-y-3">
           <button
             type="button"
@@ -289,6 +299,7 @@ function TodayPageInner() {
             plan={plan}
             log={completedLogForUi}
             hideCompletionBanner
+            onEditWorkout={handleEditCompletedWorkout}
             onNotesChange={(notes) =>
               updateCompletedWorkoutNotes(completedLogForUi.id, notes)
             }

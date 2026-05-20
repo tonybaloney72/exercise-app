@@ -17,6 +17,7 @@ interface WorkoutDayReviewProps {
   plan: DayPlan;
   log: WorkoutLog;
   onNotesChange: (notes: string) => Promise<void>;
+  onEditWorkout?: () => void;
   /** Default: "Completed today" (use for other days, e.g. "Completed · Mon, May 12") */
   completedBannerTitle?: string;
   /** Hide the green completion header when summary screen already showed it. */
@@ -63,6 +64,7 @@ export default function WorkoutDayReview({
   plan,
   log,
   onNotesChange,
+  onEditWorkout,
   completedBannerTitle = "Completed today",
   hideCompletionBanner = false,
 }: WorkoutDayReviewProps) {
@@ -115,6 +117,16 @@ export default function WorkoutDayReview({
           </SurfaceCard>
         </motion.div>
       )}
+
+      {onEditWorkout ? (
+        <button
+          type="button"
+          onClick={onEditWorkout}
+          className="w-full rounded-xl bg-accent py-3 text-sm font-semibold text-white shadow-md shadow-accent/20 transition-colors hover:bg-accent/90"
+        >
+          Edit workout
+        </button>
+      ) : null}
 
       <CollapsibleSection
         title="Warm-Up Stretches"

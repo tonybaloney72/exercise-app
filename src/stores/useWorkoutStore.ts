@@ -220,6 +220,10 @@ interface WorkoutState {
     workoutId: string,
     notes: string,
   ) => Promise<void>;
+  /** Open a completed log in the live session UI (preserves `endTime`). */
+  startEditingCompletedWorkout: (workoutId: string) => boolean;
+  saveEditedWorkout: () => Promise<WorkoutLog | null>;
+  cancelEditingWorkout: () => void;
 
   loadHistory: () => Promise<void>;
   /** Re-apply Library timer defaults to warm-up / cool-down on an active workout. */
@@ -860,6 +864,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
 
   discardWorkout: () => {
     const state = get();
+    if (state.activeWorkout?.endTime) {
+      set({ activeWorkout: null });
+      return;
+    }
     const mode = useAuthStore.getState().mode;
     const scope = draftScope();
     cancelScheduledPersistActiveWorkoutDraft();
@@ -976,9 +984,64 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     }
   },
 
+  startEditingCompletedWorkout: (workoutId) => {
+    const state = get();
+    if (state.activeWorkout) return false;
+    const existing = state.workoutHistory.find((w) => w.id === workoutId);
+    if (!existing?.endTime) return false;
+    set({
+      activeWorkout: hydrateWorkoutLog({
+        ...existing,
+        paused: false,
+      }),
+    });
+    return true;
+  },
+
+  saveEditedWorkout: async () => {
+    const state = get();
+    const current = state.activeWorkout;
+    if (!current?.endTime) return null;
+
+    const saved = hydrateWorkoutLog(
+      workoutLogForPersistence({
+        ...current,
+        paused: false,
+        endTime: current.endTime,
+        startTime: current.startTime,
+      }),
+    );
+    const historyBefore = state.workoutHistory;
+
+    set({
+      activeWorkout: null,
+      workoutHistory: historyBefore.map((w) =>
+        w.id === saved.id ? saved : w,
+      ),
+    });
+
+    try {
+      await getWorkoutRepo().saveWorkout(saved);
+      return saved;
+    } catch (err) {
+      toastSaveError("workout", err);
+      set({
+        activeWorkout: current,
+        workoutHistory: historyBefore,
+      });
+      return null;
+    }
+  },
+
+  cancelEditingWorkout: () => {
+    const state = get();
+    if (!state.activeWorkout?.endTime) return;
+    set({ activeWorkout: null });
+  },
+
   syncStretchTargetsFromLibrary: () =>
     set((state) => {
-      if (!state.activeWorkout) return state;
+      if (!state.activeWorkout || state.activeWorkout.endTime) return state;
       return {
         activeWorkout: {
           ...state.activeWorkout,
@@ -1062,6 +1125,7 @@ if (typeof window !== "undefined") {
   useWorkoutStore.subscribe((state, prevState) => {
     const log = state.activeWorkout;
     if (!log || log === prevState.activeWorkout) return;
+    if (log.endTime) return;
     const mode = useAuthStore.getState().mode;
     if (mode === "authenticated") {
       const prepared = hydrateWorkoutLog(
