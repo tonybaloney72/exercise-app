@@ -116,5 +116,6 @@ export function migrateWorkoutLog(log: WorkoutLog): WorkoutLog {
     notes: log.notes,
     startTime: log.startTime,
     endTime: log.endTime,
+    paused: log.paused,
   });
 }

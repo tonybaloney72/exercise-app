@@ -64,6 +64,7 @@ interface WorkoutRow {
   notes: string | null;
   start_time: string | null;
   end_time: string | null;
+  paused?: boolean;
   exercise_logs?: ExerciseRow[];
 }
 
@@ -178,6 +179,7 @@ function rowToWorkout(row: WorkoutRow): WorkoutLog {
     notes: userFacingWorkoutNotes(row.notes ?? undefined),
     startTime: row.start_time ?? undefined,
     endTime: row.end_time ?? undefined,
+    paused: row.paused ?? false,
   };
   return hydrateCardioFromNotes(log);
 }
@@ -197,6 +199,7 @@ function workoutToSavePayload(log: WorkoutLog) {
     notes: persisted.notes ?? null,
     start_time: persisted.startTime ?? null,
     end_time: persisted.endTime ?? null,
+    paused: persisted.paused ?? false,
   };
 
   const exerciseLogs: Array<{

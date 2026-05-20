@@ -180,6 +180,8 @@ export interface WorkoutLog {
   notes?: string;
   startTime?: string;
   endTime?: string;
+  /** Save for later — only meaningful when `endTime` is unset (authenticated cloud sync). */
+  paused?: boolean;
 }
 
 import type { TrainingPriorityScores } from "@/lib/trainingPriorities";

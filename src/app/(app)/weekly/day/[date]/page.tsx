@@ -28,7 +28,7 @@ import {
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
-import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
+import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
 import { toastSaveError } from "@/utils/saveErrorToast";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
@@ -157,7 +157,7 @@ export default function WeeklyDayPage() {
   const when = compareDateKeyToToday(dateKey);
 
   const logForDay = useMemo(
-    () => findWorkoutLogForDate(workoutHistory, dateKey),
+    () => findCompletedWorkoutForDate(workoutHistory, dateKey),
     [workoutHistory, dateKey],
   );
 

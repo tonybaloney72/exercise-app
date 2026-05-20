@@ -1,6 +1,6 @@
 import type { WorkoutLog } from "@/types";
 import { migrateWorkoutLog } from "@/lib/cpToPcMigration";
-import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
+import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
 import type { AuthMode } from "@/stores/useAuthStore";
 
 const DRAFT_KEY_PREFIX = "exercise-app-active-workout-draft";
@@ -44,10 +44,15 @@ function parsePayload(raw: string): ActiveWorkoutDraftPayload | null {
   }
 }
 
+/** Guests only — authenticated users persist in-progress rows via Supabase. */
+export function usesLocalWorkoutDraft(scope: DraftAuthScope): boolean {
+  return scope.mode !== "authenticated";
+}
+
 export function loadActiveWorkoutDraft(
   scope: DraftAuthScope,
 ): ActiveWorkoutDraftPayload | null {
-  if (!isBrowser()) return null;
+  if (!usesLocalWorkoutDraft(scope) || !isBrowser()) return null;
   try {
     const raw = localStorage.getItem(storageKey(scope));
     if (!raw) return null;
@@ -67,7 +72,7 @@ export function saveActiveWorkoutDraft(
   log: WorkoutLog,
   meta: Pick<ActiveWorkoutDraftMeta, "paused"> & { savedAt?: string },
 ): void {
-  if (!isBrowser()) return;
+  if (!usesLocalWorkoutDraft(scope) || !isBrowser()) return;
   const payload: ActiveWorkoutDraftPayload = {
     v: DRAFT_VERSION,
     meta: {
@@ -94,6 +99,7 @@ export function clearActiveWorkoutDraft(scope: DraftAuthScope): void {
 
 /** In-progress draft that should not auto-resume (explicit pause). */
 export function getPausedDraftDate(scope: DraftAuthScope): string | null {
+  if (!usesLocalWorkoutDraft(scope)) return null;
   const payload = loadActiveWorkoutDraft(scope);
   if (!payload?.meta.paused || payload.log.endTime) return null;
   return payload.log.date;
@@ -107,6 +113,7 @@ export function shouldAutoRestoreDraft(
   scope: DraftAuthScope,
   history: WorkoutLog[],
 ): WorkoutLog | null {
+  if (!usesLocalWorkoutDraft(scope)) return null;
   const payload = loadActiveWorkoutDraft(scope);
   if (!payload) return null;
   if (payload.meta.paused) return null;
@@ -114,7 +121,7 @@ export function shouldAutoRestoreDraft(
     clearActiveWorkoutDraft(scope);
     return null;
   }
-  if (findWorkoutLogForDate(history, payload.log.date)?.endTime) {
+  if (findCompletedWorkoutForDate(history, payload.log.date)) {
     clearActiveWorkoutDraft(scope);
     return null;
   }
@@ -127,7 +134,7 @@ export function schedulePersistActiveWorkoutDraft(
   scope: DraftAuthScope,
   log: WorkoutLog,
 ): void {
-  if (!isBrowser()) return;
+  if (!usesLocalWorkoutDraft(scope) || !isBrowser()) return;
   if (persistTimer) clearTimeout(persistTimer);
   persistTimer = setTimeout(() => {
     persistTimer = null;

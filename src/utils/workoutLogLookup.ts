@@ -1,9 +1,63 @@
 import type { WorkoutLog } from "@/types";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
+function matchesCalendarDate(log: WorkoutLog, dateKey: string): boolean {
+  if (log.date === dateKey) return true;
+  if (log.endTime && formatLocalDateKey(new Date(log.endTime)) === dateKey) {
+    return true;
+  }
+  return false;
+}
+
+/** Logs with `endTime` set (excludes in-progress cloud drafts). */
+export function filterCompletedWorkouts(history: WorkoutLog[]): WorkoutLog[] {
+  return history.filter((w) => w.endTime != null);
+}
+
+/** Finished workout for a calendar day (`endTime` set). */
+export function findCompletedWorkoutForDate(
+  workoutHistory: WorkoutLog[],
+  dateKey: string,
+): WorkoutLog | null {
+  return (
+    workoutHistory.find(
+      (w) => w.endTime != null && matchesCalendarDate(w, dateKey),
+    ) ?? null
+  );
+}
+
+/** In-progress workout for a calendar day (`endTime` unset, same `date`). */
+export function findInProgressWorkoutForDate(
+  workoutHistory: WorkoutLog[],
+  dateKey: string,
+): WorkoutLog | null {
+  return (
+    workoutHistory.find((w) => w.endTime == null && w.date === dateKey) ?? null
+  );
+}
+
+/** Calendar date of the paused in-progress workout, if any. */
+export function getPausedWorkoutDateFromHistory(
+  workoutHistory: WorkoutLog[],
+): string | null {
+  const paused = workoutHistory.find((w) => w.endTime == null && w.paused);
+  return paused?.date ?? null;
+}
+
+/** Non-paused in-progress log for today — auto-resume on load (authenticated). */
+export function shouldAutoRestoreInProgressFromHistory(
+  workoutHistory: WorkoutLog[],
+  todayKey: string,
+): WorkoutLog | null {
+  if (findCompletedWorkoutForDate(workoutHistory, todayKey)) return null;
+  const inProgress = findInProgressWorkoutForDate(workoutHistory, todayKey);
+  if (!inProgress || inProgress.paused) return null;
+  return inProgress;
+}
+
 /**
- * Resolve a workout log for a calendar day (local). Matches `date` first, then
- * `endTime` mapped to local date (same behavior as Today).
+ * @deprecated Prefer `findCompletedWorkoutForDate` or `findInProgressWorkoutForDate`.
+ * Returns any log tied to the day (including in-progress).
  */
 export function findWorkoutLogForDate(
   workoutHistory: WorkoutLog[],

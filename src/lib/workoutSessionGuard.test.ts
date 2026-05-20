@@ -57,4 +57,19 @@ describe("workoutSessionGuard", () => {
       isPrescribedPlanFrozenFromState("2026-05-11", useWorkoutStore.getState()),
     ).toBe(false);
   });
+
+  it("freezes when an in-progress log exists in history (cloud draft)", () => {
+    useWorkoutStore.setState({
+      workoutHistory: [
+        {
+          ...emptyLog("2026-05-11"),
+          startTime: "2026-05-11T10:00:00Z",
+          paused: false,
+        },
+      ],
+    });
+    const state = useWorkoutStore.getState();
+    expect(isWorkoutStartedFromState("2026-05-11", state)).toBe(true);
+    expect(isPrescribedPlanFrozenFromState("2026-05-11", state)).toBe(true);
+  });
 });

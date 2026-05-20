@@ -31,7 +31,7 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { toastSaveError } from "@/utils/saveErrorToast";
-import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
+import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
 
@@ -75,7 +75,7 @@ function TodayPageInner() {
   }, [mode, loadHistory]);
 
   const todaysCompletedLog = useMemo(
-    () => findWorkoutLogForDate(workoutHistory, todayKey),
+    () => findCompletedWorkoutForDate(workoutHistory, todayKey),
     [workoutHistory, todayKey],
   );
 

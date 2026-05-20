@@ -1,6 +1,9 @@
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import type { WorkoutLog } from "@/types";
-import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
+import {
+  findCompletedWorkoutForDate,
+  findInProgressWorkoutForDate,
+} from "@/utils/workoutLogLookup";
 
 export type PrescribedPlanFreezeState = {
   activeWorkout: WorkoutLog | null;
@@ -13,10 +16,9 @@ export function isWorkoutStartedFromState(
   dateKey: string,
   state: PrescribedPlanFreezeState,
 ): boolean {
-  return (
-    state.activeWorkout?.date === dateKey ||
-    state.pausedWorkoutDate === dateKey
-  );
+  if (state.activeWorkout?.date === dateKey) return true;
+  if (state.pausedWorkoutDate === dateKey) return true;
+  return findInProgressWorkoutForDate(state.workoutHistory, dateKey) != null;
 }
 
 /**
@@ -28,8 +30,7 @@ export function isPrescribedPlanFrozenFromState(
   state: PrescribedPlanFreezeState,
 ): boolean {
   if (isWorkoutStartedFromState(dateKey, state)) return true;
-  const log = findWorkoutLogForDate(state.workoutHistory, dateKey);
-  return log?.endTime != null;
+  return findCompletedWorkoutForDate(state.workoutHistory, dateKey) != null;
 }
 
 /** True when the user has started (or paused) a workout for this calendar date. */

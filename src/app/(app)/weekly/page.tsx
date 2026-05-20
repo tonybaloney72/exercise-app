@@ -21,7 +21,7 @@ import {
 } from "@/lib/planDisplayCategories";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
-import { findWorkoutLogForDate } from "@/utils/workoutLogLookup";
+import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
 
 const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 /** Same Sun–Sat order as the week strip and `weekDates`. */
@@ -108,7 +108,7 @@ export default function WeeklyPage() {
   const completedDates = useMemo(() => {
     const set = new Set<string>();
     for (const key of weekDateKeys) {
-      if (findWorkoutLogForDate(workoutHistory, key)) set.add(key);
+      if (findCompletedWorkoutForDate(workoutHistory, key)) set.add(key);
     }
     return set;
   }, [workoutHistory, weekDateKeys]);

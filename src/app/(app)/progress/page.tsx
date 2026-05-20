@@ -25,6 +25,7 @@ import {
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard, { surfaceCardClassName } from "@/components/common/SurfaceCard";
 import { weekToDatePlanAdherence } from "@/utils/progressStats";
+import { filterCompletedWorkouts } from "@/utils/workoutLogLookup";
 
 export default function ProgressPage() {
   const { workoutHistory, loadHistory } = useWorkoutStore();
@@ -59,13 +60,18 @@ export default function ProgressPage() {
     };
   }, [mode, planRevision, equipmentKey, programProfileKey]);
 
+  const completedHistory = useMemo(
+    () => filterCompletedWorkouts(workoutHistory),
+    [workoutHistory],
+  );
+
   const stats = useMemo(() => {
-    const totalWorkouts = workoutHistory.length;
+    const totalWorkouts = completedHistory.length;
 
     let currentStreak = 0;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const sortedDates = [...new Set(workoutHistory.map((w) => w.date))].sort().reverse();
+    const sortedDates = [...new Set(completedHistory.map((w) => w.date))].sort().reverse();
 
     for (let i = 0; i < sortedDates.length; i++) {
       const expected = new Date(today);
@@ -78,11 +84,11 @@ export default function ProgressPage() {
       }
     }
 
-    const cardioMiles = buildCardioMilesTotals(workoutHistory);
-    const weekPlan = weekToDatePlanAdherence(workoutHistory, weekByDow);
+    const cardioMiles = buildCardioMilesTotals(completedHistory);
+    const weekPlan = weekToDatePlanAdherence(completedHistory, weekByDow);
 
     return { totalWorkouts, currentStreak, cardioMiles, weekPlan };
-  }, [workoutHistory, weekByDow]);
+  }, [completedHistory, weekByDow]);
 
   const statCards = useMemo(() => {
     const base = [
@@ -144,17 +150,17 @@ export default function ProgressPage() {
         ))}
       </div>
 
-      <ProgressChartsSection history={workoutHistory} />
+      <ProgressChartsSection history={completedHistory} />
 
-      <ExerciseProgressChart history={workoutHistory} />
+      <ExerciseProgressChart history={completedHistory} />
 
-      <CardioProgressSection history={workoutHistory} />
+      <CardioProgressSection history={completedHistory} />
 
       {/* Recent workouts */}
-      {workoutHistory.length > 0 && (
+      {completedHistory.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-foreground">Recent Workouts</h2>
-          {workoutHistory.slice(0, 5).map((log) => {
+          {completedHistory.slice(0, 5).map((log) => {
             const exercisesDone = log.rounds.reduce(
               (a, r) => a + r.exercises.filter((e) => e.completed).length,
               0
@@ -183,7 +189,7 @@ export default function ProgressPage() {
         </div>
       )}
 
-      {workoutHistory.length === 0 && (
+      {completedHistory.length === 0 && (
         <SurfaceCard className="border-dashed bg-surface/50 py-12">
           <EmptyState
             icon="📈"
