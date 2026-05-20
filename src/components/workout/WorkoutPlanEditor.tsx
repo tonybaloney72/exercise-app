@@ -6,9 +6,9 @@ import { useBalanceAlertToasts } from "@/hooks/useBalanceAlertToasts";
 import AnimatedSection from "@/components/common/AnimatedSection";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import SurfaceCard from "@/components/common/SurfaceCard";
-import CategoryBadge from "@/components/common/CategoryBadge";
 import CategoryPickModal from "@/components/workout/CategoryPickModal";
 import DayPlanCardioEditor from "@/components/workout/DayPlanCardioEditor";
+import RoundExerciseSortableList from "@/components/workout/RoundExerciseSortableList";
 import StretchPlanSection from "@/components/workout/StretchPlanSection";
 import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
@@ -21,6 +21,7 @@ import { getPlanAddCandidates, getPlanSlotCandidates } from "@/lib/planSlotCandi
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
 import { laterRoundOccurrencesByExerciseId } from "@/lib/exerciseSwap";
 import { analyzeDayPlanBalance } from "@/lib/workoutBalanceAlerts";
+import { reorderRoundExercises } from "@/lib/reorderRoundExercises";
 import { prepareDayPlanForEditor } from "@/lib/trainingWeekCustomize";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -251,6 +252,23 @@ export default function WorkoutPlanEditor({
     });
   };
 
+  const reorderSlots = (
+    roundIndex: number,
+    fromIndex: number,
+    toIndex: number,
+  ) => {
+    setDraft((prev) => {
+      const rounds = prev.rounds.map((r, ri) => {
+        if (ri !== roundIndex) return r;
+        return {
+          ...r,
+          exercises: reorderRoundExercises(r.exercises, fromIndex, toIndex),
+        };
+      });
+      return { ...prev, rounds };
+    });
+  };
+
   const updateStretchTarget = (
     section: StretchSectionKey,
     index: number,
@@ -316,7 +334,8 @@ export default function WorkoutPlanEditor({
           <p className="text-sm font-semibold text-foreground">Customize workout</p>
           <p className="text-sm text-muted leading-snug">
             Change exercises and targets for this day. Pick any category when adding slots;
-            change keeps the same category.
+            change keeps the same category. Use the grip on the left of each exercise to
+            reorder within a round (needs two or more exercises in that round).
           </p>
           {isCustomWeek ? (
             <p className="text-xs text-muted leading-snug">
@@ -333,10 +352,15 @@ export default function WorkoutPlanEditor({
 
       <DayPlanCardioEditor plan={draft} onChange={setDraft} />
 
-      <div className="flex items-center justify-between gap-2 px-1">
-        <p className="text-xs font-medium uppercase tracking-wider text-muted">
-          Rounds
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted">
+            Rounds
+          </p>
+          <p className="text-[11px] text-muted leading-snug">
+            Drag the grip to reorder exercises in a round.
+          </p>
+        </div>
         <button
           type="button"
           disabled={saving || draft.rounds.length >= 6}
@@ -379,61 +403,21 @@ export default function WorkoutPlanEditor({
             </div>
           }
         >
-          <div className="divide-y divide-border px-2 py-1">
-            {round.exercises.length === 0 && (
-              <p className="px-2 py-4 text-center text-sm text-muted">
-                Add an exercise to build this round.
-              </p>
-            )}
-            {round.exercises.map((slot, slotIndex) => {
-              const meta = exerciseMap[slot.exerciseId];
-              if (!meta) return null;
-              return (
-                <div
-                  key={`${round.roundNumber}-${slotIndex}-${slot.exerciseId}`}
-                  className="px-2 py-3 space-y-2"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-foreground">{meta.name}</p>
-                      <CategoryBadge category={meta.category} size="sm" />
-                    </div>
-                    <div className="flex shrink-0 gap-1">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          openPickModal({ kind: "swap", roundIndex, slotIndex })
-                        }
-                        className="rounded-lg border border-border px-2 py-1 text-[11px] font-medium text-foreground hover:bg-surface-hover"
-                      >
-                        Change
-                      </button>
-                      <button
-                        type="button"
-                        disabled={round.exercises.length <= 1}
-                        onClick={() => removeSlot(roundIndex, slotIndex)}
-                        className="rounded-lg border border-border px-2 py-1 text-[11px] font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-40"
-                        aria-label={`Remove ${meta.name}`}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                  <label className="block">
-                    <span className="text-[11px] text-muted">Target</span>
-                    <input
-                      type="text"
-                      value={slot.targetReps}
-                      onChange={(e) =>
-                        updateReps(roundIndex, slotIndex, e.target.value)
-                      }
-                      className="mt-0.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-                    />
-                  </label>
-                </div>
-              );
-            })}
-          </div>
+          <RoundExerciseSortableList
+            roundIndex={roundIndex}
+            exercises={round.exercises}
+            saving={saving}
+            onReorder={(fromIndex, toIndex) =>
+              reorderSlots(roundIndex, fromIndex, toIndex)
+            }
+            onChangeSlot={(slotIndex) =>
+              openPickModal({ kind: "swap", roundIndex, slotIndex })
+            }
+            onRemoveSlot={(slotIndex) => removeSlot(roundIndex, slotIndex)}
+            onUpdateReps={(slotIndex, targetReps) =>
+              updateReps(roundIndex, slotIndex, targetReps)
+            }
+          />
         </CollapsibleSection>
       ))}
 
