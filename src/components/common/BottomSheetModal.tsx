@@ -1,7 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 function CloseIcon() {
   return (
@@ -29,6 +30,8 @@ export type BottomSheetModalProps = {
   closeOnBackdropClick?: boolean;
   /** When false, hides the header close control. Default true. */
   showCloseButton?: boolean;
+  /** When false, Escape does not call onClose. Default true. */
+  closeOnEscape?: boolean;
   titleClassName?: string;
   hintClassName?: string;
 };
@@ -52,9 +55,19 @@ export default function BottomSheetModal({
   bodyClassName = "",
   closeOnBackdropClick = true,
   showCloseButton = true,
+  closeOnEscape = true,
   titleClassName = "",
   hintClassName = "",
 }: BottomSheetModalProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap({
+    open,
+    containerRef: panelRef,
+    onClose,
+    closeOnEscape: closeOnEscape && showCloseButton,
+  });
+
   return (
     <AnimatePresence>
       {open && (
@@ -69,6 +82,7 @@ export default function BottomSheetModal({
           onClick={closeOnBackdropClick ? onClose : undefined}
         >
           <motion.div
+            ref={panelRef}
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}

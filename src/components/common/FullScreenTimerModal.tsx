@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import CountdownRing from "@/components/common/CountdownRing";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import { primeTimerAudio } from "@/utils/timerAlert";
@@ -21,19 +22,18 @@ export default function FullScreenTimerModal() {
   const minimizeTimer = useFloatingTimerStore((s) => s.minimizeTimer);
 
   const open = mode !== "idle";
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+  useFocusTrap({
+    open,
+    containerRef: panelRef,
+    onClose: stop,
+    closeOnEscape: true,
+  });
 
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") stop();
       if (e.key === " ") {
         e.preventDefault();
         if (running) pause();
@@ -45,7 +45,7 @@ export default function FullScreenTimerModal() {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, running, pause, resume, stop]);
+  }, [open, running, pause, resume]);
 
   if (!open) return null;
 
@@ -65,6 +65,7 @@ export default function FullScreenTimerModal() {
 
   return (
     <motion.div
+      ref={panelRef}
       role="dialog"
       aria-modal="true"
       aria-label={dialogLabel}

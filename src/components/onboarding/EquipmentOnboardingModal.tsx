@@ -34,6 +34,7 @@ export default function EquipmentOnboardingModal() {
       open
       onClose={() => {}}
       closeOnBackdropClick={false}
+      closeOnEscape={false}
       showCloseButton={false}
       title="What equipment do you have?"
       titleClassName="text-lg"

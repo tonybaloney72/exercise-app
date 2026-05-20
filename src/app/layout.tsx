@@ -16,10 +16,20 @@ export const metadata: Metadata = {
   title: "MyExercise",
   description: "Daily workout tracker & fitness companion",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "MyExercise",
+  },
+  other: {
+    "apple-mobile-web-app-title": "MyExercise",
   },
 };
 
@@ -41,6 +51,13 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <link
+          rel="apple-touch-startup-image"
+          href="/apple-splash-1170x2532.png"
+          media="(orientation: portrait)"
+        />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
