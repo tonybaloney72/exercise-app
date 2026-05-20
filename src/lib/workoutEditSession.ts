@@ -31,6 +31,7 @@ export function planFromWorkoutLog(log: WorkoutLog): DayPlan {
   const template: DayPlan = {
     dayOfWeek: log.dayOfWeek,
     name: "Workout",
+    theme: "",
     strengthFocus: [],
     coreGroups: [],
     hasJog: false,
