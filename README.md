@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MyExercise App
 
-## Getting Started
+https://my-exercise-tracking-app.vercel.app/
 
-First, run the development server:
+A Progressive Web App (PWA) for planning and logging workouts. Use it in the browser or add it to your home screen on iOS and Android for an app-like experience. MyExercise builds a weekly training plan from your equipment, priorities, and preferences, then guides you through each session with timers, stretch blocks, cardio logging, and progress charts. Sign in with Supabase to sync across devices, or use **Continue as guest** to try it locally without an account.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## What it does
+
+- **Today** - See today's prescribed workout, start or resume a session, log sets (reps or timed), warm-up and cool-down stretches, and optional jog/cardio. Finish with a summary and notes.
+- **Weekly** - Sun through Sat overview of the current calendar week. Open any day to preview the plan, review a completed workout, continue an unfinished session, or backfill a missed day.
+- **Library** - Browse the exercise catalog (strength, core, cardio, warm-up, cool-down). Set per-exercise defaults (reps vs timer, targets), favorites, and dislikes that influence plan generation.
+- **Progress** - Streaks, planned vs completed adherence, cardio mileage, Recharts trends, per-exercise history, and a workout calendar.
+- **Settings** - Equipment onboarding, training priorities or weekly layout modes, custom week builder, rest timers, sounds, vibration, dark mode, and default stretch lists.
+
+### Program modes
+
+| Mode              | What you control                                                      | How the week is built                                             |
+| ----------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| **Priorities**    | Preset or custom 0-4 emphasis on core, cardio, lower body, push, pull | Catalog-themed days; generator fills rounds biased by your scores |
+| **Weekly layout** | Which emphasis groups appear on each weekday (0 = rest)               | Exercises only from allowed groups per day                        |
+| **Custom week**   | Wizard, per-day editor, day templates                                 | You own the week; stored as a custom plan                         |
+
+Plan changes generally apply to **today and upcoming days** in the current week; past days stay frozen so history stays accurate.
+
+## Tech stack
+
+| Layer       | Technology                                                                                                                                                    |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework   | [Next.js](https://nextjs.org/) 16 (App Router, React Server Components where applicable)                                                                      |
+| UI          | [React](https://react.dev/) 19, [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/) 4                                     |
+| State       | [Zustand](https://zustand.docs.pmnd.rs/)                                                                                                                      |
+| Motion / UX | [Framer Motion](https://www.framer.com/motion/), [@dnd-kit](https://dndkit.com/) (drag-and-drop in editors), [Sonner](https://sonner.emilkowal.ski/) (toasts) |
+| Charts      | [Recharts](https://recharts.org/)                                                                                                                             |
+| Backend     | [Supabase](https://supabase.com/) (Auth, Postgres, Row Level Security) via `@supabase/supabase-js` and `@supabase/ssr`                                        |
+| Deploy      | [Vercel](https://vercel.com/) (typical); PWA assets in `public/`                                                                                              |
+| Tests       | [Vitest](https://vitest.dev/) (unit tests under `src/lib/`, etc.)                                                                                             |
+
+Other notable pieces: **Web Audio API** for timer chimes, **Vibration API** for haptics, **canvas-confetti** on workout complete, and **uuid** for client-generated ids in guest mode.
+
+## How data flows
+
+- **Authenticated users** - Workouts and settings persist through a repository layer (`src/lib/repos/`) that talks to Supabase. RLS limits each user to their own rows (`profiles`, `user_settings`, `workout_logs`, `exercise_logs`, preferences, training weeks).
+- **Guests** - Same UI with `localStorage`-backed repos; no Supabase calls until you create an account (optional migration on first login).
+- **Plans** - Training weeks are materialized from a catalog plus generator (`src/lib/planGenerator.ts`, `planResolver.ts`) or saved as a custom week. Stretch lists are derived from settings and day focus (`src/lib/dayStretchPlan.ts`).
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+- A Supabase project (only required for sign-in and sync; guest mode works without it for local dev if guest API is enabled)
+
+### Environment variables
+
+Create `.env.local` in the project root:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+See [docs/deployment.md](docs/deployment.md) and [docs/supabase-migrations.md](docs/supabase-migrations.md) for production setup and schema migrations.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Install and run
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000). Use **Sign up** / **Log in**, or **Continue as guest** to jump to Today.
 
-To learn more about Next.js, take a look at the following resources:
+### Useful scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command              | Purpose                                           |
+| -------------------- | ------------------------------------------------- |
+| `npm run dev`        | Development server                                |
+| `npm run build`      | Production build                                  |
+| `npm run start`      | Run production build locally                      |
+| `npm run lint`       | ESLint                                            |
+| `npm run test`       | Vitest (single run)                               |
+| `npm run test:watch` | Vitest watch mode                                 |
+| `npm run db:push`    | Apply Supabase migrations (requires Supabase CLI) |
+| `npm run icons`      | Regenerate PWA icons from brand assets            |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project layout (high level)
 
-## Deploy on Vercel
+```
+src/
+  app/              # Next.js routes (auth, today, weekly, library, progress, settings)
+  components/       # UI by feature (workout, progress, settings, common)
+  data/             # Exercise catalog, categories, training week catalog
+  hooks/            # Plan loading, resolved stretches, etc.
+  lib/              # Plan generator, repos, stretch logic, cardio, history
+  stores/           # Zustand (workout session, settings, auth, preferences)
+supabase/           # SQL migrations
+docs/               # Deployment, migrations, guest vs account
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The app is designed to deploy on Vercel with the environment variables above. After deploy, verify PWA install icons and Supabase auth redirect URLs for your production domain. Details: [docs/deployment.md](docs/deployment.md).
+
+## License
+
+Private project. All rights reserved unless otherwise noted in the repository.
