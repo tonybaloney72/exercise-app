@@ -14,6 +14,7 @@ import type {
 } from "@/types";
 import { resolveStretchesForWorkoutStart } from "@/lib/stretchResolveContext";
 import {
+  canResumeInProgressForDate,
   getBackfillEligibility,
   localNoonIsoForDateKey,
 } from "@/lib/backfillWorkout";
@@ -126,6 +127,37 @@ function syncStretchLogsFromLibrary(logs: ExerciseLog[]): ExerciseLog[] {
   });
 }
 
+function swapStretchInList(
+  logs: ExerciseLog[],
+  fromExerciseId: string,
+  toExerciseId: string,
+): ExerciseLog[] | null {
+  const index = logs.findIndex((e) => e.exerciseId === fromExerciseId);
+  if (index < 0) return null;
+  if (logs.some((e, i) => i !== index && e.exerciseId === toExerciseId)) {
+    return null;
+  }
+  const meta = exerciseMap[toExerciseId];
+  if (!meta || (meta.category !== "SW" && meta.category !== "SC")) {
+    return null;
+  }
+  const previous = logs[index]!;
+  const entry: StretchEntry = {
+    exerciseId: toExerciseId,
+    targetReps: meta.defaultReps,
+  };
+  const fresh = buildStretchExerciseLog(entry);
+  const next = [...logs];
+  next[index] = {
+    ...fresh,
+    completed: previous.completed,
+    skipped: previous.skipped,
+    actualReps: previous.actualReps,
+    actualDuration: previous.actualDuration,
+  };
+  return next;
+}
+
 function buildStretchExerciseLog(entry: StretchEntry): ExerciseLog {
   const meta = exerciseMap[entry.exerciseId];
   const stored = useExerciseSettingsStore.getState().byExerciseId[entry.exerciseId];
@@ -163,6 +195,8 @@ interface WorkoutState {
   startWorkout: (plan: DayPlan) => void;
   /** Retroactive log for a past calendar day (`YYYY-MM-DD`). */
   startWorkoutForDate: (plan: DayPlan, dateKey: string) => boolean;
+  /** Resume an in-progress log for `dateKey` (stale / backfill sessions). */
+  continueInProgressWorkout: (plan: DayPlan, dateKey: string) => boolean;
   toggleJog: () => void;
   skipJog: () => void;
   unskipJog: () => void;
@@ -213,6 +247,8 @@ interface WorkoutState {
   unskipWarmUpStretch: (exerciseId: string) => void;
   skipCoolDownStretch: (exerciseId: string) => void;
   unskipCoolDownStretch: (exerciseId: string) => void;
+  swapWarmUpStretch: (fromExerciseId: string, toExerciseId: string) => void;
+  swapCoolDownStretch: (fromExerciseId: string, toExerciseId: string) => void;
   setWarmUpStretchTargetDuration: (
     exerciseId: string,
     seconds: number | undefined,
@@ -309,9 +345,26 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     weekAnchorDateKey?: string,
   ) => {
     const state = get();
+    const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(
+      plan,
+      weekAnchorDateKey,
+    );
+
     const existing = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
     if (existing) {
-      const log = hydrateWorkoutLog({ ...existing, paused: false });
+      let log = hydrateWorkoutLog({ ...existing, paused: false });
+      if (log.warmUpExercises.length === 0 && warmUp.length > 0) {
+        log = hydrateWorkoutLog({
+          ...log,
+          warmUpExercises: warmUp.map(buildStretchExerciseLog),
+        });
+      }
+      if (log.coolDownExercises.length === 0 && coolDown.length > 0) {
+        log = hydrateWorkoutLog({
+          ...log,
+          coolDownExercises: coolDown.map(buildStretchExerciseLog),
+        });
+      }
       const mode = useAuthStore.getState().mode;
       set({
         pausedWorkoutDate: null,
@@ -325,11 +378,6 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       }
       return;
     }
-
-    const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(
-      plan,
-      weekAnchorDateKey,
-    );
     const warmUpExercises: ExerciseLog[] = warmUp.map(buildStretchExerciseLog);
     const coolDownExercises: ExerciseLog[] = coolDown.map(
       buildStretchExerciseLog,
@@ -367,11 +415,13 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
   pausedWorkoutDate: null,
   startWorkout: (plan) => {
     const now = new Date();
+    const dateKey = formatLocalDateKey(now);
     void beginWorkoutSession(
       plan,
-      formatLocalDateKey(now),
+      dateKey,
       now.toISOString(),
       now.getDay(),
+      weekKeyFromDateKey(dateKey) ?? undefined,
     );
   },
 
@@ -393,6 +443,30 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       plan,
       dateKey,
       startIso,
+      parsed.getDay(),
+      weekAnchor ?? undefined,
+    );
+    return true;
+  },
+
+  continueInProgressWorkout: (plan, dateKey) => {
+    const state = get();
+    const eligibility = canResumeInProgressForDate({
+      dateKey,
+      workoutHistory: state.workoutHistory,
+      activeWorkout: state.activeWorkout,
+    });
+    if (!eligibility.ok) return false;
+
+    const inProgress = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
+    const parsed = parseLocalDateKey(dateKey);
+    if (!inProgress || !parsed) return false;
+
+    const weekAnchor = weekKeyFromDateKey(dateKey);
+    void beginWorkoutSession(
+      plan,
+      dateKey,
+      inProgress.startTime,
       parsed.getDay(),
       weekAnchor ?? undefined,
     );
@@ -975,6 +1049,46 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       const coolDownCompleted = coolDownExercises.every((ex) => ex.completed || ex.skipped);
       return {
         activeWorkout: { ...state.activeWorkout, coolDownExercises, coolDownCompleted },
+      };
+    }),
+
+  swapWarmUpStretch: (fromExerciseId, toExerciseId) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const warmUpExercises = swapStretchInList(
+        state.activeWorkout.warmUpExercises,
+        fromExerciseId,
+        toExerciseId,
+      );
+      if (!warmUpExercises) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog({
+          ...state.activeWorkout,
+          warmUpExercises,
+          warmUpCompleted: warmUpExercises.every(
+            (e) => e.completed || e.skipped,
+          ),
+        }),
+      };
+    }),
+
+  swapCoolDownStretch: (fromExerciseId, toExerciseId) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const coolDownExercises = swapStretchInList(
+        state.activeWorkout.coolDownExercises,
+        fromExerciseId,
+        toExerciseId,
+      );
+      if (!coolDownExercises) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog({
+          ...state.activeWorkout,
+          coolDownExercises,
+          coolDownCompleted: coolDownExercises.every(
+            (e) => e.completed || e.skipped,
+          ),
+        }),
       };
     }),
 

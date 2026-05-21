@@ -12,7 +12,10 @@ import {
   pruneStoredStretchDefaults,
   stretchListsEqual,
 } from "@/lib/stretchDefaults";
-import { readLegacyLocalEquipmentOnboardingDone } from "@/lib/equipmentOnboarding";
+import {
+  markLocalEquipmentOnboardingDone,
+  readLegacyLocalEquipmentOnboardingDone,
+} from "@/lib/equipmentOnboarding";
 import { settingsHydrationKey } from "@/lib/settingsHydration";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
@@ -156,6 +159,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     if (currentKey !== authKey) return;
 
     set({ ...merged, hydrated: true, hydratedForAuthKey: authKey });
+
+    if (merged.equipmentOnboardingCompleted) {
+      markLocalEquipmentOnboardingDone();
+    }
 
     const upgradedOnboardingFromLegacy =
       merged.equipmentOnboardingCompleted &&

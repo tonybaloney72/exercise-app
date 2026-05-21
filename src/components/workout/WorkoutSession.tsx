@@ -17,6 +17,7 @@ import { celebrateWorkoutComplete } from "@/utils/workoutCelebration";
 import {
   isCompletedWorkoutLog,
   sessionPlanForWorkoutEdit,
+  stretchEntriesFromLogs,
 } from "@/lib/workoutEditSession";
 import { toast } from "sonner";
 import type { DayPlan, WorkoutLog } from "@/types";
@@ -49,6 +50,8 @@ export default function WorkoutSession({
     unskipWarmUpStretch,
     skipCoolDownStretch,
     unskipCoolDownStretch,
+    swapWarmUpStretch,
+    swapCoolDownStretch,
     setWarmUpStretchTargetDuration,
     setCoolDownStretchTargetDuration,
     setWarmUpStretchActualDuration,
@@ -84,8 +87,20 @@ export default function WorkoutSession({
   );
 
   const exerciseSettingsById = useExerciseSettingsStore((s) => s.byExerciseId);
-  const warmUp = sessionPlan.warmUp ?? [];
-  const coolDown = sessionPlan.coolDown ?? [];
+  const warmUp = useMemo(() => {
+    if (!activeWorkout) return sessionPlan.warmUp ?? [];
+    if (activeWorkout.warmUpExercises.length > 0) {
+      return stretchEntriesFromLogs(activeWorkout.warmUpExercises);
+    }
+    return sessionPlan.warmUp ?? [];
+  }, [activeWorkout, sessionPlan.warmUp, sessionPlan]);
+  const coolDown = useMemo(() => {
+    if (!activeWorkout) return sessionPlan.coolDown ?? [];
+    if (activeWorkout.coolDownExercises.length > 0) {
+      return stretchEntriesFromLogs(activeWorkout.coolDownExercises);
+    }
+    return sessionPlan.coolDown ?? [];
+  }, [activeWorkout, sessionPlan.coolDown, sessionPlan]);
   const cardioActivities = useMemo(
     () => resolveCardioActivities(sessionPlan),
     [sessionPlan],
@@ -195,11 +210,13 @@ export default function WorkoutSession({
       {!skipStretches && (
         <StretchSection
           title="Warm-Up Stretches"
+          stretchCategory="SW"
           stretches={warmUp}
           exerciseLogs={activeWorkout.warmUpExercises}
           onToggle={toggleWarmUpStretch}
           onSkip={skipWarmUpStretch}
           onUnskip={unskipWarmUpStretch}
+          onSwap={isEditing ? undefined : swapWarmUpStretch}
           onSetTargetDuration={setWarmUpStretchTargetDuration}
           onSetActualDuration={setWarmUpStretchActualDuration}
           onAddStretch={() => setPickTarget({ kind: "addWarmUp" })}
@@ -250,11 +267,13 @@ export default function WorkoutSession({
       {!skipStretches && (
         <StretchSection
           title="Cool-Down Stretches"
+          stretchCategory="SC"
           stretches={coolDown}
           exerciseLogs={activeWorkout.coolDownExercises}
           onToggle={toggleCoolDownStretch}
           onSkip={skipCoolDownStretch}
           onUnskip={unskipCoolDownStretch}
+          onSwap={isEditing ? undefined : swapCoolDownStretch}
           onSetTargetDuration={setCoolDownStretchTargetDuration}
           onSetActualDuration={setCoolDownStretchActualDuration}
           onAddStretch={() => setPickTarget({ kind: "addCoolDown" })}

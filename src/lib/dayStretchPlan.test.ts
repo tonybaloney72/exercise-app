@@ -12,7 +12,8 @@ import {
   WARM_SESSION_CATALOG_POOLS,
   WARM_UP_CATALOG_POOLS,
 } from "@/lib/stretchCatalogPools";
-import { stretchCoolDownQuota } from "@/lib/trainingPriorityStretches";
+import { COOL_DOWN_STRETCHES_PER_DAY } from "@/lib/dayStretchPlan";
+import { allCoolDownCatalogPool } from "@/lib/stretchCatalogPools";
 import { buildStretchResolveContextFromInputs } from "@/lib/stretchResolveContext";
 import type { DayPlan, StretchEntry } from "@/types";
 
@@ -104,15 +105,31 @@ describe("resolveStretchesForDay", () => {
     }
   });
 
-  it("targets about five catalog cool-down picks on a balanced training day", () => {
+  it("derives exactly five cool-down stretches from the full SC catalog", () => {
     const monday = buildCatalogWeek()[1]!;
-    const poolTotal =
-      stretchCoolDownQuota("upper", "balanced") +
-      stretchCoolDownQuota("lower", "balanced") +
-      stretchCoolDownQuota("core", "balanced");
-    expect(poolTotal).toBe(5);
     const { coolDown } = resolveStretchesForDay(monday, ctxFor());
-    expect(coolDown.length).toBeLessThanOrEqual(poolTotal);
+    expect(coolDown.length).toBe(COOL_DOWN_STRETCHES_PER_DAY);
+    const scIds = new Set(allCoolDownCatalogPool().map((e) => e.exerciseId));
+    for (const entry of coolDown) {
+      expect(scIds.has(entry.exerciseId)).toBe(true);
+    }
+  });
+
+  it("still assigns five cool-downs on the last day of a sequential week", () => {
+    const week = materializeTrainingWeek(
+      buildCatalogWeek(),
+      {},
+      [...DEFAULT_AVAILABLE_EQUIPMENT],
+      "balanced",
+      "standard",
+      undefined,
+      "cool-down-week",
+    );
+    const weekPlans = Array.from({ length: 7 }, (_, d) => week[d] ?? null);
+    const ctx = ctxFor({}, "balanced", "2026-05-18");
+    const perDay = resolveStretchesForWeekSequential(weekPlans, ctx);
+    const saturday = perDay[6];
+    expect(saturday?.coolDown.length).toBe(COOL_DOWN_STRETCHES_PER_DAY);
   });
 
   it("uses per-day overrides when set", () => {
@@ -175,7 +192,7 @@ describe("resolveStretchesForDay", () => {
     const counts = new Map<string, number>();
     for (const day of perDay) {
       if (!day) continue;
-      for (const e of [...day.warmUp, ...day.coolDown]) {
+      for (const e of day.warmUp) {
         counts.set(e.exerciseId, (counts.get(e.exerciseId) ?? 0) + 1);
       }
     }
@@ -203,6 +220,15 @@ describe("resolveStretchesForDay", () => {
       ctxFor({}, "lower_body"),
     );
     expect(warmUp.length).toBeGreaterThan(6);
+  });
+
+  it("treats empty coolDown override as derived (not zero stretches)", () => {
+    const monday = buildCatalogWeek()[1]!;
+    const derivedOnly = resolveStretchesForDay(monday, ctxFor());
+    const withEmptyCool: DayPlan = { ...monday, coolDown: [] };
+    const { coolDown } = resolveStretchesForDay(withEmptyCool, ctxFor());
+    expect(coolDown.length).toBeGreaterThan(0);
+    expect(coolDown.length).toBe(derivedOnly.coolDown.length);
   });
 
   it("filters disliked stretches from overrides", () => {

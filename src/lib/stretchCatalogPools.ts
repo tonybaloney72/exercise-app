@@ -132,3 +132,20 @@ export function warmSessionCatalogPool(
 export function coolDownCatalogPool(id: StretchThemePoolId): readonly StretchEntry[] {
   return COOL_DOWN_CATALOG_POOLS[id];
 }
+
+let cachedAllCoolDownPool: StretchEntry[] | null = null;
+
+/** Every SC stretch in the library (not split by muscle theme). */
+export function allCoolDownCatalogPool(): readonly StretchEntry[] {
+  if (cachedAllCoolDownPool) return cachedAllCoolDownPool;
+  const byId = new Map<string, StretchEntry>();
+  for (const pool of Object.values(COOL_DOWN_CATALOG_POOLS)) {
+    for (const entry of pool) {
+      byId.set(entry.exerciseId, entry);
+    }
+  }
+  cachedAllCoolDownPool = [...byId.values()].sort((a, b) =>
+    a.exerciseId.localeCompare(b.exerciseId),
+  );
+  return cachedAllCoolDownPool;
+}

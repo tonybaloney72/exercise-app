@@ -7,7 +7,10 @@ import FloatingTimer from "@/components/common/FloatingTimer";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import { ProgressBackLink } from "@/components/progress/ProgressSubnavLink";
 import WorkoutSession from "@/components/workout/WorkoutSession";
-import { getBackfillEligibility } from "@/lib/backfillWorkout";
+import {
+  canResumeInProgressForDate,
+  getBackfillEligibility,
+} from "@/lib/backfillWorkout";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
@@ -38,6 +41,7 @@ export default function WorkoutHistoryBackfillLogPage() {
     workoutHistory,
     loadHistory,
     startWorkoutForDate,
+    continueInProgressWorkout,
   } = useWorkoutStore();
   const { plan, loading: planLoading, error: planError } = useDayPlan(dateKey);
   const [startError, setStartError] = useState<string | null>(null);
@@ -59,6 +63,18 @@ export default function WorkoutHistoryBackfillLogPage() {
     [dateKey, workoutHistory, activeWorkout, todayKey],
   );
 
+  const resumeEligibility = useMemo(
+    () =>
+      canResumeInProgressForDate({
+        dateKey,
+        workoutHistory,
+        activeWorkout,
+      }),
+    [dateKey, workoutHistory, activeWorkout],
+  );
+
+  const canAccessLogPage = eligibility.ok || resumeEligibility.ok;
+
   const completedLog = useMemo(
     () => findCompletedWorkoutForDate(workoutHistory, dateKey),
     [workoutHistory, dateKey],
@@ -75,24 +91,39 @@ export default function WorkoutHistoryBackfillLogPage() {
   const handleBegin = useCallback(() => {
     if (!plan) return;
     setStartError(null);
-    const ok = startWorkoutForDate(plan, dateKey);
+    const ok = inProgressLog
+      ? continueInProgressWorkout(plan, dateKey)
+      : startWorkoutForDate(plan, dateKey);
     if (!ok) {
-      const again = getBackfillEligibility({
-        dateKey,
-        workoutHistory: useWorkoutStore.getState().workoutHistory,
-        activeWorkout: useWorkoutStore.getState().activeWorkout,
-        todayKey,
-      });
+      const again = inProgressLog
+        ? canResumeInProgressForDate({
+            dateKey,
+            workoutHistory: useWorkoutStore.getState().workoutHistory,
+            activeWorkout: useWorkoutStore.getState().activeWorkout,
+          })
+        : getBackfillEligibility({
+            dateKey,
+            workoutHistory: useWorkoutStore.getState().workoutHistory,
+            activeWorkout: useWorkoutStore.getState().activeWorkout,
+            todayKey,
+          });
       setStartError(again.ok ? "Could not start workout." : again.reason);
     }
-  }, [plan, dateKey, startWorkoutForDate, todayKey]);
+  }, [
+    plan,
+    dateKey,
+    inProgressLog,
+    startWorkoutForDate,
+    continueInProgressWorkout,
+    todayKey,
+  ]);
 
   useEffect(() => {
-    if (!plan || !eligibility.ok || sessionForThisDay) return;
+    if (!plan || !canAccessLogPage || sessionForThisDay) return;
     if (inProgressLog) {
       handleBegin();
     }
-  }, [plan, eligibility.ok, sessionForThisDay, inProgressLog, handleBegin]);
+  }, [plan, canAccessLogPage, sessionForThisDay, inProgressLog, handleBegin]);
 
   useEffect(() => {
     if (completedLog) {
@@ -112,12 +143,18 @@ export default function WorkoutHistoryBackfillLogPage() {
 
   const backHref = `/progress/history/${dateKey}`;
 
-  if (!eligibility.ok) {
+  if (!canAccessLogPage) {
     return (
       <div className="py-8 space-y-4">
         <ProgressBackLink href={backHref} label="Back to day" />
         <SurfaceCard className="px-4 py-6 text-center">
-          <p className="text-sm text-foreground">{eligibility.reason}</p>
+          <p className="text-sm text-foreground">
+            {resumeEligibility.ok === false
+              ? resumeEligibility.reason
+              : eligibility.ok === false
+                ? eligibility.reason
+                : "Cannot open this workout."}
+          </p>
         </SurfaceCard>
       </div>
     );

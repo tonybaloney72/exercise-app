@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 export type WorkoutRowMenuItem = {
   label: string;
   onClick: () => void;
+  icon?: ReactNode;
 };
 
 interface WorkoutRowOverflowMenuProps {
@@ -18,13 +20,48 @@ export default function WorkoutRowOverflowMenu({
   visible = true,
 }: WorkoutRowOverflowMenuProps) {
   const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
+  const [menuStyle, setMenuStyle] = useState<{
+    top: number;
+    left: number;
+    minWidth: number;
+  } | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const listId = useId();
 
   useEffect(() => {
     if (!open) return;
+    const updatePosition = () => {
+      const el = triggerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const minWidth = 208;
+      const left = Math.min(
+        Math.max(8, rect.right - minWidth),
+        window.innerWidth - minWidth - 8,
+      );
+      setMenuStyle({
+        top: rect.bottom + 4,
+        left,
+        minWidth,
+      });
+    };
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
     const onPointerDown = (e: PointerEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Node;
+      if (triggerRef.current?.contains(target)) return;
+      const menu = document.getElementById(listId);
+      if (menu?.contains(target)) return;
+      setOpen(false);
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -35,13 +72,52 @@ export default function WorkoutRowOverflowMenu({
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  }, [open, listId]);
 
   if (!visible || items.length === 0) return null;
 
+  const menu =
+    open && menuStyle && typeof document !== "undefined"
+      ? createPortal(
+          <ul
+            id={listId}
+            role="menu"
+            className="fixed z-[200] overflow-hidden rounded-lg border border-border bg-surface py-1 shadow-lg"
+            style={{
+              top: menuStyle.top,
+              left: menuStyle.left,
+              minWidth: menuStyle.minWidth,
+            }}
+          >
+            {items.map((item) => (
+              <li key={item.label} role="none">
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="flex w-full items-center gap-2.5 whitespace-nowrap px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-border/50"
+                  onClick={() => {
+                    setOpen(false);
+                    item.onClick();
+                  }}
+                >
+                  {item.icon ? (
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center text-muted">
+                      {item.icon}
+                    </span>
+                  ) : null}
+                  <span>{item.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>,
+          document.body,
+        )
+      : null;
+
   return (
-    <div ref={rootRef} className="relative shrink-0">
+    <div className="relative shrink-0">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex h-9 w-9 items-center justify-center rounded-md text-muted transition-colors hover:bg-border/60 hover:text-foreground"
@@ -63,29 +139,7 @@ export default function WorkoutRowOverflowMenu({
           <circle cx="12" cy="19" r="1.75" />
         </svg>
       </button>
-      {open && (
-        <ul
-          id={listId}
-          role="menu"
-          className="absolute right-0 top-full z-50 mt-1 min-w-52 overflow-hidden rounded-lg border border-border bg-surface py-1 shadow-lg"
-        >
-          {items.map((item) => (
-            <li key={item.label} role="none">
-              <button
-                type="button"
-                role="menuitem"
-                className="w-full whitespace-nowrap px-4 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-border/50"
-                onClick={() => {
-                  setOpen(false);
-                  item.onClick();
-                }}
-              >
-                {item.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      {menu}
     </div>
   );
 }

@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import AnimatedSection from "@/components/common/AnimatedSection";
 import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
-import { CATEGORIES } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
@@ -15,10 +14,7 @@ import StaleWorkoutSessionsBanner from "@/components/workout/StaleWorkoutSession
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
-import {
-  categoriesPresentInPlan,
-  planDaySubtitle,
-} from "@/lib/planDisplayCategories";
+import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import {
   bumpTrainingWeekPlans,
@@ -52,17 +48,18 @@ function TodayPageInner() {
     startEditingCompletedWorkout,
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
-  const trainingPriorityPreset = useSettingsStore(
-    (s) => s.trainingPriorityPreset,
-  );
-  const trainingPriorityScores = useSettingsStore(
-    (s) => s.trainingPriorityScores,
-  );
-  const trainingPriorityCustomized = useSettingsStore(
-    (s) => s.trainingPriorityCustomized,
-  );
   const todayKey = formatLocalDateKey();
-  const { plan, loading: planLoading, error: planError } = useDayPlan(todayKey);
+  const sessionDateKey =
+    activeWorkout && !activeWorkout.endTime ? activeWorkout.date : todayKey;
+  const { plan: todayPlan, loading: planLoading, error: planError } =
+    useDayPlan(todayKey);
+  const { plan: sessionPlanFromDate } = useDayPlan(
+    sessionDateKey !== todayKey ? sessionDateKey : "",
+  );
+  const plan =
+    sessionDateKey !== todayKey && sessionPlanFromDate
+      ? sessionPlanFromDate
+      : todayPlan;
   const [customizing, setCustomizing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -165,6 +162,12 @@ function TodayPageInner() {
   const allCategories = categoriesPresentInPlan(plan);
   const isCustomWeek = isUserCustomizedWeekSource(weekSource);
   const showPlanEditor = customizing && canEditPlan;
+  const showPreWorkoutActions =
+    !activeWorkout &&
+    !completedLogForUi &&
+    !hasPausedDraftToday &&
+    !showPlanEditor;
+  const hideStaleBanner = Boolean(activeWorkout) || customizing;
 
   async function handleSaveDay(editedPlan: DayPlan) {
     setSaving(true);
@@ -221,13 +224,6 @@ function TodayPageInner() {
         <h1 className="text-2xl font-bold text-foreground">
           Today&apos;s Workout
         </h1>
-        <p className="text-sm text-muted">
-          {planDaySubtitle(plan, trainingPriorityPreset, {
-            preferMaterialized: isCustomWeek,
-            customized: trainingPriorityCustomized,
-            scores: trainingPriorityScores,
-          })}
-        </p>
       </motion.div>
 
       {/* Category chips */}
@@ -249,23 +245,10 @@ function TodayPageInner() {
         </motion.div>
       )}
 
-      {canEditPlan && !showPlanEditor && (
-        <button
-          type="button"
-          onClick={() => {
-            setSaveError(null);
-            setCustomizing(true);
-          }}
-          className="w-full rounded-xl border border-accent/40 bg-accent/10 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
-        >
-          Customize this workout
-        </button>
-      )}
-
       {showGuestCustomizeGate && (
         <AccountFeatureGate
           feature="customizeDay"
-          title="Customize this workout"
+          title="Edit workout"
         />
       )}
 
@@ -325,7 +308,7 @@ function TodayPageInner() {
         </div>
       )}
 
-      <StaleWorkoutSessionsBanner />
+      <StaleWorkoutSessionsBanner hidden={hideStaleBanner} />
 
       {hasPausedDraftToday && (
         <AnimatedSection className="space-y-3" delay={0.15}>
@@ -355,43 +338,31 @@ function TodayPageInner() {
         </AnimatedSection>
       )}
 
-      {/* Pre-workout: plan context + start */}
-      {!activeWorkout &&
-        !completedLogForUi &&
-        !hasPausedDraftToday &&
-        !showPlanEditor && (
+      {showPreWorkoutActions && (
         <AnimatedSection className="space-y-4" delay={0.15}>
-          <SurfaceCard className="p-4 space-y-3">
-            <h2 className="text-sm font-semibold text-foreground">
-              Target Muscles
-            </h2>
-            <div className="space-y-1.5">
-              {allCategories.map((cat) => (
-                <div key={cat} className="flex items-start gap-2">
-                  <div
-                    className="mt-1 h-2 w-2 rounded-full shrink-0"
-                    style={{ backgroundColor: CATEGORIES[cat].color }}
-                  />
-                  <div>
-                    <span className="text-sm text-foreground">
-                      {CATEGORIES[cat].name}
-                    </span>
-                    <p className="text-xs text-muted">
-                      {CATEGORIES[cat].description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SurfaceCard>
-
-          <button
-            type="button"
-            onClick={() => startWorkout(plan)}
-            className="w-full rounded-xl bg-accent py-4 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
-          >
-            Start Workout
-          </button>
+          <div className="flex gap-2">
+            {canEditPlan ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setSaveError(null);
+                  setCustomizing(true);
+                }}
+                className="flex-1 rounded-xl border border-accent/40 bg-accent/10 py-3.5 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
+              >
+                Edit workout
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => startWorkout(plan)}
+              className={`rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] ${
+                canEditPlan ? "flex-1" : "w-full py-4 text-base"
+              }`}
+            >
+              Start workout
+            </button>
+          </div>
         </AnimatedSection>
       )}
     </div>

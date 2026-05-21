@@ -1,6 +1,7 @@
 "use client";
 
 import EquipmentOnboardingModal from "@/components/onboarding/EquipmentOnboardingModal";
+import { readLocalEquipmentOnboardingDone } from "@/lib/equipmentOnboarding";
 import { settingsHydrationMatchesAuth } from "@/lib/settingsHydration";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -21,7 +22,13 @@ export default function EquipmentOnboardingGate() {
     hydratedForAuthKey,
   );
 
-  if (mode === "loading" || !hydrated || !settingsReady || completed) {
+  if (
+    mode === "loading" ||
+    !hydrated ||
+    !settingsReady ||
+    completed ||
+    readLocalEquipmentOnboardingDone()
+  ) {
     return null;
   }
 

@@ -19,9 +19,23 @@ import {
 import {
   CARDIO_ACTIVITY_ORDER,
   CARDIO_KIND_TO_EXERCISE_ID,
-  CARDIO_ACTIVITY_LABELS,
   CARDIO_ACTIVITY_EMOJI,
 } from "@/lib/cardioActivities";
+import { totalMilesCardioStatLabel } from "@/lib/cardioStatLabels";
+import RotatingCardioStatCard, {
+  type CardioStatCard,
+} from "@/components/progress/RotatingCardioStatCard";
+
+type ProgressStatCard = CardioStatCard;
+type ProgressGridItem =
+  | ProgressStatCard
+  | { kind: "cardio-rotate"; cardioStats: CardioStatCard[] };
+
+function isRotatingCardioSlot(
+  item: ProgressGridItem,
+): item is { kind: "cardio-rotate"; cardioStats: CardioStatCard[] } {
+  return "kind" in item && item.kind === "cardio-rotate";
+}
 import Link from "next/link";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard, { surfaceCardClassName } from "@/components/common/SurfaceCard";
@@ -120,15 +134,23 @@ export default function ProgressPage() {
       if (bucket.totalMiles <= 0) return [];
       return [
         {
-          label: `Miles ${CARDIO_ACTIVITY_LABELS[kind]}`,
+          label: totalMilesCardioStatLabel(kind),
           value: bucket.totalMiles.toFixed(1),
           icon: CARDIO_ACTIVITY_EMOJI[kind],
         },
       ];
     });
 
-    return [...base, ...cardioStats];
+    return { base, cardioStats };
   }, [stats]);
+
+  const gridCards = useMemo((): ProgressGridItem[] => {
+    const { base, cardioStats } = statCards;
+    if (cardioStats.length <= 1) {
+      return [...base, ...cardioStats];
+    }
+    return [...base, { kind: "cardio-rotate", cardioStats }];
+  }, [statCards]);
 
   return (
     <div className="py-6 space-y-5">
@@ -139,21 +161,32 @@ export default function ProgressPage() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3">
-        {statCards.map((card, i) => (
-          <motion.div
-            key={card.label}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className={`${surfaceCardClassName} p-4`}
-          >
-            <span className="text-lg">{card.icon}</span>
-            <p className="mt-2 text-xl font-bold tabular-nums text-foreground">
-              {card.value}
-            </p>
-            <p className="text-[11px] leading-snug text-muted">{card.label}</p>
-          </motion.div>
-        ))}
+        {gridCards.map((card, i) =>
+          isRotatingCardioSlot(card) ? (
+            <motion.div
+              key="cardio-stats-rotate"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <RotatingCardioStatCard cards={card.cardioStats} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key={card.label}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className={`${surfaceCardClassName} p-4`}
+            >
+              <span className="text-lg">{card.icon}</span>
+              <p className="mt-2 text-xl font-bold tabular-nums text-foreground">
+                {card.value}
+              </p>
+              <p className="text-[11px] leading-snug text-muted">{card.label}</p>
+            </motion.div>
+          ),
+        )}
       </div>
 
       {completedHistory.length > 0 && <ProgressHistoryLink />}

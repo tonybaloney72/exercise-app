@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { getBackfillEligibility } from "@/lib/backfillWorkout";
+import {
+  canResumeInProgressForDate,
+  getBackfillEligibility,
+} from "@/lib/backfillWorkout";
 import type { WorkoutLog } from "@/types";
 
 function log(date: string, endTime?: string): WorkoutLog {
@@ -56,6 +59,27 @@ describe("getBackfillEligibility", () => {
       workoutHistory: [log("2026-05-10", "done")],
       activeWorkout: null,
       todayKey: today,
+    });
+    expect(result.ok).toBe(false);
+  });
+
+  it("allows resuming in-progress log for a past day", () => {
+    const stale = log("2026-05-10");
+    expect(
+      canResumeInProgressForDate({
+        dateKey: "2026-05-10",
+        workoutHistory: [stale],
+        activeWorkout: null,
+      }).ok,
+    ).toBe(true);
+  });
+
+  it("rejects resume when another workout is active", () => {
+    const stale = log("2026-05-10");
+    const result = canResumeInProgressForDate({
+      dateKey: "2026-05-10",
+      workoutHistory: [stale],
+      activeWorkout: log("2026-05-11"),
     });
     expect(result.ok).toBe(false);
   });

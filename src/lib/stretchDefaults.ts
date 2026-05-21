@@ -78,6 +78,13 @@ export function filterStretchesByDislikes(
   return entries.filter((e) => !dislikedExerciseIds.has(e.exerciseId));
 }
 
+/** Per-day stretch override only when the list is non-empty (empty [] means “use derived”). */
+export function hasStretchListOverride(
+  entries: StretchEntry[] | null | undefined,
+): entries is StretchEntry[] {
+  return entries != null && entries.length > 0;
+}
+
 export function stretchListsEqual(a: StretchEntry[], b: StretchEntry[]): boolean {
   if (a.length !== b.length) return false;
   const key = (list: StretchEntry[]) =>

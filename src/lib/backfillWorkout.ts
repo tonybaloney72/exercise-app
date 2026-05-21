@@ -47,7 +47,8 @@ export function getBackfillEligibility(options: {
     return { ok: false, reason: "This day already has a completed workout." };
   }
 
-  if (findInProgressWorkoutForDate(workoutHistory, dateKey)) {
+  const inProgress = findInProgressWorkoutForDate(workoutHistory, dateKey);
+  if (inProgress) {
     return {
       ok: false,
       reason: "A workout for this day is already in progress.",
@@ -58,6 +59,33 @@ export function getBackfillEligibility(options: {
     return {
       ok: false,
       reason: "Finish or discard your current workout before logging another day.",
+    };
+  }
+
+  return { ok: true };
+}
+
+/** Resume an existing in-progress log for a calendar day (stale / backfill sessions). */
+export function canResumeInProgressForDate(options: {
+  dateKey: string;
+  workoutHistory: WorkoutLog[];
+  activeWorkout: WorkoutLog | null;
+}): BackfillEligibility {
+  const { dateKey, workoutHistory, activeWorkout } = options;
+
+  if (!parseLocalDateKey(dateKey)) {
+    return { ok: false, reason: "Invalid date." };
+  }
+
+  const inProgress = findInProgressWorkoutForDate(workoutHistory, dateKey);
+  if (!inProgress) {
+    return { ok: false, reason: "No saved in-progress workout for this day." };
+  }
+
+  if (activeWorkout && !activeWorkout.endTime && activeWorkout.id !== inProgress.id) {
+    return {
+      ok: false,
+      reason: "Finish or discard your current workout before continuing another day.",
     };
   }
 

@@ -8,6 +8,11 @@ import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { EQUIPMENT_LABELS, exerciseMatchesEquipment } from "@/data/equipment";
 import EmptyState from "@/components/common/EmptyState";
+import {
+  DislikeIcon,
+  FavoriteIcon,
+  FavoriteIconOutline,
+} from "@/components/common/ExercisePreferenceIcons";
 import type { Exercise, ExerciseCategory } from "@/types";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
@@ -219,18 +224,11 @@ function ExercisePreferenceToggles({ exerciseId }: { exerciseId: string }) {
         aria-pressed={isFavorite}
         aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
       >
-        <svg
-          viewBox="0 0 24 24"
-          width="20"
-          height="20"
-          fill={isFavorite ? "currentColor" : "none"}
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinejoin="round"
-          aria-hidden
-        >
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-        </svg>
+        {isFavorite ? (
+          <FavoriteIcon size={20} />
+        ) : (
+          <FavoriteIconOutline size={20} />
+        )}
       </button>
       <button
         type="button"
@@ -254,19 +252,7 @@ function ExercisePreferenceToggles({ exerciseId }: { exerciseId: string }) {
             : "Exclude from personalized plans"
         }
       >
-        <svg
-          viewBox="0 0 24 24"
-          width="20"
-          height="20"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          aria-hidden
-        >
-          <circle cx="12" cy="12" r="9" />
-          <line x1="5" y1="5" x2="19" y2="19" />
-        </svg>
+        <DislikeIcon size={20} />
       </button>
     </div>
   );

@@ -1,17 +1,17 @@
 import { seededCandidateRank } from "@/lib/exerciseCandidates";
 import {
   dedupeStretchEntries,
+  hasStretchListOverride,
   normalizeStretchList,
 } from "@/lib/stretchDefaults";
 import {
-  coolDownCatalogPool,
+  allCoolDownCatalogPool,
   warmSessionCatalogPool,
   type StretchThemePoolId,
 } from "@/lib/stretchCatalogPools";
 import type { StretchResolveContext } from "@/lib/stretchResolveContext";
 import {
   shouldIncludeStretchPool,
-  stretchCoolDownQuota,
   stretchWarmUpQuota,
 } from "@/lib/trainingPriorityStretches";
 import { shouldSkipStretchesForPlan } from "@/lib/restDays";
@@ -21,6 +21,9 @@ export type ResolvedDayStretches = {
   warmUp: StretchEntry[];
   coolDown: StretchEntry[];
 };
+
+/** Prescribed cool-down count from the catalog generator (not counting user overrides). */
+export const COOL_DOWN_STRETCHES_PER_DAY = 5;
 
 function mergeExcludeIds(
   ...sets: (ReadonlySet<string> | undefined)[]
@@ -155,33 +158,26 @@ function deriveCoolDown(
   ctx: StretchResolveContext,
   warmExerciseIds: ReadonlySet<string>,
 ): StretchEntry[] {
-  const recovery = isLightRecoveryDay(plan);
-  const cats = categoriesInPlan(plan);
   const preset = ctx.trainingPriorityPreset;
-  const { trainingPriorityScores: scores, trainingPriorityCustomized: customized } =
-    ctx;
   const daySeed = `d${plan.dayOfWeek}-tp:${preset}`;
-  const coolParts: StretchEntry[] = [...ctx.defaultCoolDown];
+  const seed = `${ctx.weekRotationKey}-${daySeed}-cool-all`;
+  const defaults = dedupeStretchEntries([...ctx.defaultCoolDown]);
+  const usedIds = new Set(defaults.map((e) => e.exerciseId));
+  const slotsLeft = Math.max(0, COOL_DOWN_STRETCHES_PER_DAY - defaults.length);
 
-  const poolIds: StretchThemePoolId[] = ["upper", "lower", "core"];
+  const picks =
+    slotsLeft > 0
+      ? pickStretchEntries(
+          allCoolDownCatalogPool(),
+          slotsLeft,
+          seed,
+          ctx.dislikedExerciseIds,
+          mergeExcludeIds(warmExerciseIds, usedIds),
+        )
+      : [];
 
-  for (const id of poolIds) {
-    if (!shouldIncludeStretchPool(id, plan, cats, preset, scores, customized))
-      continue;
-    let quota = stretchCoolDownQuota(id, preset, scores, customized);
-    if (recovery) quota = Math.max(1, Math.ceil(quota * 0.6));
-    if (quota <= 0) continue;
-    appendPickedPool(
-      coolParts,
-      coolDownCatalogPool(id),
-      quota,
-      `${ctx.weekRotationKey}-${daySeed}-cool-${id}`,
-      ctx,
-      mergeExcludeIds(ctx.weekUsedStretchIds, warmExerciseIds),
-    );
-  }
-
-  return dedupeStretchEntries(coolParts);
+  const merged = dedupeStretchEntries([...defaults, ...picks]);
+  return merged.slice(0, COOL_DOWN_STRETCHES_PER_DAY);
 }
 
 /**
@@ -207,7 +203,6 @@ export function resolveStretchesForWeekSequential(
     };
     const result = resolveStretchesForDay(plan, dayCtx);
     recordStretchUsage(weekUsed, result.warmUp);
-    recordStretchUsage(weekUsed, result.coolDown);
     out.push(result);
   }
 
@@ -247,25 +242,28 @@ export function resolveStretchesForDay(
   }
   const { dislikedExerciseIds } = ctx;
 
-  if (plan.warmUp != null && plan.coolDown != null) {
+  const warmOverride = hasStretchListOverride(plan.warmUp);
+  const coolOverride = hasStretchListOverride(plan.coolDown);
+
+  if (warmOverride && coolOverride) {
     return {
-      warmUp: normalizeStretchList(plan.warmUp, dislikedExerciseIds),
-      coolDown: normalizeStretchList(plan.coolDown, dislikedExerciseIds),
+      warmUp: normalizeStretchList(plan.warmUp!, dislikedExerciseIds),
+      coolDown: normalizeStretchList(plan.coolDown!, dislikedExerciseIds),
     };
   }
 
-  if (plan.warmUp != null) {
-    const warmUp = normalizeStretchList(plan.warmUp, dislikedExerciseIds);
+  if (warmOverride) {
+    const warmUp = normalizeStretchList(plan.warmUp!, dislikedExerciseIds);
     return {
       warmUp,
       coolDown: deriveCoolDown(plan, ctx, warmIdsFromEntries(warmUp)),
     };
   }
 
-  if (plan.coolDown != null) {
+  if (coolOverride) {
     return {
       warmUp: deriveWarmUp(plan, ctx),
-      coolDown: normalizeStretchList(plan.coolDown, dislikedExerciseIds),
+      coolDown: normalizeStretchList(plan.coolDown!, dislikedExerciseIds),
     };
   }
 

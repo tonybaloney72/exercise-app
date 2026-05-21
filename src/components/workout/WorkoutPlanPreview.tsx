@@ -16,8 +16,8 @@ interface WorkoutPlanPreviewProps {
   plan: DayPlan;
   /** When set, stretch lists use week-aware variety (same as workout start). */
   weekByDow?: TrainingWeekDays | null;
-  /** e.g. "Scheduled for Thursday, May 15" or "Today’s prescribed plan" */
-  bannerTitle: string;
+  /** Optional banner above the plan (omit for a compact preview). */
+  bannerTitle?: string;
   /** Secondary line under banner */
   bannerHint?: string;
   /** When true, show a short note that the workout can’t be started from this screen */
@@ -44,22 +44,28 @@ export default function WorkoutPlanPreview({
     return formatPlanTargetPrescription(meta, exerciseSettings[exerciseId]);
   };
 
+  const showBanner = Boolean(bannerTitle || bannerHint || isFutureDay);
+
   return (
     <AnimatedSection className="space-y-4" delay={0.05}>
-      <SurfaceCard className="p-4 space-y-1">
-        <p className="text-xs font-medium uppercase tracking-wider text-accent">
-          {bannerTitle}
-        </p>
-        {bannerHint && (
-          <p className="text-sm text-muted">{bannerHint}</p>
-        )}
-        {isFutureDay && (
-          <p className="mt-2 text-xs text-muted">
-            You can review what&apos;s planned ahead of time. To log sets and start the timer, come
-            back on this day (use <span className="font-medium text-foreground">Today</span>).
-          </p>
-        )}
-      </SurfaceCard>
+      {showBanner && (
+        <SurfaceCard className="p-4 space-y-1">
+          {bannerTitle && (
+            <p className="text-xs font-medium uppercase tracking-wider text-accent">
+              {bannerTitle}
+            </p>
+          )}
+          {bannerHint && (
+            <p className="text-sm text-muted">{bannerHint}</p>
+          )}
+          {isFutureDay && (
+            <p className="mt-2 text-xs text-muted">
+              You can review what&apos;s planned ahead of time. To log sets and start the timer, come
+              back on this day (use <span className="font-medium text-foreground">Today</span>).
+            </p>
+          )}
+        </SurfaceCard>
+      )}
 
       {showTargetMuscleList && (
         <SurfaceCard className="p-4 space-y-3">

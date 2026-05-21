@@ -1149,7 +1149,7 @@ const catalogExercises: Exercise[] = [
     id: "CS-27",
     name: "Thigh-Block Back Extension",
     category: "CS",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "plyo_box"],
     muscleGroups: ["Spinal Erectors", "Glutes"],
     defaultReps: "12",
     notes:
@@ -1162,7 +1162,7 @@ const catalogExercises: Exercise[] = [
     id: "CS-28",
     name: "Thigh-Block Full Extension",
     category: "CS",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "plyo_box"],
     muscleGroups: ["Spinal Erectors", "Glutes"],
     defaultReps: "10",
     notes:
@@ -1175,7 +1175,7 @@ const catalogExercises: Exercise[] = [
     id: "CS-29",
     name: "Adductor Side Plank",
     category: "CS",
-    equipment: ["bodyweight"],
+    equipment: ["plyo_box"],
     muscleGroups: ["Obliques", "Transverse Abdominis"],
     defaultReps: "20–30 sec each side",
     notes:
@@ -3142,7 +3142,7 @@ const catalogExercises: Exercise[] = [
     notes:
       "Side-lying, knees bent — open top arm to ceiling and behind, follow with eyes; hips stay stacked.",
     source: "Healthline",
-    videoUrl: "https://www.youtube.com/watch?v=YMswmJKHmMo",
+    videoUrl: "https://www.youtube.com/watch?v=e71IP2SLrRc",
     isTimeBased: false,
     secondaryCategory: "CR",
   },
@@ -3198,7 +3198,7 @@ const catalogExercises: Exercise[] = [
     notes:
       "Lateral grapevine at easy pace, knees up, torso tall — prep for change-of-direction days.",
     source: "Runner's World",
-    videoUrl: "https://www.youtube.com/watch?v=0M1r5sT_2Yk",
+    videoUrl: "https://www.youtube.com/watch?v=ViOHs1b6jGc",
     isTimeBased: false,
     secondaryCategory: "PC",
   },

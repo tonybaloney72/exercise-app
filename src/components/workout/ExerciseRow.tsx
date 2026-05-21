@@ -12,6 +12,7 @@ import {
   laterRoundOccurrencesByExerciseId,
 } from "@/lib/exerciseSwap";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { ExerciseLog, ExerciseSetMode, RoundExercise } from "@/types";
 import {
@@ -25,6 +26,7 @@ import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import SwapExerciseModal from "./SwapExerciseModal";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
 import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
+import { MenuIconDislike, MenuIconStar } from "./WorkoutRowMenuIcons";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 
 interface ExerciseRowProps {
@@ -71,7 +73,10 @@ export default function ExerciseRow({
   }, [activeWorkout?.rounds, roundNumber]);
 
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const authMode = useAuthStore((s) => s.mode);
   const preferenceMap = useExercisePreferencesStore((s) => s.byExerciseId);
+  const setPreference = useExercisePreferencesStore((s) => s.setPreference);
+  const exercisePreference = preferenceMap[effectiveId];
   const swapPrefs = useMemo(
     () => ({
       availableEquipment,
@@ -185,6 +190,26 @@ export default function ExerciseRow({
         : "";
 
   const overflowItems: WorkoutRowMenuItem[] = [];
+  if (authMode === "authenticated") {
+    const isFavorite = exercisePreference === "favorite";
+    const isDisliked = exercisePreference === "disliked";
+    overflowItems.push({
+      label: isFavorite ? "Remove favorite" : "Favorite",
+      icon: <MenuIconStar filled={isFavorite} />,
+      onClick: () =>
+        void setPreference(effectiveId, isFavorite ? null : "favorite", {
+          refreshGeneratedWeek: false,
+        }),
+    });
+    overflowItems.push({
+      label: isDisliked ? "Remove dislike" : "Dislike",
+      icon: <MenuIconDislike active={isDisliked} />,
+      onClick: () =>
+        void setPreference(effectiveId, isDisliked ? null : "disliked", {
+          refreshGeneratedWeek: false,
+        }),
+    });
+  }
   if (!log.skipped) {
     overflowItems.push({
       label: "Swap exercise",

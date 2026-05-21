@@ -3,10 +3,15 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { exerciseMap } from "@/data/exercises";
+import { collectDislikedIds } from "@/lib/exerciseCandidates";
+import { getStretchSwapCandidates } from "@/lib/stretchSwap";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
+import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
 import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
+import SwapExerciseModal from "./SwapExerciseModal";
 import type { ExerciseLog, ExerciseSetMode, StretchEntry } from "@/types";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
@@ -18,11 +23,13 @@ import TimerTargetControls from "./TimerTargetControls";
 
 interface StretchSectionProps {
   title: string;
+  stretchCategory: "SW" | "SC";
   stretches: StretchEntry[];
   exerciseLogs: ExerciseLog[];
   onToggle: (exerciseId: string) => void;
   onSkip: (exerciseId: string) => void;
   onUnskip: (exerciseId: string) => void;
+  onSwap?: (fromExerciseId: string, toExerciseId: string) => void;
   onSetTargetDuration: (exerciseId: string, seconds: number) => void;
   onSetActualDuration: (
     exerciseId: string,
@@ -36,15 +43,22 @@ export default function StretchSection({
   title,
   stretches,
   exerciseLogs,
+  stretchCategory,
   onToggle,
   onSkip,
   onUnskip,
+  onSwap,
   onSetTargetDuration,
   onSetActualDuration,
   onAddStretch,
   onRemoveStretch,
 }: StretchSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const usedStretchIds = useMemo(
+    () => new Set(stretches.map((s) => s.exerciseId)),
+    [stretches],
+  );
 
   const completedCount = exerciseLogs.filter(
     (e) => e.completed || e.skipped,
@@ -144,6 +158,9 @@ export default function StretchSection({
                     }}
                     onSkip={() => onSkip(stretch.exerciseId)}
                     onUnskip={() => onUnskip(stretch.exerciseId)}
+                    onSwap={onSwap}
+                    stretchCategory={stretchCategory}
+                    usedStretchIds={usedStretchIds}
                     onSetTargetDuration={(sec) =>
                       onSetTargetDuration(stretch.exerciseId, sec)
                     }
@@ -170,9 +187,12 @@ interface StretchRowProps {
   exerciseId: string;
   targetReps: string;
   log: ExerciseLog;
+  stretchCategory: "SW" | "SC";
+  usedStretchIds: ReadonlySet<string>;
   onToggle: () => void;
   onSkip: () => void;
   onUnskip: () => void;
+  onSwap?: (fromExerciseId: string, toExerciseId: string) => void;
   onSetTargetDuration: (seconds: number) => void;
   onSetActualDuration: (seconds: number | undefined) => void;
   onRemoveFromWorkout?: () => void;
@@ -182,16 +202,43 @@ function StretchRow({
   exerciseId,
   targetReps,
   log,
+  stretchCategory,
+  usedStretchIds,
   onToggle,
   onSkip,
   onUnskip,
+  onSwap,
   onSetTargetDuration,
   onSetActualDuration,
   onRemoveFromWorkout,
 }: StretchRowProps) {
   const [expanded, setExpanded] = useState(false);
+  const [swapOpen, setSwapOpen] = useState(false);
+  const [swapModalKey, setSwapModalKey] = useState(0);
   const exercise = exerciseMap[exerciseId];
   const stored = useExerciseSettingsStore((s) => s.byExerciseId[exerciseId]);
+  const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const preferenceMap = useExercisePreferencesStore((s) => s.byExerciseId);
+  const swapCandidates = useMemo(
+    () =>
+      onSwap
+        ? getStretchSwapCandidates({
+            category: stretchCategory,
+            currentExerciseId: exerciseId,
+            usedExerciseIds: usedStretchIds,
+            availableEquipment,
+            dislikedExerciseIds: collectDislikedIds(preferenceMap),
+          })
+        : [],
+    [
+      onSwap,
+      stretchCategory,
+      exerciseId,
+      usedStretchIds,
+      availableEquipment,
+      preferenceMap,
+    ],
+  );
 
   const mode: ExerciseSetMode = useMemo(() => {
     if (!exercise) return "reps";
@@ -228,11 +275,26 @@ function StretchRow({
   if (!exercise) return null;
 
   const overflowItems: WorkoutRowMenuItem[] = [];
+  if (onSwap && !log.skipped) {
+    overflowItems.push({
+      label: "Swap stretch",
+      onClick: () => {
+        setSwapModalKey((k) => k + 1);
+        setSwapOpen(true);
+      },
+    });
+  }
   if (!log.completed && !log.skipped) {
-    overflowItems.push({ label: "Skip", onClick: onSkip });
+    overflowItems.push({
+      label: "Skip",
+      onClick: onSkip,
+    });
   }
   if (log.skipped) {
-    overflowItems.push({ label: "Undo skip", onClick: onUnskip });
+    overflowItems.push({
+      label: "Undo skip",
+      onClick: onUnskip,
+    });
   }
   if (onRemoveFromWorkout) {
     overflowItems.push({
@@ -249,6 +311,18 @@ function StretchRow({
 
   return (
     <div className={`transition-colors ${log.skipped ? "opacity-40" : ""}`}>
+      {onSwap ? (
+        <SwapExerciseModal
+          key={swapModalKey}
+          open={swapOpen}
+          plannedName={exercise?.name ?? exerciseId}
+          candidates={swapCandidates}
+          hasSwap={false}
+          onClose={() => setSwapOpen(false)}
+          onPick={(id) => onSwap(exerciseId, id)}
+          onClearSwap={() => {}}
+        />
+      ) : null}
       <div className="flex items-start gap-2 px-1">
         <button
           type="button"

@@ -332,27 +332,6 @@ export default function WorkoutPlanEditor({
 
   return (
     <AnimatedSection className="space-y-4" delay={0}>
-      {!embedded && (
-        <SurfaceCard className="border-accent/40 bg-accent/10 p-4 space-y-1.5">
-          <p className="text-sm font-semibold text-foreground">Customize workout</p>
-          <p className="text-sm text-muted leading-snug">
-            Change exercises and targets for this day. Pick any category when adding slots;
-            change keeps the same category. Use the grip on the left of each exercise to
-            reorder within a round (needs two or more exercises in that round).
-          </p>
-          {isCustomWeek ? (
-            <p className="text-xs text-muted leading-snug">
-              This week is customized — settings updates change today and upcoming days only
-              (not past days). Reset from Weekly restores the full auto-generated week.
-            </p>
-          ) : (
-            <p className="text-xs text-muted leading-snug">
-              Saving marks this week as customized.
-            </p>
-          )}
-        </SurfaceCard>
-      )}
-
       <DayPlanCardioEditor plan={draft} onChange={setDraft} />
 
       <div className="flex flex-wrap items-center justify-between gap-2 px-1">

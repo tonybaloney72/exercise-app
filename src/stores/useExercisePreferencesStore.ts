@@ -9,12 +9,22 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import type { TrainingWeekRefreshReason } from "@/stores/useTrainingWeekRefreshStore";
 import { toastSaveError, toastSavePartialWarning } from "@/utils/saveErrorToast";
 
+export type SetExercisePreferenceOptions = {
+  /**
+   * When false, only saves the preference (no week regen / plan refetch).
+   * Use during an active workout so the session UI stays stable.
+   * @default true
+   */
+  refreshGeneratedWeek?: boolean;
+};
+
 type ExercisePreferencesState = {
   byExerciseId: ExercisePreferenceMap;
   load: () => Promise<void>;
   setPreference: (
     exerciseId: string,
     preference: ExercisePreferenceKind | null,
+    options?: SetExercisePreferenceOptions,
   ) => Promise<void>;
 };
 
@@ -36,7 +46,7 @@ export const useExercisePreferencesStore = create<ExercisePreferencesState>(
       }
     },
 
-    setPreference: async (exerciseId, preference) => {
+    setPreference: async (exerciseId, preference, options) => {
       const mode = useAuthStore.getState().mode;
       if (mode !== "authenticated") return;
 
@@ -66,7 +76,8 @@ export const useExercisePreferencesStore = create<ExercisePreferencesState>(
       const affectsFavorites =
         preference === "favorite" || was === "favorite";
 
-      if (affectsDislikes || affectsFavorites) {
+      const shouldRefreshWeek = options?.refreshGeneratedWeek !== false;
+      if (shouldRefreshWeek && (affectsDislikes || affectsFavorites)) {
         const reason: TrainingWeekRefreshReason = affectsDislikes
           ? "dislike"
           : "favorite";

@@ -61,67 +61,66 @@ export default function RoundCard({
   }
 
   return (
-    <div className="rounded-xl border border-border bg-surface overflow-hidden">
+    <div className="rounded-xl border border-border bg-surface">
       {/* Header */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left"
-      >
-        <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-foreground">
-            Round {round.roundNumber}
-          </h3>
-          {allDone && (
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="text-green-400 text-xs"
-            >
-              ✓
-            </motion.span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {onAddExercise ? (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddExercise();
-              }}
-              className="rounded-md border border-border px-2 py-0.5 text-[10px] font-medium text-foreground hover:bg-surface-hover"
-            >
-              + Add
-            </button>
-          ) : null}
-          <span className="text-xs text-muted">
-            {completedCount}/{total}
-          </span>
-          {/* Progress bar */}
-          <div className="h-1.5 w-16 rounded-full bg-border overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-accent"
-              initial={{ width: 0 }}
-              animate={{ width: `${(completedCount / total) * 100}%` }}
-              transition={{ duration: 0.3 }}
-            />
+      <div className="flex w-full items-center gap-2 px-4 py-3">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex min-w-0 flex-1 items-center justify-between gap-2 text-left"
+        >
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-foreground">
+              Round {round.roundNumber}
+            </h3>
+            {allDone && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="text-green-400 text-xs"
+              >
+                ✓
+              </motion.span>
+            )}
           </div>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={`text-muted transition-transform ${isOpen ? "rotate-180" : ""}`}
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="text-xs text-muted">
+              {completedCount}/{total}
+            </span>
+            <div className="h-1.5 w-16 rounded-full bg-border overflow-hidden">
+              <motion.div
+                className="h-full rounded-full bg-accent"
+                initial={{ width: 0 }}
+                animate={{ width: `${(completedCount / total) * 100}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`text-muted transition-transform ${isOpen ? "rotate-180" : ""}`}
+              aria-hidden
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+        </button>
+        {onAddExercise ? (
+          <button
+            type="button"
+            onClick={onAddExercise}
+            className="shrink-0 rounded-md border border-border px-2 py-0.5 text-[10px] font-medium text-foreground hover:bg-surface-hover"
           >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </div>
-      </button>
+            + Add
+          </button>
+        ) : null}
+      </div>
 
       {!isOpen && showRestPrompt && (
         <motion.div

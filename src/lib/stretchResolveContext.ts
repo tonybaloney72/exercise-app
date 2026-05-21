@@ -91,7 +91,15 @@ function stretchesForPlanInWeek(
 ): ResolvedDayStretches {
   const weekPlans = Array.from({ length: 7 }, (_, d) => weekByDow[d] ?? null);
   const resolved = resolveStretchesForWeekSequential(weekPlans, ctx);
-  return resolved[plan.dayOfWeek] ?? resolveStretchesForDay(plan, ctx);
+  const weekAware =
+    resolved[plan.dayOfWeek] ?? resolveStretchesForDay(plan, ctx);
+  const dayOnly = resolveStretchesForDay(plan, ctx);
+  return {
+    warmUp:
+      weekAware.warmUp.length > 0 ? weekAware.warmUp : dayOnly.warmUp,
+    coolDown:
+      weekAware.coolDown.length > 0 ? weekAware.coolDown : dayOnly.coolDown,
+  };
 }
 
 /** Resolve warm-up / cool-down using current settings + prefs (non-React). */

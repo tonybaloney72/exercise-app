@@ -20,6 +20,7 @@ import {
 } from "@/lib/stretchResolveContext";
 import {
   cloneStretchEntries,
+  hasStretchListOverride,
   normalizeStretchList,
   stretchListsEqual,
 } from "@/lib/stretchDefaults";
@@ -66,15 +67,13 @@ export function prepareDayPlanForEditor(plan: DayPlan): DayPlan {
   const ctx = buildStretchResolveContext();
   const resolved = resolveStretchesForDay(plan, ctx);
 
-  const warmUp =
-    plan.warmUp != null
-      ? normalizeStretchList(plan.warmUp, ctx.dislikedExerciseIds)
-      : resolved.warmUp;
+  const warmUp = hasStretchListOverride(plan.warmUp)
+    ? normalizeStretchList(plan.warmUp, ctx.dislikedExerciseIds)
+    : resolved.warmUp;
 
-  const coolDown =
-    plan.coolDown != null
-      ? normalizeStretchList(plan.coolDown, ctx.dislikedExerciseIds)
-      : resolved.coolDown;
+  const coolDown = hasStretchListOverride(plan.coolDown)
+    ? normalizeStretchList(plan.coolDown, ctx.dislikedExerciseIds)
+    : resolved.coolDown;
 
   return { ...cloned, warmUp, coolDown };
 }
@@ -95,14 +94,12 @@ export function dayPlanForCustomSave(
     ctx,
   );
 
-  const normalizedWarm =
-    rest.warmUp != null
-      ? normalizeStretchList(rest.warmUp, ctx.dislikedExerciseIds)
-      : null;
-  const normalizedCool =
-    rest.coolDown != null
-      ? normalizeStretchList(rest.coolDown, ctx.dislikedExerciseIds)
-      : null;
+  const normalizedWarm = hasStretchListOverride(rest.warmUp)
+    ? normalizeStretchList(rest.warmUp, ctx.dislikedExerciseIds)
+    : null;
+  const normalizedCool = hasStretchListOverride(rest.coolDown)
+    ? normalizeStretchList(rest.coolDown, ctx.dislikedExerciseIds)
+    : null;
 
   const warmUp =
     normalizedWarm != null && !stretchListsEqual(normalizedWarm, derived.warmUp)

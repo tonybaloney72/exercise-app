@@ -6,18 +6,13 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import SurfaceCard from "@/components/common/SurfaceCard";
-import FrozenPastDayPlanNotice from "@/components/workout/FrozenPastDayPlanNotice";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
-import {
-  categoriesPresentInPlan,
-  planDaySubtitle,
-} from "@/lib/planDisplayCategories";
+import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { getFrozenPastDayPlanCopy } from "@/lib/trainingWeekFrozenDay";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import {
   bumpTrainingWeekPlans,
@@ -29,7 +24,6 @@ import {
 } from "@/lib/trainingWeekCustomize";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { getBackfillEligibility } from "@/lib/backfillWorkout";
 import {
   findCompletedWorkoutForDate,
@@ -56,17 +50,6 @@ function formatCompletedBannerTitle(dateKey: string): string {
     day: "numeric",
   });
   return `Completed · ${label}`;
-}
-
-function formatScheduledBannerTitle(dateKey: string): string {
-  const d = parseLocalDateKey(dateKey);
-  if (!d) return "Scheduled workout";
-  const label = d.toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
-  return `Scheduled · ${label}`;
 }
 
 function formatPageTitle(dateKey: string): string {
@@ -119,17 +102,7 @@ export default function WeeklyDayPage() {
     pausedWorkoutDate,
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
-  const trainingPriorityPreset = useSettingsStore(
-    (s) => s.trainingPriorityPreset,
-  );
-  const trainingPriorityScores = useSettingsStore(
-    (s) => s.trainingPriorityScores,
-  );
-  const trainingPriorityCustomized = useSettingsStore(
-    (s) => s.trainingPriorityCustomized,
-  );
   const programMode = useSettingsStore((s) => s.programMode);
-  const exercisePrefs = useExercisePreferencesStore((s) => s.byExerciseId);
   const [customizing, setCustomizing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -201,11 +174,6 @@ export default function WeeklyDayPage() {
     startEditingCompletedWorkout(logForDay.id);
   };
 
-  const frozenPastCopy = useMemo(() => {
-    if (when !== "past" || !plan) return null;
-    return getFrozenPastDayPlanCopy(plan, exercisePrefs);
-  }, [when, plan, exercisePrefs]);
-
   const continueWorkoutHere =
     when === "today" &&
     !logForDay &&
@@ -263,6 +231,12 @@ export default function WeeklyDayPage() {
 
   const allCategories = categoriesPresentInPlan(plan);
   const showPlanEditor = customizing && canCustomize && !logForDay;
+  const weekdayMatchesPlanName = (() => {
+    const d = parseLocalDateKey(dateKey);
+    if (!d) return false;
+    const weekday = d.toLocaleDateString(undefined, { weekday: "long" });
+    return plan.name.trim().toLowerCase() === weekday.toLowerCase();
+  })();
 
   async function handleSaveDay(editedPlan: DayPlan) {
     setSaving(true);
@@ -307,19 +281,14 @@ export default function WeeklyDayPage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-1"
         >
-          <p className="text-xs font-medium uppercase tracking-wider text-accent">
-            {plan.name}
-          </p>
+          {!weekdayMatchesPlanName && (
+            <p className="text-xs font-medium uppercase tracking-wider text-accent">
+              {plan.name}
+            </p>
+          )}
           <h1 className="text-2xl font-bold text-foreground">
             {formatPageTitle(dateKey)}
           </h1>
-          <p className="text-sm text-muted">
-            {planDaySubtitle(plan, trainingPriorityPreset, {
-              preferMaterialized: isCustomWeek,
-              customized: trainingPriorityCustomized,
-              scores: trainingPriorityScores,
-            })}
-          </p>
           {isCustomWeek && canCustomize && (
             <p className="text-xs text-accent/90 pt-1">
               This week has custom edits — reset the full week from Weekly overview.
@@ -348,7 +317,7 @@ export default function WeeklyDayPage() {
           }}
           className="w-full rounded-xl border border-accent/40 bg-accent/10 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
         >
-          Customize this day&apos;s workout
+          Edit workout
         </button>
       )}
 
@@ -380,17 +349,10 @@ export default function WeeklyDayPage() {
         />
       )}
 
-      {frozenPastCopy && !showPlanEditor && (
-        <FrozenPastDayPlanNotice copy={frozenPastCopy} />
-      )}
-
       {when === "future" && !showPlanEditor && (
         <WorkoutPlanPreview
           plan={plan}
           weekByDow={weekByDow}
-          bannerTitle={formatScheduledBannerTitle(dateKey)}
-          bannerHint="Read-only preview of the prescribed plan."
-          isFutureDay
           showTargetMuscleList={false}
         />
       )}
@@ -467,21 +429,11 @@ export default function WeeklyDayPage() {
               </p>
             </SurfaceCard>
           )}
-          {!showPlanEditor && (
+          {!showPlanEditor && when !== "past" && (
             <WorkoutPlanPreview
               plan={plan}
               weekByDow={weekByDow}
-              bannerTitle={
-                when === "today"
-                  ? "Today’s prescribed plan"
-                  : formatScheduledBannerTitle(dateKey)
-              }
-              bannerHint={
-                when === "today"
-                  ? undefined
-                  : "What was scheduled — not logged."
-              }
-              showTargetMuscleList
+              showTargetMuscleList={false}
             />
           )}
         </>
