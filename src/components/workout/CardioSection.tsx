@@ -66,64 +66,64 @@ export default function CardioSection({
         layout
         className="rounded-xl border border-border bg-surface overflow-hidden"
       >
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex w-full items-center justify-between px-4 py-3 text-left"
-        >
-          <motion.div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-foreground">
-              Cardio & Endurance
-            </h3>
-            {allDone ? (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="text-green-400 text-xs"
-              >
-                ✓
-              </motion.span>
-            ) : null}
-          </motion.div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setAddOpen(true);
-              }}
-              className="rounded-md border border-border px-2 py-0.5 text-[10px] font-medium text-foreground hover:bg-surface-hover"
-            >
-              + Add
-            </button>
-            <span className="text-xs text-muted">
-              {completedCount}/{total}
-            </span>
-            <motion.div className="h-1.5 w-16 rounded-full bg-border overflow-hidden">
-              <motion.div
-                className="h-full rounded-full bg-accent"
-                initial={{ width: 0 }}
-                animate={{
-                  width: `${total > 0 ? (completedCount / total) * 100 : 0}%`,
-                }}
-                transition={{ duration: 0.3 }}
-              />
+        <div className="flex w-full items-center gap-2 px-4 py-3">
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex min-w-0 flex-1 items-center justify-between gap-2 text-left"
+          >
+            <motion.div className="flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-foreground">
+                Cardio & Endurance
+              </h3>
+              {allDone ? (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="text-green-400 text-xs"
+                >
+                  ✓
+                </motion.span>
+              ) : null}
             </motion.div>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className={`text-muted transition-transform ${isOpen ? "rotate-180" : ""}`}
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-        </button>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="text-xs text-muted">
+                {completedCount}/{total}
+              </span>
+              <motion.div className="h-1.5 w-16 rounded-full bg-border overflow-hidden">
+                <motion.div
+                  className="h-full rounded-full bg-accent"
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${total > 0 ? (completedCount / total) * 100 : 0}%`,
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+              </motion.div>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`text-muted transition-transform ${isOpen ? "rotate-180" : ""}`}
+                aria-hidden
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
+            className="shrink-0 rounded-md border border-border px-2 py-0.5 text-[10px] font-medium text-foreground hover:bg-surface-hover"
+          >
+            + Add
+          </button>
+        </div>
 
         <AnimatePresence initial={false}>
           {isOpen ? (

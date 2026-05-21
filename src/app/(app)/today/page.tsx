@@ -11,6 +11,7 @@ import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import PostWorkoutSummary from "@/components/workout/PostWorkoutSummary";
+import StaleWorkoutSessionsBanner from "@/components/workout/StaleWorkoutSessionsBanner";
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
@@ -46,6 +47,7 @@ function TodayPageInner() {
     resumeWorkout,
     discardWorkout,
     loadHistory,
+    reconcileDayBoundary,
     updateCompletedWorkoutNotes,
     startEditingCompletedWorkout,
   } = useWorkoutStore();
@@ -73,8 +75,13 @@ function TodayPageInner() {
 
   useEffect(() => {
     if (mode === "loading") return;
-    loadHistory();
+    void loadHistory();
   }, [mode, loadHistory]);
+
+  useEffect(() => {
+    if (mode === "loading") return;
+    void reconcileDayBoundary();
+  }, [mode, todayKey, reconcileDayBoundary]);
 
   const todaysCompletedLog = useMemo(
     () => findCompletedWorkoutForDate(workoutHistory, todayKey),
@@ -317,6 +324,8 @@ function TodayPageInner() {
           />
         </div>
       )}
+
+      <StaleWorkoutSessionsBanner />
 
       {hasPausedDraftToday && (
         <AnimatedSection className="space-y-3" delay={0.15}>

@@ -65,9 +65,13 @@ import {
   upsertWorkoutInHistory,
 } from "@/lib/inProgressWorkoutSync";
 import {
+  pauseStaleInProgressLogs,
+  isStaleSessionDate,
+} from "@/lib/workoutSessionStale";
+import {
   findCompletedWorkoutForDate,
   findInProgressWorkoutForDate,
-  getPausedWorkoutDateFromHistory,
+  getPausedWorkoutDateForToday,
   shouldAutoRestoreInProgressFromHistory,
 } from "@/utils/workoutLogLookup";
 import {
@@ -251,6 +255,10 @@ interface WorkoutState {
   addCardioToWorkout: (kind: CardioActivityKind) => void;
 
   loadHistory: () => Promise<void>;
+  /** Pause prior-day in-progress rows and clear a stale live session (midnight rules). */
+  reconcileDayBoundary: () => Promise<void>;
+  /** Delete an unfinished workout from a previous calendar day. */
+  discardStaleWorkout: (workoutId: string) => void;
   /** Re-apply Library timer defaults to warm-up / cool-down on an active workout. */
   syncStretchTargetsFromLibrary: () => void;
 }
@@ -1267,10 +1275,118 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       };
     }),
 
+  reconcileDayBoundary: async () => {
+    const mode = useAuthStore.getState().mode;
+    if (mode === "loading") return;
+    const todayKey = formatLocalDateKey();
+    const scope = draftScope();
+    const state = get();
+    let workoutHistory = state.workoutHistory;
+    const { history, changedIds } = pauseStaleInProgressLogs(
+      workoutHistory,
+      todayKey,
+    );
+    workoutHistory = history;
+
+    if (mode === "authenticated" && changedIds.length > 0) {
+      for (const id of changedIds) {
+        const row = workoutHistory.find((w) => w.id === id);
+        if (!row) continue;
+        try {
+          await getWorkoutRepo().saveWorkout(
+            hydrateWorkoutLog(workoutLogForPersistence({ ...row, paused: true })),
+          );
+        } catch (err) {
+          toastSaveError("workout draft", err);
+        }
+      }
+    }
+
+    let activeWorkout = state.activeWorkout;
+    if (
+      activeWorkout &&
+      !activeWorkout.endTime &&
+      isStaleSessionDate(activeWorkout.date, todayKey)
+    ) {
+      const pausedLog = hydrateWorkoutLog(
+        workoutLogForPersistence({
+          ...activeWorkout,
+          paused: true,
+          endTime: undefined,
+        }),
+      );
+      workoutHistory = upsertWorkoutInHistory(workoutHistory, pausedLog);
+      cancelScheduledPersistActiveWorkoutDraft();
+      cancelScheduledPersistInProgressWorkout();
+      if (mode === "authenticated") {
+        try {
+          await getWorkoutRepo().saveWorkout(pausedLog);
+        } catch (err) {
+          toastSaveError("workout draft", err);
+        }
+      } else {
+        saveActiveWorkoutDraft(scope, activeWorkout, { paused: true });
+      }
+      activeWorkout = null;
+    }
+
+    const pausedWorkoutDate =
+      mode === "authenticated"
+        ? getPausedWorkoutDateForToday(workoutHistory, todayKey)
+        : getPausedDraftDate(scope, todayKey);
+
+    set({ workoutHistory, activeWorkout, pausedWorkoutDate });
+  },
+
+  discardStaleWorkout: (workoutId) => {
+    const state = get();
+    const target = state.workoutHistory.find((w) => w.id === workoutId);
+    if (!target || target.endTime != null) return;
+    if (!isStaleSessionDate(target.date)) return;
+
+    const mode = useAuthStore.getState().mode;
+    const scope = draftScope();
+    cancelScheduledPersistActiveWorkoutDraft();
+    cancelScheduledPersistInProgressWorkout();
+
+    const historyBefore = state.workoutHistory;
+    const todayKey = formatLocalDateKey();
+    const pausedWorkoutDate =
+      state.pausedWorkoutDate === target.date
+        ? null
+        : mode === "authenticated"
+          ? getPausedWorkoutDateForToday(
+              historyBefore.filter((w) => w.id !== workoutId),
+              todayKey,
+            )
+          : getPausedDraftDate(scope, todayKey);
+
+    set({
+      activeWorkout:
+        state.activeWorkout?.id === workoutId ? null : state.activeWorkout,
+      pausedWorkoutDate,
+      workoutHistory: historyBefore.filter((w) => w.id !== workoutId),
+    });
+
+    if (mode === "authenticated") {
+      void (async () => {
+        try {
+          await getWorkoutRepo().deleteWorkout(workoutId);
+        } catch (err) {
+          toastSaveError("workout", err);
+          set({ workoutHistory: historyBefore, pausedWorkoutDate: state.pausedWorkoutDate });
+        }
+      })();
+    } else if (loadActiveWorkoutDraft(scope)?.log.id === workoutId) {
+      clearActiveWorkoutDraft(scope);
+    }
+  },
+
   loadHistory: async () => {
     const mode = useAuthStore.getState().mode;
     if (mode === "loading") return; // Wait until AuthInitializer settles.
     const scope = draftScope();
+    const todayKey = formatLocalDateKey();
     let workoutHistory = (await getWorkoutRepo(mode).loadHistory()).map(
       hydrateWorkoutLog,
     );
@@ -1304,26 +1420,66 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       }
     }
 
-    const pausedWorkoutDate =
-      mode === "authenticated"
-        ? getPausedWorkoutDateFromHistory(workoutHistory)
-        : getPausedDraftDate(scope);
+    const stalePause = pauseStaleInProgressLogs(workoutHistory, todayKey);
+    workoutHistory = stalePause.history;
+    if (mode === "authenticated" && stalePause.changedIds.length > 0) {
+      for (const id of stalePause.changedIds) {
+        const row = workoutHistory.find((w) => w.id === id);
+        if (!row) continue;
+        try {
+          await getWorkoutRepo().saveWorkout(
+            hydrateWorkoutLog(workoutLogForPersistence({ ...row, paused: true })),
+          );
+        } catch (err) {
+          toastSaveError("workout draft", err);
+        }
+      }
+    }
 
     const current = get();
     let activeWorkout = current.activeWorkout;
+    if (
+      activeWorkout &&
+      !activeWorkout.endTime &&
+      isStaleSessionDate(activeWorkout.date, todayKey)
+    ) {
+      const pausedLog = hydrateWorkoutLog(
+        workoutLogForPersistence({
+          ...activeWorkout,
+          paused: true,
+          endTime: undefined,
+        }),
+      );
+      workoutHistory = upsertWorkoutInHistory(workoutHistory, pausedLog);
+      if (mode === "authenticated") {
+        try {
+          await getWorkoutRepo().saveWorkout(pausedLog);
+        } catch (err) {
+          toastSaveError("workout draft", err);
+        }
+      } else {
+        saveActiveWorkoutDraft(scope, activeWorkout, { paused: true });
+      }
+      activeWorkout = null;
+    }
+
     if (!activeWorkout) {
       if (mode === "authenticated") {
-        const todayKey = formatLocalDateKey();
         const restored = shouldAutoRestoreInProgressFromHistory(
           workoutHistory,
           todayKey,
         );
         if (restored) activeWorkout = hydrateWorkoutLog(restored);
       } else {
-        const restored = shouldAutoRestoreDraft(scope, workoutHistory);
+        const restored = shouldAutoRestoreDraft(scope, workoutHistory, todayKey);
         if (restored) activeWorkout = hydrateWorkoutLog(restored);
       }
     }
+
+    const pausedWorkoutDate =
+      mode === "authenticated"
+        ? getPausedWorkoutDateForToday(workoutHistory, todayKey)
+        : getPausedDraftDate(scope, todayKey);
 
     set({
       workoutHistory,

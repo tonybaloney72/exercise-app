@@ -1,5 +1,7 @@
 import type { WorkoutLog } from "@/types";
 import { migrateWorkoutLog } from "@/lib/cpToPcMigration";
+import { isStaleSessionDate } from "@/lib/workoutSessionStale";
+import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
 import type { AuthMode } from "@/stores/useAuthStore";
 
@@ -98,10 +100,14 @@ export function clearActiveWorkoutDraft(scope: DraftAuthScope): void {
 }
 
 /** In-progress draft that should not auto-resume (explicit pause). */
-export function getPausedDraftDate(scope: DraftAuthScope): string | null {
+export function getPausedDraftDate(
+  scope: DraftAuthScope,
+  todayKey: string = formatLocalDateKey(),
+): string | null {
   if (!usesLocalWorkoutDraft(scope)) return null;
   const payload = loadActiveWorkoutDraft(scope);
   if (!payload?.meta.paused || payload.log.endTime) return null;
+  if (payload.log.date !== todayKey) return null;
   return payload.log.date;
 }
 
@@ -112,12 +118,23 @@ export function getPausedDraftDate(scope: DraftAuthScope): string | null {
 export function shouldAutoRestoreDraft(
   scope: DraftAuthScope,
   history: WorkoutLog[],
+  todayKey: string = formatLocalDateKey(),
 ): WorkoutLog | null {
   if (!usesLocalWorkoutDraft(scope)) return null;
   const payload = loadActiveWorkoutDraft(scope);
   if (!payload) return null;
   if (payload.meta.paused) return null;
   if (payload.log.endTime) {
+    clearActiveWorkoutDraft(scope);
+    return null;
+  }
+  if (isStaleSessionDate(payload.log.date, todayKey)) {
+    if (!payload.meta.paused) {
+      saveActiveWorkoutDraft(scope, payload.log, { paused: true });
+    }
+    return null;
+  }
+  if (payload.log.date !== todayKey) {
     clearActiveWorkoutDraft(scope);
     return null;
   }

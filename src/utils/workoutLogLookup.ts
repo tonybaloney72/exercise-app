@@ -44,6 +44,17 @@ export function getPausedWorkoutDateFromHistory(
   return paused?.date ?? null;
 }
 
+/** Paused in-progress draft for today only (excludes stale prior-day sessions). */
+export function getPausedWorkoutDateForToday(
+  workoutHistory: WorkoutLog[],
+  todayKey: string = formatLocalDateKey(),
+): string | null {
+  const paused = workoutHistory.find(
+    (w) => w.endTime == null && w.paused && w.date === todayKey,
+  );
+  return paused?.date ?? null;
+}
+
 /** Non-paused in-progress log for today — auto-resume on load (authenticated). */
 export function shouldAutoRestoreInProgressFromHistory(
   workoutHistory: WorkoutLog[],

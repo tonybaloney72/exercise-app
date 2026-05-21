@@ -23,7 +23,7 @@ interface WorkoutRowMetaLineProps {
 }
 
 /**
- * Shared workout row chrome: title + optional category + menu, then one detail line.
+ * Shared workout row chrome: title, reps or timer target tucked under the name, category + menu.
  */
 export default function WorkoutRowMetaLine({
   name,
@@ -37,42 +37,43 @@ export default function WorkoutRowMetaLine({
   timerSeconds = 45,
   timerTitle,
 }: WorkoutRowMetaLineProps) {
-  const hasDetail =
-    Boolean(detailText?.trim()) || (showTimerPill && timerSeconds > 0);
+  const trimmedDetail = detailText?.trim() ?? "";
+  const inlineDetail = trimmedDetail.length > 0 && !showTimerPill;
+  const showTimerPillRow = showTimerPill && timerSeconds > 0;
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-1.5 py-1">
-      <div className="flex min-w-0 items-center gap-2">
-        <button
-          type="button"
-          onClick={onNameClick}
-          className="min-w-0 flex-1 text-left"
-        >
-          <p
-            className={`text-sm font-medium leading-snug wrap-break-word ${nameClassName}`}
+    <div className="flex min-w-0 flex-1 py-1">
+      <div className="flex min-w-0 flex-1 items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <button
+            type="button"
+            onClick={onNameClick}
+            className="w-full text-left"
           >
-            {name}
-          </p>
-          {subName}
-        </button>
+            <p
+              className={`text-sm font-medium leading-tight wrap-break-word ${nameClassName}`}
+            >
+              {name}
+            </p>
+            {subName}
+            {inlineDetail ? (
+              <p className="mt-0.5 text-xs leading-snug text-muted">{trimmedDetail}</p>
+            ) : null}
+          </button>
+          {showTimerPillRow ? (
+            <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+              <SetTimerPill seconds={timerSeconds} title={timerTitle} />
+              {trimmedDetail ? (
+                <p className="min-w-0 text-xs leading-snug text-muted">{trimmedDetail}</p>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
         {category ? (
           <CategoryBadge category={category} className="shrink-0" />
         ) : null}
         <WorkoutRowOverflowMenu items={menuItems} />
       </div>
-
-      {hasDetail ? (
-        <div className="flex min-w-0 items-center gap-2">
-          {showTimerPill ? (
-            <SetTimerPill seconds={timerSeconds} title={timerTitle} />
-          ) : null}
-          {detailText?.trim() ? (
-            <p className="min-w-0 text-xs leading-relaxed text-muted">
-              {detailText}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
     </div>
   );
 }
