@@ -14,6 +14,8 @@ export type CountdownRingProps = {
   trackClassName?: string;
   progressClassName?: string;
   strokeWidth?: number;
+  /** Framer transition length; keep near UI tick interval (~250ms) for smooth countdowns. */
+  transitionDuration?: number;
 };
 
 /**
@@ -26,8 +28,10 @@ export default function CountdownRing({
   trackClassName = "stroke-[var(--border-color)]/45",
   progressClassName = "text-accent",
   strokeWidth = 4,
+  transitionDuration,
 }: CountdownRingProps) {
   const p = Math.min(1, Math.max(0, progress));
+  const duration = transitionDuration ?? (p <= 0 ? 0 : 0.25);
 
   return (
     <svg
@@ -57,7 +61,7 @@ export default function CountdownRing({
         animate={{
           strokeDashoffset: COUNTDOWN_RING_CIRCUMFERENCE * (1 - p),
         }}
-        transition={{ duration: 0.95, ease: "linear" }}
+        transition={{ duration, ease: "linear" }}
       />
     </svg>
   );

@@ -45,6 +45,33 @@ export function formatTimerDisplay(totalSeconds: number): string {
   return formatSecondsToMMSS(totalSeconds);
 }
 
+/** Milliseconds left until `endsAtMs` (0 at or after deadline). */
+export function countdownRemainingMs(
+  endsAtMs: number,
+  nowMs: number = Date.now(),
+): number {
+  return Math.max(0, endsAtMs - nowMs);
+}
+
+/**
+ * Countdown label seconds: show N while (N−1, N] seconds remain (ceiling).
+ * Shows 0 only when `remainingMs` is 0.
+ */
+export function displayCountdownSeconds(remainingMs: number): number {
+  if (remainingMs <= 0) return 0;
+  return Math.ceil(remainingMs / 1000);
+}
+
+/** Ring fill: 1 at start, 0 when time is up (continuous, not per-tick steps). */
+export function countdownRingProgress(
+  remainingMs: number,
+  totalSeconds: number,
+): number {
+  if (totalSeconds <= 0) return 0;
+  const totalMs = totalSeconds * 1000;
+  return Math.min(1, Math.max(0, remainingMs / totalMs));
+}
+
 /** Logged duration for display (MM:SS, or raw seconds if formatting fails). */
 export function formatLoggedDuration(seconds: number | undefined | null): string {
   if (seconds == null) return "";

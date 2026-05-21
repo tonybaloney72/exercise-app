@@ -6,13 +6,19 @@ import { useFocusTrap } from "@/hooks/useFocusTrap";
 import CountdownRing from "@/components/common/CountdownRing";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import { primeTimerAudio } from "@/utils/timerAlert";
-import { formatTimerDisplay } from "@/utils/time";
+import {
+  countdownRingProgress,
+  formatTimerDisplay,
+} from "@/utils/time";
 
 export default function FullScreenTimerModal() {
   const mode = useFloatingTimerStore((s) => s.mode);
   const running = useFloatingTimerStore((s) => s.running);
   const seconds = useFloatingTimerStore((s) => s.seconds);
   const restTotalSeconds = useFloatingTimerStore((s) => s.restTotalSeconds);
+  const countdownRemainingMs = useFloatingTimerStore(
+    (s) => s.countdownRemainingMs,
+  );
   const pause = useFloatingTimerStore((s) => s.pause);
   const resume = useFloatingTimerStore((s) => s.resume);
   const adjustRest = useFloatingTimerStore((s) => s.adjustRest);
@@ -53,7 +59,9 @@ export default function FullScreenTimerModal() {
   const isSetTimer = mode === "setTimer";
   const isCountdown = isRest || isSetTimer;
   const progress =
-    isCountdown && restTotalSeconds > 0 ? seconds / restTotalSeconds : 0;
+    isCountdown && restTotalSeconds > 0
+      ? countdownRingProgress(countdownRemainingMs, restTotalSeconds)
+      : 0;
 
   const dialogLabel = isRest
     ? "Rest timer"

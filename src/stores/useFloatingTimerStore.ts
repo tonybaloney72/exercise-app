@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { primeTimerAudio, playTimerDoneAlert } from "@/utils/timerAlert";
+import { displayCountdownSeconds } from "@/utils/time";
 
 export type TimerMode = "idle" | "rest" | "stopwatch" | "setTimer";
 export type TimerPresentation = "fullscreen" | "minimized";
@@ -22,6 +23,8 @@ interface FloatingTimerState {
   lastStopwatchSeconds: number | null;
   /** Wall-clock ms when an active countdown reaches zero. */
   countdownEndsAtMs: number | null;
+  /** Continuous ms left (running: wall clock; paused: frozen). Drives ring progress. */
+  countdownRemainingMs: number;
   /** Wall-clock ms when the current stopwatch segment started (null while paused). */
   stopwatchStartedAtMs: number | null;
   /** Elapsed seconds accumulated before the current stopwatch segment. */
@@ -50,6 +53,7 @@ function countdownEndsAtFromSeconds(seconds: number): number {
 function clearClockFields() {
   return {
     countdownEndsAtMs: null as number | null,
+    countdownRemainingMs: 0,
     stopwatchStartedAtMs: null as number | null,
     stopwatchBaseSeconds: 0,
   };
@@ -63,6 +67,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   restTotalSeconds: 0,
   lastStopwatchSeconds: null,
   countdownEndsAtMs: null,
+  countdownRemainingMs: 0,
   stopwatchStartedAtMs: null,
   stopwatchBaseSeconds: 0,
 
@@ -77,6 +82,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       restTotalSeconds: seconds,
       lastStopwatchSeconds: null,
       countdownEndsAtMs: autoStart ? countdownEndsAtFromSeconds(seconds) : null,
+      countdownRemainingMs: seconds * 1000,
       stopwatchStartedAtMs: null,
       stopwatchBaseSeconds: 0,
     });
@@ -93,6 +99,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       restTotalSeconds: seconds,
       lastStopwatchSeconds: null,
       countdownEndsAtMs: countdownEndsAtFromSeconds(seconds),
+      countdownRemainingMs: seconds * 1000,
       stopwatchStartedAtMs: null,
       stopwatchBaseSeconds: 0,
     });
@@ -119,11 +126,14 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       if (!s.running) return s;
       if (s.mode === "rest" || s.mode === "setTimer") {
         if (s.countdownEndsAtMs != null) {
-          const left = Math.max(
-            0,
-            Math.ceil((s.countdownEndsAtMs - Date.now()) / 1000),
-          );
-          return { running: false, seconds: left, countdownEndsAtMs: null };
+          const remainingMs = Math.max(0, s.countdownEndsAtMs - Date.now());
+          const left = displayCountdownSeconds(remainingMs);
+          return {
+            running: false,
+            seconds: left,
+            countdownEndsAtMs: null,
+            countdownRemainingMs: remainingMs,
+          };
         }
         return { running: false };
       }
@@ -147,6 +157,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
         return {
           running: true,
           countdownEndsAtMs: countdownEndsAtFromSeconds(s.seconds),
+          countdownRemainingMs: s.seconds * 1000,
         };
       }
       if (s.mode === "stopwatch") {
@@ -163,15 +174,20 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       if (s.mode !== "rest") return s;
       const next = Math.max(0, s.seconds + deltaSeconds);
       const total = Math.max(s.restTotalSeconds, next);
+      const nextEndsAt =
+        s.running && s.countdownEndsAtMs != null
+          ? s.countdownEndsAtMs + deltaSeconds * 1000
+          : s.running
+            ? countdownEndsAtFromSeconds(next)
+            : null;
       return {
         seconds: next,
         restTotalSeconds: total,
-        countdownEndsAtMs:
-          s.running && s.countdownEndsAtMs != null
-            ? s.countdownEndsAtMs + deltaSeconds * 1000
-            : s.running
-              ? countdownEndsAtFromSeconds(next)
-              : null,
+        countdownEndsAtMs: nextEndsAt,
+        countdownRemainingMs:
+          nextEndsAt != null
+            ? Math.max(0, nextEndsAt - Date.now())
+            : next * 1000,
       };
     }),
 
@@ -182,6 +198,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
         seconds: s.restTotalSeconds,
         running: true,
         countdownEndsAtMs: countdownEndsAtFromSeconds(s.restTotalSeconds),
+        countdownRemainingMs: s.restTotalSeconds * 1000,
       };
     }),
 
@@ -226,20 +243,21 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
 
       if (s.mode === "rest" || s.mode === "setTimer") {
         if (s.countdownEndsAtMs == null) return s;
-        const left = Math.max(
-          0,
-          Math.ceil((s.countdownEndsAtMs - Date.now()) / 1000),
-        );
-        if (left <= 0) {
+        const remainingMs = Math.max(0, s.countdownEndsAtMs - Date.now());
+        if (remainingMs <= 0) {
           playTimerDoneAlert();
           return {
             seconds: 0,
             running: false,
             countdownEndsAtMs: null,
+            countdownRemainingMs: 0,
           };
         }
-        if (left === s.seconds) return s;
-        return { seconds: left };
+        const displaySec = displayCountdownSeconds(remainingMs);
+        if (displaySec === s.seconds && remainingMs === s.countdownRemainingMs) {
+          return s;
+        }
+        return { seconds: displaySec, countdownRemainingMs: remainingMs };
       }
 
       if (s.mode === "stopwatch") {

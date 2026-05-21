@@ -17,6 +17,7 @@ describe("useFloatingTimerStore syncTimerClock", () => {
       restTotalSeconds: 0,
       lastStopwatchSeconds: null,
       countdownEndsAtMs: null,
+      countdownRemainingMs: 0,
       stopwatchStartedAtMs: null,
       stopwatchBaseSeconds: 0,
     });
@@ -39,7 +40,28 @@ describe("useFloatingTimerStore syncTimerClock", () => {
     useFloatingTimerStore.getState().syncTimerClock();
     const s = useFloatingTimerStore.getState();
     expect(s.seconds).toBe(0);
+    expect(s.countdownRemainingMs).toBe(0);
     expect(s.running).toBe(false);
+  });
+
+  it("updates countdownRemainingMs between second ticks", () => {
+    useFloatingTimerStore.getState().startRest(10, true);
+    vi.advanceTimersByTime(500);
+    useFloatingTimerStore.getState().syncTimerClock();
+    const s = useFloatingTimerStore.getState();
+    expect(s.seconds).toBe(10);
+    expect(s.countdownRemainingMs).toBeGreaterThan(9_000);
+    expect(s.countdownRemainingMs).toBeLessThanOrEqual(10_000);
+  });
+
+  it("shows 1 second on display while sub-second time remains", () => {
+    useFloatingTimerStore.getState().startRest(5, true);
+    vi.advanceTimersByTime(4_500);
+    useFloatingTimerStore.getState().syncTimerClock();
+    const s = useFloatingTimerStore.getState();
+    expect(s.seconds).toBe(1);
+    expect(s.countdownRemainingMs).toBeLessThanOrEqual(500);
+    expect(s.countdownRemainingMs).toBeGreaterThan(0);
   });
 
   it("advances stopwatch from wall-clock segment start", () => {
