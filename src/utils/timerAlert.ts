@@ -5,6 +5,10 @@
  */
 
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { vibrateTimerDone } from "@/utils/hapticFeedback";
+
+/** Peak gain for timer chime (Web Audio; ~0.12 was hard to hear on phone speakers). */
+const TIMER_CHIME_PEAK_GAIN = 0.38;
 
 let sharedCtx: AudioContext | null = null;
 
@@ -42,7 +46,11 @@ function beep(
   const gain = ctx.createGain();
   osc.type = "sine";
   osc.frequency.value = frequency;
-  gain.gain.value = 0.12;
+  gain.gain.setValueAtTime(0.001, startAt);
+  gain.gain.exponentialRampToValueAtTime(
+    TIMER_CHIME_PEAK_GAIN,
+    startAt + 0.012,
+  );
   gain.gain.exponentialRampToValueAtTime(
     0.001,
     startAt + durationSec,
@@ -60,17 +68,9 @@ export function playTimerDoneChime(): void {
   if (!ctx) return;
   void ctx.resume().then(() => {
     const t = ctx.currentTime;
-    beep(ctx, 880, t, 0.12);
-    beep(ctx, 1174, t + 0.18, 0.16);
+    beep(ctx, 880, t, 0.14);
+    beep(ctx, 1174, t + 0.2, 0.18);
   }).catch(() => {});
-}
-
-export function vibrateTimerDone(): void {
-  const { timerVibrationEnabled } = useSettingsStore.getState();
-  if (!timerVibrationEnabled) return;
-  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-    navigator.vibrate([200, 100, 200]);
-  }
 }
 
 export function playTimerDoneAlert(): void {

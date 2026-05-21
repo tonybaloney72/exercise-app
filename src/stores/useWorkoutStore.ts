@@ -460,13 +460,15 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
 
     const inProgress = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
     const parsed = parseLocalDateKey(dateKey);
-    if (!inProgress || !parsed) return false;
+    const startIso =
+      inProgress?.startTime ?? localNoonIsoForDateKey(dateKey);
+    if (!inProgress || !parsed || !startIso) return false;
 
     const weekAnchor = weekKeyFromDateKey(dateKey);
     void beginWorkoutSession(
       plan,
       dateKey,
-      inProgress.startTime,
+      startIso,
       parsed.getDay(),
       weekAnchor ?? undefined,
     );
