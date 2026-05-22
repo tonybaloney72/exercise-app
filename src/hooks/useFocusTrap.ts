@@ -21,12 +21,20 @@ function preferredFocusTarget(nodes: HTMLElement[]): HTMLElement | undefined {
   );
 }
 
+export type FocusTrapInitialFocus = "prefer-input" | "first" | "none";
+
 type Options = {
   open: boolean;
   containerRef: RefObject<HTMLElement | null>;
   /** When provided, Escape calls this (if closeOnEscape). */
   onClose?: () => void;
   closeOnEscape?: boolean;
+  /**
+   * `prefer-input` — first input/textarea if present (default).
+   * `first` — first focusable in DOM order (often the close button).
+   * `none` — do not move focus on open (avoids mobile keyboard popping up).
+   */
+  initialFocus?: FocusTrapInitialFocus;
 };
 
 /**
@@ -38,6 +46,7 @@ export function useFocusTrap({
   containerRef,
   onClose,
   closeOnEscape = true,
+  initialFocus = "prefer-input",
 }: Options): void {
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
@@ -55,10 +64,14 @@ export function useFocusTrap({
     document.body.style.overflow = "hidden";
 
     const focusFirst = () => {
+      if (initialFocus === "none") return;
       const container = containerRef.current;
       if (!container) return;
       const nodes = getFocusableElements(container);
-      const target = preferredFocusTarget(nodes) ?? container;
+      const target =
+        initialFocus === "first"
+          ? (nodes[0] ?? container)
+          : (preferredFocusTarget(nodes) ?? nodes[0] ?? container);
       if (typeof target.focus === "function") {
         target.focus({ preventScroll: true });
       }
@@ -115,5 +128,5 @@ export function useFocusTrap({
         prev.focus({ preventScroll: true });
       }
     };
-  }, [open, containerRef, closeOnEscape]);
+  }, [open, containerRef, closeOnEscape, initialFocus]);
 }

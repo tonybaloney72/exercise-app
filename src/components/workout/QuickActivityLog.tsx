@@ -153,6 +153,8 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
         hint="Distance and/or time required."
         ariaLabel={modalTitle}
         placement="center"
+        initialFocus="none"
+        bodyClassName="px-0"
         footer={
           <div className="flex gap-2">
             <button
@@ -184,6 +186,12 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
               inputMode="decimal"
               value={distanceInput}
               onChange={(e) => setDistanceInput(e.target.value)}
+              onFocus={(e) =>
+                e.currentTarget.scrollIntoView({
+                  block: "nearest",
+                  behavior: "smooth",
+                })
+              }
               placeholder="1.2"
               className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
             />
@@ -196,6 +204,12 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
               type="text"
               value={timeInput}
               onChange={(e) => setTimeInput(e.target.value)}
+              onFocus={(e) =>
+                e.currentTarget.scrollIntoView({
+                  block: "nearest",
+                  behavior: "smooth",
+                })
+              }
               placeholder="32:00"
               className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
             />

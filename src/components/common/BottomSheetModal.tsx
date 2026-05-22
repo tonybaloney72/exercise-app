@@ -2,7 +2,8 @@
 
 import { useRef, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { useFocusTrap, type FocusTrapInitialFocus } from "@/hooks/useFocusTrap";
+import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 
 function CloseIcon() {
   return (
@@ -39,6 +40,7 @@ export type BottomSheetModalProps = {
    * `center` — centered dialog on all breakpoints.
    */
   placement?: "sheet" | "center";
+  initialFocus?: FocusTrapInitialFocus;
 };
 
 const maxWidthClass: Record<NonNullable<BottomSheetModalProps["maxWidth"]>, string> = {
@@ -64,15 +66,18 @@ export default function BottomSheetModal({
   titleClassName = "",
   hintClassName = "",
   placement = "sheet",
+  initialFocus = "prefer-input",
 }: BottomSheetModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const centered = placement === "center";
+  const keyboardInset = useKeyboardInset(open && centered);
 
   useFocusTrap({
     open,
     containerRef: panelRef,
     onClose,
     closeOnEscape: closeOnEscape && showCloseButton,
+    initialFocus,
   });
 
   return (
@@ -87,8 +92,15 @@ export default function BottomSheetModal({
           exit={{ opacity: 0 }}
           className={
             centered
-              ? "fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+              ? keyboardInset > 0
+                ? "fixed inset-0 z-[60] flex items-end justify-center bg-black/70 px-4 pt-4"
+                : "fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
               : "fixed inset-0 z-[60] flex items-end justify-center bg-black/70 p-0 sm:items-center sm:p-4"
+          }
+          style={
+            centered && keyboardInset > 0
+              ? { paddingBottom: keyboardInset + 16 }
+              : undefined
           }
           onClick={closeOnBackdropClick ? onClose : undefined}
         >
@@ -134,7 +146,9 @@ export default function BottomSheetModal({
 
             {headerExtra}
 
-            <div className={`min-h-0 flex-1 ${bodyClassName}`.trim()}>
+            <div
+              className={`min-h-0 flex-1 overflow-y-auto overscroll-contain ${bodyClassName}`.trim()}
+            >
               {children}
             </div>
 
