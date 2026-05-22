@@ -19,6 +19,7 @@ import { rebuildDerivedStretches } from "@/lib/dayStretchPlan";
 import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import { buildStretchUsedExerciseIds } from "@/lib/stretchDefaults";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
+import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import { getPlanAddCandidates, getPlanSlotCandidates } from "@/lib/planSlotCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
 import { laterRoundOccurrencesByExerciseId } from "@/lib/exerciseSwap";
@@ -87,8 +88,13 @@ export default function WorkoutPlanEditor({
   const [resetConfirm, setResetConfirm] = useState(false);
 
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
   const prefs = useExercisePreferencesStore((s) => s.byExerciseId);
   const dislikedIds = useMemo(() => collectDislikedIds(prefs), [prefs]);
+  const expertiseFilter = useMemo(
+    () => resolveExpertiseFilter({ expertiseByGroup }),
+    [expertiseByGroup],
+  );
   const balanceAlerts = useMemo(() => analyzeDayPlanBalance(draft), [draft]);
   const hasBalanceWarning = balanceAlerts.some((a) => a.severity === "warning");
   useBalanceAlertToasts(balanceAlerts);
@@ -121,6 +127,7 @@ export default function WorkoutPlanEditor({
         roundExerciseIds: round.exercises.map((e) => e.exerciseId),
         availableEquipment,
         dislikedExerciseIds: dislikedIds,
+        expertiseFilter,
       });
     }
 
@@ -133,8 +140,9 @@ export default function WorkoutPlanEditor({
       slotIndex: pickTarget.slotIndex,
       availableEquipment,
       dislikedExerciseIds: dislikedIds,
+      expertiseFilter,
     });
-  }, [pickTarget, draft, availableEquipment, dislikedIds]);
+  }, [pickTarget, draft, availableEquipment, dislikedIds, expertiseFilter]);
 
   const laterRoundByExerciseIdForSwap = useMemo(() => {
     if (pickTarget?.kind !== "swap") return undefined;

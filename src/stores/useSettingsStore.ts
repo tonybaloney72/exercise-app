@@ -185,6 +185,7 @@ function pickUserSettingsFields(
     weeklyRestDaysCustomized: state.weeklyRestDaysCustomized,
     weeklyCardioByDay: state.weeklyCardioByDay,
     weeklyCardioCustomized: state.weeklyCardioCustomized,
+    expertiseByGroup: state.expertiseByGroup,
   };
 }
 

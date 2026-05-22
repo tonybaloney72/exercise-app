@@ -13,7 +13,14 @@ import {
   FavoriteIcon,
   FavoriteIconOutline,
 } from "@/components/common/ExercisePreferenceIcons";
-import type { Exercise, ExerciseCategory } from "@/types";
+import {
+  EXPERTISE_LEVEL_LABELS,
+  EXPERTISE_LEVEL_ORDER,
+  exerciseExpertiseLevel,
+  exerciseMeetsExpertiseCap,
+  resolveExpertiseFilter,
+} from "@/lib/expertiseLevels";
+import type { Exercise, ExerciseCategory, ExpertiseLevel } from "@/types";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -33,31 +40,65 @@ export default function LibraryPage() {
     "all",
   );
   const [showUnavailable, setShowUnavailable] = useState(false);
+  const [withinMyLevel, setWithinMyLevel] = useState(false);
+  const [activeDifficulty, setActiveDifficulty] = useState<
+    ExpertiseLevel | "all"
+  >("all");
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
   const authMode = useAuthStore((s) => s.mode);
 
+  const expertiseFilter = useMemo(
+    () => resolveExpertiseFilter({ expertiseByGroup }),
+    [expertiseByGroup],
+  );
+
   const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
     return exercises.filter((ex) => {
+      const level = exerciseExpertiseLevel(ex);
+      const levelLabel = EXPERTISE_LEVEL_LABELS[level];
+
       const matchesSearch =
-        search === "" ||
-        ex.name.toLowerCase().includes(search.toLowerCase()) ||
-        ex.id.toLowerCase().includes(search.toLowerCase()) ||
-        ex.notes.toLowerCase().includes(search.toLowerCase()) ||
-        (ex.muscleGroups?.some((m) =>
-          m.toLowerCase().includes(search.toLowerCase()),
-        ) ??
-          false);
+        q === "" ||
+        ex.name.toLowerCase().includes(q) ||
+        ex.id.toLowerCase().includes(q) ||
+        ex.notes.toLowerCase().includes(q) ||
+        level.includes(q) ||
+        levelLabel.toLowerCase().includes(q) ||
+        (ex.muscleGroups?.some((m) => m.toLowerCase().includes(q)) ?? false);
 
       const matchesCategory =
         activeFilter === "all" || ex.category === activeFilter;
+
+      const matchesDifficulty =
+        activeDifficulty === "all" || level === activeDifficulty;
 
       const matchesEquipment =
         showUnavailable ||
         exerciseMatchesEquipment(ex.equipment, availableEquipment);
 
-      return matchesSearch && matchesCategory && matchesEquipment;
+      const matchesExpertise =
+        !withinMyLevel ||
+        exerciseMeetsExpertiseCap(ex, ex.category, expertiseFilter.byGroup);
+
+      return (
+        matchesSearch &&
+        matchesCategory &&
+        matchesDifficulty &&
+        matchesEquipment &&
+        matchesExpertise
+      );
     });
-  }, [search, activeFilter, showUnavailable, availableEquipment]);
+  }, [
+    search,
+    activeFilter,
+    activeDifficulty,
+    showUnavailable,
+    withinMyLevel,
+    availableEquipment,
+    expertiseFilter,
+  ]);
 
   const grouped = useMemo(() => {
     const groups: Record<string, typeof exercises> = {};
@@ -89,8 +130,23 @@ export default function LibraryPage() {
           className="mt-0.5 h-4 w-4 rounded border-border accent-accent"
         />
         <span className="text-xs text-muted leading-relaxed">
-          Show exercises that need equipment you haven&apos;t selected in{" "}
+          Show exercises that need equipment you haven&apos;t selected <br />
           <span className="text-foreground">Settings → Your equipment</span>
+        </span>
+      </label>
+
+      <label className="flex items-start gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={withinMyLevel}
+          onChange={(e) => setWithinMyLevel(e.target.checked)}
+          className="mt-0.5 h-4 w-4 rounded border-border accent-accent"
+        />
+        <span className="text-xs text-muted leading-relaxed">
+          Only show exercises at or below my skill level <br />
+          <span className="text-foreground">
+            Settings → Exercise difficulty
+          </span>
         </span>
       </label>
 
@@ -114,7 +170,7 @@ export default function LibraryPage() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search exercises..."
+          placeholder="Search name, muscle, or difficulty…"
           className="w-full rounded-xl border border-border bg-surface py-3 pl-10 pr-4 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted"
         />
       </div>
@@ -144,6 +200,42 @@ export default function LibraryPage() {
             {CATEGORIES[cat].shortName}
           </button>
         ))}
+      </div>
+
+      {/* Difficulty filter chips */}
+      <div className="space-y-1.5">
+        <p className="text-[11px] font-medium text-muted px-1">Difficulty</p>
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+          <button
+            type="button"
+            onClick={() => setActiveDifficulty("all")}
+            className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+              activeDifficulty === "all"
+                ? "bg-accent text-white"
+                : "bg-surface text-muted hover:text-foreground border border-border"
+            }`}
+          >
+            All
+          </button>
+          {EXPERTISE_LEVEL_ORDER.map((level) => (
+            <button
+              key={level}
+              type="button"
+              onClick={() =>
+                setActiveDifficulty(
+                  level === activeDifficulty ? "all" : level,
+                )
+              }
+              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                activeDifficulty === level
+                  ? "bg-accent text-white"
+                  : "bg-surface text-muted hover:text-foreground border border-border"
+              }`}
+            >
+              {EXPERTISE_LEVEL_LABELS[level]}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Exercise list */}
@@ -379,8 +471,11 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
           }}
           className="flex min-w-0 flex-1 flex-col items-start gap-0.5 py-0.5 text-left"
         >
-          <span className="text-sm font-medium text-foreground leading-snug">
+          <span className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-foreground leading-snug">
             {exercise.name}
+            <span className="rounded-md border border-border bg-surface-hover px-1.5 py-0.5 text-[10px] font-medium text-muted">
+              {EXPERTISE_LEVEL_LABELS[exerciseExpertiseLevel(exercise)]}
+            </span>
           </span>
           {exercise.equipment && exercise.equipment.length > 0 ? (
             <span className="text-xs text-muted leading-snug">

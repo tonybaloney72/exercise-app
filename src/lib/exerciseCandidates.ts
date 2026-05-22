@@ -6,7 +6,13 @@ import {
 import { isEnduranceBlockExerciseId } from "@/lib/enduranceBlockExercises";
 import { isDeprecatedExerciseId } from "@/lib/exerciseIdConsolidation";
 import type { ExercisePreferenceMap } from "@/lib/repos";
+import {
+  exerciseMeetsExpertiseCap,
+  type ExpertiseFilter,
+} from "@/lib/expertiseLevels";
 import type { Exercise, ExerciseCategory, ExerciseEquipment } from "@/types";
+
+export type { ExpertiseFilter } from "@/lib/expertiseLevels";
 
 export function collectDislikedIds(prefs: ExercisePreferenceMap): Set<string> {
   const out = new Set<string>();
@@ -33,9 +39,15 @@ export function getReplacementCandidates(options: {
   excludeExerciseIds: ReadonlySet<string>;
   availableEquipment: ExerciseEquipment[];
   dislikedExerciseIds?: ReadonlySet<string>;
+  expertiseFilter?: ExpertiseFilter | null;
 }): Exercise[] {
-  const { category, excludeExerciseIds, availableEquipment, dislikedExerciseIds } =
-    options;
+  const {
+    category,
+    excludeExerciseIds,
+    availableEquipment,
+    dislikedExerciseIds,
+    expertiseFilter,
+  } = options;
 
   return exercises.filter(
     (ex) =>
@@ -44,7 +56,9 @@ export function getReplacementCandidates(options: {
       !isDeprecatedExerciseId(ex.id) &&
       !excludeExerciseIds.has(ex.id) &&
       !dislikedExerciseIds?.has(ex.id) &&
-      exerciseMatchesEquipment(ex.equipment, availableEquipment),
+      exerciseMatchesEquipment(ex.equipment, availableEquipment) &&
+      (!expertiseFilter ||
+        exerciseMeetsExpertiseCap(ex, category, expertiseFilter.byGroup)),
   );
 }
 
@@ -100,6 +114,7 @@ export function pickDislikeReplacement(options: {
   dislikedExerciseIds: ReadonlySet<string>;
   favoriteIds?: ReadonlySet<string>;
   seed: string;
+  expertiseFilter?: ExpertiseFilter | null;
 }): Exercise | null {
   const {
     category,
@@ -108,6 +123,7 @@ export function pickDislikeReplacement(options: {
     dislikedExerciseIds,
     favoriteIds = new Set(),
     seed,
+    expertiseFilter,
   } = options;
 
   const withUserEquipment = getReplacementCandidates({
@@ -115,6 +131,7 @@ export function pickDislikeReplacement(options: {
     excludeExerciseIds,
     availableEquipment,
     dislikedExerciseIds,
+    expertiseFilter,
   });
   const pick = pickReplacementCandidate(withUserEquipment, favoriteIds, seed);
   if (pick) return pick;
@@ -124,6 +141,7 @@ export function pickDislikeReplacement(options: {
     excludeExerciseIds,
     availableEquipment: ALL_EXERCISE_EQUIPMENT,
     dislikedExerciseIds,
+    expertiseFilter,
   });
   return pickReplacementCandidate(anyEquipment, favoriteIds, `${seed}:any`);
 }

@@ -4,7 +4,9 @@ import {
   collectFavoriteIds,
   getReplacementCandidates,
   pickReplacementCandidate,
+  type ExpertiseFilter,
 } from "@/lib/exerciseCandidates";
+import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import type { ExercisePreferenceMap, ExerciseSettingsMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { balancedRoundBudget } from "@/lib/balancedRoundBudget";
@@ -203,6 +205,7 @@ function fillSlot(
   favoriteIds: ReadonlySet<string>,
   seed: string,
   exerciseSettings?: ExerciseSettingsMap,
+  expertiseFilter?: ExpertiseFilter | null,
 ): RoundExercise | null {
   const exclude = new Set<string>([...usedInRound, ...usedInDay]);
   const candidates = getReplacementCandidates({
@@ -210,6 +213,7 @@ function fillSlot(
     excludeExerciseIds: exclude,
     availableEquipment,
     dislikedExerciseIds: dislikedIds,
+    expertiseFilter,
   });
   const pick = pickReplacementCandidate(candidates, favoriteIds, seed);
   if (!pick) return null;
@@ -297,6 +301,7 @@ function rebuildRound(
   usedInDay: Set<string>,
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
+  expertiseFilter?: ExpertiseFilter | null,
 ): RoundExercise[] {
   const weights = profile.layoutMode
     ? weightsFromScores(scoresFromPreset("balanced"))
@@ -327,6 +332,7 @@ function rebuildRound(
       favoriteIds,
       `d${plan.dayOfWeek}-r${roundNumber}-i${i}-tp:${profile.preset}-v:${variety}-u:${usedInDay.size}`,
       exerciseSettings,
+      expertiseFilter,
     );
     if (!filled) continue;
     rebuilt.push(filled);
@@ -347,11 +353,15 @@ export function applyProgramProfileToDayPlan(
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
   profileInput?: ProgramProfileInput,
+  userSettings?: UserSettings,
 ): DayPlan {
   const profile = profileInput ?? buildProgramProfileInput(preset);
   const dislikedIds = collectDislikedIds(prefs);
   const favoriteIds = collectFavoriteIds(prefs);
   const usedInDay = new Set<string>();
+  const expertiseFilter = userSettings
+    ? resolveExpertiseFilter(userSettings)
+    : null;
 
   if (profile.customMode) {
     if (plan.restDayMode === "full_rest") {
@@ -392,6 +402,7 @@ export function applyProgramProfileToDayPlan(
         usedInDay,
         exerciseSettings,
         varietySeed,
+        expertiseFilter,
       ),
     })),
   };
@@ -406,6 +417,7 @@ export function applyProgramProfileToWeek(
   exerciseSettings?: ExerciseSettingsMap,
   varietySeed?: string,
   profileInput?: ProgramProfileInput,
+  userSettings?: UserSettings,
 ): TrainingWeekDays {
   const profile = profileInput ?? buildProgramProfileInput(preset);
   const out: TrainingWeekDays = {};
@@ -421,6 +433,7 @@ export function applyProgramProfileToWeek(
       exerciseSettings,
       varietySeed,
       profile,
+      userSettings,
     );
   }
   return out;

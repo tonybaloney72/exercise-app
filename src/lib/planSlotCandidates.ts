@@ -1,4 +1,4 @@
-import { getReplacementCandidates } from "@/lib/exerciseCandidates";
+import { getReplacementCandidates, type ExpertiseFilter } from "@/lib/exerciseCandidates";
 import { buildRoundExcludeIds } from "@/lib/roundExclude";
 import type { Exercise, ExerciseCategory, ExerciseEquipment } from "@/types";
 
@@ -10,6 +10,7 @@ export function getPlanSlotCandidates(options: {
   slotIndex: number;
   availableEquipment: ExerciseEquipment[];
   dislikedExerciseIds?: ReadonlySet<string>;
+  expertiseFilter?: ExpertiseFilter | null;
 }): Exercise[] {
   const {
     category,
@@ -18,6 +19,7 @@ export function getPlanSlotCandidates(options: {
     slotIndex,
     availableEquipment,
     dislikedExerciseIds,
+    expertiseFilter,
   } = options;
 
   const exclude = buildRoundExcludeIds({
@@ -31,6 +33,7 @@ export function getPlanSlotCandidates(options: {
     excludeExerciseIds: exclude,
     availableEquipment,
     dislikedExerciseIds,
+    expertiseFilter,
   }).sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -40,6 +43,7 @@ export function getPlanAddCandidates(options: {
   roundExerciseIds: string[];
   availableEquipment: ExerciseEquipment[];
   dislikedExerciseIds?: ReadonlySet<string>;
+  expertiseFilter?: ExpertiseFilter | null;
 }): Exercise[] {
   const exclude = new Set(options.roundExerciseIds);
   return getReplacementCandidates({
@@ -47,5 +51,6 @@ export function getPlanAddCandidates(options: {
     excludeExerciseIds: exclude,
     availableEquipment: options.availableEquipment,
     dislikedExerciseIds: options.dislikedExerciseIds,
+    expertiseFilter: options.expertiseFilter,
   }).sort((a, b) => a.name.localeCompare(b.name));
 }

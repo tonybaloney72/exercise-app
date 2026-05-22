@@ -709,6 +709,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
           swapCandidatePrefsFromStores(
             () => useSettingsStore.getState().availableEquipment,
             () => useExercisePreferencesStore.getState().byExerciseId,
+            () => useSettingsStore.getState(),
           ),
         );
         if (!candidates.some((c) => c.id === substituteId)) return r;
@@ -811,6 +812,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       swapCandidatePrefsFromStores(
         () => useSettingsStore.getState().availableEquipment,
         () => useExercisePreferencesStore.getState().byExerciseId,
+        () => useSettingsStore.getState(),
       ),
     );
     const pick = pickRandomSwap(candidates);

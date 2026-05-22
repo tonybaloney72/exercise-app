@@ -11,6 +11,7 @@ import type {
 } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeStretchEntries } from "@/lib/stretchDefaults";
+import { sanitizeExpertiseByGroup } from "@/lib/expertiseLevels";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import {
   sanitizeTrainingPriorityPreset,
@@ -116,6 +117,8 @@ interface SettingsRow {
   weekly_cardio_by_day?: unknown;
   weekly_cardio_customized?: boolean;
   equipment_onboarding_completed?: boolean;
+  expertise_by_group?: unknown;
+  expertise_by_group_customized?: boolean;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -343,6 +346,7 @@ function rowToSettings(row: SettingsRow): UserSettings {
     weeklyCardioByDay: sanitizeWeeklyCardioByDay(row.weekly_cardio_by_day),
     weeklyCardioCustomized: row.weekly_cardio_customized ?? false,
     equipmentOnboardingCompleted: row.equipment_onboarding_completed ?? false,
+    expertiseByGroup: sanitizeExpertiseByGroup(row.expertise_by_group),
   });
 }
 
@@ -371,6 +375,8 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     weekly_cardio_by_day: s.weeklyCardioByDay,
     weekly_cardio_customized: s.weeklyCardioCustomized,
     equipment_onboarding_completed: s.equipmentOnboardingCompleted,
+    expertise_by_group: s.expertiseByGroup,
+    expertise_by_group_customized: true,
   };
 }
 

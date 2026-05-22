@@ -3,6 +3,11 @@ import {
   collectFavoriteIds,
   pickDislikeReplacement,
 } from "@/lib/exerciseCandidates";
+import {
+  DEFAULT_EXPERTISE_BY_GROUP,
+  expertiseByGroupFingerprint,
+  resolveExpertiseFilter,
+} from "@/lib/expertiseLevels";
 import { stretchDefaultsFingerprint } from "@/lib/stretchDefaults";
 import type { StretchEntry } from "@/types";
 import { applyProgramProfileToWeek } from "@/lib/programProfile";
@@ -66,6 +71,7 @@ export function computePrefsFingerprint(
   weeklyRestDaysCustomized = false,
   weeklyCardioByDay?: UserSettings["weeklyCardioByDay"],
   weeklyCardioCustomized = false,
+  expertiseByGroup?: UserSettings["expertiseByGroup"],
 ): string {
   const disliked = Object.entries(prefs)
     .filter(([, v]) => v === "disliked")
@@ -105,7 +111,10 @@ export function computePrefsFingerprint(
   const cardioSeg = weeklyCardioCustomized
     ? `wc:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${(weeklyCardioByDay?.[d] ?? []).join("+") || "-"}`).join(",")}`
     : "wc:default";
-  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pm:${mode}|${prioritySeg}|${layoutSeg}|rd:${roundDensity}|${restSeg}|${cardioSeg}|${stretches}`;
+  const expertiseSeg = `exp:${expertiseByGroupFingerprint(
+    expertiseByGroup ?? DEFAULT_EXPERTISE_BY_GROUP,
+  )}`;
+  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pm:${mode}|${prioritySeg}|${layoutSeg}|rd:${roundDensity}|${restSeg}|${cardioSeg}|${expertiseSeg}|${stretches}`;
 }
 
 export function computePrefsFingerprintFromSettings(
@@ -128,6 +137,7 @@ export function computePrefsFingerprintFromSettings(
     settings.weeklyRestDaysCustomized ?? false,
     settings.weeklyCardioByDay,
     settings.weeklyCardioCustomized ?? false,
+    settings.expertiseByGroup,
   );
 }
 
@@ -147,6 +157,7 @@ function replaceSlotIfDisliked(
   favoriteIds: ReadonlySet<string>,
   availableEquipment: ExerciseEquipment[],
   exerciseSettings?: ExerciseSettingsMap,
+  expertiseFilter?: ReturnType<typeof resolveExpertiseFilter>,
 ): RoundExercise | null {
   if (!dislikedIds.has(slot.exerciseId)) {
     usedInRound.add(slot.exerciseId);
@@ -163,6 +174,7 @@ function replaceSlotIfDisliked(
     dislikedExerciseIds: dislikedIds,
     favoriteIds,
     seed: `dislike:${slot.exerciseId}`,
+    expertiseFilter,
   });
   if (!substitute) {
     console.warn(
@@ -191,9 +203,13 @@ export function applyDislikesToDayPlan(
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
   exerciseSettings?: ExerciseSettingsMap,
+  userSettings?: UserSettings,
 ): DayPlan {
   const dislikedIds = collectDislikedIds(prefs);
   const favoriteIds = collectFavoriteIds(prefs);
+  const expertiseFilter = userSettings
+    ? resolveExpertiseFilter(userSettings)
+    : null;
   if (dislikedIds.size === 0) {
     return plan;
   }
@@ -213,6 +229,7 @@ export function applyDislikesToDayPlan(
               favoriteIds,
               availableEquipment,
               exerciseSettings,
+              expertiseFilter,
             ),
           )
           .filter((slot): slot is RoundExercise => slot != null),
@@ -226,6 +243,7 @@ export function applyDislikesToWeek(
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
   exerciseSettings?: ExerciseSettingsMap,
+  userSettings?: UserSettings,
 ): TrainingWeekDays {
   const out: TrainingWeekDays = {};
   for (let i = 0; i < 7; i++) {
@@ -236,6 +254,7 @@ export function applyDislikesToWeek(
       prefs,
       availableEquipment,
       exerciseSettings,
+      userSettings,
     );
   }
   return out;
@@ -268,12 +287,14 @@ export function materializeTrainingWeek(
     exerciseSettings,
     varietySeed,
     profile,
+    userSettings,
   );
   return applyDislikesToWeek(
     profiled,
     prefs,
     availableEquipment,
     exerciseSettings,
+    userSettings,
   );
 }
 

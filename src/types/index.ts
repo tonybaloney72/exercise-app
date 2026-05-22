@@ -49,6 +49,12 @@ export type ExpertiseLevel =
   | "advanced"
   | "expert";
 
+/** User skill cap per training emphasis group (mirrors training priorities). */
+export type ExpertiseByGroup = Record<
+  "core" | "cardio" | "lower" | "upper_push" | "upper_pull",
+  ExpertiseLevel
+>;
+
 export interface Exercise {
   id: string;
   name: string;
@@ -284,6 +290,8 @@ export interface UserSettings {
   /** Per weekday cardio kinds (when customized). */
   weeklyCardioByDay: WeeklyCardioByDay;
   weeklyCardioCustomized: boolean;
+  /** Per emphasis-group skill cap for generator / swap / library. */
+  expertiseByGroup: ExpertiseByGroup;
 }
 
 export interface ProgressEntry {

@@ -1,4 +1,6 @@
 import { collectDislikedIds, getReplacementCandidates } from "@/lib/exerciseCandidates";
+import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
+import type { UserSettings } from "@/types";
 import { buildRoundExcludeIds } from "@/lib/roundExclude";
 import type {
   Exercise,
@@ -15,6 +17,7 @@ export function effectiveExerciseId(log: ExerciseLog): string {
 export type SwapCandidatePrefs = {
   availableEquipment: ExerciseEquipment[];
   dislikedExerciseIds: ReadonlySet<string>;
+  expertiseFilter?: ReturnType<typeof resolveExpertiseFilter>;
 };
 
 /**
@@ -40,6 +43,7 @@ export function getSwapCandidates(
     excludeExerciseIds: exclude,
     availableEquipment: prefs.availableEquipment,
     dislikedExerciseIds: prefs.dislikedExerciseIds,
+    expertiseFilter: prefs.expertiseFilter,
   });
 }
 
@@ -97,9 +101,12 @@ export function pickRandomSwap(candidates: Exercise[]): Exercise | null {
 export function swapCandidatePrefsFromStores(
   getEquipment: () => ExerciseEquipment[],
   getPreferenceMap: () => Parameters<typeof collectDislikedIds>[0],
+  getSettings?: () => Pick<UserSettings, "expertiseByGroup">,
 ): SwapCandidatePrefs {
+  const settings = getSettings?.();
   return {
     availableEquipment: getEquipment(),
     dislikedExerciseIds: collectDislikedIds(getPreferenceMap()),
+    expertiseFilter: settings ? resolveExpertiseFilter(settings) : null,
   };
 }

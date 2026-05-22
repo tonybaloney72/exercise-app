@@ -21,6 +21,10 @@ import {
   sanitizeWeeklyCategoryLayout,
   suggestLayoutFromCatalog,
 } from "@/lib/weeklyCategoryLayout";
+import {
+  DEFAULT_EXPERTISE_BY_GROUP,
+  sanitizeExpertiseByGroup,
+} from "@/lib/expertiseLevels";
 import type { UserSettings } from "@/types";
 
 /** Merge partial settings and migrate legacy `programFocus` → `trainingPriorityPreset`. */
@@ -83,9 +87,15 @@ export function normalizeUserSettings(
     (partial.weeklyRestDays != null &&
       !weeklyRestDaysEqual(weeklyRestDays, defaultRest));
 
+  const expertiseByGroup = sanitizeExpertiseByGroup(
+    partial.expertiseByGroup,
+    DEFAULT_EXPERTISE_BY_GROUP,
+  );
+
   return {
     ...DEFAULT_SETTINGS,
     ...rest,
+    expertiseByGroup,
     equipmentOnboardingCompleted:
       partial.equipmentOnboardingCompleted ?? DEFAULT_SETTINGS.equipmentOnboardingCompleted,
     trainingPriorityPreset: preset,

@@ -13,6 +13,7 @@ import { ROUND_DENSITY_OPTIONS } from "@/lib/programProfile";
 import ProgramModeSelector from "@/components/settings/ProgramModeSelector";
 import WeekModeOptionsPanel from "@/components/settings/WeekModeOptionsPanel";
 import TrainingPriorityCustomize from "@/components/settings/TrainingPriorityCustomize";
+import ExpertiseByGroupEditor from "@/components/settings/ExpertiseByGroupEditor";
 import WeeklyCategoryLayoutEditor from "@/components/settings/WeeklyCategoryLayoutEditor";
 import WeeklyRestDaysEditor from "@/components/settings/WeeklyRestDaysEditor";
 import WeeklyCardioEditor from "@/components/settings/WeeklyCardioEditor";
@@ -77,56 +78,58 @@ export default function SettingsPage() {
           defaultOpen
           contentClassName="space-y-3 p-4"
         >
-        {mode === "authenticated" && user && (
-          <>
-            <div>
-              <p className="text-xs text-muted">Signed in as</p>
-              <p className="text-sm text-foreground break-all">{user.email}</p>
-            </div>
-            <ChangePasswordSection email={user.email ?? ""} />
-            <button
-              onClick={handleSignOut}
-              className="w-full rounded-lg border border-border bg-surface-hover py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-border/50"
-            >
-              Sign out
-            </button>
-          </>
-        )}
-
-        {mode === "guest" && (
-          <>
-            <div>
-              <p className="text-xs text-muted">Mode</p>
-              <p className="text-sm text-foreground">
-                Guest — data is stored on this device only.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Link
-                href="/login"
-                className="rounded-lg border border-border bg-surface-hover py-2.5 text-center text-sm font-medium text-foreground transition-colors hover:bg-border/50"
+          {mode === "authenticated" && user && (
+            <>
+              <div>
+                <p className="text-xs text-muted">Signed in as</p>
+                <p className="text-sm text-foreground break-all">
+                  {user.email}
+                </p>
+              </div>
+              <ChangePasswordSection email={user.email ?? ""} />
+              <button
+                onClick={handleSignOut}
+                className="w-full rounded-lg border border-border bg-surface-hover py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-border/50"
               >
-                Log in
-              </Link>
-              <Link
-                href="/signup"
-                className="rounded-lg bg-accent py-2.5 text-center text-sm font-bold text-white transition-colors hover:bg-accent/90"
-              >
-                Create account
-              </Link>
-            </div>
-            <button
-              onClick={handleExitGuest}
-              className="w-full rounded-lg border border-red-500/30 bg-red-500/10 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/15"
-            >
-              Exit guest mode
-            </button>
-          </>
-        )}
+                Sign out
+              </button>
+            </>
+          )}
 
-        {(mode === "loading" || mode === "anonymous") && (
-          <p className="text-xs text-muted">Loading account…</p>
-        )}
+          {mode === "guest" && (
+            <>
+              <div>
+                <p className="text-xs text-muted">Mode</p>
+                <p className="text-sm text-foreground">
+                  Guest — data is stored on this device only.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/login"
+                  className="rounded-lg border border-border bg-surface-hover py-2.5 text-center text-sm font-medium text-foreground transition-colors hover:bg-border/50"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="rounded-lg bg-accent py-2.5 text-center text-sm font-bold text-white transition-colors hover:bg-accent/90"
+                >
+                  Create account
+                </Link>
+              </div>
+              <button
+                onClick={handleExitGuest}
+                className="w-full rounded-lg border border-red-500/30 bg-red-500/10 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/15"
+              >
+                Exit guest mode
+              </button>
+            </>
+          )}
+
+          {(mode === "loading" || mode === "anonymous") && (
+            <p className="text-xs text-muted">Loading account…</p>
+          )}
         </CollapsibleSection>
       </AnimatedSection>
 
@@ -138,30 +141,34 @@ export default function SettingsPage() {
           defaultOpen={false}
           contentClassName="p-4"
         >
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium text-foreground">Dark mode</p>
-            <p className="text-xs text-muted mt-0.5">
-              Turn off for a light background across the app
-            </p>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={settings.darkMode}
-            onClick={() => settings.updateSettings({ darkMode: !settings.darkMode })}
-            className={`relative h-8 w-14 shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-              settings.darkMode ? "bg-accent" : "bg-border"
-            }`}
-          >
-            <span
-              className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
-                settings.darkMode ? "translate-x-6" : "translate-x-0"
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-foreground">Dark mode</p>
+              <p className="text-xs text-muted mt-0.5">
+                Turn off for a light background across the app
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={settings.darkMode}
+              onClick={() =>
+                settings.updateSettings({ darkMode: !settings.darkMode })
+              }
+              className={`relative h-8 w-14 shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                settings.darkMode ? "bg-accent" : "bg-border"
               }`}
-            />
-            <span className="sr-only">{settings.darkMode ? "On" : "Off"}</span>
-          </button>
-        </div>
+            >
+              <span
+                className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                  settings.darkMode ? "translate-x-6" : "translate-x-0"
+                }`}
+              />
+              <span className="sr-only">
+                {settings.darkMode ? "On" : "Off"}
+              </span>
+            </button>
+          </div>
         </CollapsibleSection>
       </AnimatedSection>
 
@@ -173,70 +180,76 @@ export default function SettingsPage() {
           defaultOpen={false}
           contentClassName="space-y-4 p-4"
         >
-        <div>
-          <p className="text-xs font-semibold text-foreground">
-            Rest between rounds
-          </p>
-          <p className="text-xs text-muted mt-0.5 mb-2">
-            Default countdown length when you start a rest timer.
-          </p>
-          <div className="flex gap-2" role="group" aria-label="Rest between rounds in seconds">
-            {[60, 75, 90, 120].map((val) => (
-              <button
-                key={val}
-                type="button"
-                onClick={() => settings.updateSettings({ restBetweenRounds: val })}
-                className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
-                  settings.restBetweenRounds === val
-                    ? "bg-accent text-white"
-                    : "bg-surface-hover text-muted hover:text-foreground border border-border"
-                }`}
-              >
-                {val}s
-              </button>
-            ))}
+          <div>
+            <p className="text-xs font-semibold text-foreground">
+              Rest between rounds
+            </p>
+            <p className="text-xs text-muted mt-0.5 mb-2">
+              Default countdown length when you start a rest timer.
+            </p>
+            <div
+              className="flex gap-2"
+              role="group"
+              aria-label="Rest between rounds in seconds"
+            >
+              {[60, 75, 90, 120].map((val) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() =>
+                    settings.updateSettings({ restBetweenRounds: val })
+                  }
+                  className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+                    settings.restBetweenRounds === val
+                      ? "bg-accent text-white"
+                      : "bg-surface-hover text-muted hover:text-foreground border border-border"
+                  }`}
+                >
+                  {val}s
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-        <SettingsSwitch
-          title="Auto-start rest timer"
-          description="When you finish a round, open the rest countdown immediately. Turn off to tap Start rest on the round card instead."
-          checked={settings.restTimerAutoStart}
-          onChange={() =>
-            settings.updateSettings({
-              restTimerAutoStart: !settings.restTimerAutoStart,
-            })
-          }
-        />
-        <SettingsSwitch
-          title="Timer sounds"
-          description="Play a short chime when a set timer, rest timer, or similar countdown finishes."
-          checked={settings.timerSoundsEnabled}
-          onChange={() =>
-            settings.updateSettings({
-              timerSoundsEnabled: !settings.timerSoundsEnabled,
-            })
-          }
-        />
-        <SettingsSwitch
-          title="Timer & exercise vibration"
-          description="Brief vibration when a timer finishes or you mark an exercise complete (if your device supports it)."
-          checked={settings.timerVibrationEnabled}
-          onChange={() =>
-            settings.updateSettings({
-              timerVibrationEnabled: !settings.timerVibrationEnabled,
-            })
-          }
-        />
-        <SettingsSwitch
-          title="Keep screen on"
-          description="Try to prevent the screen from dimming while this app is open. Rest and set timers also keep the screen awake while running. Countdowns stay accurate if the phone locks (wall-clock sync)."
-          checked={settings.keepScreenAwake}
-          onChange={() =>
-            settings.updateSettings({
-              keepScreenAwake: !settings.keepScreenAwake,
-            })
-          }
-        />
+          <SettingsSwitch
+            title="Auto-start rest timer"
+            description="When you finish a round, open the rest countdown immediately. Turn off to tap Start rest on the round card instead."
+            checked={settings.restTimerAutoStart}
+            onChange={() =>
+              settings.updateSettings({
+                restTimerAutoStart: !settings.restTimerAutoStart,
+              })
+            }
+          />
+          <SettingsSwitch
+            title="Timer sounds"
+            description="Play a short chime when a set timer, rest timer, or similar countdown finishes."
+            checked={settings.timerSoundsEnabled}
+            onChange={() =>
+              settings.updateSettings({
+                timerSoundsEnabled: !settings.timerSoundsEnabled,
+              })
+            }
+          />
+          <SettingsSwitch
+            title="Timer & exercise vibration"
+            description="Brief vibration when a timer finishes or you mark an exercise complete (if your device supports it)."
+            checked={settings.timerVibrationEnabled}
+            onChange={() =>
+              settings.updateSettings({
+                timerVibrationEnabled: !settings.timerVibrationEnabled,
+              })
+            }
+          />
+          <SettingsSwitch
+            title="Keep screen on"
+            description="Try to prevent the screen from dimming while this app is open. Rest and set timers also keep the screen awake while running. Countdowns stay accurate if the phone locks (wall-clock sync)."
+            checked={settings.keepScreenAwake}
+            onChange={() =>
+              settings.updateSettings({
+                keepScreenAwake: !settings.keepScreenAwake,
+              })
+            }
+          />
         </CollapsibleSection>
       </AnimatedSection>
 
@@ -248,34 +261,43 @@ export default function SettingsPage() {
           defaultOpen={false}
           contentClassName="space-y-3 p-4"
         >
-        <p className="text-xs text-muted">
-          {mode === "guest" ? (
-            <>
-              As a guest, equipment changes regenerate this device&apos;s current
-              week in memory only (not saved across devices). Sign in to persist
-              your week.{" "}
-            </>
-          ) : (
-            <>
-              When signed in, changing equipment updates this week&apos;s prescribed
-              plan (finished workouts stay as logged).{" "}
-            </>
-          )}
-          Based on the{" "}
-          <a
-            href="https://www.hybridcalisthenics.com/exercise-library"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-accent hover:underline"
-          >
-            Hybrid Calisthenics
-          </a>{" "}
-          exercise reference.
-        </p>
-        <EquipmentPicker
-          selected={settings.availableEquipment}
-          onChange={(next) => void settings.updateSettings({ availableEquipment: next })}
-        />
+          <p className="text-xs text-muted">
+            {mode === "guest" ? (
+              <>
+                As a guest, equipment changes regenerate this device&apos;s
+                current week in memory only (not saved across devices). Sign in
+                to persist your week.{" "}
+              </>
+            ) : (
+              <>
+                When signed in, changing equipment updates this week&apos;s
+                prescribed plan
+              </>
+            )}
+          </p>
+          <EquipmentPicker
+            selected={settings.availableEquipment}
+            onChange={(next) =>
+              void settings.updateSettings({ availableEquipment: next })
+            }
+          />
+        </CollapsibleSection>
+      </AnimatedSection>
+
+      {/* Skill level caps */}
+      <AnimatedSection delay={0.048}>
+        <CollapsibleSection
+          title="Exercise difficulty"
+          hint="Cap generated workouts and swaps by skill level"
+          defaultOpen={false}
+          contentClassName="space-y-3 p-4"
+        >
+          <ExpertiseByGroupEditor
+            byGroup={settings.expertiseByGroup}
+            onChange={(expertiseByGroup) => {
+              void settings.updateSettings({ expertiseByGroup });
+            }}
+          />
         </CollapsibleSection>
       </AnimatedSection>
 
@@ -288,219 +310,240 @@ export default function SettingsPage() {
             defaultOpen={false}
             contentClassName="space-y-4 p-4"
           >
-          <ProgramModeSelector
-            value={settings.programMode}
-            onChange={(programMode: ProgramMode) =>
-              void settings.updateSettings({ programMode })
-            }
-          />
+            <ProgramModeSelector
+              value={settings.programMode}
+              onChange={(programMode: ProgramMode) =>
+                void settings.updateSettings({ programMode })
+              }
+            />
 
-          {settings.programMode === "custom" && (
-            <WeekModeOptionsPanel
-              title="Step 2 · Build your week"
-              hint="Walk through Sun–Sat with the week builder, or edit one day at a time on Weekly."
-            >
-              <div className="flex flex-col gap-2">
-                <Link
-                  href="/weekly/build"
-                  className="w-full rounded-xl bg-accent py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-accent/90"
-                >
-                  Open week builder
-                </Link>
-                <p className="text-xs text-muted leading-snug">
-                  Or open <strong className="text-foreground">Weekly</strong> and customize
-                  individual days. Your week stays manual until you reset it or switch mode.
-                </p>
-              </div>
-            </WeekModeOptionsPanel>
-          )}
-
-          {settings.programMode === "priorities" && (
-            <WeekModeOptionsPanel
-              title="Step 2 · Priority preset"
-              hint="The catalog still rotates push, pull, legs, and core across the week. Presets tilt how hard each group shows up on each day."
-            >
-          <div className="space-y-2" role="radiogroup" aria-label="Training priority preset">
-            {TRAINING_PRIORITY_OPTIONS.map((option) => {
-              const selected =
-                !settings.trainingPriorityCustomized &&
-                settings.trainingPriorityPreset === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  onClick={() =>
-                    void settings.updateSettings({
-                      trainingPriorityPreset: option.value,
-                      trainingPriorityScores: scoresFromPreset(option.value),
-                      trainingPriorityCustomized: false,
-                    })
-                  }
-                  className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
-                    selected
-                      ? "border-accent bg-accent/10"
-                      : "border-border bg-surface-hover hover:border-accent/30"
-                  }`}
-                >
-                  <span
-                    className={`block text-sm font-medium ${
-                      selected ? "text-accent" : "text-foreground"
-                    }`}
+            {settings.programMode === "custom" && (
+              <WeekModeOptionsPanel
+                title="Step 2 · Build your week"
+                hint="Walk through Sun–Sat with the week builder, or edit one day at a time on Weekly."
+              >
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/weekly/build"
+                    className="w-full rounded-xl bg-accent py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-accent/90"
                   >
-                    {option.label}
-                  </span>
-                  <span className="mt-0.5 block text-xs leading-snug text-muted">
-                    {option.description}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-            </WeekModeOptionsPanel>
-          )}
+                    Open week builder
+                  </Link>
+                  <p className="text-xs text-muted leading-snug">
+                    Or open <strong className="text-foreground">Weekly</strong>{" "}
+                    and customize individual days. Your week stays manual until
+                    you reset it or switch mode.
+                  </p>
+                </div>
+              </WeekModeOptionsPanel>
+            )}
 
-          {settings.programMode === "priorities" && (
-            <TrainingPriorityCustomize
-              scores={settings.trainingPriorityScores}
-              customized={settings.trainingPriorityCustomized}
-              activePreset={settings.trainingPriorityPreset}
-              onPresetSelect={(preset) => {
-                void settings.updateSettings({
-                  trainingPriorityPreset: preset,
-                  trainingPriorityScores: scoresFromPreset(preset),
-                  trainingPriorityCustomized: false,
-                });
-              }}
-              onScoresChange={(trainingPriorityScores, trainingPriorityCustomized) => {
-                void settings.updateSettings({
+            {settings.programMode === "priorities" && (
+              <WeekModeOptionsPanel
+                title="Step 2 · Priority preset"
+                hint="The catalog still rotates push, pull, legs, and core across the week. Presets tilt how hard each group shows up on each day."
+              >
+                <div
+                  className="space-y-2"
+                  role="radiogroup"
+                  aria-label="Training priority preset"
+                >
+                  {TRAINING_PRIORITY_OPTIONS.map((option) => {
+                    const selected =
+                      !settings.trainingPriorityCustomized &&
+                      settings.trainingPriorityPreset === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        onClick={() =>
+                          void settings.updateSettings({
+                            trainingPriorityPreset: option.value,
+                            trainingPriorityScores: scoresFromPreset(
+                              option.value,
+                            ),
+                            trainingPriorityCustomized: false,
+                          })
+                        }
+                        className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                          selected
+                            ? "border-accent bg-accent/10"
+                            : "border-border bg-surface-hover hover:border-accent/30"
+                        }`}
+                      >
+                        <span
+                          className={`block text-sm font-medium ${
+                            selected ? "text-accent" : "text-foreground"
+                          }`}
+                        >
+                          {option.label}
+                        </span>
+                        <span className="mt-0.5 block text-xs leading-snug text-muted">
+                          {option.description}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </WeekModeOptionsPanel>
+            )}
+
+            {settings.programMode === "priorities" && (
+              <TrainingPriorityCustomize
+                scores={settings.trainingPriorityScores}
+                customized={settings.trainingPriorityCustomized}
+                activePreset={settings.trainingPriorityPreset}
+                onPresetSelect={(preset) => {
+                  void settings.updateSettings({
+                    trainingPriorityPreset: preset,
+                    trainingPriorityScores: scoresFromPreset(preset),
+                    trainingPriorityCustomized: false,
+                  });
+                }}
+                onScoresChange={(
                   trainingPriorityScores,
                   trainingPriorityCustomized,
-                });
-              }}
-            />
-          )}
-
-          {settings.programMode === "layout" && (
-            <WeekModeOptionsPanel
-              title="Step 2 · Groups per day"
-              hint="Turn groups on or off for each day. We pick exercises only from what’s enabled (all off = rest)."
-            >
-              <WeeklyCategoryLayoutEditor
-                layout={settings.weeklyCategoryLayout}
-                onChange={(weeklyCategoryLayout, weeklyCategoryLayoutCustomized) => {
+                ) => {
                   void settings.updateSettings({
-                    weeklyCategoryLayout,
-                    weeklyCategoryLayoutCustomized,
+                    trainingPriorityScores,
+                    trainingPriorityCustomized,
                   });
                 }}
               />
-            </WeekModeOptionsPanel>
-          )}
+            )}
 
-          <CollapsibleSection
-            embedded
-            title="Day type"
-            hint="Workout, active recovery, stretches-only, or full rest — per weekday."
-            defaultOpen={false}
-          >
-            <WeeklyRestDaysEditor
-              value={settings.weeklyRestDays}
-              onChange={(weeklyRestDays, weeklyRestDaysCustomized) => {
-                void settings.updateSettings({
-                  weeklyRestDays,
-                  weeklyRestDaysCustomized,
-                });
-              }}
-            />
-          </CollapsibleSection>
-          <CollapsibleSection
-            embedded
-            title="Cardio & endurance"
-            hint="Jog, walk, cycle, hike, or swim per day — log time and distance in the workout."
-            defaultOpen={false}
-          >
-            <WeeklyCardioEditor
-              value={settings.weeklyCardioByDay}
-              onChange={(weeklyCardioByDay, weeklyCardioCustomized) => {
-                void settings.updateSettings({
-                  weeklyCardioByDay,
-                  weeklyCardioCustomized,
-                });
-              }}
-            />
-          </CollapsibleSection>
-          {settings.programMode !== "custom" && (
-            <>
-          <section className="border-t border-border pt-4">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted mb-3">
-              Generated week options
-            </p>
-          </section>
-          <CollapsibleSection
-            embedded
-            title="Round density"
-            hint="How many exercises per round when your week is generated"
-            defaultOpen={false}
-          >
-            <div className="space-y-2" role="radiogroup" aria-label="Round density">
-              {ROUND_DENSITY_OPTIONS.map((option) => {
-                const selected = settings.roundDensity === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    role="radio"
-                    aria-checked={selected}
-                    onClick={() =>
-                      void settings.updateSettings({ roundDensity: option.value })
-                    }
-                    className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
-                      selected
-                        ? "border-accent bg-accent/10"
-                        : "border-border bg-surface-hover hover:border-accent/30"
-                    }`}
-                  >
-                    <span
-                      className={`block text-sm font-medium ${
-                        selected ? "text-accent" : "text-foreground"
-                      }`}
-                    >
-                      {option.label}
-                    </span>
-                    <span className="mt-0.5 block text-xs leading-snug text-muted">
-                      {option.description}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </CollapsibleSection>
-            </>
-          )}
-          <CollapsibleSection
-            embedded
-            title="Default stretches"
-            hint="Always included in warm-up / cool-down when a day is built"
-            defaultOpen={false}
-          >
-            <p className="text-xs text-muted">
-              Start empty and add your own; disliked Library exercises are excluded.
-            </p>
-            <p className="text-xs text-foreground">
-              {effectiveStretchDefaults.warm === 0 && effectiveStretchDefaults.cool === 0
-                ? "None selected — focus-based stretches still apply per day."
-                : `${effectiveStretchDefaults.warm} warm-up · ${effectiveStretchDefaults.cool} cool-down`}
-            </p>
-            <button
-              type="button"
-              onClick={() => setStretchModalOpen(true)}
-              className="w-full rounded-xl border border-border bg-surface-hover py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent/40 hover:bg-accent/10"
+            {settings.programMode === "layout" && (
+              <WeekModeOptionsPanel
+                title="Step 2 · Groups per day"
+                hint="Turn groups on or off for each day. We pick exercises only from what’s enabled (all off = rest)."
+              >
+                <WeeklyCategoryLayoutEditor
+                  layout={settings.weeklyCategoryLayout}
+                  onChange={(
+                    weeklyCategoryLayout,
+                    weeklyCategoryLayoutCustomized,
+                  ) => {
+                    void settings.updateSettings({
+                      weeklyCategoryLayout,
+                      weeklyCategoryLayoutCustomized,
+                    });
+                  }}
+                />
+              </WeekModeOptionsPanel>
+            )}
+
+            <CollapsibleSection
+              embedded
+              title="Day type"
+              hint="Workout, active recovery, stretches-only, or full rest — per weekday."
+              defaultOpen={false}
             >
-              Edit default stretches
-            </button>
-          </CollapsibleSection>
+              <WeeklyRestDaysEditor
+                value={settings.weeklyRestDays}
+                onChange={(weeklyRestDays, weeklyRestDaysCustomized) => {
+                  void settings.updateSettings({
+                    weeklyRestDays,
+                    weeklyRestDaysCustomized,
+                  });
+                }}
+              />
+            </CollapsibleSection>
+            <CollapsibleSection
+              embedded
+              title="Cardio & endurance"
+              hint="Jog, walk, cycle, hike, or swim per day — log time and distance in the workout."
+              defaultOpen={false}
+            >
+              <WeeklyCardioEditor
+                value={settings.weeklyCardioByDay}
+                onChange={(weeklyCardioByDay, weeklyCardioCustomized) => {
+                  void settings.updateSettings({
+                    weeklyCardioByDay,
+                    weeklyCardioCustomized,
+                  });
+                }}
+              />
+            </CollapsibleSection>
+            {settings.programMode !== "custom" && (
+              <>
+                <section className="border-t border-border pt-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted mb-3">
+                    Generated week options
+                  </p>
+                </section>
+                <CollapsibleSection
+                  embedded
+                  title="Round density"
+                  hint="How many exercises per round when your week is generated"
+                  defaultOpen={false}
+                >
+                  <div
+                    className="space-y-2"
+                    role="radiogroup"
+                    aria-label="Round density"
+                  >
+                    {ROUND_DENSITY_OPTIONS.map((option) => {
+                      const selected = settings.roundDensity === option.value;
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          role="radio"
+                          aria-checked={selected}
+                          onClick={() =>
+                            void settings.updateSettings({
+                              roundDensity: option.value,
+                            })
+                          }
+                          className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                            selected
+                              ? "border-accent bg-accent/10"
+                              : "border-border bg-surface-hover hover:border-accent/30"
+                          }`}
+                        >
+                          <span
+                            className={`block text-sm font-medium ${
+                              selected ? "text-accent" : "text-foreground"
+                            }`}
+                          >
+                            {option.label}
+                          </span>
+                          <span className="mt-0.5 block text-xs leading-snug text-muted">
+                            {option.description}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </CollapsibleSection>
+              </>
+            )}
+            <CollapsibleSection
+              embedded
+              title="Default stretches"
+              hint="Always included in warm-up / cool-down when a day is built"
+              defaultOpen={false}
+            >
+              <p className="text-xs text-muted">
+                Start empty and add your own; disliked Library exercises are
+                excluded.
+              </p>
+              <p className="text-xs text-foreground">
+                {effectiveStretchDefaults.warm === 0 &&
+                effectiveStretchDefaults.cool === 0
+                  ? "None selected — focus-based stretches still apply per day."
+                  : `${effectiveStretchDefaults.warm} warm-up · ${effectiveStretchDefaults.cool} cool-down`}
+              </p>
+              <button
+                type="button"
+                onClick={() => setStretchModalOpen(true)}
+                className="w-full rounded-xl border border-border bg-surface-hover py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent/40 hover:bg-accent/10"
+              >
+                Edit default stretches
+              </button>
+            </CollapsibleSection>
           </CollapsibleSection>
         </AnimatedSection>
       )}
@@ -631,7 +674,10 @@ function ChangePasswordSection({ email }: { email: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 border-t border-border pt-3">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-2 border-t border-border pt-3"
+    >
       <PasswordField
         id="current-password"
         label="Current password"

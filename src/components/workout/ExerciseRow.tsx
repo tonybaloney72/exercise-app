@@ -6,6 +6,7 @@ import { exerciseMap } from "@/data/exercises";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
+import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import {
   effectiveExerciseId,
   getSwapCandidates,
@@ -77,12 +78,15 @@ export default function ExerciseRow({
   const preferenceMap = useExercisePreferencesStore((s) => s.byExerciseId);
   const setPreference = useExercisePreferencesStore((s) => s.setPreference);
   const exercisePreference = preferenceMap[effectiveId];
+  const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
+
   const swapPrefs = useMemo(
     () => ({
       availableEquipment,
       dislikedExerciseIds: collectDislikedIds(preferenceMap),
+      expertiseFilter: resolveExpertiseFilter({ expertiseByGroup }),
     }),
-    [availableEquipment, preferenceMap],
+    [availableEquipment, preferenceMap, expertiseByGroup],
   );
 
   const swapCandidates = useMemo(

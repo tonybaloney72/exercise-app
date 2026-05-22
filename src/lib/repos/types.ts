@@ -8,6 +8,7 @@ import type {
   WorkoutDayTemplateSnapshot,
 } from "@/types";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+import { DEFAULT_EXPERTISE_BY_GROUP } from "@/lib/expertiseLevels";
 import { scoresFromPreset } from "@/lib/trainingPriorities";
 import { suggestWeeklyCardioFromCatalog } from "@/lib/cardioActivities";
 import { DEFAULT_WEEKLY_REST_DAYS } from "@/lib/restDays";
@@ -105,6 +106,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   weeklyRestDaysCustomized: false,
   weeklyCardioByDay: suggestWeeklyCardioFromCatalog(),
   weeklyCardioCustomized: false,
+  expertiseByGroup: { ...DEFAULT_EXPERTISE_BY_GROUP },
 };
 
 /** Stretch defaults seeded for guest localStorage when none are stored. */
