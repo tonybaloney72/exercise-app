@@ -14,26 +14,42 @@ interface CardioActivityPickModalProps {
   open: boolean;
   onClose: () => void;
   onPick: (kind: CardioActivityKind) => void;
+  /** Subset to show; defaults to all activities in catalog order. */
+  kinds?: readonly CardioActivityKind[];
+  title?: string;
+  hint?: string;
+  placement?: "sheet" | "center";
 }
 
 export default function CardioActivityPickModal({
   open,
   onClose,
   onPick,
+  kinds,
+  title = "Add cardio activity",
+  hint = "Choose an activity to log distance and time.",
+  placement = "sheet",
 }: CardioActivityPickModalProps) {
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const list = kinds ?? CARDIO_ACTIVITY_ORDER;
 
   return (
     <BottomSheetModal
       open={open}
       onClose={onClose}
-      title="Add cardio activity"
-      hint="Choose an activity to log distance and time."
-      ariaLabel="Add cardio activity"
+      title={title}
+      hint={hint}
+      ariaLabel={title}
+      placement={placement}
       bodyClassName="overflow-y-auto px-2 py-3 max-h-[min(60vh,420px)]"
     >
-      <ul>
-          {CARDIO_ACTIVITY_ORDER.map((kind) => {
+      {list.length === 0 ? (
+        <p className="px-3 py-4 text-sm text-muted text-center">
+          No other activities available.
+        </p>
+      ) : (
+        <ul>
+          {list.map((kind) => {
             const allowed = cardioKindAllowed(kind, availableEquipment);
             return (
               <li key={kind}>
@@ -57,6 +73,7 @@ export default function CardioActivityPickModal({
             );
           })}
         </ul>
+      )}
     </BottomSheetModal>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
+import CardioActivityPickModal from "@/components/workout/CardioActivityPickModal";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import {
   CARDIO_ACTIVITY_EMOJI,
@@ -15,10 +16,15 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import type { CardioActivityKind, DayPlan } from "@/types";
 
+const PRIMARY_KINDS: CardioActivityKind[] = ["walk", "jog"];
+
 type Props = {
   plan: DayPlan;
   dateKey: string;
 };
+
+const tileClass =
+  "flex flex-1 flex-col items-center justify-center gap-1 rounded-xl border border-border bg-surface-hover px-2 py-3 min-h-[4.25rem] transition-colors hover:border-accent/40";
 
 export default function QuickActivityLog({ plan, dateKey }: Props) {
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
@@ -26,15 +32,31 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
   const [pendingKind, setPendingKind] = useState<CardioActivityKind | null>(
     null,
   );
+  const [morePickerOpen, setMorePickerOpen] = useState(false);
   const [distanceInput, setDistanceInput] = useState("");
   const [timeInput, setTimeInput] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const closeModal = useCallback(() => {
+  const moreKinds = useMemo(
+    () =>
+      CARDIO_ACTIVITY_ORDER.filter(
+        (kind) =>
+          !PRIMARY_KINDS.includes(kind) &&
+          (kind !== "cycle" || cardioKindAllowed("cycle", availableEquipment)),
+      ),
+    [availableEquipment],
+  );
+
+  const closeLogModal = useCallback(() => {
     setPendingKind(null);
     setDistanceInput("");
     setTimeInput("");
   }, []);
+
+  function openLogForm(kind: CardioActivityKind) {
+    setMorePickerOpen(false);
+    setPendingKind(kind);
+  }
 
   async function handleSave() {
     if (!pendingKind) return;
@@ -60,7 +82,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     setSaving(false);
     if (ok) {
       toast.success(`${CARDIO_ACTIVITY_LABELS[pendingKind]} logged`);
-      closeModal();
+      closeLogModal();
     }
   }
 
@@ -76,52 +98,66 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
             Log activity
           </h2>
           <p className="text-xs text-muted mt-0.5 leading-relaxed">
-            Add a walk, jog, or other cardio to today&apos;s workout.
+            Walk, jog, or pick another activity for today&apos;s workout.
           </p>
         </div>
         <div
-          className="flex flex-wrap gap-2 justify-center"
+          className="grid grid-cols-3 gap-2"
           role="group"
           aria-label="Quick log activity"
         >
-          {CARDIO_ACTIVITY_ORDER.map((kind) => {
-            const allowed = cardioKindAllowed(kind, availableEquipment);
-            return (
-              <button
-                key={kind}
-                type="button"
-                disabled={!allowed}
-                title={
-                  allowed
-                    ? CARDIO_ACTIVITY_LABELS[kind]
-                    : `${CARDIO_ACTIVITY_LABELS[kind]} requires equipment in Settings`
-                }
-                onClick={() => setPendingKind(kind)}
-                className="flex flex-col items-center gap-1 rounded-xl border border-border bg-surface-hover px-3 py-2.5 min-w-18 transition-colors hover:border-accent/40 disabled:opacity-40 disabled:hover:border-border"
-              >
-                <span className="text-xl" aria-hidden>
-                  {CARDIO_ACTIVITY_EMOJI[kind]}
-                </span>
-                <span className="text-[10px] font-medium text-foreground">
-                  {CARDIO_ACTIVITY_LABELS[kind]}
-                </span>
-              </button>
-            );
-          })}
+          {PRIMARY_KINDS.map((kind) => (
+            <button
+              key={kind}
+              type="button"
+              onClick={() => openLogForm(kind)}
+              className={tileClass}
+            >
+              <span className="text-xl" aria-hidden>
+                {CARDIO_ACTIVITY_EMOJI[kind]}
+              </span>
+              <span className="text-[10px] font-medium text-foreground">
+                {CARDIO_ACTIVITY_LABELS[kind]}
+              </span>
+            </button>
+          ))}
+          <button
+            type="button"
+            disabled={moreKinds.length === 0}
+            onClick={() => setMorePickerOpen(true)}
+            className={`${tileClass} disabled:opacity-40`}
+            aria-label="More activities"
+          >
+            <span className="text-xl text-muted" aria-hidden>
+              ⋯
+            </span>
+            <span className="text-[10px] font-medium text-foreground">More</span>
+          </button>
         </div>
       </SurfaceCard>
 
+      <CardioActivityPickModal
+        open={morePickerOpen}
+        onClose={() => setMorePickerOpen(false)}
+        onPick={openLogForm}
+        kinds={moreKinds}
+        title="Other activities"
+        hint="Hike, swim, and more."
+        placement="center"
+      />
+
       <BottomSheetModal
         open={pendingKind != null}
-        onClose={closeModal}
+        onClose={closeLogModal}
         title={modalTitle}
         hint="Distance and/or time required."
         ariaLabel={modalTitle}
+        placement="center"
         footer={
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={closeModal}
+              onClick={closeLogModal}
               disabled={saving}
               className="flex-1 rounded-xl border border-border py-3 text-sm font-medium text-muted hover:text-foreground"
             >
@@ -138,7 +174,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
           </div>
         }
       >
-        <div className="space-y-3 px-1">
+        <div className="space-y-3 px-4 py-1">
           <label className="block">
             <span className="text-[10px] text-muted uppercase tracking-wider">
               Distance (mi)

@@ -34,6 +34,11 @@ export type BottomSheetModalProps = {
   closeOnEscape?: boolean;
   titleClassName?: string;
   hintClassName?: string;
+  /**
+   * `sheet` — slides up from the bottom on small screens (default).
+   * `center` — centered dialog on all breakpoints.
+   */
+  placement?: "sheet" | "center";
 };
 
 const maxWidthClass: Record<NonNullable<BottomSheetModalProps["maxWidth"]>, string> = {
@@ -58,8 +63,10 @@ export default function BottomSheetModal({
   closeOnEscape = true,
   titleClassName = "",
   hintClassName = "",
+  placement = "sheet",
 }: BottomSheetModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const centered = placement === "center";
 
   useFocusTrap({
     open,
@@ -78,16 +85,24 @@ export default function BottomSheetModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 p-0 sm:items-center sm:p-4"
+          className={
+            centered
+              ? "fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+              : "fixed inset-0 z-[60] flex items-end justify-center bg-black/70 p-0 sm:items-center sm:p-4"
+          }
           onClick={closeOnBackdropClick ? onClose : undefined}
         >
           <motion.div
             ref={panelRef}
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 40, opacity: 0 }}
+            initial={centered ? { scale: 0.96, opacity: 0 } : { y: 40, opacity: 0 }}
+            animate={centered ? { scale: 1, opacity: 1 } : { y: 0, opacity: 1 }}
+            exit={centered ? { scale: 0.96, opacity: 0 } : { y: 40, opacity: 0 }}
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
-            className={`flex max-h-[90vh] w-full ${maxWidthClass[maxWidth]} flex-col overflow-hidden rounded-t-2xl border border-border bg-surface shadow-xl sm:max-h-[85vh] sm:rounded-2xl ${panelClassName}`.trim()}
+            className={`flex max-h-[90vh] w-full ${maxWidthClass[maxWidth]} flex-col overflow-hidden border border-border bg-surface shadow-xl ${
+              centered
+                ? "max-h-[85vh] rounded-2xl"
+                : "rounded-t-2xl sm:max-h-[85vh] sm:rounded-2xl"
+            } ${panelClassName}`.trim()}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-3">
