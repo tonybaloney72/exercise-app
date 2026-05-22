@@ -209,7 +209,7 @@ export function applyDislikesToDayPlan(
   const favoriteIds = collectFavoriteIds(prefs);
   const expertiseFilter = userSettings
     ? resolveExpertiseFilter(userSettings)
-    : null;
+    : undefined;
   if (dislikedIds.size === 0) {
     return plan;
   }

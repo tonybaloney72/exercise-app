@@ -107,6 +107,8 @@ export function swapCandidatePrefsFromStores(
   return {
     availableEquipment: getEquipment(),
     dislikedExerciseIds: collectDislikedIds(getPreferenceMap()),
-    expertiseFilter: settings ? resolveExpertiseFilter(settings) : null,
+    expertiseFilter: settings
+      ? resolveExpertiseFilter(settings)
+      : undefined,
   };
 }

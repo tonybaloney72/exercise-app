@@ -361,7 +361,7 @@ export function applyProgramProfileToDayPlan(
   const usedInDay = new Set<string>();
   const expertiseFilter = userSettings
     ? resolveExpertiseFilter(userSettings)
-    : null;
+    : undefined;
 
   if (profile.customMode) {
     if (plan.restDayMode === "full_rest") {
