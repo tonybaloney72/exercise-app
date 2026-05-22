@@ -12,10 +12,6 @@ import {
   pruneStoredStretchDefaults,
   stretchListsEqual,
 } from "@/lib/stretchDefaults";
-import {
-  markLocalEquipmentOnboardingDone,
-  readLegacyLocalEquipmentOnboardingDone,
-} from "@/lib/equipmentOnboarding";
 import { settingsHydrationKey } from "@/lib/settingsHydration";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
@@ -135,18 +131,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       loaded.defaultCoolDown ?? [],
       disliked,
     );
-    let merged: UserSettings = normalizeUserSettings({
+    const merged: UserSettings = normalizeUserSettings({
       ...loaded,
       defaultWarmUp,
       defaultCoolDown,
     });
-
-    if (
-      !merged.equipmentOnboardingCompleted &&
-      readLegacyLocalEquipmentOnboardingDone()
-    ) {
-      merged = { ...merged, equipmentOnboardingCompleted: true };
-    }
 
     const pruned =
       !stretchListsEqual(defaultWarmUp, loaded.defaultWarmUp ?? []) ||
@@ -160,15 +149,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
     set({ ...merged, hydrated: true, hydratedForAuthKey: authKey });
 
-    if (merged.equipmentOnboardingCompleted) {
-      markLocalEquipmentOnboardingDone();
-    }
-
-    const upgradedOnboardingFromLegacy =
-      merged.equipmentOnboardingCompleted &&
-      loaded.equipmentOnboardingCompleted !== true;
-
-    if (mode === "authenticated" && (pruned || upgradedOnboardingFromLegacy)) {
+    if (mode === "authenticated" && pruned) {
       try {
         await getSettingsRepo(mode).save(merged);
       } catch (err) {

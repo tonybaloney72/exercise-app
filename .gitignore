@@ -22,6 +22,8 @@
 
 # misc
 week-audit.json
+reports/catalog-audit.json
+reports/catalog-audit.csv
 .DS_Store
 *.pem
 

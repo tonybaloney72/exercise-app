@@ -1,13 +1,13 @@
 "use client";
 
 import EquipmentOnboardingModal from "@/components/onboarding/EquipmentOnboardingModal";
-import { readLocalEquipmentOnboardingDone } from "@/lib/equipmentOnboarding";
 import { settingsHydrationMatchesAuth } from "@/lib/settingsHydration";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
 /**
- * Shows first-run equipment selection once per account (stored in user_settings).
+ * Shows equipment onboarding when persisted settings say it is incomplete.
+ * Signed-in: `user_settings.equipment_onboarding_completed`. Guest: same flag in local settings JSON.
  */
 export default function EquipmentOnboardingGate() {
   const mode = useAuthStore((s) => s.mode);
@@ -22,13 +22,7 @@ export default function EquipmentOnboardingGate() {
     hydratedForAuthKey,
   );
 
-  if (
-    mode === "loading" ||
-    !hydrated ||
-    !settingsReady ||
-    completed ||
-    readLocalEquipmentOnboardingDone()
-  ) {
+  if (mode === "loading" || !hydrated || !settingsReady || completed) {
     return null;
   }
 

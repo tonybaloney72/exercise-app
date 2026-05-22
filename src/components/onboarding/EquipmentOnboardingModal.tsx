@@ -4,7 +4,6 @@ import { useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
-import { markLocalEquipmentOnboardingDone } from "@/lib/equipmentOnboarding";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { ExerciseEquipment } from "@/types";
 
@@ -18,7 +17,6 @@ export default function EquipmentOnboardingModal() {
 
   const finish = async (equipment: ExerciseEquipment[]) => {
     setSaving(true);
-    markLocalEquipmentOnboardingDone();
     try {
       await updateSettings({
         availableEquipment: equipment,

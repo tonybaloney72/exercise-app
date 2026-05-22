@@ -12,6 +12,7 @@ import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStor
  */
 export default function AppSettingsSync() {
   const mode = useAuthStore((s) => s.mode);
+  const userId = useAuthStore((s) => s.user?.id);
   const darkMode = useSettingsStore((s) => s.darkMode);
   const loadSettings = useSettingsStore((s) => s.loadSettings);
   const loadExerciseSettings = useExerciseSettingsStore((s) => s.load);
@@ -22,7 +23,7 @@ export default function AppSettingsSync() {
     void loadSettings();
     void loadExerciseSettings();
     void loadExercisePreferences();
-  }, [mode, loadSettings, loadExerciseSettings, loadExercisePreferences]);
+  }, [mode, userId, loadSettings, loadExerciseSettings, loadExercisePreferences]);
 
   useEffect(() => {
     const root = document.documentElement;
