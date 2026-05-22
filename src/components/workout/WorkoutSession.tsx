@@ -225,7 +225,6 @@ export default function WorkoutSession({
       )}
 
       <CardioSection
-        activities={cardioActivities}
         activeWorkout={activeWorkout}
         onToggle={toggleCardio}
         onSkip={skipCardio}

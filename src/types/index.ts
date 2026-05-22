@@ -189,6 +189,11 @@ export interface ExerciseLog {
   loggingMode?: ExerciseSetMode;
   /** Miles (endurance / cardio block). */
   actualDistanceMi?: number;
+  /**
+   * Unique row id for cardio/endurance logs (multiple walks per day, etc.).
+   * When omitted, legacy rows are keyed by `exerciseId` only.
+   */
+  cardioInstanceId?: string;
 }
 
 export interface RoundLog {

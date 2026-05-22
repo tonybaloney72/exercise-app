@@ -1,5 +1,9 @@
 import { exerciseMap } from "@/data/exercises";
 import { CARDIO_KIND_TO_EXERCISE_ID } from "@/lib/cardioActivities";
+import {
+  appendCardioKind as appendCardioKindInstance,
+  cardioRowKey,
+} from "@/lib/cardioInstances";
 import { ensureCardioExercises } from "@/lib/resolveWorkoutCardio";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
@@ -196,24 +200,14 @@ export function addCoolDownStretch(
   };
 }
 
-export function removeCardioAt(log: WorkoutLog, exerciseId: string): WorkoutLog {
-  const rows = (log.cardioExercises ?? []).filter(
-    (e) => e.exerciseId !== exerciseId,
+export function removeCardioAt(log: WorkoutLog, instanceKey: string): WorkoutLog {
+  const rows = ensureCardioExercises(log).filter(
+    (e) => cardioRowKey(e) !== instanceKey,
   );
   return { ...log, cardioExercises: rows.length > 0 ? rows : undefined };
 }
 
+/** Always appends a new session (multiple walks per day allowed). */
 export function addCardioKind(log: WorkoutLog, kind: CardioActivityKind): WorkoutLog {
-  const exerciseId = CARDIO_KIND_TO_EXERCISE_ID[kind];
-  const existing = ensureCardioExercises(log);
-  if (existing.some((e) => e.exerciseId === exerciseId)) {
-    return log;
-  }
-  return {
-    ...log,
-    cardioExercises: [
-      ...existing,
-      { exerciseId, completed: false, skipped: false },
-    ],
-  };
+  return appendCardioKindInstance(log, kind);
 }

@@ -1,5 +1,6 @@
 import type { ExerciseLog, WorkoutLog, ExerciseSetMode } from "@/types";
 import { exerciseMap } from "@/data/exercises";
+import { ensureCardioInstanceIds } from "@/lib/cardioInstances";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
@@ -137,11 +138,12 @@ export function ensureExerciseMetrics(log: ExerciseLog): ExerciseLog {
 }
 
 export function hydrateWorkoutLog(log: WorkoutLog): WorkoutLog {
+  const withCardio = ensureCardioInstanceIds(log);
   return {
-    ...log,
-    warmUpExercises: log.warmUpExercises.map(ensureExerciseMetrics),
-    coolDownExercises: log.coolDownExercises.map(ensureExerciseMetrics),
-    rounds: log.rounds.map((r) => ({
+    ...withCardio,
+    warmUpExercises: withCardio.warmUpExercises.map(ensureExerciseMetrics),
+    coolDownExercises: withCardio.coolDownExercises.map(ensureExerciseMetrics),
+    rounds: withCardio.rounds.map((r) => ({
       ...r,
       exercises: r.exercises.map(ensureExerciseMetrics),
     })),

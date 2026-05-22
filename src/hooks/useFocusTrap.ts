@@ -12,6 +12,15 @@ export function getFocusableElements(root: HTMLElement | null): HTMLElement[] {
   );
 }
 
+function preferredFocusTarget(nodes: HTMLElement[]): HTMLElement | undefined {
+  return (
+    nodes.find((el) => {
+      const tag = el.tagName;
+      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+    }) ?? nodes[0]
+  );
+}
+
 type Options = {
   open: boolean;
   containerRef: RefObject<HTMLElement | null>;
@@ -22,6 +31,7 @@ type Options = {
 
 /**
  * Trap Tab within the container while open; restore focus to the prior element on close.
+ * Initial focus runs once per open (stable even when `onClose` identity changes).
  */
 export function useFocusTrap({
   open,
@@ -30,6 +40,8 @@ export function useFocusTrap({
   closeOnEscape = true,
 }: Options): void {
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!open) return;
@@ -46,8 +58,8 @@ export function useFocusTrap({
       const container = containerRef.current;
       if (!container) return;
       const nodes = getFocusableElements(container);
-      const target = nodes[0] ?? container;
-      if (target && typeof target.focus === "function") {
+      const target = preferredFocusTarget(nodes) ?? container;
+      if (typeof target.focus === "function") {
         target.focus({ preventScroll: true });
       }
     };
@@ -58,11 +70,11 @@ export function useFocusTrap({
       if (
         e.key === "Escape" &&
         closeOnEscape &&
-        onClose &&
+        onCloseRef.current &&
         !e.defaultPrevented
       ) {
         e.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -77,8 +89,8 @@ export function useFocusTrap({
         return;
       }
 
-      const first = nodes[0];
-      const last = nodes[nodes.length - 1];
+      const first = nodes[0]!;
+      const last = nodes[nodes.length - 1]!;
       const active = document.activeElement;
 
       if (e.shiftKey) {
@@ -103,5 +115,5 @@ export function useFocusTrap({
         prev.focus({ preventScroll: true });
       }
     };
-  }, [open, containerRef, onClose, closeOnEscape]);
+  }, [open, containerRef, closeOnEscape]);
 }

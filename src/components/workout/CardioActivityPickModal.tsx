@@ -12,19 +12,16 @@ import type { CardioActivityKind } from "@/types";
 
 interface CardioActivityPickModalProps {
   open: boolean;
-  activeKinds: ReadonlySet<CardioActivityKind>;
   onClose: () => void;
   onPick: (kind: CardioActivityKind) => void;
 }
 
 export default function CardioActivityPickModal({
   open,
-  activeKinds,
   onClose,
   onPick,
 }: CardioActivityPickModalProps) {
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
-  const addable = CARDIO_ACTIVITY_ORDER.filter((k) => !activeKinds.has(k));
 
   return (
     <BottomSheetModal
@@ -35,13 +32,8 @@ export default function CardioActivityPickModal({
       ariaLabel="Add cardio activity"
       bodyClassName="overflow-y-auto px-2 py-3 max-h-[min(60vh,420px)]"
     >
-      {addable.length === 0 ? (
-        <p className="px-3 py-4 text-sm text-muted text-center">
-          All activities are already in this workout.
-        </p>
-      ) : (
-        <ul>
-          {addable.map((kind) => {
+      <ul>
+          {CARDIO_ACTIVITY_ORDER.map((kind) => {
             const allowed = cardioKindAllowed(kind, availableEquipment);
             return (
               <li key={kind}>
@@ -65,7 +57,6 @@ export default function CardioActivityPickModal({
             );
           })}
         </ul>
-      )}
     </BottomSheetModal>
   );
 }

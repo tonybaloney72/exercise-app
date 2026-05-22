@@ -83,14 +83,16 @@ export function buildCardioMilesTotals(
 
 export function formatCardioRecentLine(log: WorkoutLog): string | null {
   const parts: string[] = [];
-  for (const kind of CARDIO_ACTIVITY_ORDER) {
-    const id = CARDIO_KIND_TO_EXERCISE_ID[kind];
-    const row = resolveWorkoutCardioExercises(log).find((r) => r.exerciseId === id);
-    if (!row?.completed || row.skipped) continue;
+  for (const row of resolveWorkoutCardioExercises(log)) {
+    if (!row.completed || row.skipped) continue;
+    if (!ENDURANCE_EXERCISE_IDS.has(row.exerciseId)) continue;
     const dist =
       row.actualDistanceMi != null ? `${row.actualDistanceMi}mi` : null;
-    const label = kind;
-    parts.push(dist ? `${dist} ${label}` : label);
+    const kind =
+      CARDIO_ACTIVITY_ORDER.find(
+        (k) => CARDIO_KIND_TO_EXERCISE_ID[k] === row.exerciseId,
+      ) ?? row.exerciseId;
+    parts.push(dist ? `${dist} ${kind}` : kind);
   }
   return parts.length > 0 ? parts.join(" · ") : null;
 }

@@ -32,6 +32,7 @@ import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
+import QuickActivityLog from "@/components/workout/QuickActivityLog";
 
 function TodayPageInner() {
   const searchParams = useSearchParams();
@@ -168,6 +169,11 @@ function TodayPageInner() {
     !hasPausedDraftToday &&
     !showPlanEditor;
   const hideStaleBanner = Boolean(activeWorkout) || customizing;
+  const showQuickActivityLog =
+    !customizing &&
+    !showPlanEditor &&
+    (!activeWorkout || editingCompletedToday) &&
+    !hasPausedDraftToday;
 
   async function handleSaveDay(editedPlan: DayPlan) {
     setSaving(true);
@@ -306,6 +312,12 @@ function TodayPageInner() {
             }
           />
         </div>
+      )}
+
+      {showQuickActivityLog && (
+        <AnimatedSection delay={0.12}>
+          <QuickActivityLog plan={plan} dateKey={todayKey} />
+        </AnimatedSection>
       )}
 
       <StaleWorkoutSessionsBanner hidden={hideStaleBanner} />

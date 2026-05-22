@@ -8,6 +8,7 @@ import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/data/exercises";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
+import { cardioLabelForRow } from "@/lib/cardioInstances";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import { formatLoggedDuration } from "@/utils/time";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
@@ -150,10 +151,11 @@ export default function WorkoutDayReview({
       </CollapsibleSection>
 
       {resolveWorkoutCardioExercises(log).map((entry) => {
-        const title =
-          exerciseMap[entry.exerciseId]?.name ?? entry.exerciseId;
+        const allCardio = resolveWorkoutCardioExercises(log);
+        const title = cardioLabelForRow(entry, allCardio);
+        const rowKey = entry.cardioInstanceId ?? entry.exerciseId;
         return (
-          <CollapsibleSection key={entry.exerciseId} title={title} defaultOpen>
+          <CollapsibleSection key={rowKey} title={title} defaultOpen>
             <div className="space-y-1 px-3 py-2">
               {entry.skipped ? (
                 <p className="text-xs text-muted">Skipped</p>

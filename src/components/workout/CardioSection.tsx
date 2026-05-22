@@ -4,23 +4,22 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CardioActivityPickModal from "./CardioActivityPickModal";
 import CardioSessionBlock from "./CardioSessionBlock";
-import { getCardioLog } from "@/lib/cardioWorkoutLog";
-import type { CardioActivity, CardioActivityKind, WorkoutLog } from "@/types";
+import { cardioRowKey } from "@/lib/cardioInstances";
+import { ensureCardioExercises } from "@/lib/resolveWorkoutCardio";
+import type { CardioActivityKind, WorkoutLog } from "@/types";
 
 interface CardioSectionProps {
-  activities: CardioActivity[];
   activeWorkout: WorkoutLog;
-  onToggle: (exerciseId: string) => void;
-  onSkip: (exerciseId: string) => void;
-  onUnskip: (exerciseId: string) => void;
-  onSetDistance: (exerciseId: string, mi: number | undefined) => void;
-  onSetDurationSeconds: (exerciseId: string, seconds: number | undefined) => void;
+  onToggle: (instanceKey: string) => void;
+  onSkip: (instanceKey: string) => void;
+  onUnskip: (instanceKey: string) => void;
+  onSetDistance: (instanceKey: string, mi: number | undefined) => void;
+  onSetDurationSeconds: (instanceKey: string, seconds: number | undefined) => void;
   onAddCardio: (kind: CardioActivityKind) => void;
-  onRemoveCardio: (exerciseId: string) => void;
+  onRemoveCardio: (instanceKey: string) => void;
 }
 
 export default function CardioSection({
-  activities,
   activeWorkout,
   onToggle,
   onSkip,
@@ -30,31 +29,22 @@ export default function CardioSection({
   onAddCardio,
   onRemoveCardio,
 }: CardioSectionProps) {
-  const [isOpen, setIsOpen] = useState(activities.length > 0);
+  const [isOpen, setIsOpen] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
 
-  const activeKinds = useMemo(
-    () => new Set(activities.map((a) => a.kind)),
-    [activities],
+  const cardioRows = useMemo(
+    () => ensureCardioExercises(activeWorkout),
+    [activeWorkout],
   );
 
-  const logs = useMemo(
-    () =>
-      activities
-        .map((a) => getCardioLog(activeWorkout, a.exerciseId))
-        .filter((l): l is NonNullable<typeof l> => l != null),
-    [activities, activeWorkout],
-  );
-
-  const completedCount = logs.filter((e) => e.completed || e.skipped).length;
-  const total = logs.length;
+  const completedCount = cardioRows.filter((e) => e.completed || e.skipped).length;
+  const total = cardioRows.length;
   const allDone = total > 0 && completedCount === total;
 
   return (
     <>
       <CardioActivityPickModal
         open={addOpen}
-        activeKinds={activeKinds}
         onClose={() => setAddOpen(false)}
         onPick={(kind) => {
           onAddCardio(kind);
@@ -135,28 +125,25 @@ export default function CardioSection({
               className="overflow-hidden"
             >
               <div className="border-t border-border px-2 py-1 space-y-2">
-                {activities.length === 0 ? (
+                {cardioRows.length === 0 ? (
                   <p className="px-2 py-3 text-xs text-muted">
                     No cardio yet. Tap + Add to log an activity.
                   </p>
                 ) : (
-                  activities.map((activity) => {
-                    const log = getCardioLog(activeWorkout, activity.exerciseId);
-                    if (!log) return null;
+                  cardioRows.map((log) => {
+                    const key = cardioRowKey(log);
                     return (
                       <CardioSessionBlock
-                        key={activity.exerciseId}
+                        key={key}
                         log={log}
-                        onToggle={() => onToggle(activity.exerciseId)}
-                        onSkip={() => onSkip(activity.exerciseId)}
-                        onUnskip={() => onUnskip(activity.exerciseId)}
-                        onSetDistance={(mi) =>
-                          onSetDistance(activity.exerciseId, mi)
-                        }
+                        onToggle={() => onToggle(key)}
+                        onSkip={() => onSkip(key)}
+                        onUnskip={() => onUnskip(key)}
+                        onSetDistance={(mi) => onSetDistance(key, mi)}
                         onSetDurationSeconds={(sec) =>
-                          onSetDurationSeconds(activity.exerciseId, sec)
+                          onSetDurationSeconds(key, sec)
                         }
-                        onRemove={() => onRemoveCardio(activity.exerciseId)}
+                        onRemove={() => onRemoveCardio(key)}
                       />
                     );
                   })

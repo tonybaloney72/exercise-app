@@ -76,6 +76,11 @@ import {
   shouldAutoRestoreInProgressFromHistory,
 } from "@/utils/workoutLogLookup";
 import {
+  appendCardioRow,
+  buildCompletedQuickCardioRow,
+  cardioRowKey,
+} from "@/lib/cardioInstances";
+import {
   addCardioKind,
   addRoundAt,
   removeCardioAt,
@@ -202,12 +207,12 @@ interface WorkoutState {
   unskipJog: () => void;
   setJogDistance: (distance: number | undefined) => void;
   setJogDurationSeconds: (seconds: number | undefined) => void;
-  toggleCardio: (exerciseId: string) => void;
-  skipCardio: (exerciseId: string) => void;
-  unskipCardio: (exerciseId: string) => void;
-  setCardioDistance: (exerciseId: string, distance: number | undefined) => void;
+  toggleCardio: (instanceKey: string) => void;
+  skipCardio: (instanceKey: string) => void;
+  unskipCardio: (instanceKey: string) => void;
+  setCardioDistance: (instanceKey: string, distance: number | undefined) => void;
   setCardioDurationSeconds: (
-    exerciseId: string,
+    instanceKey: string,
     seconds: number | undefined,
   ) => void;
   toggleWarmUpStretch: (exerciseId: string) => void;
@@ -287,8 +292,14 @@ interface WorkoutState {
   addWarmUpStretchToWorkout: (exerciseId: string) => void;
   removeCoolDownStretchFromWorkout: (exerciseId: string) => void;
   addCoolDownStretchToWorkout: (exerciseId: string) => void;
-  removeCardioFromWorkout: (exerciseId: string) => void;
+  removeCardioFromWorkout: (instanceKey: string) => void;
   addCardioToWorkout: (kind: CardioActivityKind) => void;
+  quickLogCardio: (
+    plan: DayPlan,
+    dateKey: string,
+    kind: CardioActivityKind,
+    input: { distanceMi?: number; durationSeconds?: number },
+  ) => Promise<boolean>;
 
   loadHistory: () => Promise<void>;
   /** Pause prior-day in-progress rows and clear a stale live session (midnight rules). */
@@ -475,66 +486,95 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     return true;
   },
 
-  toggleJog: () => get().toggleCardio(CARDIO_KIND_TO_EXERCISE_ID.jog),
+  toggleJog: () => {
+    const state = get();
+    if (!state.activeWorkout) return;
+    const jogKey = (state.activeWorkout.cardioExercises ?? []).find(
+      (r) => r.exerciseId === CARDIO_KIND_TO_EXERCISE_ID.jog,
+    );
+    if (jogKey) get().toggleCardio(cardioRowKey(jogKey));
+  },
 
-  skipJog: () => get().skipCardio(CARDIO_KIND_TO_EXERCISE_ID.jog),
+  skipJog: () => {
+    const state = get();
+    const row = state.activeWorkout?.cardioExercises?.find(
+      (r) => r.exerciseId === CARDIO_KIND_TO_EXERCISE_ID.jog,
+    );
+    if (row) get().skipCardio(cardioRowKey(row));
+  },
 
-  unskipJog: () => get().unskipCardio(CARDIO_KIND_TO_EXERCISE_ID.jog),
+  unskipJog: () => {
+    const state = get();
+    const row = state.activeWorkout?.cardioExercises?.find(
+      (r) => r.exerciseId === CARDIO_KIND_TO_EXERCISE_ID.jog,
+    );
+    if (row) get().unskipCardio(cardioRowKey(row));
+  },
 
-  setJogDistance: (distance) =>
-    get().setCardioDistance(CARDIO_KIND_TO_EXERCISE_ID.jog, distance),
+  setJogDistance: (distance) => {
+    const state = get();
+    const row = state.activeWorkout?.cardioExercises?.find(
+      (r) => r.exerciseId === CARDIO_KIND_TO_EXERCISE_ID.jog,
+    );
+    if (row) get().setCardioDistance(cardioRowKey(row), distance);
+  },
 
-  setJogDurationSeconds: (seconds) =>
-    get().setCardioDurationSeconds(CARDIO_KIND_TO_EXERCISE_ID.jog, seconds),
+  setJogDurationSeconds: (seconds) => {
+    const state = get();
+    const row = state.activeWorkout?.cardioExercises?.find(
+      (r) => r.exerciseId === CARDIO_KIND_TO_EXERCISE_ID.jog,
+    );
+    if (row) get().setCardioDurationSeconds(cardioRowKey(row), seconds);
+  },
 
-  toggleCardio: (exerciseId) =>
+  toggleCardio: (instanceKey) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const current = getCardioLog(state.activeWorkout, exerciseId);
+      const current = getCardioLog(state.activeWorkout, instanceKey);
       return {
-        activeWorkout: patchCardioLog(state.activeWorkout, exerciseId, {
+        activeWorkout: patchCardioLog(state.activeWorkout, instanceKey, {
           completed: !(current?.completed ?? false),
           skipped: false,
         }),
       };
     }),
 
-  skipCardio: (exerciseId) =>
+  skipCardio: (instanceKey) =>
     set((state) => {
       if (!state.activeWorkout) return state;
       return {
-        activeWorkout: patchCardioLog(state.activeWorkout, exerciseId, {
+        activeWorkout: patchCardioLog(state.activeWorkout, instanceKey, {
           skipped: true,
           completed: false,
         }),
       };
     }),
 
-  unskipCardio: (exerciseId) =>
+  unskipCardio: (instanceKey) =>
     set((state) => {
       if (!state.activeWorkout) return state;
       return {
-        activeWorkout: patchCardioLog(state.activeWorkout, exerciseId, {
+        activeWorkout: patchCardioLog(state.activeWorkout, instanceKey, {
           skipped: false,
         }),
       };
     }),
 
-  setCardioDistance: (exerciseId, distance) =>
+  setCardioDistance: (instanceKey, distance) =>
     set((state) => {
       if (!state.activeWorkout) return state;
       return {
-        activeWorkout: patchCardioLog(state.activeWorkout, exerciseId, {
+        activeWorkout: patchCardioLog(state.activeWorkout, instanceKey, {
           actualDistanceMi: distance,
         }),
       };
     }),
 
-  setCardioDurationSeconds: (exerciseId, seconds) =>
+  setCardioDurationSeconds: (instanceKey, seconds) =>
     set((state) => {
       if (!state.activeWorkout) return state;
       return {
-        activeWorkout: patchCardioLog(state.activeWorkout, exerciseId, {
+        activeWorkout: patchCardioLog(state.activeWorkout, instanceKey, {
           actualDuration: seconds,
         }),
       };
@@ -942,12 +982,12 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       };
     }),
 
-  removeCardioFromWorkout: (exerciseId) =>
+  removeCardioFromWorkout: (instanceKey) =>
     set((state) => {
       if (!state.activeWorkout) return state;
       return {
         activeWorkout: hydrateWorkoutLog(
-          removeCardioAt(state.activeWorkout, exerciseId),
+          removeCardioAt(state.activeWorkout, instanceKey),
         ),
       };
     }),
@@ -959,6 +999,93 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         activeWorkout: hydrateWorkoutLog(addCardioKind(state.activeWorkout, kind)),
       };
     }),
+
+  quickLogCardio: async (plan, dateKey, kind, input) => {
+    const hasDistance =
+      input.distanceMi != null && input.distanceMi > 0 && !Number.isNaN(input.distanceMi);
+    const hasDuration =
+      input.durationSeconds != null &&
+      input.durationSeconds > 0 &&
+      !Number.isNaN(input.durationSeconds);
+    if (!hasDistance && !hasDuration) return false;
+
+    const row = buildCompletedQuickCardioRow(kind, {
+      distanceMi: hasDistance ? input.distanceMi : undefined,
+      durationSeconds: hasDuration ? input.durationSeconds : undefined,
+    });
+
+    const persistCompleted = async (log: WorkoutLog): Promise<boolean> => {
+      const saved = hydrateWorkoutLog(
+        workoutLogForPersistence({ ...log, paused: false }),
+      );
+      const historyBefore = get().workoutHistory;
+      set({
+        workoutHistory: upsertWorkoutInHistory(historyBefore, saved),
+      });
+      try {
+        await getWorkoutRepo().saveWorkout(saved);
+        return true;
+      } catch (err) {
+        toastSaveError("activity log", err);
+        set({ workoutHistory: historyBefore });
+        return false;
+      }
+    };
+
+    const state = get();
+    const active = state.activeWorkout;
+
+    if (active && !active.endTime && active.date === dateKey) {
+      const updated = hydrateWorkoutLog(appendCardioRow(active, row));
+      set({ activeWorkout: updated });
+      const mode = useAuthStore.getState().mode;
+      if (mode === "authenticated") {
+        set({
+          workoutHistory: upsertWorkoutInHistory(
+            get().workoutHistory,
+            updated,
+          ),
+        });
+        void flushPersistInProgressWorkout(updated, { paused: false });
+      } else {
+        saveActiveWorkoutDraft(draftScope(), updated, { paused: false });
+      }
+      return true;
+    }
+
+    if (active && !active.endTime && active.date !== dateKey) {
+      return false;
+    }
+
+    const completed = findCompletedWorkoutForDate(state.workoutHistory, dateKey);
+    if (completed) {
+      return persistCompleted(appendCardioRow(completed, row));
+    }
+
+    const inProgress = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
+    if (inProgress) {
+      return false;
+    }
+
+    const dayOfWeek =
+      parseLocalDateKey(dateKey)?.getDay() ?? plan.dayOfWeek;
+    const nowIso = new Date().toISOString();
+    const fresh: WorkoutLog = {
+      id: uuidv4(),
+      date: dateKey,
+      dayOfWeek,
+      cardioExercises: [row],
+      warmUpCompleted: true,
+      warmUpExercises: [],
+      coolDownCompleted: true,
+      coolDownExercises: [],
+      rounds: buildEmptyRoundLogs(plan),
+      startTime: nowIso,
+      endTime: nowIso,
+      paused: false,
+    };
+    return persistCompleted(fresh);
+  },
 
   skipExercise: (roundNumber, exerciseId) =>
     set((state) => {

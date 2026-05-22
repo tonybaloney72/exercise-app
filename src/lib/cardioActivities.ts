@@ -1,5 +1,6 @@
 import { TRAINING_WEEK_CATALOG } from "@/data/trainingWeekCatalog";
 import { exerciseMatchesEquipment } from "@/data/equipment";
+import { buildNewCardioRow } from "@/lib/cardioInstances";
 import type {
   CardioActivity,
   CardioActivityKind,
@@ -167,12 +168,13 @@ export function applyWeeklyCardioToDay(
 }
 
 export function buildEmptyCardioLogs(activities: CardioActivity[]): ExerciseLog[] {
-  return activities.map((a) => ({
-    exerciseId: a.exerciseId,
-    completed: false,
-    skipped: false,
-    targetPrescription: a.defaultPrescription ?? "20 min",
-    loggingMode: "timer",
-  }));
+  return activities.map((a) =>
+    buildNewCardioRow(a.exerciseId, {
+      completed: false,
+      skipped: false,
+      targetPrescription: a.defaultPrescription ?? "20 min",
+      loggingMode: "timer",
+    }),
+  );
 }
 

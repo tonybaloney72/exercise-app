@@ -85,7 +85,7 @@ export default function PostWorkoutSummary({
 
         {summary.cardio.map((line, i) => (
           <motion.div
-            key={line.exerciseId}
+            key={line.instanceKey}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.28 + i * 0.06, duration: 0.25 }}

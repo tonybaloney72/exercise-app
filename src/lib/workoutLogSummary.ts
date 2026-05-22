@@ -1,5 +1,5 @@
-import { resolveCardioActivities } from "@/lib/cardioActivities";
 import { exerciseMap } from "@/data/exercises";
+import { cardioLabelForRow, cardioRowKey } from "@/lib/cardioInstances";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
 
@@ -10,6 +10,7 @@ export type ExerciseSlotCounts = {
 };
 
 export type CardioSummaryLine = {
+  instanceKey: string;
   exerciseId: string;
   label: string;
   completed: boolean;
@@ -39,24 +40,21 @@ export function countExerciseSlots(logs: ExerciseLog[]): ExerciseSlotCounts {
 
 export function summarizeWorkoutLog(
   log: WorkoutLog,
-  plan: DayPlan,
+  _plan: DayPlan,
 ): WorkoutLogSummary {
   const strengthLogs = log.rounds.flatMap((r) => r.exercises);
   const stretchLogs = [...log.warmUpExercises, ...log.coolDownExercises];
   const logged = resolveWorkoutCardioExercises(log);
 
-  const cardio: CardioSummaryLine[] = resolveCardioActivities(plan).map((activity) => {
-    const row = logged.find((r) => r.exerciseId === activity.exerciseId);
-    const label = exerciseMap[activity.exerciseId]?.name ?? activity.kind;
-    return {
-      exerciseId: activity.exerciseId,
-      label,
-      completed: row?.completed ?? false,
-      skipped: row?.skipped ?? false,
-      distanceMi: row?.actualDistanceMi,
-      durationSeconds: row?.actualDuration,
-    };
-  });
+  const cardio: CardioSummaryLine[] = logged.map((row) => ({
+    instanceKey: cardioRowKey(row),
+    exerciseId: row.exerciseId,
+    label: cardioLabelForRow(row, logged),
+    completed: row.completed,
+    skipped: row.skipped,
+    distanceMi: row.actualDistanceMi,
+    durationSeconds: row.actualDuration,
+  }));
 
   return {
     strength: countExerciseSlots(strengthLogs),
