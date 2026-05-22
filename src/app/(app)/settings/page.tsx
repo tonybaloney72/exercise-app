@@ -6,6 +6,7 @@ import Link from "next/link";
 import AnimatedSection from "@/components/common/AnimatedSection";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import AboutDeveloperSection from "@/components/settings/AboutDeveloperSection";
 import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
 import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
@@ -547,6 +548,10 @@ export default function SettingsPage() {
           </CollapsibleSection>
         </AnimatedSection>
       )}
+
+      <AnimatedSection delay={0.05}>
+        <AboutDeveloperSection />
+      </AnimatedSection>
 
       <DefaultStretchesModal
         open={stretchModalOpen}
