@@ -15,7 +15,11 @@
     "db:push:dry": "supabase db push --dry-run",
     "db:dump": "supabase db dump --linked -f supabase/schema.remote.sql",
     "icons": "node scripts/generate-pwa-icons.mjs",
-    "audit:catalog": "node scripts/audit-catalog.mjs"
+    "audit:catalog": "node scripts/audit-catalog.mjs",
+    "catalog:enrich": "node scripts/catalog-enrich.mjs",
+    "catalog:scrape-hc": "node scripts/scrape-hc-progressions.mjs",
+    "catalog:suggest-videos": "node scripts/catalog-suggest-videos.mjs",
+    "catalog:video-review": "node scripts/catalog-video-review.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

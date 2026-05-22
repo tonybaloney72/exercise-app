@@ -24,6 +24,14 @@
 week-audit.json
 reports/catalog-audit.json
 reports/catalog-audit.csv
+reports/catalog-enrichment.csv
+reports/catalog-enrichment-summary.json
+reports/hc-progressions.json
+reports/youtube-oembed-cache.json
+reports/youtube-search-cache.json
+reports/video-suggestions.json
+reports/video-suggestions.csv
+reports/video-review.html
 .DS_Store
 *.pem
 

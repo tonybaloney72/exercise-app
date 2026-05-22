@@ -41,6 +41,14 @@ export type ExerciseEquipment =
 /** Planned: ExRx-style plyometric intensity (low → high). Not used in UI yet. */
 export type PlyometricIntensity = "low" | "low_medium" | "medium" | "medium_high" | "high";
 
+/** Curated difficulty for generator filtering (see ROADMAP — Expertise levels). */
+export type ExpertiseLevel =
+  | "beginner"
+  | "novice"
+  | "intermediate"
+  | "advanced"
+  | "expert";
+
 export interface Exercise {
   id: string;
   name: string;
@@ -49,6 +57,8 @@ export interface Exercise {
   notes: string;
   source?: string;
   videoUrl?: string;
+  /** Generator / swap cap vs user per-group expertise. */
+  expertiseLevel?: ExpertiseLevel;
   isTimeBased: boolean;
   secondaryCategory?: ExerciseCategory;
   /** When set, exercise only applies if the user has this equipment (see `availableEquipment`). */

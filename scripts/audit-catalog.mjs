@@ -10,16 +10,19 @@
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import {
+  CATALOG_SOURCES,
+  isCatalogAuditExempt,
+  parseExercisesFromText,
+} from "./lib/catalog-parse.mjs";
+import {
+  equipmentAuditMismatch,
+  expectedEquipmentForExercise,
+} from "./lib/equipment-heuristic.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const REPORTS = join(ROOT, "reports");
-
-const SOURCES = [
-  { file: "src/data/exercises.ts", label: "catalog" },
-  { file: "src/data/enduranceExercises.ts", label: "endurance" },
-  { file: "src/data/hybridCalisthenicsExercises.ts", label: "hybrid" },
-];
 
 const VALID_EQUIPMENT = new Set([
   "bodyweight",
@@ -39,112 +42,11 @@ const VALID_EQUIPMENT = new Set([
 
 const STRETCH_CATEGORIES = new Set(["SW", "SC"]);
 
-/** Heuristic expected equipment from name (matches enrich-catalog-exercises.mjs). */
-function expectedEquipmentFromName(name) {
-  if (/\bring\b/i.test(name)) return ["rings"];
-  if (
-    /\b(pull-?up|chin-?up|dead hang|inverted row|hanging|toes to bar|front lever)\b/i.test(
-      name,
-    )
-  ) {
-    return ["pull_up_bar"];
-  }
-  if (/\b(swiss ball|bosu)\b/i.test(name)) return ["stability_ball"];
-  if (/\b(medicine ball|med ball)\b/i.test(name)) return ["medicine_ball"];
-  if (/\b(plyo|box jump|step-?up)\b/i.test(name) && /\bbox\b/i.test(name)) {
-    return ["plyo_box"];
-  }
-  if (/\bband\b/i.test(name)) return ["resistance_band"];
-  if (/\b(dumbbell|db )\b/i.test(name)) return ["dumbbell"];
-  if (/\bkettlebell|kb\b/i.test(name)) return ["kettlebell"];
-  if (/\bbarbell\b/i.test(name)) return ["barbell"];
-  if (/\b(cable|lat pulldown|tricep pushdown)\b/i.test(name)) return ["cable"];
-  if (/\b(machine|smith)\b/i.test(name)) return ["machine"];
-  if (/\b(bike|cycle|bicycle)\b/i.test(name)) return ["bicycle"];
-  return ["bodyweight"];
-}
-
 function arraysEqualSorted(a, b) {
   if (a.length !== b.length) return false;
   const sa = [...a].sort();
   const sb = [...b].sort();
   return sa.every((v, i) => v === sb[i]);
-}
-
-function parseEquipmentLine(line) {
-  const m = line.match(/^\s*equipment:\s*\[([^\]]*)\]/);
-  if (!m) return null;
-  const inner = m[1].trim();
-  if (!inner) return [];
-  const items = [];
-  const itemRe = /"([^"]+)"/g;
-  let im;
-  while ((im = itemRe.exec(inner)) !== null) items.push(im[1]);
-  return items;
-}
-
-function parseExercisesFromText(text, sourceLabel) {
-  const entries = [];
-  let cur = null;
-
-  const flush = () => {
-    if (!cur?.id) return;
-    entries.push(cur);
-    cur = null;
-  };
-
-  for (const line of text.split("\n")) {
-    const idM = line.match(/^\s*id:\s*"([^"]+)"/);
-    if (idM) {
-      flush();
-      cur = {
-        source: sourceLabel,
-        id: idM[1],
-        name: null,
-        category: null,
-        secondaryCategory: null,
-        equipment: null,
-        videoUrl: null,
-        videoUrlExplicit: false,
-        sourceLabel: null,
-        isTimeBased: null,
-      };
-      continue;
-    }
-    if (!cur) continue;
-
-    const nameM = line.match(/^\s*name:\s*"([^"]+)"/);
-    if (nameM) cur.name = nameM[1];
-
-    const catM = line.match(/^\s*category:\s*"([^"]+)"/);
-    if (catM) cur.category = catM[1];
-
-    const secM = line.match(/^\s*secondaryCategory:\s*"([^"]+)"/);
-    if (secM) cur.secondaryCategory = secM[1];
-
-    const equip = parseEquipmentLine(line);
-    if (equip !== null) cur.equipment = equip;
-
-    if (/^\s*videoUrl:\s*undefined/.test(line)) {
-      cur.videoUrl = null;
-      cur.videoUrlExplicit = true;
-    } else {
-      const vidM = line.match(/^\s*videoUrl:\s*"([^"]*)"/);
-      if (vidM) {
-        cur.videoUrl = vidM[1];
-        cur.videoUrlExplicit = true;
-      }
-    }
-
-    const srcM = line.match(/^\s*source:\s*"([^"]+)"/);
-    if (srcM) cur.sourceLabel = srcM[1];
-
-    if (/^\s*isTimeBased:\s*(true|false)/.test(line)) {
-      cur.isTimeBased = line.includes("true");
-    }
-  }
-  flush();
-  return entries;
 }
 
 function youtubeVideoKey(url) {
@@ -176,6 +78,10 @@ function isVagueSource(label) {
 }
 
 function buildIssues(entry) {
+  if (isCatalogAuditExempt(entry)) {
+    return { issues: [], flags: [] };
+  }
+
   const issues = [];
   const flags = [];
 
@@ -197,8 +103,11 @@ function buildIssues(entry) {
   }
 
   if (entry.name && entry.equipment?.length) {
-    const expected = expectedEquipmentFromName(entry.name);
-    if (!arraysEqualSorted(entry.equipment, expected)) {
+    const expected = expectedEquipmentForExercise({
+      name: entry.name,
+      notes: entry.notes,
+    });
+    if (equipmentAuditMismatch(entry.equipment, expected)) {
       issues.push(
         `equipment_heuristic_mismatch:expected=${expected.join("|")}:actual=${entry.equipment.join("|")}`,
       );
@@ -219,6 +128,11 @@ function buildIssues(entry) {
   if (isVagueSource(entry.sourceLabel)) {
     issues.push("vague_or_missing_source");
     flags.push("vague_or_missing_source");
+  }
+
+  if (!entry.expertiseLevel) {
+    issues.push("missing_expertise_level");
+    flags.push("missing_expertise_level");
   }
 
   return { issues, flags };
@@ -274,10 +188,26 @@ async function main() {
   const checkLinks = process.argv.includes("--check-links");
   const all = [];
 
-  for (const { file, label } of SOURCES) {
+  for (const { file, label } of CATALOG_SOURCES) {
     const text = readFileSync(join(ROOT, file), "utf8");
-    const parsed = parseExercisesFromText(text, label);
-    for (const e of parsed) all.push(e);
+    const parsed = parseExercisesFromText(text, file);
+    for (const e of parsed) {
+      all.push({
+        source: label,
+        sourceFile: file,
+        id: e.id,
+        name: e.name,
+        category: e.category,
+        secondaryCategory: e.secondaryCategory,
+        equipment: e.equipment,
+        videoUrl: e.videoUrl,
+        videoUrlExplicit: e.hasVideoField,
+        sourceLabel: e.sourceLabel,
+        expertiseLevel: e.expertiseLevel,
+        notes: e.notes,
+        isTimeBased: e.isTimeBased,
+      });
+    }
   }
 
   const idCounts = new Map();
@@ -333,6 +263,7 @@ async function main() {
     }))
     .sort((a, b) => b.count - a.count);
 
+  const exemptCount = rows.filter((r) => isCatalogAuditExempt(r)).length;
   const flagged = rows.filter((r) => r.flags.length > 0);
   const byFlag = {};
   for (const r of flagged) {
@@ -356,6 +287,7 @@ async function main() {
     generatedAt: new Date().toISOString(),
     totals: {
       exercises: rows.length,
+      catalogAuditExempt: exemptCount,
       flagged: flagged.length,
       missingVideoUrl: rows.filter((r) => !r.videoUrl).length,
       missingEquipment: rows.filter((r) => !r.equipment?.length).length,
@@ -385,6 +317,7 @@ async function main() {
 
   console.log("Exercise catalog audit (Phase 0)\n");
   console.log(`  Exercises parsed: ${rows.length}`);
+  console.log(`  Audit-exempt:     ${exemptCount} (END-* cardio)`);
   console.log(`  Flagged rows:     ${flagged.length} (see CSV)`);
   console.log(`  Missing videoUrl: ${report.totals.missingVideoUrl}`);
   console.log(`  Missing equipment: ${report.totals.missingEquipment}`);

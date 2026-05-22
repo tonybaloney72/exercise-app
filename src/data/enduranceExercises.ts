@@ -1,6 +1,9 @@
 import type { Exercise } from "@/types";
 
-/** Endurance / cardio block activities (logged in exercise_logs with section cardio). */
+/**
+ * Endurance / cardio block activities (logged in exercise_logs with section cardio).
+ * No videoUrl or source — catalog audit skips END-* (see scripts/lib/catalog-parse.mjs).
+ */
 export const enduranceExercises: Exercise[] = [
   {
     id: "END-JOG",
