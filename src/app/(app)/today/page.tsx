@@ -110,8 +110,9 @@ function TodayPageInner() {
   );
 
   const completedLogForUi = devForcePreWorkout ? null : todaysCompletedLog;
-  const editingCompletedToday =
-    activeWorkout?.endTime != null && activeWorkout.date === todayKey;
+  /** Any live session (in progress or editing a finished log) replaces the completion review. */
+  const showTodaysCompletedReview =
+    Boolean(completedLogForUi) && !activeWorkout;
 
   const handleEditCompletedWorkout = () => {
     if (!completedLogForUi) return;
@@ -151,6 +152,10 @@ function TodayPageInner() {
   useEffect(() => {
     setShowWorkoutDetails(false);
   }, [todaysCompletedLog?.id]);
+
+  useEffect(() => {
+    if (activeWorkout) setShowWorkoutDetails(false);
+  }, [activeWorkout?.id]);
 
   if (planLoading) {
     return (
@@ -196,6 +201,8 @@ function TodayPageInner() {
 
   const allCategories = categoriesPresentInPlan(plan);
   const isCustomWeek = isUserCustomizedWeekSource(weekSource);
+  const editingCompletedSession =
+    Boolean(activeWorkout?.endTime) && activeWorkout?.date === todayKey;
   const showPlanEditor = customizing && canEditPlan;
   const showPreWorkoutActions =
     !activeWorkout &&
@@ -210,7 +217,7 @@ function TodayPageInner() {
     isTodaySession &&
     !customizing &&
     !showPlanEditor &&
-    (!activeWorkout || editingCompletedToday) &&
+    !activeWorkout &&
     !hasPausedDraftToday;
 
   async function handleSaveDay(editedPlan: DayPlan) {
@@ -266,12 +273,14 @@ function TodayPageInner() {
           {plan.name}
         </p>
         <h1 className="text-2xl font-bold text-foreground">
-          Today&apos;s Workout
+          {editingCompletedSession
+            ? "Edit today\u2019s workout"
+            : "Today\u2019s Workout"}
         </h1>
       </motion.div>
 
-      {/* Category chips */}
-      {!completedLogForUi && (
+      {/* Category chips — hide during live session or after completion summary */}
+      {!completedLogForUi && !activeWorkout && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -323,22 +332,20 @@ function TodayPageInner() {
       )}
       {activeWorkout && isTodaySession && <FloatingTimer />}
 
-      {/* Completed today — summary first, full log on demand */}
+      {/* Completed today — summary first, full log on demand (hidden while session is open) */}
       {isTodaySession &&
-        !editingCompletedToday &&
-        completedLogForUi &&
+        showTodaysCompletedReview &&
         !showWorkoutDetails && (
         <PostWorkoutSummary
           plan={plan}
-          log={completedLogForUi}
+          log={completedLogForUi!}
           onMoreDetails={() => setShowWorkoutDetails(true)}
           onEditWorkout={handleEditCompletedWorkout}
         />
       )}
 
       {isTodaySession &&
-        !editingCompletedToday &&
-        completedLogForUi &&
+        showTodaysCompletedReview &&
         showWorkoutDetails && (
         <div className="space-y-3">
           <button
@@ -350,20 +357,14 @@ function TodayPageInner() {
           </button>
           <WorkoutDayReview
             plan={plan}
-            log={completedLogForUi}
+            log={completedLogForUi!}
             hideCompletionBanner
             onEditWorkout={handleEditCompletedWorkout}
             onNotesChange={(notes) =>
-              updateCompletedWorkoutNotes(completedLogForUi.id, notes)
+              updateCompletedWorkoutNotes(completedLogForUi!.id, notes)
             }
           />
         </div>
-      )}
-
-      {showQuickActivityLog && (
-        <AnimatedSection delay={0.12}>
-          <QuickActivityLog plan={plan} dateKey={todayKey} />
-        </AnimatedSection>
       )}
 
       <StaleWorkoutSessionsBanner hidden={hideStaleBanner} />
@@ -421,6 +422,12 @@ function TodayPageInner() {
               Start workout
             </button>
           </div>
+        </AnimatedSection>
+      )}
+
+      {showQuickActivityLog && (
+        <AnimatedSection delay={0.18}>
+          <QuickActivityLog plan={plan} dateKey={todayKey} />
         </AnimatedSection>
       )}
     </div>

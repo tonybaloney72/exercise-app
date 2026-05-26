@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import { formatLaterRoundWarning, pickRandomSwap } from "@/lib/exerciseSwap";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 import type { Exercise } from "@/types";
 
 interface SwapExerciseModalProps {
@@ -28,6 +30,7 @@ export default function SwapExerciseModal({
   onClearSwap,
 }: SwapExerciseModalProps) {
   const [query, setQuery] = useState("");
+  const byExerciseId = useExerciseSettingsStore((s) => s.byExerciseId);
   const [pendingLaterRound, setPendingLaterRound] = useState<{
     exerciseId: string;
     name: string;
@@ -39,6 +42,17 @@ export default function SwapExerciseModal({
     if (!q) return candidates;
     return candidates.filter((c) => c.name.toLowerCase().includes(q));
   }, [candidates, query]);
+
+  const targetByExerciseId = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const ex of candidates) {
+      map.set(
+        ex.id,
+        formatPlanTargetPrescription(ex, byExerciseId[ex.id]),
+      );
+    }
+    return map;
+  }, [candidates, byExerciseId]);
 
   function resetPending() {
     setPendingLaterRound(null);
@@ -180,7 +194,7 @@ export default function SwapExerciseModal({
                           {ex.name}
                         </span>
                         <span className="text-[10px] tabular-nums text-muted shrink-0">
-                          {ex.defaultReps}
+                          {targetByExerciseId.get(ex.id) ?? ex.defaultReps}
                         </span>
                       </span>
                       {laterHint ? (
