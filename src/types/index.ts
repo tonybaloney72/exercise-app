@@ -73,6 +73,9 @@ export interface Exercise {
   muscleGroups?: string[];
   /** Reserved for catalog metadata (e.g. ExRx plyometric tier). */
   plyometricIntensity?: PlyometricIntensity;
+  /** Hybrid Calisthenics progression ladder (1 = easiest in that chain). */
+  hcProgressionStep?: number;
+  hcProgressionTotal?: number;
 }
 
 /** Persisted row for `exercise_settings` (and local guest mirror). */

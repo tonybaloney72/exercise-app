@@ -48,6 +48,10 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "SW-44": "PC-1",
   // E — duplicate mountain climber variants
   "PC-3": "CR-10",
+  // P3 — catalog hygiene (May 2026)
+  "SC-20": "SC-15",
+  "SC-28": "SC-8",
+  "HC-243": "SW-10",
 };
 
 /** Ids that redirect to a canonical entry; excluded from generator / swap pools. */
@@ -83,6 +87,7 @@ export const REMOVED_HYBRID_EXERCISE_IDS = new Set<string>([
   "HC-288",
   "HC-292",
   "HC-295",
+  "HC-243",
 ]);
 
 /** Catalog stretch ids removed (workout id kept). */
@@ -95,6 +100,8 @@ export const REMOVED_CATALOG_STRETCH_IDS = new Set<string>([
   "SW-51",
   "SW-52",
   "SW-44",
+  "SC-20",
+  "SC-28",
 ]);
 
 export function migrateConsolidatedExerciseId(id: string): string {

@@ -300,7 +300,7 @@ const catalogExercises: Exercise[] = [
   },
   {
     id: "CS-4",
-    name: "Regular Plank",
+    name: "Forearm Plank",
     category: "CS",
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
@@ -2831,10 +2831,10 @@ const catalogExercises: Exercise[] = [
     category: "SW",
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
-    muscleGroups: ["Biceps", "Lats", "Mobility", "Rear Deltoids", "Rhomboids"],
+    muscleGroups: ["Biceps", "Lats", "Mobility", "Rear Deltoids", "Rhomboids", "Serratus Anterior"],
     defaultReps: "10",
     notes:
-      "In plank, keep arms straight — retract shoulder blades together, then protract apart",
+      "Warm-up scapular control in plank — retract shoulder blades together, then protract apart (serratus activation)",
     source: "Live Lean TV Daily Exercises",
     videoUrl: "https://www.youtube.com/watch?v=iQP1BBmwAgg",
     isTimeBased: false,
@@ -3070,7 +3070,7 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
     muscleGroups: ["Chest", "Front Deltoids", "Mobility"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
       "One arm reaches up and back while the other reaches down; switch in a controlled rhythm. DAREBEE Quick / 4-Min.",
     source: "DAREBEE — Quick Warmup",
@@ -3085,7 +3085,7 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
     muscleGroups: ["Biceps", "Lats", "Mobility", "Rear Deltoids", "Rhomboids"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
       "Alternate reaching one arm up and slightly back while the other stays down. Opens chest and shoulders. DAREBEE 2-Minute Warmup.",
     source: "DAREBEE — 2-Minute Warmup",
@@ -3236,7 +3236,7 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
     muscleGroups: ["Glutes", "Hip Flexors", "Mobility", "Quadriceps"],
-    defaultReps: "30 sec",
+    defaultReps: "30 sec (alternate legs)",
     notes:
       "Low snap kicks straight ahead, light contact, alternate legs. DAREBEE Fighter's Warmup.",
     source: "DAREBEE — Fighter's Warmup",
@@ -3774,7 +3774,7 @@ const catalogExercises: Exercise[] = [
     notes:
       "On back, draw one knee across body, opposite arm out, keep shoulders on floor",
     source: "YouTube",
-    videoUrl: "https://www.youtube.com/watch?v=CKJ9Wmh9aY8",
+    videoUrl: "https://www.youtube.com/watch?v=mNdJti7ZwKI",
     isTimeBased: true,
     secondaryCategory: "CR",
   },
@@ -3807,21 +3807,6 @@ const catalogExercises: Exercise[] = [
     videoUrl: "https://www.youtube.com/watch?v=cnuBSIWReSc",
     isTimeBased: true,
     secondaryCategory: "UP",
-  },
-  {
-    id: "SC-20",
-    name: "Upper Trapezius Stretch",
-    category: "SC",
-    equipment: ["bodyweight"],
-    expertiseLevel: "beginner",
-    muscleGroups: ["Mobility"],
-    defaultReps: "20 sec each side",
-    notes:
-      "Tilt head to one side, gently add overpressure with hand, opposite hand behind back",
-    source: "YouTube",
-    videoUrl: "https://www.youtube.com/watch?v=7NeNLUe6n7k",
-    isTimeBased: true,
-    secondaryCategory: "UPL",
   },
   {
     id: "SC-21",
@@ -3878,7 +3863,7 @@ const catalogExercises: Exercise[] = [
     notes:
       "On back, loop towel under foot, raise leg with knee slightly bent until hamstring stretch",
     source: "AskDoctorJo",
-    videoUrl: "https://www.youtube.com/watch?v=Yd9wY25koVk",
+    videoUrl: "https://www.youtube.com/watch?v=Y1mez6vrHKI",
     isTimeBased: true,
     secondaryCategory: "LB",
   },
@@ -3893,7 +3878,7 @@ const catalogExercises: Exercise[] = [
     notes:
       "Half-kneel, tuck pelvis under until stretch in front of hip; keep ribs stacked over pelvis.",
     source: "YouTube",
-    videoUrl: "https://www.youtube.com/watch?v=DXuC00DQ-Yo",
+    videoUrl: "https://www.youtube.com/watch?v=34SlL-PPCWQ",
     isTimeBased: true,
     secondaryCategory: "LB",
   },
@@ -3926,21 +3911,6 @@ const catalogExercises: Exercise[] = [
     videoUrl: "https://liftmanual.com/standing-leg-cross-abductor-stretch/",
     isTimeBased: true,
     secondaryCategory: "LB",
-  },
-  {
-    id: "SC-28",
-    name: "Overhead Lat Side Bend",
-    category: "SC",
-    equipment: ["bodyweight"],
-    expertiseLevel: "beginner",
-    muscleGroups: ["Biceps", "Lats", "Mobility"],
-    defaultReps: "20 sec each side",
-    notes:
-      "One arm overhead, lean to opposite side, keep chest open; gentle lat and side-body stretch.",
-    source: "Dr. Fitology",
-    videoUrl: "https://www.drfitology.com/exercises/lats/standing-lat-stretch",
-    isTimeBased: true,
-    secondaryCategory: "UPL",
   },
 ];
 

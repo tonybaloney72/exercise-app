@@ -20,4 +20,22 @@ describe("getReplacementCandidates", () => {
     });
     expect(candidates.some((e) => e.id === "PC-3")).toBe(false);
   });
+
+  it("excludes bench-only moves when user has bodyweight only", () => {
+    const candidates = getReplacementCandidates({
+      category: "CS",
+      excludeExerciseIds: new Set(),
+      availableEquipment: ["bodyweight"],
+    });
+    expect(candidates.some((e) => e.id === "HC-229")).toBe(false);
+  });
+
+  it("includes reverse hyper when bench or machine is available", () => {
+    const candidates = getReplacementCandidates({
+      category: "CS",
+      excludeExerciseIds: new Set(),
+      availableEquipment: ["bodyweight", "plyo_box"],
+    });
+    expect(candidates.some((e) => e.id === "HC-229")).toBe(true);
+  });
 });
