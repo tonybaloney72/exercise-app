@@ -61,7 +61,9 @@ import {
 } from "@/lib/activeWorkoutDraft";
 import {
   cancelScheduledPersistInProgressWorkout,
+  clearWorkoutCompleting,
   flushPersistInProgressWorkout,
+  markWorkoutCompleting,
   schedulePersistInProgressWorkout,
   upsertWorkoutInHistory,
 } from "@/lib/inProgressWorkoutSync";
@@ -1297,15 +1299,15 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     const historyBefore = state.workoutHistory;
     const auth = useAuthStore.getState().mode === "authenticated";
 
+    markWorkoutCompleting(inProgress.id);
     cancelScheduledPersistActiveWorkoutDraft();
-    cancelScheduledPersistInProgressWorkout();
     clearActiveWorkoutDraft(draftScope());
 
     // Optimistic UI: update store first so the user gets immediate feedback.
     set({
       activeWorkout: null,
       pausedWorkoutDate: null,
-      workoutHistory: [completed, ...historyBefore],
+      workoutHistory: upsertWorkoutInHistory(historyBefore, completed),
     });
 
     try {
@@ -1324,6 +1326,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         schedulePersistActiveWorkoutDraft(draftScope(), inProgress);
       }
       return null;
+    } finally {
+      clearWorkoutCompleting(inProgress.id);
     }
   },
 

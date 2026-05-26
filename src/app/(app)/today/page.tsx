@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/common/AnimatedSection";
 import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
@@ -29,12 +29,24 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { toastSaveError } from "@/utils/saveErrorToast";
 import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
+import { parseLocalDateKey } from "@/utils/weekCalendar";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 import QuickActivityLog from "@/components/workout/QuickActivityLog";
 
+function formatSessionHeaderDate(dateKey: string): string {
+  const d = parseLocalDateKey(dateKey);
+  if (!d) return dateKey;
+  return d.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 function TodayPageInner() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const {
     activeWorkout,
@@ -50,6 +62,12 @@ function TodayPageInner() {
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
   const todayKey = formatLocalDateKey();
+  const activePastSession =
+    Boolean(
+      activeWorkout &&
+        !activeWorkout.endTime &&
+        activeWorkout.date !== todayKey,
+    );
   const sessionDateKey =
     activeWorkout && !activeWorkout.endTime ? activeWorkout.date : todayKey;
   const { plan: todayPlan, loading: planLoading, error: planError } =
@@ -80,6 +98,11 @@ function TodayPageInner() {
     if (mode === "loading") return;
     void reconcileDayBoundary();
   }, [mode, todayKey, reconcileDayBoundary]);
+
+  useEffect(() => {
+    if (!activePastSession || !activeWorkout) return;
+    router.replace(`/progress/history/${activeWorkout.date}/log`);
+  }, [activePastSession, activeWorkout, router]);
 
   const todaysCompletedLog = useMemo(
     () => findCompletedWorkoutForDate(workoutHistory, todayKey),
@@ -160,6 +183,17 @@ function TodayPageInner() {
     );
   }
 
+  if (activePastSession) {
+    return (
+      <div className="py-12 text-center space-y-2 px-2">
+        <p className="text-sm text-muted">Opening session for</p>
+        <p className="text-sm font-medium text-foreground">
+          {formatSessionHeaderDate(sessionDateKey)}
+        </p>
+      </div>
+    );
+  }
+
   const allCategories = categoriesPresentInPlan(plan);
   const isCustomWeek = isUserCustomizedWeekSource(weekSource);
   const showPlanEditor = customizing && canEditPlan;
@@ -168,8 +202,12 @@ function TodayPageInner() {
     !completedLogForUi &&
     !hasPausedDraftToday &&
     !showPlanEditor;
-  const hideStaleBanner = Boolean(activeWorkout) || customizing;
+  const hideStaleBanner =
+    Boolean(activeWorkout) || customizing || activePastSession;
+  const isTodaySession =
+    !activeWorkout || activeWorkout.endTime != null || activeWorkout.date === todayKey;
   const showQuickActivityLog =
+    isTodaySession &&
     !customizing &&
     !showPlanEditor &&
     (!activeWorkout || editingCompletedToday) &&
@@ -279,12 +317,17 @@ function TodayPageInner() {
         />
       )}
 
-      {/* Active workout session */}
-      {activeWorkout && <WorkoutSession plan={plan} />}
-      {activeWorkout && <FloatingTimer />}
+      {/* Active workout session (today only — past days use /progress/history/[date]/log) */}
+      {activeWorkout && isTodaySession && (
+        <WorkoutSession plan={plan} />
+      )}
+      {activeWorkout && isTodaySession && <FloatingTimer />}
 
       {/* Completed today — summary first, full log on demand */}
-      {!editingCompletedToday && completedLogForUi && !showWorkoutDetails && (
+      {isTodaySession &&
+        !editingCompletedToday &&
+        completedLogForUi &&
+        !showWorkoutDetails && (
         <PostWorkoutSummary
           plan={plan}
           log={completedLogForUi}
@@ -293,7 +336,10 @@ function TodayPageInner() {
         />
       )}
 
-      {!editingCompletedToday && completedLogForUi && showWorkoutDetails && (
+      {isTodaySession &&
+        !editingCompletedToday &&
+        completedLogForUi &&
+        showWorkoutDetails && (
         <div className="space-y-3">
           <button
             type="button"

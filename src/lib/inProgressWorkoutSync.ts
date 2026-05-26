@@ -8,6 +8,8 @@ const DEBOUNCE_MS = 250;
 
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
 let persistGeneration = 0;
+/** While set, in-progress cloud saves for this workout id are skipped (completion in flight). */
+let completingWorkoutId: string | null = null;
 
 export type InProgressPersistOptions = {
   paused: boolean;
@@ -34,11 +36,41 @@ export function upsertWorkoutInHistory(
   return [log, ...without];
 }
 
+/** Invalidate scheduled and in-flight in-progress persists (e.g. before complete). */
+export function invalidateInProgressPersists(): void {
+  if (persistTimer) {
+    clearTimeout(persistTimer);
+    persistTimer = null;
+  }
+  persistGeneration++;
+}
+
+export function markWorkoutCompleting(workoutId: string): void {
+  completingWorkoutId = workoutId;
+  invalidateInProgressPersists();
+}
+
+export function clearWorkoutCompleting(workoutId: string): void {
+  if (completingWorkoutId === workoutId) {
+    completingWorkoutId = null;
+  }
+}
+
+function shouldSkipInProgressPersist(
+  log: WorkoutLog,
+  generation: number,
+): boolean {
+  if (generation !== persistGeneration) return true;
+  if (completingWorkoutId === log.id) return true;
+  return false;
+}
+
 export function schedulePersistInProgressWorkout(
   log: WorkoutLog,
   options: InProgressPersistOptions,
 ): void {
   if (typeof window === "undefined") return;
+  if (completingWorkoutId === log.id) return;
   if (persistTimer) clearTimeout(persistTimer);
   const generation = ++persistGeneration;
   persistTimer = setTimeout(() => {
@@ -47,12 +79,9 @@ export function schedulePersistInProgressWorkout(
   }, DEBOUNCE_MS);
 }
 
+/** @deprecated Prefer `invalidateInProgressPersists` */
 export function cancelScheduledPersistInProgressWorkout(): void {
-  if (persistTimer) {
-    clearTimeout(persistTimer);
-    persistTimer = null;
-  }
-  persistGeneration++;
+  invalidateInProgressPersists();
 }
 
 export async function flushPersistInProgressWorkout(
@@ -60,11 +89,26 @@ export async function flushPersistInProgressWorkout(
   options: InProgressPersistOptions,
   generation = persistGeneration,
 ): Promise<WorkoutLog | null> {
-  cancelScheduledPersistInProgressWorkout();
+  if (persistTimer) {
+    clearTimeout(persistTimer);
+    persistTimer = null;
+  }
+
+  if (shouldSkipInProgressPersist(log, generation)) {
+    return null;
+  }
+
   const prepared = prepareInProgressLog(log, options);
+
+  if (shouldSkipInProgressPersist(log, generation)) {
+    return null;
+  }
+
   try {
     await getWorkoutRepo("authenticated").saveWorkout(prepared);
-    if (generation !== persistGeneration) return null;
+    if (shouldSkipInProgressPersist(log, generation)) {
+      return null;
+    }
     return prepared;
   } catch (err) {
     toastSaveError("workout progress", err);
