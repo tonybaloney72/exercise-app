@@ -1917,7 +1917,7 @@ const catalogExercises: Exercise[] = [
     name: "Depth Jump",
     category: "PC",
     equipment: ["plyo_box"],
-    expertiseLevel: "beginner",
+    expertiseLevel: "advanced",
     plyometricIntensity: "high",
     muscleGroups: ["Calves", "Glutes", "Quadriceps"],
     defaultReps: "4–6",
@@ -2277,7 +2277,7 @@ const catalogExercises: Exercise[] = [
     name: "Clap Push-Up",
     category: "PC",
     equipment: ["bodyweight"],
-    expertiseLevel: "beginner",
+    expertiseLevel: "advanced",
     muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
     defaultReps: "4–6",
     notes:
@@ -2292,7 +2292,7 @@ const catalogExercises: Exercise[] = [
     name: "Depth Push-Up",
     category: "PC",
     equipment: ["plyo_box"],
-    expertiseLevel: "beginner",
+    expertiseLevel: "advanced",
     muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
     defaultReps: "5–8",
     notes:
@@ -2629,7 +2629,7 @@ const catalogExercises: Exercise[] = [
     name: "Box Depth Jump",
     category: "PC",
     equipment: ["plyo_box"],
-    expertiseLevel: "beginner",
+    expertiseLevel: "advanced",
     muscleGroups: ["Calves", "Glutes", "Quadriceps"],
     defaultReps: "4–6",
     notes:

@@ -1,4 +1,11 @@
+import {
+  scaledCatalogPrescription,
+  scaledDefaultTimerSeconds,
+  type PlanPrescriptionOptions,
+} from "@/lib/prescriptionScaling";
 import type { Exercise, ExerciseSetMode, ExerciseSettingsValues } from "@/types";
+
+export type { PlanPrescriptionOptions } from "@/lib/prescriptionScaling";
 
 /** Seconds hint from prescription text (e.g. "30 sec", "20–30 sec each side"). */
 export function parseTimerSecondsHint(prescription: string): number | undefined {
@@ -122,17 +129,26 @@ export function resolveStretchTimerTargetSeconds(
  * Prescription string for plan slots and previews (Library defaults over catalog).
  */
 export function formatPlanTargetPrescription(
-  exercise: Pick<Exercise, "isTimeBased" | "defaultReps">,
+  exercise: Pick<Exercise, "isTimeBased" | "defaultReps" | "category">,
   stored: StoredExerciseSlice | undefined,
+  options?: PlanPrescriptionOptions,
 ): string {
   const resolved = resolveExerciseSettings(exercise, stored);
+  const expertiseByGroup = options?.expertiseByGroup;
+
   if (resolved.defaultSetMode === "timer") {
-    const sec =
-      resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK;
+    const hasLibraryOverride =
+      stored?.defaultTimerSeconds != null && stored.defaultTimerSeconds > 0;
+    if (hasLibraryOverride) {
+      return `${resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK} sec`;
+    }
+    const sec = scaledDefaultTimerSeconds(exercise, expertiseByGroup);
     return `${sec} sec`;
   }
+
   if (resolved.defaultTargetReps != null && resolved.defaultTargetReps > 0) {
     return String(resolved.defaultTargetReps);
   }
-  return exercise.defaultReps;
+
+  return scaledCatalogPrescription(exercise, expertiseByGroup);
 }

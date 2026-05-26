@@ -8,6 +8,7 @@ import { exerciseMap } from "@/data/exercises";
 import { CATEGORIES } from "@/data/categories";
 import { useResolvedStretches } from "@/hooks/useResolvedStretches";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan } from "@/types";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
@@ -37,11 +38,14 @@ export default function WorkoutPlanPreview({
   const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
   const { warmUp, coolDown } = useResolvedStretches(plan, weekByDow);
   const exerciseSettings = useExerciseSettingsStore((s) => s.byExerciseId);
+  const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
 
   const roundTargetLabel = (exerciseId: string, fallback: string) => {
     const meta = exerciseMap[exerciseId];
     if (!meta) return fallback;
-    return formatPlanTargetPrescription(meta, exerciseSettings[exerciseId]);
+    return formatPlanTargetPrescription(meta, exerciseSettings[exerciseId], {
+      expertiseByGroup,
+    });
   };
 
   const showBanner = Boolean(bannerTitle || bannerHint || isFutureDay);

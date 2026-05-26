@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import { formatLaterRoundWarning, pickRandomSwap } from "@/lib/exerciseSwap";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 import type { Exercise } from "@/types";
 
@@ -31,6 +32,7 @@ export default function SwapExerciseModal({
 }: SwapExerciseModalProps) {
   const [query, setQuery] = useState("");
   const byExerciseId = useExerciseSettingsStore((s) => s.byExerciseId);
+  const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
   const [pendingLaterRound, setPendingLaterRound] = useState<{
     exerciseId: string;
     name: string;
@@ -48,11 +50,13 @@ export default function SwapExerciseModal({
     for (const ex of candidates) {
       map.set(
         ex.id,
-        formatPlanTargetPrescription(ex, byExerciseId[ex.id]),
+        formatPlanTargetPrescription(ex, byExerciseId[ex.id], {
+          expertiseByGroup,
+        }),
       );
     }
     return map;
-  }, [candidates, byExerciseId]);
+  }, [candidates, byExerciseId, expertiseByGroup]);
 
   function resetPending() {
     setPendingLaterRound(null);

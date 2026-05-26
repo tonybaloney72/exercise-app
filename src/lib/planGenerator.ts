@@ -188,7 +188,9 @@ function replaceSlotIfDisliked(
   usedInRound.add(substitute.id);
   const meta = exerciseMap[substitute.id];
   const targetReps = meta
-    ? formatPlanTargetPrescription(meta, exerciseSettings?.[substitute.id])
+    ? formatPlanTargetPrescription(meta, exerciseSettings?.[substitute.id], {
+        expertiseByGroup: expertiseFilter?.byGroup,
+      })
     : substitute.defaultReps;
   return {
     exerciseId: substitute.id,

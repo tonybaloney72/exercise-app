@@ -220,7 +220,9 @@ function fillSlot(
 
   const meta = exerciseMap[pick.id];
   const targetReps = meta
-    ? formatPlanTargetPrescription(meta, exerciseSettings?.[pick.id])
+    ? formatPlanTargetPrescription(meta, exerciseSettings?.[pick.id], {
+        expertiseByGroup: expertiseFilter?.byGroup,
+      })
     : pick.defaultReps;
 
   return {

@@ -41,6 +41,7 @@ import {
   clearExerciseMetrics,
   hydrateWorkoutLog,
 } from "@/utils/exerciseLogDefaults";
+import { scaledDefaultTimerSeconds } from "@/lib/prescriptionScaling";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   formatPlanTargetPrescription,
@@ -98,8 +99,25 @@ function draftScope(): DraftAuthScope {
 
 function seedTimerTargetSecondsFromResolved(
   resolved: ReturnType<typeof resolveExerciseSettings>,
+  meta?: {
+    isTimeBased: boolean;
+    defaultReps: string;
+    category: ExerciseCategory;
+  },
+  stored?: { defaultTimerSeconds?: number | null },
 ): number | undefined {
   if (resolved.defaultSetMode !== "timer") return undefined;
+  const hasLibraryOverride =
+    stored?.defaultTimerSeconds != null && stored.defaultTimerSeconds > 0;
+  if (hasLibraryOverride) {
+    return Math.min(999, Math.max(5, stored.defaultTimerSeconds!));
+  }
+  if (meta) {
+    return scaledDefaultTimerSeconds(
+      meta,
+      useSettingsStore.getState().expertiseByGroup,
+    );
+  }
   const sec = resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK;
   return Math.min(999, Math.max(5, sec));
 }
@@ -314,10 +332,12 @@ interface WorkoutState {
 
 function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
   const byId = useExerciseSettingsStore.getState().byExerciseId;
+  const expertiseByGroup = useSettingsStore.getState().expertiseByGroup;
   return plan.rounds.map((round) => ({
     roundNumber: round.roundNumber,
     exercises: round.exercises.map((ex): ExerciseLog => {
       const meta = exerciseMap[ex.exerciseId];
+      const stored = byId[ex.exerciseId];
       const resolved = resolveExerciseSettings(
         meta ?? {
           id: ex.exerciseId,
@@ -327,23 +347,42 @@ function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
           defaultReps: "",
           notes: "",
         },
-        byId[ex.exerciseId],
+        stored,
       );
-      const targetPrescription = formatPlanTargetPrescription(
-        meta ?? {
-          id: ex.exerciseId,
-          isTimeBased: false,
-          defaultReps: ex.targetReps,
-        },
-        byId[ex.exerciseId],
-      );
+      const prescriptionOpts = { expertiseByGroup };
+      const targetPrescription =
+        ex.targetReps?.trim() ||
+        formatPlanTargetPrescription(
+          meta ?? {
+            id: ex.exerciseId,
+            isTimeBased: false,
+            category: ex.category,
+            defaultReps: ex.targetReps,
+          },
+          stored,
+          prescriptionOpts,
+        );
       return {
         exerciseId: ex.exerciseId,
         completed: false,
         skipped: false,
         targetPrescription,
         loggingMode: resolved.defaultSetMode,
-        targetDurationSeconds: seedTimerTargetSecondsFromResolved(resolved),
+        targetDurationSeconds: seedTimerTargetSecondsFromResolved(
+          resolved,
+          meta
+            ? {
+                isTimeBased: meta.isTimeBased,
+                defaultReps: meta.defaultReps,
+                category: meta.category,
+              }
+            : {
+                isTimeBased: false,
+                defaultReps: ex.targetReps,
+                category: ex.category,
+              },
+          stored,
+        ),
       };
     }),
   }));
@@ -727,7 +766,17 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
               loggingMode: "timer" as const,
               actualReps: undefined,
               actualDuration: undefined,
-              targetDurationSeconds: seedTimerTargetSecondsFromResolved(resolved),
+              targetDurationSeconds: seedTimerTargetSecondsFromResolved(
+                resolved,
+                meta
+                  ? {
+                      isTimeBased: meta.isTimeBased,
+                      defaultReps: meta.defaultReps,
+                      category: meta.category,
+                    }
+                  : undefined,
+                byId[id],
+              ),
             };
           }),
         };
@@ -762,6 +811,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
               ? (() => {
                   const meta = exerciseMap[substituteId];
                   const byId = useExerciseSettingsStore.getState().byExerciseId;
+                  const expertiseByGroup = useSettingsStore.getState().expertiseByGroup;
                   const resolved = resolveExerciseSettings(
                     meta ?? {
                       id: substituteId,
@@ -773,6 +823,11 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
                     },
                     byId[substituteId],
                   );
+                  const targetPrescription = meta
+                    ? formatPlanTargetPrescription(meta, byId[substituteId], {
+                        expertiseByGroup,
+                      })
+                    : (exerciseMap[substituteId]?.defaultReps ?? ex.targetPrescription);
                   return {
                     ...ex,
                     swappedWith: substituteId,
@@ -780,10 +835,22 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
                     actualReps: undefined,
                     actualDuration: undefined,
                     loggingMode: resolved.defaultSetMode,
-                    targetDurationSeconds:
-                      seedTimerTargetSecondsFromResolved(resolved),
-                    targetPrescription:
-                      exerciseMap[substituteId]?.defaultReps ?? ex.targetPrescription,
+                    targetDurationSeconds: seedTimerTargetSecondsFromResolved(
+                      resolved,
+                      meta
+                        ? {
+                            isTimeBased: meta.isTimeBased,
+                            defaultReps: meta.defaultReps,
+                            category: meta.category,
+                          }
+                        : {
+                            isTimeBased: false,
+                            defaultReps: targetPrescription,
+                            category,
+                          },
+                      byId[substituteId],
+                    ),
+                    targetPrescription,
                   };
                 })()
               : ex,
@@ -807,6 +874,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
               ? (() => {
                   const meta = exerciseMap[ex.exerciseId];
                   const byId = useExerciseSettingsStore.getState().byExerciseId;
+                  const expertiseByGroup = useSettingsStore.getState().expertiseByGroup;
                   const resolved = resolveExerciseSettings(
                     meta ?? {
                       id: ex.exerciseId,
@@ -818,16 +886,29 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
                     },
                     byId[ex.exerciseId],
                   );
+                  const targetPrescription = meta
+                    ? formatPlanTargetPrescription(meta, byId[ex.exerciseId], {
+                        expertiseByGroup,
+                      })
+                    : (exerciseMap[ex.exerciseId]?.defaultReps ?? ex.targetPrescription);
                   return {
                     ...ex,
                     swappedWith: undefined,
                     actualReps: undefined,
                     actualDuration: undefined,
                     loggingMode: resolved.defaultSetMode,
-                    targetDurationSeconds:
-                      seedTimerTargetSecondsFromResolved(resolved),
-                    targetPrescription:
-                      exerciseMap[ex.exerciseId]?.defaultReps ?? ex.targetPrescription,
+                    targetDurationSeconds: seedTimerTargetSecondsFromResolved(
+                      resolved,
+                      meta
+                        ? {
+                            isTimeBased: meta.isTimeBased,
+                            defaultReps: meta.defaultReps,
+                            category: meta.category,
+                          }
+                        : undefined,
+                      byId[ex.exerciseId],
+                    ),
+                    targetPrescription,
                   };
                 })()
               : ex,
@@ -886,10 +967,21 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       const byId = useExerciseSettingsStore.getState().byExerciseId;
       const meta = exerciseMap[exerciseId];
       if (!meta) return state;
+      const expertiseByGroup = useSettingsStore.getState().expertiseByGroup;
       const resolved = resolveExerciseSettings(meta, byId[exerciseId]);
-      const targetPrescription = formatPlanTargetPrescription(meta, byId[exerciseId]);
+      const targetPrescription = formatPlanTargetPrescription(meta, byId[exerciseId], {
+        expertiseByGroup,
+      });
       const loggingMode = resolved.defaultSetMode;
-      const targetDurationSeconds = seedTimerTargetSecondsFromResolved(resolved);
+      const targetDurationSeconds = seedTimerTargetSecondsFromResolved(
+        resolved,
+        {
+          isTimeBased: meta.isTimeBased,
+          defaultReps: meta.defaultReps,
+          category: meta.category,
+        },
+        byId[exerciseId],
+      );
       const rounds = state.activeWorkout.rounds.map((r) => {
         if (r.roundNumber !== roundNumber) return r;
         if (r.exercises.some((e) => e.exerciseId === exerciseId && !e.swappedWith)) {
