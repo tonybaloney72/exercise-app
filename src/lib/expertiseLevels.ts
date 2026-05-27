@@ -67,17 +67,23 @@ export function expertiseByGroupEqual(a: ExpertiseByGroup, b: ExpertiseByGroup):
   );
 }
 
-export type ExpertiseFilter = { byGroup: ExpertiseByGroup };
+export type ExpertiseFilter = {
+  byGroup: ExpertiseByGroup;
+  /** When false, skip P4b min-step filtering (expertise cap still applies). */
+  progressionFamiliesEnabled: boolean;
+};
 
 /** Sanitized per-group caps; defaults to intermediate for every group. */
 export function resolveExpertiseFilter(settings: {
   expertiseByGroup?: ExpertiseByGroup;
+  progressionFamiliesEnabled?: boolean;
 }): ExpertiseFilter {
   return {
     byGroup: sanitizeExpertiseByGroup(
       settings.expertiseByGroup,
       DEFAULT_EXPERTISE_BY_GROUP,
     ),
+    progressionFamiliesEnabled: settings.progressionFamiliesEnabled !== false,
   };
 }
 

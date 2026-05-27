@@ -25,8 +25,9 @@ export default function ExpertiseByGroupEditor({ byGroup, onChange }: Props) {
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted leading-relaxed">
-        Workouts and swaps only use exercises at or below each group&apos;s
-        level.
+        Plans and swaps only use exercises at or below each group&apos;s level.
+        Turn off &ldquo;Avoid easy regressions&rdquo; above to allow easier
+        steps in a progression (e.g. incline push-ups) regardless of cap.
       </p>
 
       <div className="space-y-3">

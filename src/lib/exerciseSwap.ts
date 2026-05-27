@@ -101,7 +101,10 @@ export function pickRandomSwap(candidates: Exercise[]): Exercise | null {
 export function swapCandidatePrefsFromStores(
   getEquipment: () => ExerciseEquipment[],
   getPreferenceMap: () => Parameters<typeof collectDislikedIds>[0],
-  getSettings?: () => Pick<UserSettings, "expertiseByGroup">,
+  getSettings?: () => Pick<
+    UserSettings,
+    "expertiseByGroup" | "progressionFamiliesEnabled"
+  >,
 ): SwapCandidatePrefs {
   const settings = getSettings?.();
   return {

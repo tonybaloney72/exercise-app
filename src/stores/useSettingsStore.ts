@@ -23,6 +23,7 @@ import {
   weeklyCardioSettingsChanged,
   weeklyRestSettingsChanged,
 } from "@/lib/weekPlanPreferences";
+import { expertiseByGroupEqual } from "@/lib/expertiseLevels";
 import { layoutEqual } from "@/lib/weeklyCategoryLayout";
 import type { ExerciseEquipment, UserSettings } from "@/types";
 
@@ -83,6 +84,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       weeklyCardioSettingsChanged(partial, current);
     const programModeChanged =
       partial.programMode != null && partial.programMode !== current.programMode;
+    const expertiseChanged =
+      partial.expertiseByGroup != null &&
+      !expertiseByGroupEqual(partial.expertiseByGroup, current.expertiseByGroup);
+    const progressionFamiliesChanged =
+      partial.progressionFamiliesEnabled != null &&
+      partial.progressionFamiliesEnabled !== current.progressionFamiliesEnabled;
 
     set((s) => ({ ...s, ...updated }));
     try {
@@ -103,7 +110,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         updated.programMode === "custom"
       ) {
         await refreshCurrentCustomWeekSchedule();
-      } else if (programProfileChanged || weekScheduleChanged) {
+      } else if (
+        programProfileChanged ||
+        weekScheduleChanged ||
+        expertiseChanged ||
+        progressionFamiliesChanged
+      ) {
         await refreshCurrentTrainingWeek("program");
       } else if (equipmentChanged) {
         await refreshCurrentTrainingWeek("equipment");
@@ -186,6 +198,7 @@ function pickUserSettingsFields(
     weeklyCardioByDay: state.weeklyCardioByDay,
     weeklyCardioCustomized: state.weeklyCardioCustomized,
     expertiseByGroup: state.expertiseByGroup,
+    progressionFamiliesEnabled: state.progressionFamiliesEnabled,
   };
 }
 

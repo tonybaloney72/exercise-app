@@ -11,16 +11,16 @@ describe("weekToDatePlanAdherence", () => {
         name: "Sunday",
         theme: "Test",
         hasJog: false,
-        strengthFocus: ["CB"],
+        strengthFocus: ["PC"],
         coreGroups: [],
         rounds: [
           {
             roundNumber: 1,
             exercises: [
               {
-                exerciseId: "CB-1",
+                exerciseId: "PC-1",
                 targetReps: "12",
-                category: "CB",
+                category: "PC",
               },
             ],
           },
@@ -39,14 +39,14 @@ describe("weekToDatePlanAdherence", () => {
         {
           roundNumber: 1,
           exercises: [
-            { exerciseId: "CB-1", completed: true, skipped: false },
-            { exerciseId: "CB-2", completed: true, skipped: false },
+            { exerciseId: "PC-1", completed: true, skipped: false },
+            { exerciseId: "PC-2", completed: true, skipped: false },
           ],
         },
         {
           roundNumber: 2,
           exercises: [
-            { exerciseId: "CB-3", completed: true, skipped: false },
+            { exerciseId: "PC-3", completed: true, skipped: false },
           ],
         },
       ],

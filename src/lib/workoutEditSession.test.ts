@@ -11,7 +11,7 @@ const template: DayPlan = {
   name: "Monday",
   theme: "Test",
   hasJog: false,
-  strengthFocus: ["CB"],
+  strengthFocus: ["PC"],
   coreGroups: ["CF"],
   rounds: [],
 };
@@ -40,10 +40,10 @@ describe("workoutEditSession", () => {
           roundNumber: 1,
           exercises: [
             {
-              exerciseId: "CB-1",
+              exerciseId: "PC-1",
               completed: true,
               skipped: false,
-              swappedWith: "CB-99",
+              swappedWith: "PC-2",
               targetPrescription: "12",
             },
           ],
@@ -52,7 +52,7 @@ describe("workoutEditSession", () => {
       endTime: "2026-05-18T12:00:00Z",
     };
     const plan = sessionPlanForWorkoutEdit(log, template);
-    expect(plan.rounds[0].exercises[0].exerciseId).toBe("CB-1");
+    expect(plan.rounds[0].exercises[0].exerciseId).toBe("PC-1");
     expect(stretchEntriesFromLogs(log.warmUpExercises)[0].targetReps).toBe("30 sec");
   });
 });

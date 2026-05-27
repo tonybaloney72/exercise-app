@@ -5,7 +5,7 @@ import type { RoundExercise } from "@/types";
 const slot = (id: string): RoundExercise => ({
   exerciseId: id,
   targetReps: "10",
-  category: "PU",
+  category: "UP",
 });
 
 describe("reorderRoundExercises", () => {

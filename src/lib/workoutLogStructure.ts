@@ -32,7 +32,7 @@ export function buildStrengthExerciseLog(exerciseId: string): ExerciseLog {
     meta ?? {
       id: exerciseId,
       isTimeBased: false,
-      category: "CB",
+      category: "UP",
       name: "",
       defaultReps: "",
       notes: "",

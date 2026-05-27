@@ -9,6 +9,7 @@ import {
 import { activeRecoveryDayPlan, applyRestDayToPlan } from "@/lib/restDays";
 import { prepareCatalogDayForUser } from "@/lib/weekPlanPreferences";
 import { DEFAULT_SETTINGS } from "@/lib/repos/types";
+import type { UserSettings } from "@/types";
 
 describe("cardioActivities", () => {
   it("migrates hasJog to cardioActivities", () => {
@@ -20,7 +21,7 @@ describe("cardioActivities", () => {
 
   it("applies weekly cardio from settings", () => {
     const tue = getCatalogPlanForDay(2);
-    const settings = {
+    const settings: UserSettings = {
       ...DEFAULT_SETTINGS,
       weeklyCardioCustomized: true,
       weeklyCardioByDay: { ...suggestWeeklyCardioFromCatalog(), 2: ["walk", "cycle"] },

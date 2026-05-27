@@ -30,9 +30,9 @@ describe("workoutDayTemplates", () => {
           roundNumber: 1,
           exercises: [
             {
-              exerciseId: "CB-1",
+              exerciseId: "PC-1",
               targetReps: "12",
-              category: "CB",
+              category: "PC",
             },
           ],
         },
@@ -42,7 +42,7 @@ describe("workoutDayTemplates", () => {
     const next = applyTemplateToDayPlan(baseDay, snapshot);
     expect(next.name).toBe("Tuesday");
     expect(next.dayOfWeek).toBe(2);
-    expect(next.rounds[0].exercises[0].exerciseId).toBe("CB-1");
+    expect(next.rounds[0].exercises[0].exerciseId).toBe("PC-1");
     expect(next.cardioActivities?.[0].kind).toBe("jog");
   });
 });

@@ -92,10 +92,15 @@ export function normalizeUserSettings(
     DEFAULT_EXPERTISE_BY_GROUP,
   );
 
+  const progressionFamiliesEnabled =
+    partial.progressionFamiliesEnabled ??
+    DEFAULT_SETTINGS.progressionFamiliesEnabled;
+
   return {
     ...DEFAULT_SETTINGS,
     ...rest,
     expertiseByGroup,
+    progressionFamiliesEnabled,
     equipmentOnboardingCompleted:
       partial.equipmentOnboardingCompleted ?? DEFAULT_SETTINGS.equipmentOnboardingCompleted,
     trainingPriorityPreset: preset,

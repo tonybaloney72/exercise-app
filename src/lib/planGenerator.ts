@@ -32,6 +32,7 @@ import {
   type ProgramMode,
   type WeeklyCategoryLayout,
 } from "@/lib/weeklyCategoryLayout";
+import { PROGRESSION_FAMILIES_VERSION } from "@/lib/progressionFamilies";
 import { prepareCatalogWeekForUser } from "@/lib/weekPlanPreferences";
 import type {
   DayPlan,
@@ -72,6 +73,7 @@ export function computePrefsFingerprint(
   weeklyCardioByDay?: UserSettings["weeklyCardioByDay"],
   weeklyCardioCustomized = false,
   expertiseByGroup?: UserSettings["expertiseByGroup"],
+  progressionFamiliesEnabled = true,
 ): string {
   const disliked = Object.entries(prefs)
     .filter(([, v]) => v === "disliked")
@@ -114,7 +116,9 @@ export function computePrefsFingerprint(
   const expertiseSeg = `exp:${expertiseByGroupFingerprint(
     expertiseByGroup ?? DEFAULT_EXPERTISE_BY_GROUP,
   )}`;
-  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pm:${mode}|${prioritySeg}|${layoutSeg}|rd:${roundDensity}|${restSeg}|${cardioSeg}|${expertiseSeg}|${stretches}`;
+  const progressionSeg = `pf:${PROGRESSION_FAMILIES_VERSION}`;
+  const progressionFilterSeg = `pff:${progressionFamiliesEnabled ? 1 : 0}`;
+  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pm:${mode}|${prioritySeg}|${layoutSeg}|rd:${roundDensity}|${restSeg}|${cardioSeg}|${expertiseSeg}|${progressionSeg}|${progressionFilterSeg}|${stretches}`;
 }
 
 export function computePrefsFingerprintFromSettings(
@@ -138,6 +142,7 @@ export function computePrefsFingerprintFromSettings(
     settings.weeklyCardioByDay,
     settings.weeklyCardioCustomized ?? false,
     settings.expertiseByGroup,
+    settings.progressionFamiliesEnabled,
   );
 }
 

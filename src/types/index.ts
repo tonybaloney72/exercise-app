@@ -76,6 +76,11 @@ export interface Exercise {
   /** Hybrid Calisthenics progression ladder (1 = easiest in that chain). */
   hcProgressionStep?: number;
   hcProgressionTotal?: number;
+  /** Curated regression family (see `progressionFamilies.ts`). */
+  progressionFamilyId?: string;
+  /** Step within `progressionFamilyId` (1 = easiest). */
+  progressionStep?: number;
+  progressionBranch?: "bodyweight" | "loaded";
 }
 
 /** Persisted row for `exercise_settings` (and local guest mirror). */
@@ -300,6 +305,11 @@ export interface UserSettings {
   weeklyCardioCustomized: boolean;
   /** Per emphasis-group skill cap for generator / swap / library. */
   expertiseByGroup: ExpertiseByGroup;
+  /**
+   * When true, generator and swap omit regression steps below the skill cap
+   * within curated progression families (see progressionFamilies.ts).
+   */
+  progressionFamiliesEnabled: boolean;
 }
 
 export interface ProgressEntry {
