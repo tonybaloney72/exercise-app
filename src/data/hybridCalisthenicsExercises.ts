@@ -2522,7 +2522,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     notes:
       "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
     source: "Nuffield Health",
-    videoUrl: "https://www.youtube.com/watch?v=pUdIL5x0fWg",
+    videoUrl: "https://www.youtube.com/watch?v=RR0oZhhUVWo",
     isTimeBased: false,
   },
 
@@ -2851,7 +2851,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     notes:
       "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
     source: "IgnasFit",
-    videoUrl: "https://www.youtube.com/watch?v=5okBao1CTlo",
+    videoUrl: "https://www.youtube.com/watch?v=AcvfBd9C2kA",
     isTimeBased: false,
   },
   {
@@ -2870,7 +2870,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   },
   {
     id: "HC-216",
-    name: "Peeing Dog",
+    name: "Fire Hydrant",
     category: "LB",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
@@ -2879,7 +2879,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     notes:
       "Muscle focus: Abductors. Reference: Hybrid Calisthenics exercise library.",
     source: "AgaAndGina Channel",
-    videoUrl: "https://www.youtube.com/watch?v=nj9bYHx5_ZU",
+    videoUrl: "https://www.youtube.com/watch?v=IRkRgk2Gc1E",
     isTimeBased: false,
   },
   {
