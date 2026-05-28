@@ -40,7 +40,7 @@ export default function AuthField({
         onChange={(e) => onChange(e.target.value)}
         className={authInputClassName}
       />
-      {hint ? <p className="text-[10px] text-muted">{hint}</p> : null}
+      {hint ? <p className="text-caption text-muted">{hint}</p> : null}
     </div>
   );
 }

@@ -68,13 +68,13 @@ export default function LandingPage() {
           >
             {busy ? "Loading…" : "Continue as guest"}
           </button>
-          <p className="text-center text-[10px] leading-snug text-muted sm:text-[11px]">
+          <p className="text-center text-caption leading-snug text-muted sm:text-sm">
             Guest mode keeps everything on this device — no account, no sync.
           </p>
 
           <div className="my-2 flex items-center gap-3 sm:my-4">
             <div className="h-px flex-1 bg-border" />
-            <span className="text-[10px] uppercase tracking-wider text-muted">
+            <span className="text-caption uppercase tracking-wider text-muted">
               or
             </span>
             <div className="h-px flex-1 bg-border" />

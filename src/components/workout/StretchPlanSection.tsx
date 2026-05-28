@@ -53,7 +53,7 @@ function StretchListBody({
                   <button
                     type="button"
                     onClick={() => onChange(index)}
-                    className="rounded-lg border border-border px-2 py-1 text-[11px] font-medium text-foreground hover:bg-surface-hover"
+                    className="rounded-lg border border-border px-2 py-1 text-sm font-medium text-foreground hover:bg-surface-hover"
                   >
                     Change
                   </button>
@@ -61,14 +61,14 @@ function StretchListBody({
                     type="button"
                     disabled={entries.length <= minCount}
                     onClick={() => onRemove(index)}
-                    className="rounded-lg border border-border px-2 py-1 text-[11px] font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-40"
+                    className="rounded-lg border border-border px-2 py-1 text-sm font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-40"
                   >
                     Remove
                   </button>
                 </div>
               </div>
               <label className="block">
-                <span className="text-[11px] text-muted">Target</span>
+                <span className="text-sm text-muted">Target</span>
                 <input
                   type="text"
                   value={entry.targetReps}
@@ -135,7 +135,7 @@ export default function StretchPlanSection({
         <div className="min-w-0">
           <h2 className="text-sm font-semibold text-foreground">{title}</h2>
           {hint ? (
-            <p className="text-[11px] text-muted mt-0.5">{hint}</p>
+            <p className="text-sm text-muted mt-0.5">{hint}</p>
           ) : null}
         </div>
         {addButton}

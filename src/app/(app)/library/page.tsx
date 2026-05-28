@@ -205,7 +205,7 @@ export default function LibraryPage() {
 
       {/* Difficulty filter chips */}
       <div className="space-y-1.5">
-        <p className="text-[11px] font-medium text-muted px-1">Difficulty</p>
+        <p className="text-sm font-medium text-muted px-1">Difficulty</p>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
           <button
             type="button"
@@ -449,10 +449,10 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
   }
 
   const modeBtn =
-    "rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors border";
+    "rounded-lg px-2.5 py-1 text-sm font-medium transition-colors border";
 
   const presetChipClass =
-    "rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors";
+    "rounded-lg border px-2.5 py-1 text-sm font-medium transition-colors";
 
   const customChipSelected =
     customChipActive ||
@@ -474,7 +474,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
         >
           <span className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-foreground leading-snug">
             {exercise.name}
-            <span className="rounded-md border border-border bg-surface-hover px-1.5 py-0.5 text-[10px] font-medium text-muted">
+            <span className="rounded-md border border-border bg-surface-hover px-1.5 py-0.5 text-caption font-medium text-muted">
               {EXPERTISE_LEVEL_LABELS[exerciseExpertiseLevel(exercise)]}
             </span>
           </span>
@@ -512,16 +512,16 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
             className="overflow-hidden"
           >
             <div className="border-t border-border px-3 py-3 space-y-2">
-              <p className="text-[10px] font-mono text-muted">{exercise.id}</p>
+              <p className="text-caption font-mono text-muted">{exercise.id}</p>
               <p className="text-xs text-muted">{exercise.notes}</p>
               {exercise.source && (
-                <p className="text-[10px] text-muted">
+                <p className="text-caption text-muted">
                   Source: {exercise.source}
                 </p>
               )}
               {exercise.secondaryCategory && (
                 <div className="flex items-center gap-1">
-                  <span className="text-[10px] text-muted">Also:</span>
+                  <span className="text-caption text-muted">Also:</span>
                   <CategoryBadge category={exercise.secondaryCategory} />
                 </div>
               )}
@@ -558,7 +558,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
               )}
 
               <div className="mt-3 space-y-2 border-t border-border pt-3">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                <p className="text-caption font-medium uppercase tracking-wide text-muted">
                   Default logging
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -616,7 +616,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                     </div>
                     {showCustomInput && (
                       <div className="flex flex-col gap-1.5 pt-0.5">
-                        <label className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                        <label className="text-caption font-medium uppercase tracking-wide text-muted">
                           Seconds
                         </label>
                         <input
@@ -638,7 +638,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                 {resolved.defaultSetMode === "reps" && (
                   <div className="space-y-3 pt-0.5">
                     <div className="flex flex-col gap-2.5">
-                      <label className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                      <label className="text-caption font-medium uppercase tracking-wide text-muted">
                         Default reps
                       </label>
                       <input
@@ -658,7 +658,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                         className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
                       />
                     </div>
-                    <p className="text-[10px] text-muted">
+                    <p className="text-caption text-muted">
                       Clear the field and tap away to use the catalog line (
                       {exercise.defaultReps}) until you set a number.
                     </p>

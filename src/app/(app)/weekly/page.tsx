@@ -169,7 +169,7 @@ export default function WeeklyPage() {
               }`}
             >
               <span
-                className={`text-[10px] font-medium ${isToday ? "text-accent" : "text-muted"}`}
+                className={`text-caption font-medium ${isToday ? "text-accent" : "text-muted"}`}
               >
                 {DAY_ABBRS[i]}
               </span>
@@ -270,12 +270,12 @@ export default function WeeklyPage() {
                           {plan.name}
                         </h3>
                         {isToday && (
-                          <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-medium text-accent">
+                          <span className="rounded-full bg-accent/20 px-2 py-0.5 text-caption font-medium text-accent">
                             Today
                           </span>
                         )}
                         {isCompleted && (
-                          <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-[10px] font-medium text-green-400">
+                          <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-caption font-medium text-green-400">
                             Done
                           </span>
                         )}
@@ -295,21 +295,21 @@ export default function WeeklyPage() {
                       <CategoryBadge key={cat} category={cat} />
                     ))}
                     {restBadgeForPlan(plan) ? (
-                      <span className="inline-flex items-center rounded-full bg-muted/30 px-2 py-0.5 text-[10px] font-medium text-muted">
+                      <span className="inline-flex items-center rounded-full bg-muted/30 px-2 py-0.5 text-caption font-medium text-muted">
                         {restBadgeForPlan(plan)}
                       </span>
                     ) : null}
                     {cardioBadgesForPlan(plan).map((label) => (
                       <span
                         key={label}
-                        className="inline-flex items-center rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-medium text-sky-400"
+                        className="inline-flex items-center rounded-full bg-sky-500/20 px-2 py-0.5 text-caption font-medium text-sky-400"
                       >
                         {label}
                       </span>
                     ))}
                   </div>
 
-                  <div className="mt-2 text-[10px] text-muted">
+                  <div className="mt-2 text-caption text-muted">
                     {completedLog ? (
                       <>
                         {completedLog.rounds.length} round

@@ -480,7 +480,7 @@ export default function WeeklyDayPage() {
               Start workout
             </button>
           )}
-          <p className="text-center text-[11px] text-muted">
+          <p className="text-center text-sm text-muted">
             {continueWorkoutHere
               ? pausedWorkoutDate === dateKey && !activeWorkout
                 ? "Resume your saved session on Today."

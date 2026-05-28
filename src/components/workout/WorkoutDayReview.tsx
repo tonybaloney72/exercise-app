@@ -268,7 +268,7 @@ export default function WorkoutDayReview({
           className="mt-2 w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted"
         />
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-[11px] text-muted">
+          <p className="text-sm text-muted">
             Tap <span className="font-medium text-foreground">Save notes</span> or
             leave this field to save on close.
           </p>
@@ -313,7 +313,7 @@ function ReviewRow({
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-foreground">{name}</p>
           {prescribedLabel && (
-            <p className="text-[10px] text-muted mt-0.5">{prescribedLabel}</p>
+            <p className="text-caption text-muted mt-0.5">{prescribedLabel}</p>
           )}
           <p className="text-xs text-muted">{target}</p>
         </div>
@@ -321,7 +321,7 @@ function ReviewRow({
       </div>
       <p className="text-xs text-foreground/90">{detail}</p>
       {exerciseNotes && (
-        <p className="text-[11px] text-muted italic pl-0.5">{exerciseNotes}</p>
+        <p className="text-sm text-muted italic pl-0.5">{exerciseNotes}</p>
       )}
     </div>
   );

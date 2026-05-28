@@ -25,6 +25,7 @@ import {
 } from "@/lib/weekPlanPreferences";
 import { expertiseByGroupEqual } from "@/lib/expertiseLevels";
 import { layoutEqual } from "@/lib/weeklyCategoryLayout";
+import { weeklyLayoutDayStructureEqual } from "@/lib/weeklyLayoutDayStructure";
 import type { ExerciseEquipment, UserSettings } from "@/types";
 
 interface SettingsState extends UserSettings {
@@ -72,6 +73,14 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       (partial.weeklyCategoryLayoutCustomized != null &&
         partial.weeklyCategoryLayoutCustomized !==
           current.weeklyCategoryLayoutCustomized) ||
+      (partial.weeklyLayoutDayStructure != null &&
+        !weeklyLayoutDayStructureEqual(
+          partial.weeklyLayoutDayStructure,
+          current.weeklyLayoutDayStructure,
+        )) ||
+      (partial.weeklyLayoutDayStructureCustomized != null &&
+        partial.weeklyLayoutDayStructureCustomized !==
+          current.weeklyLayoutDayStructureCustomized) ||
       (partial.roundDensity != null &&
         partial.roundDensity !== current.roundDensity);
     const stretchDefaultsChanged =
@@ -190,6 +199,9 @@ function pickUserSettingsFields(
     programMode: state.programMode,
     weeklyCategoryLayout: state.weeklyCategoryLayout,
     weeklyCategoryLayoutCustomized: state.weeklyCategoryLayoutCustomized,
+    weeklyLayoutDayStructure: state.weeklyLayoutDayStructure,
+    weeklyLayoutDayStructureCustomized:
+      state.weeklyLayoutDayStructureCustomized,
     roundDensity: state.roundDensity,
     defaultWarmUp: state.defaultWarmUp,
     defaultCoolDown: state.defaultCoolDown,

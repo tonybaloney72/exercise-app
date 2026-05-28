@@ -126,7 +126,7 @@ export default function BottomSheetModal({
                 </h2>
                 {hint ? (
                   <p
-                    className={`mt-0.5 text-[11px] text-muted ${hintClassName}`.trim()}
+                    className={`mt-0.5 text-sm text-muted ${hintClassName}`.trim()}
                   >
                     {hint}
                   </p>

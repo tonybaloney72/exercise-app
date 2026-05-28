@@ -23,6 +23,7 @@ Or run each new migration manually in the Supabase Dashboard → **SQL Editor** 
 | `20260520150000_workout_day_templates.sql` | Saved **workout day templates** (save/reuse in customize) |
 | `20260524120000_user_settings_weekly_ppl_schedule.sql` | Customizable 6-day P/P/L week schedule |
 | `20260525120000_user_settings_program_mode_preset.sql` | `program_mode` value `priorities` → `preset` |
+| `20260526120000_user_settings_weekly_layout_day_structure.sql` | Weekly layout per-day structure (blocks / repeat / mixed) |
 
 If a column or RPC is missing, authenticated users may see failed saves or settings that do not persist.
 

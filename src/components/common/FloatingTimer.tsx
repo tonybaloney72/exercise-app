@@ -233,7 +233,7 @@ export default function FloatingTimer() {
                 aria-label={`Expand ${timerModeLabel(mode)} timer`}
                 className="flex min-w-0 items-center gap-2 rounded-full py-2 pl-3 pr-2 text-left text-white active:scale-[0.97] transition-transform"
               >
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-white/75">
+                <span className="text-caption font-semibold uppercase tracking-wide text-white/75">
                   {timerModeLabel(mode)}
                 </span>
                 <span className="font-mono text-sm font-bold tabular-nums">

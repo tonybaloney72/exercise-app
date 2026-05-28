@@ -18,12 +18,12 @@ export default function WeekModeOptionsPanel({ title, hint, children }: Props) {
       <div>
         <p
           id="week-mode-options-heading"
-          className="text-[10px] font-semibold uppercase tracking-wide text-accent"
+          className="text-caption font-semibold uppercase tracking-wide text-accent"
         >
           {title}
         </p>
         {hint ? (
-          <p className="text-[11px] leading-snug text-muted mt-1">{hint}</p>
+          <p className="text-sm leading-snug text-muted mt-1">{hint}</p>
         ) : null}
       </div>
       {children}

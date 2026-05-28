@@ -317,3 +317,18 @@ export function threeDayPplSchedule(): WeeklyPplSchedule {
     6: "full_rest",
   };
 }
+
+export type PplSchedulePresetId = "classic" | "three_day" | "custom";
+
+/** Which built-in weekday template matches the current schedule (if any). */
+export function detectPplSchedulePreset(
+  schedule: WeeklyPplSchedule,
+): PplSchedulePresetId {
+  if (weeklyPplScheduleEqual(schedule, classicWeeklyPplSchedule())) {
+    return "classic";
+  }
+  if (weeklyPplScheduleEqual(schedule, threeDayPplSchedule())) {
+    return "three_day";
+  }
+  return "custom";
+}

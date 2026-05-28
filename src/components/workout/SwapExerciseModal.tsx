@@ -197,12 +197,12 @@ export default function SwapExerciseModal({
                         <span className="flex-1 font-medium text-foreground">
                           {ex.name}
                         </span>
-                        <span className="text-[10px] tabular-nums text-muted shrink-0">
+                        <span className="text-caption tabular-nums text-muted shrink-0">
                           {targetByExerciseId.get(ex.id) ?? ex.defaultReps}
                         </span>
                       </span>
                       {laterHint ? (
-                        <span className="text-[11px] font-medium text-amber-400/90">
+                        <span className="text-sm font-medium text-amber-400/90">
                           {laterHint}
                         </span>
                       ) : null}

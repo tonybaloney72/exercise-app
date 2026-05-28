@@ -296,7 +296,7 @@ export default function ExerciseRow({
           }
           subName={
             log.swappedWith ? (
-              <p className="mt-0.5 text-[10px] text-muted">
+              <p className="mt-0.5 text-caption text-muted">
                 Instead of {plannedExercise.name}
               </p>
             ) : undefined
@@ -337,7 +337,7 @@ export default function ExerciseRow({
               <p className="text-xs text-muted">{effectiveExercise.notes}</p>
 
               <div className="space-y-1.5">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                <p className="text-caption font-medium uppercase tracking-wide text-muted">
                   This set
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -350,7 +350,7 @@ export default function ExerciseRow({
                         "reps",
                       )
                     }
-                    className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                    className={`rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors ${
                       mode === "reps"
                         ? "border-accent bg-accent/15 text-accent"
                         : "border-border bg-surface-hover text-muted hover:text-foreground"
@@ -367,7 +367,7 @@ export default function ExerciseRow({
                         "timer",
                       )
                     }
-                    className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                    className={`rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors ${
                       mode === "timer"
                         ? "border-accent bg-accent/15 text-accent"
                         : "border-border bg-surface-hover text-muted hover:text-foreground"

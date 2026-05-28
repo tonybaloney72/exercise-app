@@ -108,7 +108,7 @@ export default function WorkoutHistoryCalendar({
         {CALENDAR_WEEKDAY_LABELS.map((label) => (
           <div
             key={label}
-            className="py-1 text-[10px] font-semibold uppercase tracking-wide text-muted"
+            className="py-1 text-caption font-semibold uppercase tracking-wide text-muted"
           >
             {label}
           </div>
@@ -118,7 +118,7 @@ export default function WorkoutHistoryCalendar({
         ))}
       </div>
 
-      <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted px-1">
+      <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted px-1">
         <li className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-sm bg-green-500/30 border border-green-500/40" />
           Completed

@@ -114,7 +114,7 @@ function SortableExerciseRow({
               <button
                 type="button"
                 onClick={onChange}
-                className="rounded-lg border border-border px-2 py-1 text-[11px] font-medium text-foreground hover:bg-surface-hover"
+                className="rounded-lg border border-border px-2 py-1 text-sm font-medium text-foreground hover:bg-surface-hover"
               >
                 Change
               </button>
@@ -122,7 +122,7 @@ function SortableExerciseRow({
                 type="button"
                 disabled={!canRemove}
                 onClick={onRemove}
-                className="rounded-lg border border-border px-2 py-1 text-[11px] font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-40"
+                className="rounded-lg border border-border px-2 py-1 text-sm font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-40"
                 aria-label={`Remove ${meta.name}`}
               >
                 Remove
@@ -130,7 +130,7 @@ function SortableExerciseRow({
             </div>
           </div>
           <label className="mt-2 block">
-            <span className="text-[11px] text-muted">Target</span>
+            <span className="text-sm text-muted">Target</span>
             <input
               type="text"
               value={slot.targetReps}

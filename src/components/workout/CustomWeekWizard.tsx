@@ -221,10 +221,10 @@ export default function CustomWeekWizard() {
                   : "border-border bg-surface text-muted hover:text-foreground"
               }`}
             >
-              <span className="block text-[10px] font-semibold uppercase">
+              <span className="block text-caption font-semibold uppercase">
                 {label}
               </span>
-              <span className="mt-0.5 block text-[11px]">
+              <span className="mt-0.5 block text-sm">
                 {count > 0 ? `${count} ex` : "—"}
               </span>
               {isToday && (

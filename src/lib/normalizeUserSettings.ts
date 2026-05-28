@@ -28,6 +28,11 @@ import {
   suggestLayoutFromCatalog,
 } from "@/lib/weeklyCategoryLayout";
 import {
+  sanitizeWeeklyLayoutDayStructure,
+  suggestWeeklyLayoutDayStructure,
+  weeklyLayoutDayStructureEqual,
+} from "@/lib/weeklyLayoutDayStructure";
+import {
   DEFAULT_EXPERTISE_BY_GROUP,
   sanitizeExpertiseByGroup,
 } from "@/lib/expertiseLevels";
@@ -75,6 +80,21 @@ export function normalizeUserSettings(
     layoutCustomizedExplicit ??
     (partial.weeklyCategoryLayout != null &&
       !layoutEqual(weeklyCategoryLayout, catalogLayout));
+
+  const catalogStructure = suggestWeeklyLayoutDayStructure(catalogLayout);
+  const weeklyLayoutDayStructure = sanitizeWeeklyLayoutDayStructure(
+    partial.weeklyLayoutDayStructure,
+    weeklyCategoryLayout,
+  );
+  const structureCustomizedExplicit =
+    partial.weeklyLayoutDayStructureCustomized;
+  const weeklyLayoutDayStructureCustomized =
+    structureCustomizedExplicit ??
+    (partial.weeklyLayoutDayStructure != null &&
+      !weeklyLayoutDayStructureEqual(
+        weeklyLayoutDayStructure,
+        catalogStructure,
+      ));
 
   const catalogCardio = suggestWeeklyCardioFromCatalog();
   const weeklyCardioByDay = sanitizeWeeklyCardioByDay(
@@ -131,6 +151,8 @@ export function normalizeUserSettings(
     programMode,
     weeklyCategoryLayout,
     weeklyCategoryLayoutCustomized,
+    weeklyLayoutDayStructure,
+    weeklyLayoutDayStructureCustomized,
     weeklyRestDays,
     weeklyRestDaysCustomized,
     weeklyPplSchedule,

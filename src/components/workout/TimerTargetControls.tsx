@@ -8,7 +8,7 @@ import {
 } from "@/utils/effectiveExerciseSettings";
 
 const presetChip =
-  "rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-colors";
+  "rounded-lg border px-2 py-0.5 text-caption font-medium transition-colors";
 
 function clampTimerSeconds(n: number): number {
   return Math.min(999, Math.max(5, Math.round(n)));
@@ -49,7 +49,7 @@ export default function TimerTargetControls({
 
   return (
     <div className="space-y-2">
-      <p className="text-[10px] text-muted">Timer length (this set)</p>
+      <p className="text-caption text-muted">Timer length (this set)</p>
       <div className="flex flex-wrap gap-1.5">
         {TIMER_DURATION_PRESET_SECONDS.map((sec) => (
           <button
@@ -82,7 +82,7 @@ export default function TimerTargetControls({
       </div>
       {showCustomInput && (
         <div className="flex flex-col gap-1.5 pt-0.5">
-          <label className="text-[10px] font-medium uppercase tracking-wide text-muted">
+          <label className="text-caption font-medium uppercase tracking-wide text-muted">
             Custom seconds
           </label>
           <input

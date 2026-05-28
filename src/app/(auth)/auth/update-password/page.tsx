@@ -88,7 +88,7 @@ export default function UpdatePasswordPage() {
         </button>
       </form>
 
-      <p className="text-center text-[11px] text-muted sm:text-xs">
+      <p className="text-center text-sm text-muted sm:text-xs">
         Link expired or not working?{" "}
         <Link href="/forgot-password" className="text-accent hover:underline">
           Request a new one

@@ -106,7 +106,7 @@ export default function WorkoutDayTemplateToolbar({
     <>
       <div className="rounded-xl border border-border bg-surface px-4 py-3 space-y-2">
         <p className="text-xs font-medium text-muted">Templates</p>
-        <p className="text-[11px] text-muted leading-snug">
+        <p className="text-sm text-muted leading-snug">
           Save this day&apos;s rounds, stretches, and cardio to reuse on other days.
         </p>
         <div className="flex flex-wrap gap-2">

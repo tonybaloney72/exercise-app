@@ -172,7 +172,7 @@ export default function ProgressChartsSection({ history }: Props) {
               {categoryData.map((entry) => (
                 <li
                   key={entry.category}
-                  className="flex shrink-0 items-center gap-1.5 text-[11px] font-medium text-muted"
+                  className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-muted"
                 >
                   <span
                     className="h-2.5 w-2.5 shrink-0 rounded-sm"

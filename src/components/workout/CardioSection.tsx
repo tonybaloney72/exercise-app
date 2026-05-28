@@ -109,7 +109,7 @@ export default function CardioSection({
           <button
             type="button"
             onClick={() => setAddOpen(true)}
-            className="shrink-0 rounded-md border border-border px-2 py-0.5 text-[10px] font-medium text-foreground hover:bg-surface-hover"
+            className="shrink-0 rounded-md border border-border px-2 py-0.5 text-caption font-medium text-foreground hover:bg-surface-hover"
           >
             + Add
           </button>

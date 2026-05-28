@@ -116,7 +116,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
               <span className="text-xl" aria-hidden>
                 {CARDIO_ACTIVITY_EMOJI[kind]}
               </span>
-              <span className="text-[10px] font-medium text-foreground">
+              <span className="text-caption font-medium text-foreground">
                 {CARDIO_ACTIVITY_LABELS[kind]}
               </span>
             </button>
@@ -131,7 +131,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
             <span className="text-xl text-muted" aria-hidden>
               ⋯
             </span>
-            <span className="text-[10px] font-medium text-foreground">More</span>
+            <span className="text-caption font-medium text-foreground">More</span>
           </button>
         </div>
       </SurfaceCard>
@@ -178,7 +178,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
       >
         <div className="space-y-3 px-4 py-1">
           <label className="block">
-            <span className="text-[10px] text-muted uppercase tracking-wider">
+            <span className="text-caption text-muted uppercase tracking-wider">
               Distance (mi)
             </span>
             <input
@@ -197,7 +197,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
             />
           </label>
           <label className="block">
-            <span className="text-[10px] text-muted uppercase tracking-wider">
+            <span className="text-caption text-muted uppercase tracking-wider">
               Time (MM:SS or minutes)
             </span>
             <input

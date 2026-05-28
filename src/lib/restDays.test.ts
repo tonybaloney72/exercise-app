@@ -22,7 +22,7 @@ describe("restDays", () => {
     expect(days[3]).toBe("workout");
   });
 
-  it("defaults Sunday to active recovery before user customization", () => {
+  it("defaults Sunday to active recovery before user customization (preset)", () => {
     expect(DEFAULT_WEEKLY_REST_DAYS[0]).toBe("active_recovery");
     const settings = {
       programMode: DEFAULT_SETTINGS.programMode,
@@ -33,6 +33,17 @@ describe("restDays", () => {
     };
     expect(resolveRestDayMode(0, settings)).toBe("active_recovery");
     expect(resolveRestDayMode(1, settings)).toBe("workout");
+  });
+
+  it("weekly layout mode always uses workout (rest via empty groups)", () => {
+    const settings = {
+      programMode: "layout" as const,
+      weeklyRestDays: { 0: "active_recovery" as const },
+      weeklyRestDaysCustomized: true,
+      weeklyPplSchedule: DEFAULT_SETTINGS.weeklyPplSchedule,
+      weeklyPplScheduleCustomized: DEFAULT_SETTINGS.weeklyPplScheduleCustomized,
+    };
+    expect(resolveRestDayMode(0, settings)).toBe("workout");
   });
 
   it("applyRestDayToPlan full_rest removes all rounds", () => {

@@ -62,7 +62,7 @@ export default function RotatingCardioStatCard({
           <p className="mt-2 text-xl font-bold tabular-nums text-foreground">
             {card.value}
           </p>
-          <p className="text-[11px] leading-snug text-muted pr-4">{card.label}</p>
+          <p className="text-sm leading-snug text-muted pr-4">{card.label}</p>
         </motion.div>
       </AnimatePresence>
     </div>

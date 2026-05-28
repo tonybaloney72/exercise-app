@@ -354,7 +354,7 @@ export default function WorkoutPlanEditor({
           <p className="text-xs font-medium uppercase tracking-wider text-muted">
             Rounds
           </p>
-          <p className="text-[11px] text-muted leading-snug">
+          <p className="text-sm text-muted leading-snug">
             Drag the grip to reorder exercises in a round.
           </p>
         </div>

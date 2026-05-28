@@ -130,7 +130,7 @@ export function weeklyRestSettingsChanged(
   current: UserSettings,
 ): boolean {
   if (weeklyPplScheduleSettingsChanged(partial, current)) return true;
-  if (partial.weeklyRestDays != null && !isPresetProgramMode(current.programMode)) {
+  if (partial.weeklyRestDays != null && current.programMode === "custom") {
     const next = sanitizeWeeklyRestDays(partial.weeklyRestDays);
     const prev = sanitizeWeeklyRestDays(current.weeklyRestDays);
     for (let d = 0; d < 7; d++) {

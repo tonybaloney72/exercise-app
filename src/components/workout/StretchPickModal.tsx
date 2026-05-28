@@ -125,14 +125,14 @@ export default function StretchPickModal({
                   <span className="flex-1 text-sm font-medium text-foreground">
                     {ex.name}
                   </span>
-                  <span className="text-[10px] tabular-nums text-muted shrink-0">
+                  <span className="text-caption tabular-nums text-muted shrink-0">
                     {ex.defaultReps}
                   </span>
                 </span>
                 {ex.secondaryCategory ? (
                   <span className="flex items-center gap-1.5">
                     <CategoryBadge category={ex.secondaryCategory} size="sm" />
-                    <span className="text-[11px] text-muted">
+                    <span className="text-sm text-muted">
                       {CATEGORIES[ex.secondaryCategory].name}
                     </span>
                   </span>

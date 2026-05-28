@@ -2,10 +2,12 @@
 
 import {
   classicWeeklyPplSchedule,
+  detectPplSchedulePreset,
   PPL_SCHEDULE_LABELS,
   PPL_SCHEDULE_ORDER,
   threeDayPplSchedule,
 } from "@/lib/pplWeekSchedule";
+import { uiChoicePillClass } from "@/lib/uiClasses";
 import type { PplDaySchedule, WeeklyPplSchedule } from "@/types";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
@@ -16,6 +18,8 @@ type Props = {
 };
 
 export default function PplWeekScheduleEditor({ value, onChange }: Props) {
+  const activePreset = detectPplSchedulePreset(value);
+
   function setDay(dayOfWeek: number, entry: PplDaySchedule) {
     onChange({ ...value, [dayOfWeek]: entry }, true);
   }
@@ -27,27 +31,32 @@ export default function PplWeekScheduleEditor({ value, onChange }: Props) {
   return (
     <section className="space-y-3">
       <p className="text-xs text-muted leading-snug">
-        Assign each weekday: <strong className="text-foreground">push</strong>,{" "}
-        <strong className="text-foreground">pull</strong>, or{" "}
-        <strong className="text-foreground">legs</strong> for working rounds, or choose
-        recovery / rest. Cardio settings below follow push and pull days automatically.
+        Assign each weekday for working rounds, or choose recovery / rest.
+        Cardio settings below follow push and pull days automatically.
       </p>
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
+          aria-pressed={activePreset === "classic"}
           onClick={() => applyPreset(classicWeeklyPplSchedule())}
-          className="rounded-lg border border-border bg-surface-hover px-3 py-1.5 text-xs font-medium text-foreground hover:border-accent/40"
+          className={uiChoicePillClass(activePreset === "classic")}
         >
           Classic 6-day
         </button>
         <button
           type="button"
+          aria-pressed={activePreset === "three_day"}
           onClick={() => applyPreset(threeDayPplSchedule())}
-          className="rounded-lg border border-border bg-surface-hover px-3 py-1.5 text-xs font-medium text-foreground hover:border-accent/40"
+          className={uiChoicePillClass(activePreset === "three_day")}
         >
-          3-day P/P/L
+          3-day PPL
         </button>
       </div>
+      {activePreset === "custom" ? (
+        <p className="text-caption text-muted leading-snug">
+          Custom schedule — weekdays don&apos;t match a preset.
+        </p>
+      ) : null}
       <ul className="space-y-2">
         {DAY_NAMES.map((shortName, dayOfWeek) => {
           const entry = value[dayOfWeek] ?? "full_rest";

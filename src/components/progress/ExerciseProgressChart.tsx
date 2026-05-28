@@ -137,7 +137,7 @@ export default function ExerciseProgressChart({ history }: Props) {
         panelClassName="max-h-[min(85dvh,560px)] sm:max-h-[min(85dvh,560px)]"
         bodyClassName="overflow-y-auto overscroll-contain px-2 pb-3"
         headerExtra={
-          <p className="shrink-0 border-b border-border px-4 py-2 text-[11px] leading-snug text-muted">
+          <p className="shrink-0 border-b border-border px-4 py-2 text-sm leading-snug text-muted">
             One row per workout. Numbers are{" "}
             <span className="text-foreground">what you logged </span>
             (summed across rounds), not the prescribed targets. The line chart

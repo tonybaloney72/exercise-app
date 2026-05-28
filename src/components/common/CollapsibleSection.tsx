@@ -57,8 +57,8 @@ export default function CollapsibleSection({
   const panelToolbar = toolbar ?? headerActions;
 
   const titleClass = embedded
-    ? "text-xs font-semibold text-foreground"
-    : "text-sm font-semibold text-foreground";
+    ? "text-sm font-semibold text-foreground"
+    : "text-base font-semibold text-foreground";
 
   const headerButtonClass = embedded
     ? "flex w-full items-start gap-2 border-t border-border py-3 text-left"
@@ -78,7 +78,7 @@ export default function CollapsibleSection({
         <span className="min-w-0 flex-1">
           <span className={`block ${titleClass}`}>{title}</span>
           {hint ? (
-            <span className="mt-0.5 block text-[11px] leading-snug text-muted">{hint}</span>
+            <span className="mt-0.5 block text-sm leading-snug text-muted">{hint}</span>
           ) : null}
         </span>
       </button>

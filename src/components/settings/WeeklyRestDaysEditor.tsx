@@ -1,6 +1,7 @@
 "use client";
 
 import { REST_DAY_DESCRIPTIONS, REST_DAY_LABELS } from "@/lib/restDays";
+import { uiChoicePillSolidClass } from "@/lib/uiClasses";
 import type { RestDayMode, WeeklyRestDays } from "@/types";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
@@ -24,7 +25,7 @@ export default function WeeklyRestDaysEditor({ value, onChange }: Props) {
 
   return (
     <section className="space-y-2">
-      <p className="text-xs text-muted leading-snug">
+      <p className="text-sm text-muted leading-snug">
         <strong className="text-foreground">Active recovery</strong> is a light session (one
         core round), not a rest day. <strong className="text-foreground">Stretches</strong> and{" "}
         <strong className="text-foreground">Full rest</strong> are true rest. Sunday defaults to
@@ -40,7 +41,7 @@ export default function WeeklyRestDaysEditor({ value, onChange }: Props) {
             >
               <span className="text-sm font-medium text-foreground">{shortName}</span>
               <span
-                className="flex flex-wrap gap-1"
+                className="flex flex-wrap gap-1.5"
                 role="group"
                 aria-label={`${shortName} day type`}
               >
@@ -50,11 +51,7 @@ export default function WeeklyRestDaysEditor({ value, onChange }: Props) {
                     type="button"
                     onClick={() => setMode(dayOfWeek, m)}
                     title={REST_DAY_DESCRIPTIONS[m]}
-                    className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
-                      mode === m
-                        ? "bg-accent text-white"
-                        : "bg-background text-muted hover:text-foreground"
-                    }`}
+                    className={uiChoicePillSolidClass(mode === m)}
                   >
                     {REST_DAY_LABELS[m]}
                   </button>

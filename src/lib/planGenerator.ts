@@ -32,6 +32,10 @@ import {
   type ProgramMode,
   type WeeklyCategoryLayout,
 } from "@/lib/weeklyCategoryLayout";
+import {
+  sanitizeWeeklyLayoutDayStructure,
+  weeklyLayoutDayStructureFingerprint,
+} from "@/lib/weeklyLayoutDayStructure";
 import { PROGRESSION_FAMILIES_VERSION } from "@/lib/progressionFamilies";
 import { pplTemplateFingerprint } from "@/lib/pplWeekTemplate";
 import { prepareWeekSeedForUser } from "@/lib/weekPlanPreferences";
@@ -69,6 +73,8 @@ export function computePrefsFingerprint(
   programMode: ProgramMode = "preset",
   weeklyCategoryLayout?: WeeklyCategoryLayout,
   weeklyCategoryLayoutCustomized = false,
+  weeklyLayoutDayStructure?: UserSettings["weeklyLayoutDayStructure"],
+  weeklyLayoutDayStructureCustomized = false,
   weeklyRestDays?: UserSettings["weeklyRestDays"],
   weeklyRestDaysCustomized = false,
   weeklyPplSchedule?: UserSettings["weeklyPplSchedule"],
@@ -92,15 +98,21 @@ export function computePrefsFingerprint(
     trainingPriorityScores ??
     resolveTrainingPriorityScores({ trainingPriorityPreset });
   const mode = sanitizeProgramMode(programMode);
+  const resolvedLayout =
+    weeklyCategoryLayout ??
+    resolveWeeklyCategoryLayout({
+      weeklyCategoryLayout,
+      weeklyCategoryLayoutCustomized,
+    });
   const layoutSeg =
     mode === "layout"
-      ? weeklyCategoryLayoutFingerprint(
-          weeklyCategoryLayout ??
-            resolveWeeklyCategoryLayout({
-              weeklyCategoryLayout,
-              weeklyCategoryLayoutCustomized,
-            }),
-        )
+      ? `${weeklyCategoryLayoutFingerprint(resolvedLayout)}|${weeklyLayoutDayStructureFingerprint(
+          sanitizeWeeklyLayoutDayStructure(
+            weeklyLayoutDayStructure,
+            resolvedLayout,
+          ),
+          resolvedLayout,
+        )}`
       : "wcl:default";
   const prioritySeg =
     mode === "preset"
@@ -116,9 +128,12 @@ export function computePrefsFingerprint(
           trainingPriorityCustomized,
         )}`
       : "tp:layout";
-  const restSeg = weeklyRestDaysCustomized
-    ? `wrd:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${weeklyRestDays?.[d] ?? "workout"}`).join(",")}`
-    : "wrd:default";
+  const restSeg =
+    mode === "layout"
+      ? "wrd:layout"
+      : weeklyRestDaysCustomized
+        ? `wrd:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${weeklyRestDays?.[d] ?? "workout"}`).join(",")}`
+        : "wrd:default";
   const cardioSeg = weeklyCardioCustomized
     ? `wc:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${(weeklyCardioByDay?.[d] ?? []).join("+") || "-"}`).join(",")}`
     : "wc:default";
@@ -146,6 +161,8 @@ export function computePrefsFingerprintFromSettings(
     settings.programMode ?? "preset",
     settings.weeklyCategoryLayout,
     settings.weeklyCategoryLayoutCustomized ?? false,
+    settings.weeklyLayoutDayStructure,
+    settings.weeklyLayoutDayStructureCustomized ?? false,
     settings.weeklyRestDays,
     settings.weeklyRestDaysCustomized ?? false,
     settings.weeklyPplSchedule,

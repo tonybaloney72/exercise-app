@@ -62,7 +62,7 @@ export default function AboutDeveloperSection() {
           </li>
         ))}
       </ul>
-      <p className="text-[10px] text-muted">
+      <p className="text-caption text-muted">
         My Exercise · v{packageJson.version}
       </p>
     </CollapsibleSection>

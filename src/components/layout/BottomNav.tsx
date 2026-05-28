@@ -23,7 +23,7 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors ${
+              className={`flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium transition-colors ${
                 isActive
                   ? "text-accent"
                   : "text-muted hover:text-foreground"

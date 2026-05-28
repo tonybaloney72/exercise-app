@@ -191,7 +191,7 @@ export default function ProgressPage() {
               <p className="mt-2 text-xl font-bold tabular-nums text-foreground">
                 {card.value}
               </p>
-              <p className="text-[11px] leading-snug text-muted">
+              <p className="text-sm leading-snug text-muted">
                 {card.label}
               </p>
             </motion.div>

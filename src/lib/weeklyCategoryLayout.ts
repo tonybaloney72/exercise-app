@@ -47,16 +47,17 @@ export const LAYOUT_GROUP_TO_CATEGORY: Record<LayoutGroup, ExerciseCategory> = {
   upper_pull: "UPL",
 };
 
-const CATEGORY_TO_LAYOUT_GROUP: Partial<Record<ExerciseCategory, LayoutGroup>> = {
-  CF: "core_front",
-  CL: "core_lower",
-  CR: "core_rotational",
-  CS: "core_stability",
-  PC: "cardio",
-  LB: "lower",
-  UP: "upper_push",
-  UPL: "upper_pull",
-};
+const CATEGORY_TO_LAYOUT_GROUP: Partial<Record<ExerciseCategory, LayoutGroup>> =
+  {
+    CF: "core_front",
+    CL: "core_lower",
+    CR: "core_rotational",
+    CS: "core_stability",
+    PC: "cardio",
+    LB: "lower",
+    UP: "upper_push",
+    UPL: "upper_pull",
+  };
 
 const CORE_LAYOUT_GROUPS: LayoutGroup[] = [
   "core_front",
@@ -86,14 +87,14 @@ export const PROGRAM_MODE_LABELS: Record<
   { label: string; description: string }
 > = {
   preset: {
-    label: "6 Day P/P/L",
+    label: "PPL",
     description:
-      "Push, pull, and legs on a fixed weekly calendar. Rounds 1–3 repeat the same exercises; cardio uses the endurance block (not strength rounds). Customize rest days below for a lighter week.",
+      "Push, pull, and legs on a fixed weekly calendar. Rounds 1–3 repeat the same exercises; cardio uses the endurance block. Customize rest days below for a lighter week.",
   },
   layout: {
     label: "Weekly layout",
     description:
-      "Choose which groups run each day; we pick exercises inside those groups.",
+      "Choose which groups run each day; turn all groups off for a rest day. We pick exercises inside enabled groups.",
   },
   custom: {
     label: "Custom week",
@@ -144,7 +145,9 @@ export function suggestLayoutFromCatalog(): WeeklyCategoryLayout {
 function coreLayoutGroupsForCatalogDay(dayOfWeek: number): LayoutGroup[] {
   const plan = TRAINING_WEEK_CATALOG.find((d) => d.dayOfWeek === dayOfWeek);
   if (!plan) return [...CORE_LAYOUT_GROUPS];
-  return groupsForCatalogDay(plan).filter((g) => CORE_LAYOUT_GROUPS.includes(g));
+  return groupsForCatalogDay(plan).filter((g) =>
+    CORE_LAYOUT_GROUPS.includes(g),
+  );
 }
 
 function normalizeLayoutGroupToken(
@@ -204,7 +207,10 @@ export function resolveWeeklyCategoryLayout(settings: {
   weeklyCategoryLayout?: WeeklyCategoryLayout;
   weeklyCategoryLayoutCustomized?: boolean;
 }): WeeklyCategoryLayout {
-  if (settings.weeklyCategoryLayoutCustomized && settings.weeklyCategoryLayout) {
+  if (
+    settings.weeklyCategoryLayoutCustomized &&
+    settings.weeklyCategoryLayout
+  ) {
     return sanitizeWeeklyCategoryLayout(settings.weeklyCategoryLayout);
   }
   return suggestLayoutFromCatalog();

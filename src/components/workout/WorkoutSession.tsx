@@ -289,7 +289,7 @@ export default function WorkoutSession({
           placeholder="How did it feel today?"
           className="mt-2 w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted"
         />
-        <p className="mt-2 text-[11px] text-muted">
+        <p className="mt-2 text-sm text-muted">
           {isEditing
             ? "Notes are saved when you tap Save changes."
             : (

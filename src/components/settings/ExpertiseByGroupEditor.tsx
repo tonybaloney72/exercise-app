@@ -10,6 +10,7 @@ import {
   EMPHASIS_GROUP_ORDER,
   type EmphasisGroup,
 } from "@/lib/trainingPriorities";
+import { uiChoicePillClass } from "@/lib/uiClasses";
 import type { ExpertiseByGroup, ExpertiseLevel } from "@/types";
 
 type Props = {
@@ -24,7 +25,7 @@ export default function ExpertiseByGroupEditor({ byGroup, onChange }: Props) {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-muted leading-relaxed">
+      <p className="text-sm text-muted leading-relaxed">
         Plans and swaps only use exercises at or below each group&apos;s level.
         Turn off &ldquo;Avoid easy regressions&rdquo; above to allow easier
         steps in a progression (e.g. incline push-ups) regardless of cap.
@@ -34,12 +35,12 @@ export default function ExpertiseByGroupEditor({ byGroup, onChange }: Props) {
         {EMPHASIS_GROUP_ORDER.map((group) => (
           <div key={group} className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-medium text-foreground">
+              <span className="text-sm font-medium text-foreground">
                 {EMPHASIS_GROUP_LABELS[group]}
               </span>
             </div>
             <div
-              className="flex flex-wrap gap-1"
+              className="flex flex-wrap gap-1.5"
               role="radiogroup"
               aria-label={`${EMPHASIS_GROUP_LABELS[group]} skill level`}
             >
@@ -52,11 +53,7 @@ export default function ExpertiseByGroupEditor({ byGroup, onChange }: Props) {
                     role="radio"
                     aria-checked={selected}
                     onClick={() => setGroupLevel(group, level)}
-                    className={`rounded-lg border px-2 py-1 text-[10px] font-medium transition-colors ${
-                      selected
-                        ? "border-accent bg-accent/15 text-accent"
-                        : "border-border bg-surface-hover text-muted hover:border-accent/30"
-                    }`}
+                    className={uiChoicePillClass(selected)}
                   >
                     {EXPERTISE_LEVEL_LABELS[level]}
                   </button>

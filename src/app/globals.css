@@ -10,6 +10,9 @@
   --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* Slightly larger than legacy 10px / 11px arbitrary sizes */
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.35;
 }
 
 :root {
@@ -84,6 +87,11 @@
 
 [data-sonner-toast][data-styled="true"] [data-description] {
   color: var(--muted);
+}
+
+html {
+  /* Scales rem-based type (text-xs, text-sm, …) app-wide */
+  font-size: 106.25%;
 }
 
 body {

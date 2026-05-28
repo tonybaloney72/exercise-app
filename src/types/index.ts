@@ -249,6 +249,7 @@ import type {
   ProgramMode,
   WeeklyCategoryLayout,
 } from "@/lib/weeklyCategoryLayout";
+import type { WeeklyLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
 
 /** Training priority preset (replaces legacy “program focus” naming in UI). */
 export type TrainingPriorityPreset =
@@ -301,6 +302,9 @@ export interface UserSettings {
   weeklyCategoryLayout: WeeklyCategoryLayout;
   /** When false, layout is derived from catalog until user edits. */
   weeklyCategoryLayoutCustomized: boolean;
+  /** Per-day round structure for layout mode (blocks / repeat / mixed). */
+  weeklyLayoutDayStructure: WeeklyLayoutDayStructure;
+  weeklyLayoutDayStructureCustomized: boolean;
   /** @deprecated Use {@link UserSettings.trainingPriorityPreset}. */
   programFocus?: TrainingPriorityPreset;
   roundDensity: RoundDensity;

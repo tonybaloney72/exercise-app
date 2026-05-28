@@ -21,6 +21,7 @@ import {
   sanitizeProgramMode,
   sanitizeWeeklyCategoryLayout,
 } from "@/lib/weeklyCategoryLayout";
+import { sanitizeWeeklyLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
 import { DEFAULT_TIMER_SECONDS_FALLBACK } from "@/utils/effectiveExerciseSettings";
 import type {
   ExerciseSettingsMap,
@@ -110,6 +111,8 @@ interface SettingsRow {
   program_mode?: string;
   weekly_category_layout?: unknown;
   weekly_category_layout_customized?: boolean;
+  weekly_layout_day_structure?: unknown;
+  weekly_layout_day_structure_customized?: boolean;
   round_density?: string;
   default_warm_up?: unknown;
   default_cool_down?: unknown;
@@ -342,6 +345,12 @@ function rowToSettings(row: SettingsRow): UserSettings {
     ),
     weeklyCategoryLayoutCustomized:
       row.weekly_category_layout_customized ?? false,
+    weeklyLayoutDayStructure: sanitizeWeeklyLayoutDayStructure(
+      row.weekly_layout_day_structure,
+      sanitizeWeeklyCategoryLayout(row.weekly_category_layout),
+    ),
+    weeklyLayoutDayStructureCustomized:
+      row.weekly_layout_day_structure_customized ?? false,
     roundDensity: sanitizeRoundDensity(row.round_density),
     defaultWarmUp: sanitizeStretchEntries(row.default_warm_up),
     defaultCoolDown: sanitizeStretchEntries(row.default_cool_down),
@@ -374,6 +383,9 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     program_mode: s.programMode,
     weekly_category_layout: s.weeklyCategoryLayout,
     weekly_category_layout_customized: s.weeklyCategoryLayoutCustomized,
+    weekly_layout_day_structure: s.weeklyLayoutDayStructure,
+    weekly_layout_day_structure_customized:
+      s.weeklyLayoutDayStructureCustomized,
     round_density: s.roundDensity,
     default_warm_up: s.defaultWarmUp,
     default_cool_down: s.defaultCoolDown,

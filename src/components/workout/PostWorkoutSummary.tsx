@@ -98,7 +98,7 @@ export default function PostWorkoutSummary({
               </span>
             </div>
             {line.completed && !line.skipped && (
-              <p className="text-[11px] text-muted">
+              <p className="text-sm text-muted">
                 {[
                   line.distanceMi != null ? `${line.distanceMi} mi` : null,
                   line.durationSeconds != null

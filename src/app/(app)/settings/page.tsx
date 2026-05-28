@@ -245,7 +245,7 @@ export default function SettingsPage() {
           />
           <SettingsSwitch
             title="Keep screen on"
-            description="Try to prevent the screen from dimming while this app is open. Rest and set timers also keep the screen awake while running. Countdowns stay accurate if the phone locks (wall-clock sync)."
+            description="Try to prevent the screen from dimming while this app is open. Rest and set timers also keep the screen awake while running."
             checked={settings.keepScreenAwake}
             onChange={() =>
               settings.updateSettings({
@@ -265,16 +265,11 @@ export default function SettingsPage() {
           contentClassName="space-y-3 p-4"
         >
           <p className="text-xs text-muted">
-            {mode === "guest" ? (
+            {mode === "guest" && (
               <>
                 As a guest, equipment changes regenerate this device&apos;s
                 current week in memory only (not saved across devices). Sign in
                 to persist your week.{" "}
-              </>
-            ) : (
-              <>
-                When signed in, changing equipment updates this week&apos;s
-                prescribed plan
               </>
             )}
           </p>
@@ -320,7 +315,7 @@ export default function SettingsPage() {
         <AnimatedSection delay={0.049}>
           <CollapsibleSection
             title="Your week"
-            hint="How your Sun–Sat plan is built. Updates today and upcoming days."
+            hint="How your week is built."
             defaultOpen={false}
             contentClassName="space-y-4 p-4"
           >
@@ -353,35 +348,43 @@ export default function SettingsPage() {
             )}
 
             {settings.programMode === "layout" && (
-              <WeekModeOptionsPanel
-                title="Step 2 · Groups per day"
-                hint="Turn groups on or off for each day. We pick exercises only from what’s enabled (all off = rest)."
+              <CollapsibleSection
+                embedded
+                title="Groups per day"
+                hint="Turn groups on or off for each day."
+                defaultOpen={false}
               >
                 <WeeklyCategoryLayoutEditor
                   layout={settings.weeklyCategoryLayout}
+                  dayStructure={settings.weeklyLayoutDayStructure}
                   onChange={(
                     weeklyCategoryLayout,
-                    weeklyCategoryLayoutCustomized,
+                    weeklyLayoutDayStructure,
                   ) => {
                     void settings.updateSettings({
                       weeklyCategoryLayout,
-                      weeklyCategoryLayoutCustomized,
+                      weeklyCategoryLayoutCustomized: true,
+                      weeklyLayoutDayStructure,
+                      weeklyLayoutDayStructureCustomized: true,
                     });
                   }}
                 />
-              </WeekModeOptionsPanel>
+              </CollapsibleSection>
             )}
 
             {settings.programMode === "preset" ? (
               <CollapsibleSection
                 embedded
                 title="Week schedule"
-                hint="Which days are push, pull, legs, or rest. Changes apply to today and upcoming generated days."
+                hint=""
                 defaultOpen
               >
                 <PplWeekScheduleEditor
                   value={settings.weeklyPplSchedule}
-                  onChange={(weeklyPplSchedule, weeklyPplScheduleCustomized) => {
+                  onChange={(
+                    weeklyPplSchedule,
+                    weeklyPplScheduleCustomized,
+                  ) => {
                     void settings.updateSettings({
                       weeklyPplSchedule,
                       weeklyPplScheduleCustomized,
@@ -389,7 +392,7 @@ export default function SettingsPage() {
                   }}
                 />
               </CollapsibleSection>
-            ) : (
+            ) : settings.programMode === "custom" ? (
               <CollapsibleSection
                 embedded
                 title="Day type"
@@ -406,13 +409,13 @@ export default function SettingsPage() {
                   }}
                 />
               </CollapsibleSection>
-            )}
+            ) : null}
             <CollapsibleSection
               embedded
               title="Cardio & endurance"
               hint={
                 settings.programMode === "preset"
-                  ? "Push and pull days: pick jog, walk, cycle, etc. Logged in the Cardio section (time and distance), not as strength rounds."
+                  ? "Push and pull days: pick jog, walk, cycle, etc."
                   : "Jog, walk, cycle, hike, or swim per day — log time and distance in the workout."
               }
               defaultOpen={false}
@@ -733,7 +736,7 @@ function PasswordField({
 }) {
   return (
     <div className="space-y-1">
-      <label htmlFor={id} className="text-[11px] font-medium text-muted">
+      <label htmlFor={id} className="text-sm font-medium text-muted">
         {label}
       </label>
       <input
@@ -746,7 +749,7 @@ function PasswordField({
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-lg border border-border bg-surface-hover px-3 py-2 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted"
       />
-      {hint && <p className="text-[10px] text-muted">{hint}</p>}
+      {hint && <p className="text-caption text-muted">{hint}</p>}
     </div>
   );
 }

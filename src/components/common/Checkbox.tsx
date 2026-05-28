@@ -19,7 +19,7 @@ export default function Checkbox({ checked, onChange, label, sublabel, disabled 
       className="flex min-h-[44px] w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-surface-hover active:bg-surface-hover disabled:opacity-50"
     >
       <div
-        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
           checked
             ? "border-accent bg-accent"
             : "border-border bg-transparent"

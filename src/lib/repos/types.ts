@@ -14,6 +14,7 @@ import { scoresFromPreset } from "@/lib/trainingPriorities";
 import { suggestWeeklyCardioFromCatalog } from "@/lib/cardioActivities";
 import { DEFAULT_WEEKLY_REST_DAYS } from "@/lib/restDays";
 import { suggestLayoutFromCatalog } from "@/lib/weeklyCategoryLayout";
+import { suggestWeeklyLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
 import {
   GUEST_FALLBACK_COOL_DOWN,
   GUEST_FALLBACK_WARM_UP,
@@ -99,6 +100,10 @@ export const DEFAULT_SETTINGS: UserSettings = {
   programMode: "preset",
   weeklyCategoryLayout: suggestLayoutFromCatalog(),
   weeklyCategoryLayoutCustomized: false,
+  weeklyLayoutDayStructure: suggestWeeklyLayoutDayStructure(
+    suggestLayoutFromCatalog(),
+  ),
+  weeklyLayoutDayStructureCustomized: false,
   roundDensity: "standard",
   /** Signed-in users configure their own; guests get catalog fallbacks at resolve time. */
   defaultWarmUp: [],

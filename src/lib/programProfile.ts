@@ -10,6 +10,7 @@ import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import type { ExercisePreferenceMap, ExerciseSettingsMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { balancedRoundBudget } from "@/lib/balancedRoundBudget";
+import { materializeLayoutDayPlan } from "@/lib/layoutDayMaterializer";
 import { materializePplDayPlan } from "@/lib/pplDayMaterializer";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 import type {
@@ -39,6 +40,7 @@ import {
   type WeeklyCategoryLayout,
   LAYOUT_GROUP_TO_CATEGORY,
 } from "@/lib/weeklyCategoryLayout";
+import type { WeeklyLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
 
 export type ProgramProfileInput = {
   preset: TrainingPriorityPreset;
@@ -47,6 +49,7 @@ export type ProgramProfileInput = {
   /** Layout mode: per-day group allowlist, equal fill weights, no preset extras. */
   layoutMode?: boolean;
   weeklyCategoryLayout?: WeeklyCategoryLayout;
+  weeklyLayoutDayStructure?: WeeklyLayoutDayStructure;
   /** Custom week mode: keep day shells; do not auto-fill strength exercises. */
   customMode?: boolean;
   /** Preset mode: PPL day pools + round budgets; no cross-day category injection. */
@@ -60,6 +63,7 @@ export function buildProgramProfileInput(
   options?: {
     layoutMode?: boolean;
     weeklyCategoryLayout?: WeeklyCategoryLayout;
+    weeklyLayoutDayStructure?: WeeklyLayoutDayStructure;
     customMode?: boolean;
     pplMode?: boolean;
   },
@@ -71,6 +75,7 @@ export function buildProgramProfileInput(
     customized,
     layoutMode: options?.layoutMode,
     weeklyCategoryLayout: options?.weeklyCategoryLayout,
+    weeklyLayoutDayStructure: options?.weeklyLayoutDayStructure,
     customMode: options?.customMode,
     pplMode: options?.pplMode,
   };
@@ -88,6 +93,7 @@ export function buildProgramProfileInputFromSettings(
     return buildProgramProfileInput("balanced", scoresFromPreset("balanced"), false, {
       layoutMode: true,
       weeklyCategoryLayout: resolveWeeklyCategoryLayout(settings),
+      weeklyLayoutDayStructure: settings.weeklyLayoutDayStructure,
     });
   }
   const preset = settings.trainingPriorityPreset ?? "balanced";
@@ -487,6 +493,21 @@ export function applyProgramProfileToDayPlan(
       exerciseSettings,
       varietySeed,
       userSettings,
+    );
+  }
+
+  if (profile.layoutMode) {
+    return materializeLayoutDayPlan(
+      plan,
+      density,
+      availableEquipment,
+      dislikedIds,
+      favoriteIds,
+      profile.weeklyCategoryLayout ?? {},
+      profile.weeklyLayoutDayStructure,
+      exerciseSettings,
+      varietySeed,
+      expertiseFilter,
     );
   }
 

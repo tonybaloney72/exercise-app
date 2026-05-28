@@ -11,6 +11,7 @@ import {
   type TrainingPriorityScore,
   type TrainingPriorityScores,
 } from "@/lib/trainingPriorities";
+import { uiChoicePillClass } from "@/lib/uiClasses";
 import type { TrainingPriorityPreset } from "@/types";
 
 type Props = {
@@ -40,7 +41,7 @@ export default function TrainingPriorityCustomize({
       hint="Emphasis from Skip (0) to Peak (4). Presets fill these scores."
       defaultOpen={false}
     >
-      <p className="rounded-lg border border-accent/20 bg-accent/5 px-3 py-2 text-xs leading-relaxed text-foreground">
+      <p className="rounded-lg border border-accent/20 bg-accent/5 px-3 py-2 text-sm leading-relaxed text-foreground">
         {describeTrainingPriorityScores(scores)}
       </p>
 
@@ -48,10 +49,10 @@ export default function TrainingPriorityCustomize({
         {EMPHASIS_GROUP_ORDER.map((group) => (
           <div key={group} className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-medium text-foreground">
+              <span className="text-sm font-medium text-foreground">
                 {EMPHASIS_GROUP_LABELS[group]}
               </span>
-              <span className="text-[10px] tabular-nums text-muted">{scores[group]}</span>
+              <span className="text-caption tabular-nums text-muted">{scores[group]}</span>
             </div>
             <div
               className="flex gap-1"
@@ -68,7 +69,7 @@ export default function TrainingPriorityCustomize({
                     role="radio"
                     aria-checked={selected}
                     onClick={() => setGroupScore(group, score)}
-                    className={`flex-1 rounded-lg border px-1 py-1.5 text-[10px] font-medium transition-colors ${
+                    className={`flex-1 min-h-9 rounded-lg border px-1.5 py-2 text-xs font-medium transition-colors ${
                       selected
                         ? "border-accent bg-accent/15 text-accent"
                         : "border-border bg-surface-hover text-muted hover:border-accent/30"

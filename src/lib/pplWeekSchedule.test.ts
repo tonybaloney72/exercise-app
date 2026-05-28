@@ -3,7 +3,9 @@ import { buildPplWeek } from "@/lib/pplWeekTemplate";
 import { prepareWeekSeedForUser } from "@/lib/weekPlanPreferences";
 import { DEFAULT_SETTINGS } from "@/lib/repos/types";
 import {
+  classicWeeklyPplSchedule,
   DEFAULT_WEEKLY_PPL_SCHEDULE,
+  detectPplSchedulePreset,
   pplWeeklyCardioEligibleDaysFromSchedule,
   resolveWeeklyPplSchedule,
   sanitizePplWeeklyCardioByDayForSchedule,
@@ -80,5 +82,13 @@ describe("pplWeekSchedule", () => {
     ).toBe(true);
     const tweaked = { ...DEFAULT_WEEKLY_PPL_SCHEDULE, 2: "legs" as const };
     expect(weeklyPplScheduleEqual(DEFAULT_WEEKLY_PPL_SCHEDULE, tweaked)).toBe(false);
+  });
+
+  it("detectPplSchedulePreset identifies classic, three-day, and custom", () => {
+    expect(detectPplSchedulePreset(classicWeeklyPplSchedule())).toBe("classic");
+    expect(detectPplSchedulePreset(threeDayPplSchedule())).toBe("three_day");
+    expect(
+      detectPplSchedulePreset({ ...DEFAULT_WEEKLY_PPL_SCHEDULE, 2: "legs" }),
+    ).toBe("custom");
   });
 });

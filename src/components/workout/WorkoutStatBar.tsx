@@ -47,7 +47,7 @@ export default function WorkoutStatBar({
       </div>
 
       {skipped > 0 && (
-        <p className="text-[11px] text-muted">
+        <p className="text-sm text-muted">
           {skipped} skipped
           {total - completed - skipped > 0 &&
             ` · ${total - completed - skipped} not completed`}

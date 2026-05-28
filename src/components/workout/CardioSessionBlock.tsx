@@ -86,7 +86,7 @@ export default function CardioSessionBlock({
       </span>
       <span className="flex gap-3 pl-11 pr-2 pb-3">
         <label className="flex-1 block">
-          <span className="text-[10px] text-muted uppercase tracking-wider">
+          <span className="text-caption text-muted uppercase tracking-wider">
             Distance (mi)
           </span>
           <input
@@ -111,7 +111,7 @@ export default function CardioSessionBlock({
           />
         </label>
         <label className="flex-1 block">
-          <span className="text-[10px] text-muted uppercase tracking-wider">
+          <span className="text-caption text-muted uppercase tracking-wider">
             Time (MM:SS)
           </span>
           <input
