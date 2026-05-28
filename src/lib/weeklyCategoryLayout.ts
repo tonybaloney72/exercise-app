@@ -99,7 +99,7 @@ export const PROGRAM_MODE_LABELS: Record<
   custom: {
     label: "Custom week",
     description:
-      "You build every day on Weekly — empty round slots, no auto-filled exercises.",
+      "You build every day on Weekly — rounds, cardio, and rest are up to you on each day.",
   },
 };
 

@@ -22,7 +22,6 @@ import WeekModeOptionsPanel from "@/components/settings/WeekModeOptionsPanel";
 import ExpertiseByGroupEditor from "@/components/settings/ExpertiseByGroupEditor";
 import WeeklyCategoryLayoutEditor from "@/components/settings/WeeklyCategoryLayoutEditor";
 import PplWeekScheduleEditor from "@/components/settings/PplWeekScheduleEditor";
-import WeeklyRestDaysEditor from "@/components/settings/WeeklyRestDaysEditor";
 import WeeklyCardioEditor from "@/components/settings/WeeklyCardioEditor";
 import type { ProgramMode } from "@/lib/weeklyCategoryLayout";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -327,24 +326,19 @@ export default function SettingsPage() {
             />
 
             {settings.programMode === "custom" && (
-              <WeekModeOptionsPanel
-                title="Step 2 · Build your week"
-                hint="Walk through Sun–Sat with the week builder, or edit one day at a time on Weekly."
-              >
-                <div className="flex flex-col gap-2">
-                  <Link
-                    href="/weekly/build"
-                    className="w-full rounded-xl bg-accent py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-accent/90"
-                  >
-                    Open week builder
-                  </Link>
-                  <p className="text-xs text-muted leading-snug">
-                    Or open <strong className="text-foreground">Weekly</strong>{" "}
-                    and customize individual days. Your week stays manual until
-                    you reset it or switch mode.
-                  </p>
-                </div>
-              </WeekModeOptionsPanel>
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/weekly/build"
+                  className="w-full rounded-xl bg-accent py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+                >
+                  Open week builder
+                </Link>
+                <p className="text-xs text-muted leading-snug">
+                  Or open <strong className="text-foreground">Weekly</strong>{" "}
+                  and customize individual days. Your week stays manual until
+                  you reset it or switch mode.
+                </p>
+              </div>
             )}
 
             {settings.programMode === "layout" && (
@@ -392,58 +386,43 @@ export default function SettingsPage() {
                   }}
                 />
               </CollapsibleSection>
-            ) : settings.programMode === "custom" ? (
+            ) : null}
+            {settings.programMode !== "custom" ? (
               <CollapsibleSection
                 embedded
-                title="Day type"
-                hint="Workout, active recovery, stretches-only, or full rest — per weekday."
+                title="Cardio & endurance"
+                hint={
+                  settings.programMode === "preset"
+                    ? "Push and pull days: pick jog, walk, cycle, etc."
+                    : "Jog, walk, cycle, hike, or swim per day — log time and distance in the workout."
+                }
                 defaultOpen={false}
               >
-                <WeeklyRestDaysEditor
-                  value={settings.weeklyRestDays}
-                  onChange={(weeklyRestDays, weeklyRestDaysCustomized) => {
+                <WeeklyCardioEditor
+                  value={settings.weeklyCardioByDay}
+                  editableDays={
+                    settings.programMode === "preset"
+                      ? pplWeeklyCardioEligibleDaysFromSchedule(
+                          resolveWeeklyPplSchedule(settings),
+                        )
+                      : undefined
+                  }
+                  onChange={(weeklyCardioByDay, weeklyCardioCustomized) => {
+                    const next =
+                      settings.programMode === "preset"
+                        ? sanitizePplWeeklyCardioByDayForSchedule(
+                            weeklyCardioByDay,
+                            resolveWeeklyPplSchedule(settings),
+                          )
+                        : weeklyCardioByDay;
                     void settings.updateSettings({
-                      weeklyRestDays,
-                      weeklyRestDaysCustomized,
+                      weeklyCardioByDay: next,
+                      weeklyCardioCustomized,
                     });
                   }}
                 />
               </CollapsibleSection>
             ) : null}
-            <CollapsibleSection
-              embedded
-              title="Cardio & endurance"
-              hint={
-                settings.programMode === "preset"
-                  ? "Push and pull days: pick jog, walk, cycle, etc."
-                  : "Jog, walk, cycle, hike, or swim per day — log time and distance in the workout."
-              }
-              defaultOpen={false}
-            >
-              <WeeklyCardioEditor
-                value={settings.weeklyCardioByDay}
-                editableDays={
-                  settings.programMode === "preset"
-                    ? pplWeeklyCardioEligibleDaysFromSchedule(
-                        resolveWeeklyPplSchedule(settings),
-                      )
-                    : undefined
-                }
-                onChange={(weeklyCardioByDay, weeklyCardioCustomized) => {
-                  const next =
-                    settings.programMode === "preset"
-                      ? sanitizePplWeeklyCardioByDayForSchedule(
-                          weeklyCardioByDay,
-                          resolveWeeklyPplSchedule(settings),
-                        )
-                      : weeklyCardioByDay;
-                  void settings.updateSettings({
-                    weeklyCardioByDay: next,
-                    weeklyCardioCustomized,
-                  });
-                }}
-              />
-            </CollapsibleSection>
             {settings.programMode !== "custom" && (
               <>
                 <CollapsibleSection

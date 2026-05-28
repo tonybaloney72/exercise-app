@@ -51,6 +51,9 @@ export function prepareCatalogDayForUser(
   settings: UserSettings,
   availableEquipment: ExerciseEquipment[],
 ): DayPlan {
+  if (settings.programMode === "custom") {
+    return normalizeDayPlanCardio({ ...plan, restDayMode: "workout" });
+  }
   const cardioKinds = resolveWeeklyCardioByDay(settings)[plan.dayOfWeek] ?? [];
   let next = applyWeeklyCardioToDay(plan, cardioKinds, availableEquipment);
   const restMode = resolveRestDayMode(plan.dayOfWeek, settings);
@@ -86,6 +89,7 @@ export function weeklyCardioSettingsChanged(
   partial: Partial<UserSettings>,
   current: UserSettings,
 ): boolean {
+  if (current.programMode === "custom") return false;
   if (partial.weeklyCardioByDay != null) {
     const next = sanitizeWeeklyCardioByDay(
       partial.weeklyCardioByDay,
@@ -130,7 +134,13 @@ export function weeklyRestSettingsChanged(
   current: UserSettings,
 ): boolean {
   if (weeklyPplScheduleSettingsChanged(partial, current)) return true;
-  if (partial.weeklyRestDays != null && current.programMode === "custom") {
+  if (
+    current.programMode === "custom" ||
+    current.programMode === "layout"
+  ) {
+    return false;
+  }
+  if (partial.weeklyRestDays != null) {
     const next = sanitizeWeeklyRestDays(partial.weeklyRestDays);
     const prev = sanitizeWeeklyRestDays(current.weeklyRestDays);
     for (let d = 0; d < 7; d++) {

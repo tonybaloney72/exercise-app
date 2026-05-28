@@ -131,12 +131,17 @@ export function computePrefsFingerprint(
   const restSeg =
     mode === "layout"
       ? "wrd:layout"
-      : weeklyRestDaysCustomized
-        ? `wrd:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${weeklyRestDays?.[d] ?? "workout"}`).join(",")}`
-        : "wrd:default";
-  const cardioSeg = weeklyCardioCustomized
-    ? `wc:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${(weeklyCardioByDay?.[d] ?? []).join("+") || "-"}`).join(",")}`
-    : "wc:default";
+      : mode === "custom"
+        ? "wrd:custom"
+        : weeklyRestDaysCustomized
+          ? `wrd:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${weeklyRestDays?.[d] ?? "workout"}`).join(",")}`
+          : "wrd:default";
+  const cardioSeg =
+    mode === "custom"
+      ? "wc:custom"
+      : weeklyCardioCustomized
+        ? `wc:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${(weeklyCardioByDay?.[d] ?? []).join("+") || "-"}`).join(",")}`
+        : "wc:default";
   const expertiseSeg = `exp:${expertiseByGroupFingerprint(
     expertiseByGroup ?? DEFAULT_EXPERTISE_BY_GROUP,
   )}`;

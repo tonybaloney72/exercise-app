@@ -46,6 +46,17 @@ describe("restDays", () => {
     expect(resolveRestDayMode(0, settings)).toBe("workout");
   });
 
+  it("custom week mode always uses workout (schedule built on Weekly)", () => {
+    const settings = {
+      programMode: "custom" as const,
+      weeklyRestDays: { 0: "full_rest" as const },
+      weeklyRestDaysCustomized: true,
+      weeklyPplSchedule: DEFAULT_SETTINGS.weeklyPplSchedule,
+      weeklyPplScheduleCustomized: DEFAULT_SETTINGS.weeklyPplScheduleCustomized,
+    };
+    expect(resolveRestDayMode(0, settings)).toBe("workout");
+  });
+
   it("applyRestDayToPlan full_rest removes all rounds", () => {
     const mon = getCatalogPlanForDay(1);
     const rested = applyRestDayToPlan(mon, "full_rest");
