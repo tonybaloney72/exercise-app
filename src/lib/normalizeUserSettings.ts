@@ -12,6 +12,12 @@ import {
   weeklyCardioEqual,
 } from "@/lib/cardioActivities";
 import {
+  DEFAULT_WEEKLY_PPL_SCHEDULE,
+  mergeRestDaysIntoPplSchedule,
+  sanitizeWeeklyPplSchedule,
+  weeklyPplScheduleEqual,
+} from "@/lib/pplWeekSchedule";
+import {
   sanitizeWeeklyRestDays,
   weeklyRestDaysEqual,
 } from "@/lib/restDays";
@@ -87,6 +93,22 @@ export function normalizeUserSettings(
     (partial.weeklyRestDays != null &&
       !weeklyRestDaysEqual(weeklyRestDays, defaultRest));
 
+  let weeklyPplSchedule = sanitizeWeeklyPplSchedule(
+    partial.weeklyPplSchedule,
+    DEFAULT_WEEKLY_PPL_SCHEDULE,
+  );
+  if (
+    !partial.weeklyPplScheduleCustomized &&
+    partial.weeklyPplSchedule == null &&
+    partial.weeklyRestDaysCustomized
+  ) {
+    weeklyPplSchedule = mergeRestDaysIntoPplSchedule(weeklyRestDays);
+  }
+  const weeklyPplScheduleCustomized =
+    partial.weeklyPplScheduleCustomized ??
+    (partial.weeklyPplSchedule != null &&
+      !weeklyPplScheduleEqual(weeklyPplSchedule, DEFAULT_WEEKLY_PPL_SCHEDULE));
+
   const expertiseByGroup = sanitizeExpertiseByGroup(
     partial.expertiseByGroup,
     DEFAULT_EXPERTISE_BY_GROUP,
@@ -111,6 +133,8 @@ export function normalizeUserSettings(
     weeklyCategoryLayoutCustomized,
     weeklyRestDays,
     weeklyRestDaysCustomized,
+    weeklyPplSchedule,
+    weeklyPplScheduleCustomized,
     weeklyCardioByDay,
     weeklyCardioCustomized,
   };

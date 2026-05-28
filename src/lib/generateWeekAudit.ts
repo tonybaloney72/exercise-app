@@ -1,4 +1,5 @@
-import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
+import { buildProgramProfileInput } from "@/lib/programProfile";
+import { buildPplWeek } from "@/lib/pplWeekTemplate";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import { exerciseMap } from "@/data/exercises";
 import { resolveStretchesForWeekSequential } from "@/lib/dayStretchPlan";
@@ -137,15 +138,16 @@ export function buildWeekAuditReport(options: WeekAuditOptions = {}): WeekAuditR
   const availableEquipment = options.availableEquipment ?? [...DEFAULT_AVAILABLE_EQUIPMENT];
   const prefs = options.prefs ?? {};
 
-  const catalogWeek = buildCatalogWeek();
+  const seedWeek = buildPplWeek();
   const week: TrainingWeekDays = materializeTrainingWeek(
-    catalogWeek,
+    seedWeek,
     prefs,
     availableEquipment,
     preset,
     roundDensity,
     undefined,
     varietySeed,
+    buildProgramProfileInput(preset, undefined, false, { pplMode: true }),
   );
 
   const stretchCtx = buildStretchResolveContextFromInputs({

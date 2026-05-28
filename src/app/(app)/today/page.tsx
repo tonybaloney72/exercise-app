@@ -15,6 +15,7 @@ import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
+import { isOptionalRestDay } from "@/lib/restDays";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import {
   bumpTrainingWeekPlans,

@@ -10,6 +10,7 @@ import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import type { ExercisePreferenceMap, ExerciseSettingsMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { balancedRoundBudget } from "@/lib/balancedRoundBudget";
+import { materializePplDayPlan } from "@/lib/pplDayMaterializer";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 import type {
   DayPlan,
@@ -44,6 +45,8 @@ export type ProgramProfileInput = {
   weeklyCategoryLayout?: WeeklyCategoryLayout;
   /** Custom week mode: keep day shells; do not auto-fill strength exercises. */
   customMode?: boolean;
+  /** Preset mode: PPL day pools + round budgets; no cross-day category injection. */
+  pplMode?: boolean;
 };
 
 export function buildProgramProfileInput(
@@ -54,6 +57,7 @@ export function buildProgramProfileInput(
     layoutMode?: boolean;
     weeklyCategoryLayout?: WeeklyCategoryLayout;
     customMode?: boolean;
+    pplMode?: boolean;
   },
 ): ProgramProfileInput {
   const resolved = scores ?? scoresFromPreset(preset);
@@ -64,6 +68,7 @@ export function buildProgramProfileInput(
     layoutMode: options?.layoutMode,
     weeklyCategoryLayout: options?.weeklyCategoryLayout,
     customMode: options?.customMode,
+    pplMode: options?.pplMode,
   };
 }
 
@@ -86,6 +91,7 @@ export function buildProgramProfileInputFromSettings(
     preset,
     settings.trainingPriorityScores,
     settings.trainingPriorityCustomized ?? false,
+    { pplMode: true },
   );
 }
 
@@ -138,6 +144,27 @@ function catalogDayCategoryPool(plan: DayPlan): ExerciseCategory[] {
   return out;
 }
 
+/** PPL preset pools: day theme only; cardio finisher is not a strength-round PC slot. */
+function pplDayCategoryPool(plan: DayPlan): ExerciseCategory[] {
+  const out: ExerciseCategory[] = [];
+  for (const c of plan.strengthFocus) {
+    if (!out.includes(c)) out.push(c);
+  }
+  for (const c of plan.coreGroups) {
+    if (!out.includes(c)) out.push(c);
+  }
+  if (out.length === 0) out.push("CS");
+  return out;
+}
+
+export function isPplProgramProfile(profile: ProgramProfileInput): boolean {
+  return (
+    profile.pplMode === true &&
+    !profile.layoutMode &&
+    !profile.customMode
+  );
+}
+
 function dayCategoryPool(
   plan: DayPlan,
   profile: ProgramProfileInput,
@@ -145,6 +172,9 @@ function dayCategoryPool(
   if (profile.layoutMode && profile.weeklyCategoryLayout) {
     const groups = profile.weeklyCategoryLayout[plan.dayOfWeek] ?? [];
     return categoriesForDayLayout(plan, groups);
+  }
+  if (isPplProgramProfile(profile)) {
+    return pplDayCategoryPool(plan);
   }
   return catalogDayCategoryPool(plan);
 }
@@ -154,7 +184,7 @@ function expandedCategoryPool(
   profile: ProgramProfileInput,
 ): ExerciseCategory[] {
   const out = dayCategoryPool(plan, profile);
-  if (profile.layoutMode) return out;
+  if (profile.layoutMode || isPplProgramProfile(profile)) return out;
   for (const c of extraCategoriesForProfile(
     profile.preset,
     profile.scores,
@@ -247,6 +277,9 @@ function roundCategoriesForProfile(
   target: number,
   weights: TrainingPriorityWeights,
 ): ExerciseCategory[] {
+  if (isPplProgramProfile(profile)) {
+    return [];
+  }
   if (
     !profile.layoutMode &&
     isBalancedProfile(profile.scores, profile.customized)
@@ -376,10 +409,7 @@ export function applyProgramProfileToDayPlan(
   }
 
   if (plan.restDayMode === "full_rest" || plan.restDayMode === "stretches") {
-    return {
-      ...plan,
-      rounds: plan.rounds.map((round) => ({ ...round, exercises: [] })),
-    };
+    return { ...plan, rounds: [] };
   }
 
   if (
@@ -387,6 +417,18 @@ export function applyProgramProfileToDayPlan(
     expandedCategoryPool(plan, profile).length === 0
   ) {
     return { ...plan, rounds: [] };
+  }
+
+  if (isPplProgramProfile(profile)) {
+    return materializePplDayPlan(
+      plan,
+      density,
+      prefs,
+      availableEquipment,
+      exerciseSettings,
+      varietySeed,
+      userSettings,
+    );
   }
 
   return {

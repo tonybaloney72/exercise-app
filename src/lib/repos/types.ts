@@ -9,6 +9,7 @@ import type {
 } from "@/types";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import { DEFAULT_EXPERTISE_BY_GROUP } from "@/lib/expertiseLevels";
+import { DEFAULT_WEEKLY_PPL_SCHEDULE } from "@/lib/pplWeekSchedule";
 import { scoresFromPreset } from "@/lib/trainingPriorities";
 import { suggestWeeklyCardioFromCatalog } from "@/lib/cardioActivities";
 import { DEFAULT_WEEKLY_REST_DAYS } from "@/lib/restDays";
@@ -95,7 +96,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   trainingPriorityPreset: "balanced",
   trainingPriorityScores: scoresFromPreset("balanced"),
   trainingPriorityCustomized: false,
-  programMode: "priorities",
+  programMode: "preset",
   weeklyCategoryLayout: suggestLayoutFromCatalog(),
   weeklyCategoryLayoutCustomized: false,
   roundDensity: "standard",
@@ -104,6 +105,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   defaultCoolDown: [],
   weeklyRestDays: { ...DEFAULT_WEEKLY_REST_DAYS },
   weeklyRestDaysCustomized: false,
+  weeklyPplSchedule: { ...DEFAULT_WEEKLY_PPL_SCHEDULE },
+  weeklyPplScheduleCustomized: false,
   weeklyCardioByDay: suggestWeeklyCardioFromCatalog(),
   weeklyCardioCustomized: false,
   expertiseByGroup: { ...DEFAULT_EXPERTISE_BY_GROUP },

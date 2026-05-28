@@ -52,6 +52,7 @@ import {
   migrateTrainingWeekDays,
   migrateWorkoutLog,
 } from "@/lib/cpToPcMigration";
+import { sanitizeWeeklyPplSchedule } from "@/lib/pplWeekSchedule";
 import { sanitizeWeeklyRestDays } from "@/lib/restDays";
 import { ensureCardioExercises } from "@/lib/resolveWorkoutCardio";
 import {
@@ -114,6 +115,8 @@ interface SettingsRow {
   default_cool_down?: unknown;
   weekly_rest_days?: unknown;
   weekly_rest_days_customized?: boolean;
+  weekly_ppl_schedule?: unknown;
+  weekly_ppl_schedule_customized?: boolean;
   weekly_cardio_by_day?: unknown;
   weekly_cardio_customized?: boolean;
   equipment_onboarding_completed?: boolean;
@@ -344,6 +347,8 @@ function rowToSettings(row: SettingsRow): UserSettings {
     defaultCoolDown: sanitizeStretchEntries(row.default_cool_down),
     weeklyRestDays: sanitizeWeeklyRestDays(row.weekly_rest_days),
     weeklyRestDaysCustomized: row.weekly_rest_days_customized ?? false,
+    weeklyPplSchedule: sanitizeWeeklyPplSchedule(row.weekly_ppl_schedule),
+    weeklyPplScheduleCustomized: row.weekly_ppl_schedule_customized ?? false,
     weeklyCardioByDay: sanitizeWeeklyCardioByDay(row.weekly_cardio_by_day),
     weeklyCardioCustomized: row.weekly_cardio_customized ?? false,
     equipmentOnboardingCompleted: row.equipment_onboarding_completed ?? false,
@@ -374,6 +379,8 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     default_cool_down: s.defaultCoolDown,
     weekly_rest_days: s.weeklyRestDays,
     weekly_rest_days_customized: s.weeklyRestDaysCustomized,
+    weekly_ppl_schedule: s.weeklyPplSchedule,
+    weekly_ppl_schedule_customized: s.weeklyPplScheduleCustomized,
     weekly_cardio_by_day: s.weeklyCardioByDay,
     weekly_cardio_customized: s.weeklyCardioCustomized,
     equipment_onboarding_completed: s.equipmentOnboardingCompleted,

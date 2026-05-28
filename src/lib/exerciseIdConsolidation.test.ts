@@ -21,6 +21,8 @@ describe("exerciseIdConsolidation", () => {
     expect(migrateConsolidatedExerciseId("SC-20")).toBe("SC-15");
     expect(migrateConsolidatedExerciseId("SC-28")).toBe("SC-8");
     expect(migrateConsolidatedExerciseId("HC-243")).toBe("SW-10");
+    expect(migrateConsolidatedExerciseId("PC-25")).toBe("PC-22");
+    expect(migrateConsolidatedExerciseId("HC-137")).toBe("SC-23");
   });
 
   it("chains CP rename then consolidation", () => {

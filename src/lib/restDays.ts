@@ -1,4 +1,9 @@
-import type { DayPlan, RestDayMode, WeeklyRestDays } from "@/types";
+import { isPresetProgramMode } from "@/lib/weekSeed";
+import {
+  pplScheduleToRestDayMode,
+  resolveWeeklyPplSchedule,
+} from "@/lib/pplWeekSchedule";
+import type { DayPlan, RestDayMode, UserSettings, WeeklyRestDays } from "@/types";
 
 export const REST_DAY_LABELS: Record<RestDayMode, string> = {
   workout: "Workout",
@@ -71,11 +76,20 @@ export function weeklyRestDaysFingerprint(days: WeeklyRestDays): string {
 /** Effective mode for a weekday (defaults apply even before the user edits rest days). */
 export function resolveRestDayMode(
   dayOfWeek: number,
-  settings: {
-    weeklyRestDays?: WeeklyRestDays;
-    weeklyRestDaysCustomized?: boolean;
-  },
+  settings: Pick<
+    UserSettings,
+    | "programMode"
+    | "weeklyRestDays"
+    | "weeklyRestDaysCustomized"
+    | "weeklyPplSchedule"
+    | "weeklyPplScheduleCustomized"
+  >,
 ): RestDayMode {
+  if (isPresetProgramMode(settings.programMode)) {
+    const schedule = resolveWeeklyPplSchedule(settings as UserSettings);
+    const entry = schedule[dayOfWeek] ?? "full_rest";
+    return pplScheduleToRestDayMode(entry);
+  }
   if (settings.weeklyRestDaysCustomized && settings.weeklyRestDays) {
     return sanitizeRestDayMode(settings.weeklyRestDays[dayOfWeek]);
   }
@@ -104,19 +118,19 @@ export function applyRestDayToPlan(plan: DayPlan, mode: RestDayMode): DayPlan {
       return {
         ...plan,
         restDayMode: "stretches",
-        rounds: plan.rounds.map((round) => ({
-          ...round,
-          exercises: [],
-        })),
+        strengthFocus: [],
+        coreGroups: [],
+        hasJog: false,
+        rounds: [],
       };
     case "full_rest":
       return {
         ...plan,
         restDayMode: "full_rest",
-        rounds: plan.rounds.map((round) => ({
-          ...round,
-          exercises: [],
-        })),
+        strengthFocus: [],
+        coreGroups: [],
+        hasJog: false,
+        rounds: [],
       };
   }
 }
@@ -127,6 +141,46 @@ export function isStretchOnlyRestDay(plan: DayPlan): boolean {
 
 export function isFullRestDay(plan: DayPlan): boolean {
   return plan.restDayMode === "full_rest";
+}
+
+/** Full rest or stretches-only — user may still add optional work via the editor. */
+export function isOptionalRestDay(plan: DayPlan): boolean {
+  return plan.restDayMode === "full_rest" || plan.restDayMode === "stretches";
+}
+
+/** True when any round still has prescribed strength slots. */
+export function planHasStrengthExercises(plan: DayPlan): boolean {
+  return plan.rounds.some((round) => round.exercises.length > 0);
+}
+
+/**
+ * Drop empty round shells on rest days (legacy weeks stored a blank Round 1).
+ * Keeps rounds when the user added exercises via customize.
+ */
+export function stripPhantomRestDayRounds(plan: DayPlan): DayPlan {
+  if (!isOptionalRestDay(plan)) return plan;
+  if (planHasStrengthExercises(plan)) return plan;
+  if (plan.rounds.length === 0) return plan;
+
+  const cleared: DayPlan = {
+    ...plan,
+    rounds: [],
+  };
+  if (plan.restDayMode === "full_rest") {
+    return {
+      ...cleared,
+      strengthFocus: [],
+      coreGroups: [],
+      hasJog: false,
+      cardioActivities: [],
+    };
+  }
+  return {
+    ...cleared,
+    strengthFocus: [],
+    coreGroups: [],
+    hasJog: false,
+  };
 }
 
 export function shouldSkipStretchesForPlan(plan: DayPlan): boolean {

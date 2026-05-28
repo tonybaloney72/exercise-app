@@ -11,6 +11,11 @@ import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan } from "@/types";
+import {
+  CARDIO_ACTIVITY_LABELS,
+  resolveCardioActivities,
+} from "@/lib/cardioActivities";
+import { isFullRestDay, REST_DAY_DESCRIPTIONS } from "@/lib/restDays";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 
 interface WorkoutPlanPreviewProps {
@@ -59,13 +64,12 @@ export default function WorkoutPlanPreview({
               {bannerTitle}
             </p>
           )}
-          {bannerHint && (
-            <p className="text-sm text-muted">{bannerHint}</p>
-          )}
+          {bannerHint && <p className="text-sm text-muted">{bannerHint}</p>}
           {isFutureDay && (
             <p className="mt-2 text-xs text-muted">
-              You can review what&apos;s planned ahead of time. To log sets and start the timer, come
-              back on this day (use <span className="font-medium text-foreground">Today</span>).
+              You can review what&apos;s planned ahead of time. To log sets and
+              start the timer, come back on this day (use{" "}
+              <span className="font-medium text-foreground">Today</span>).
             </p>
           )}
         </SurfaceCard>
@@ -73,7 +77,9 @@ export default function WorkoutPlanPreview({
 
       {showTargetMuscleList && (
         <SurfaceCard className="p-4 space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">Target muscles</h2>
+          <h2 className="text-sm font-semibold text-foreground">
+            Target muscles
+          </h2>
           <div className="space-y-1.5">
             {allCategories.map((cat) => (
               <div key={cat} className="flex items-start gap-2">
@@ -82,8 +88,12 @@ export default function WorkoutPlanPreview({
                   style={{ backgroundColor: CATEGORIES[cat].color }}
                 />
                 <div>
-                  <span className="text-sm text-foreground">{CATEGORIES[cat].name}</span>
-                  <p className="text-xs text-muted">{CATEGORIES[cat].description}</p>
+                  <span className="text-sm text-foreground">
+                    {CATEGORIES[cat].name}
+                  </span>
+                  <p className="text-xs text-muted">
+                    {CATEGORIES[cat].description}
+                  </p>
                 </div>
               </div>
             ))}
@@ -91,27 +101,41 @@ export default function WorkoutPlanPreview({
         </SurfaceCard>
       )}
 
-      <CollapsibleSection title="Warm-Up Stretches" defaultOpen={false}>
-        <div className="divide-y divide-border px-2 py-1">
-          {warmUp.map((stretch) => {
-            const ex = exerciseMap[stretch.exerciseId];
-            if (!ex) return null;
-            return (
-              <PreviewRow
-                key={stretch.exerciseId}
-                name={ex.name}
-                target={stretch.targetReps}
-              />
-            );
-          })}
-        </div>
-      </CollapsibleSection>
+      {!isFullRestDay(plan) && (
+        <CollapsibleSection title="Warm-Up Stretches" defaultOpen={false}>
+          <div className="divide-y divide-border px-2 py-1">
+            {warmUp.map((stretch) => {
+              const ex = exerciseMap[stretch.exerciseId];
+              if (!ex) return null;
+              return (
+                <PreviewRow
+                  key={stretch.exerciseId}
+                  name={ex.name}
+                  target={stretch.targetReps}
+                />
+              );
+            })}
+          </div>
+        </CollapsibleSection>
+      )}
 
-      {plan.hasJog && (
-        <CollapsibleSection title="Jog" defaultOpen>
-          <div className="px-2 py-2.5">
-            <p className="text-sm font-medium text-foreground">Run</p>
-            <p className="text-xs text-muted">As prescribed on Today when you start</p>
+      {!isFullRestDay(plan) && resolveCardioActivities(plan).length > 0 && (
+        <CollapsibleSection title="Cardio & endurance" defaultOpen>
+          <div className="divide-y divide-border px-2 py-1">
+            {resolveCardioActivities(plan).map((activity) => {
+              const meta = exerciseMap[activity.exerciseId];
+              return (
+                <PreviewRow
+                  key={activity.kind}
+                  name={meta?.name ?? CARDIO_ACTIVITY_LABELS[activity.kind]}
+                  target={
+                    activity.defaultPrescription ??
+                    meta?.defaultReps ??
+                    "Log time and distance when you start"
+                  }
+                />
+              );
+            })}
           </div>
         </CollapsibleSection>
       )}
@@ -132,7 +156,9 @@ export default function WorkoutPlanPreview({
                   className="flex items-start justify-between gap-2 px-2 py-2.5"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-foreground">{meta.name}</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {meta.name}
+                    </p>
                     <p className="text-xs text-muted">
                       {roundTargetLabel(ex.exerciseId, ex.targetReps)}
                     </p>
@@ -145,21 +171,23 @@ export default function WorkoutPlanPreview({
         </CollapsibleSection>
       ))}
 
-      <CollapsibleSection title="Cool-Down Stretches" defaultOpen={false}>
-        <div className="divide-y divide-border px-2 py-1">
-          {coolDown.map((stretch) => {
-            const ex = exerciseMap[stretch.exerciseId];
-            if (!ex) return null;
-            return (
-              <PreviewRow
-                key={stretch.exerciseId}
-                name={ex.name}
-                target={stretch.targetReps}
-              />
-            );
-          })}
-        </div>
-      </CollapsibleSection>
+      {!isFullRestDay(plan) && (
+        <CollapsibleSection title="Cool-Down Stretches" defaultOpen={false}>
+          <div className="divide-y divide-border px-2 py-1">
+            {coolDown.map((stretch) => {
+              const ex = exerciseMap[stretch.exerciseId];
+              if (!ex) return null;
+              return (
+                <PreviewRow
+                  key={stretch.exerciseId}
+                  name={ex.name}
+                  target={stretch.targetReps}
+                />
+              );
+            })}
+          </div>
+        </CollapsibleSection>
+      )}
     </AnimatedSection>
   );
 }

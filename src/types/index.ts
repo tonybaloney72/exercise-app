@@ -132,6 +132,17 @@ export type WeeklyRestDays = Record<number, RestDayMode>;
 
 export type WeeklyCardioByDay = Record<number, CardioActivityKind[]>;
 
+/** P/P/L preset: training focus or rest per weekday (0 = Sun … 6 = Sat). */
+export type PplDaySchedule =
+  | "push"
+  | "pull"
+  | "legs"
+  | "active_recovery"
+  | "stretches"
+  | "full_rest";
+
+export type WeeklyPplSchedule = Record<number, PplDaySchedule>;
+
 export interface DayPlan {
   dayOfWeek: number; // 0=Sunday, 1=Monday, ...
   name: string;
@@ -284,7 +295,7 @@ export interface UserSettings {
   trainingPriorityScores: TrainingPriorityScores;
   /** True when scores differ from the selected preset template. */
   trainingPriorityCustomized: boolean;
-  /** How automated weeks are built: priorities, per-day layout, or manual. */
+  /** How automated weeks are built: preset (6-day P/P/L), per-day layout, or manual. */
   programMode: ProgramMode;
   /** Per-day enabled groups (layout mode). */
   weeklyCategoryLayout: WeeklyCategoryLayout;
@@ -300,6 +311,9 @@ export interface UserSettings {
   /** Per weekday rest (full = no work; light = stretches only). */
   weeklyRestDays: WeeklyRestDays;
   weeklyRestDaysCustomized: boolean;
+  /** P/P/L preset: push, pull, legs, active recovery, stretches, or full rest per weekday. */
+  weeklyPplSchedule: WeeklyPplSchedule;
+  weeklyPplScheduleCustomized: boolean;
   /** Per weekday cardio kinds (when customized). */
   weeklyCardioByDay: WeeklyCardioByDay;
   weeklyCardioCustomized: boolean;

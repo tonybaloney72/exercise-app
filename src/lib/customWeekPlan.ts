@@ -1,4 +1,5 @@
 import { normalizeDayPlanCardio } from "@/lib/cardioActivities";
+import { planHasStrengthExercises } from "@/lib/restDays";
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan } from "@/types";
 
@@ -18,7 +19,7 @@ export function mergeWeekScheduleIntoStoredWeek(
 }
 
 export function mergeDayScheduleMetadata(existing: DayPlan, shell: DayPlan): DayPlan {
-  return normalizeDayPlanCardio({
+  const merged = normalizeDayPlanCardio({
     ...existing,
     dayOfWeek: shell.dayOfWeek,
     theme: shell.theme,
@@ -28,4 +29,10 @@ export function mergeDayScheduleMetadata(existing: DayPlan, shell: DayPlan): Day
     restDayMode: shell.restDayMode,
     cardioActivities: shell.cardioActivities?.map((a) => ({ ...a })),
   });
+  const shellIsOptionalRest =
+    shell.restDayMode === "full_rest" || shell.restDayMode === "stretches";
+  if (shellIsOptionalRest && !planHasStrengthExercises(existing)) {
+    return { ...merged, rounds: [] };
+  }
+  return merged;
 }

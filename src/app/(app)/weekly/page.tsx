@@ -10,6 +10,7 @@ import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import { cardioBadgesForPlan, restBadgeForPlan } from "@/lib/planCardioDisplay";
+import { isFullRestDay, REST_DAY_DESCRIPTIONS } from "@/lib/restDays";
 import { resetTrainingWeekToGenerated } from "@/lib/trainingWeekRefresh";
 import { getWeekSourceForDate } from "@/lib/trainingWeekCustomize";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
@@ -23,9 +24,7 @@ import {
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
-import {
-  countRoundExerciseSlots,
-} from "@/utils/workoutLogCounts";
+import { countRoundExerciseSlots } from "@/utils/workoutLogCounts";
 
 const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 /** Same Sun–Sat order as the week strip and `weekDates`. */
@@ -101,8 +100,11 @@ export default function WeeklyPage() {
   const trainingPriorityCustomized = useSettingsStore(
     (s) => s.trainingPriorityCustomized,
   );
-  const { weekByDow, loading: weekLoading, error: weekError } =
-    useTrainingWeekPlans(weekDates);
+  const {
+    weekByDow,
+    loading: weekLoading,
+    error: weekError,
+  } = useTrainingWeekPlans(weekDates);
 
   const weekDateKeys = useMemo(
     () => weekDates.map((d) => formatLocalDateKey(d)),
@@ -121,7 +123,9 @@ export default function WeeklyPage() {
     <div className="py-6 space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Weekly Overview</h1>
-        <p className="text-sm text-muted mt-1">Your training week at a glance</p>
+        <p className="text-sm text-muted mt-1">
+          Your training week at a glance
+        </p>
       </div>
 
       {weekError && (
@@ -133,8 +137,8 @@ export default function WeeklyPage() {
       {mode === "guest" && !weekLoading && (
         <p className="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-muted leading-relaxed">
           <span className="font-medium text-foreground">Guest mode: </span>
-          This week is generated for this device only and won&apos;t sync. Sign in
-          to save a custom week and customize individual days.
+          This week is generated for this device only and won&apos;t sync. Sign
+          in to save a custom week and customize individual days.
         </p>
       )}
 
@@ -158,16 +162,20 @@ export default function WeeklyPage() {
                 isToday
                   ? "border-accent bg-accent/10"
                   : isCompleted
-                  ? "border-green-500/30 bg-green-500/5"
-                  : isPast
-                  ? "border-border bg-surface opacity-50"
-                  : "border-border bg-surface"
+                    ? "border-green-500/30 bg-green-500/5"
+                    : isPast
+                      ? "border-border bg-surface opacity-50"
+                      : "border-border bg-surface"
               }`}
             >
-              <span className={`text-[10px] font-medium ${isToday ? "text-accent" : "text-muted"}`}>
+              <span
+                className={`text-[10px] font-medium ${isToday ? "text-accent" : "text-muted"}`}
+              >
                 {DAY_ABBRS[i]}
               </span>
-              <span className={`text-sm font-bold ${isToday ? "text-accent" : "text-foreground"}`}>
+              <span
+                className={`text-sm font-bold ${isToday ? "text-accent" : "text-foreground"}`}
+              >
                 {date.getDate()}
               </span>
               {isCompleted && (
@@ -198,9 +206,12 @@ export default function WeeklyPage() {
 
       {mode === "authenticated" && isCustomWeek && !weekLoading && (
         <SurfaceCard className="border-accent/40 bg-accent/10 p-4">
-          <h2 className="text-sm font-semibold text-foreground">Custom week builder</h2>
+          <h2 className="text-sm font-semibold text-foreground">
+            Custom week builder
+          </h2>
           <p className="mt-1 text-xs text-muted leading-snug">
-            Walk through Sun–Sat and add rounds, exercises, and stretches for each day.
+            Walk through Sun–Sat and add rounds, exercises, and stretches for
+            each day.
           </p>
           <Link
             href="/weekly/build"
@@ -311,11 +322,15 @@ export default function WeeklyPage() {
                           </span>
                         ) : null}
                       </>
+                    ) : isFullRestDay(plan) ? (
+                      <span>{REST_DAY_DESCRIPTIONS.full_rest}</span>
+                    ) : plan.restDayMode === "stretches" ? (
+                      <span>{REST_DAY_DESCRIPTIONS.stretches}</span>
                     ) : (
                       <>
                         {plan.rounds.length} round
-                        {plan.rounds.length !== 1 ? "s" : ""} · {planExerciseCount}{" "}
-                        exercises
+                        {plan.rounds.length !== 1 ? "s" : ""} ·{" "}
+                        {planExerciseCount} exercises
                       </>
                     )}
                   </div>
@@ -332,8 +347,9 @@ export default function WeeklyPage() {
               Reset training week
             </h2>
             <p className="text-xs text-muted">
-              Regenerate Sun–Sat from your current settings and remove all custom
-              workout edits for this week. Finished workout logs are unchanged.
+              Regenerate Sun–Sat from your current settings and remove all
+              custom workout edits for this week. Finished workout logs are
+              unchanged.
             </p>
             {resetWeekError && (
               <p className="text-sm text-red-400" role="alert">

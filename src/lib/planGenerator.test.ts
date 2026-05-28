@@ -49,6 +49,11 @@ describe("computePrefsFingerprint", () => {
     expect(computePrefsFingerprint(prefsA, EQUIP)).toContain("fv:LB-1,LB-2");
   });
 
+  it("includes PPL template segment in preset mode", () => {
+    const fp = computePrefsFingerprint(EMPTY_PREFS, EQUIP, "balanced", "standard");
+    expect(fp).toContain("ppl:ppl-2026-05-v4:balanced");
+  });
+
   it("changes when program focus, density, equipment, or stretches change", () => {
     const base = computePrefsFingerprint(EMPTY_PREFS, EQUIP);
     expect(computePrefsFingerprint(EMPTY_PREFS, EQUIP, "upper_body")).not.toBe(base);

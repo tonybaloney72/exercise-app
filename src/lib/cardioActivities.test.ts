@@ -36,7 +36,7 @@ describe("cardioActivities", () => {
     const mon = getCatalogPlanForDay(1);
     const rested = applyRestDayToPlan(mon, "full_rest");
     expect(rested.restDayMode).toBe("full_rest");
-    expect(rested.rounds.every((r) => r.exercises.length === 0)).toBe(true);
+    expect(rested.rounds).toEqual([]);
   });
 
   it("active recovery is one light core round", () => {

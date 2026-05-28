@@ -1,4 +1,7 @@
-import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
+import {
+  buildWeekSeedForProgramMode,
+  buildWeekSeedFromSettings,
+} from "@/lib/weekSeed";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   computePrefsFingerprintFromSettings,
@@ -41,6 +44,7 @@ import type {
 } from "@/types";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import { normalizeDayPlanCardio } from "@/lib/cardioActivities";
+import { stripPhantomRestDayRounds } from "@/lib/restDays";
 import { weekAnchorFromDateKey } from "@/utils/weekCalendar";
 
 export { isUserCustomizedWeekSource } from "@/lib/planGenerator";
@@ -63,7 +67,7 @@ export function cloneDayPlan(plan: DayPlan): DayPlan {
 
 /** Seed editor lists from resolved stretches (respects dislikes; matches day preview). */
 export function prepareDayPlanForEditor(plan: DayPlan): DayPlan {
-  const cloned = cloneDayPlan(plan);
+  const cloned = cloneDayPlan(stripPhantomRestDayRounds(plan));
   const ctx = buildStretchResolveContext();
   const resolved = resolveStretchesForDay(plan, ctx);
 
@@ -172,9 +176,17 @@ export function buildGeneratedDayPlan(
   userSettings?: UserSettings,
 ): DayPlan {
   const profile =
-    profileInput ?? buildProgramProfileInput(trainingPriorityPreset);
+    profileInput ??
+    (userSettings
+      ? buildProgramProfileInputFromSettings(userSettings)
+      : buildProgramProfileInput(trainingPriorityPreset, undefined, false, {
+          pplMode: true,
+        }));
+  const seedWeek = userSettings
+    ? buildWeekSeedFromSettings(userSettings)
+    : buildWeekSeedForProgramMode("preset");
   const generated = materializeTrainingWeek(
-    buildCatalogWeek(),
+    seedWeek,
     prefs,
     availableEquipment,
     trainingPriorityPreset,

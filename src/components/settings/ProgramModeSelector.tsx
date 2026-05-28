@@ -10,7 +10,7 @@ type Props = {
   onChange: (mode: ProgramMode) => void;
 };
 
-const MODES: ProgramMode[] = ["priorities", "layout", "custom"];
+const MODES: ProgramMode[] = ["preset", "layout", "custom"];
 
 export default function ProgramModeSelector({ value, onChange }: Props) {
   const active = PROGRAM_MODE_LABELS[value];

@@ -1,5 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
+import { DEFAULT_SETTINGS } from "@/lib/repos/types";
+import {
+  buildProgramProfileInput,
+  buildProgramProfileInputFromSettings,
+} from "@/lib/programProfile";
+import { buildPplWeek } from "@/lib/pplWeekTemplate";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import { materializeTrainingWeek } from "@/lib/planGenerator";
@@ -70,27 +76,61 @@ describe("dayPlanForCustomSave", () => {
 });
 
 describe("buildGeneratedDayPlan", () => {
-  it("returns the materialized catalog day with dayOfWeek set", () => {
+  const presetSettings = {
+    ...DEFAULT_SETTINGS,
+    programMode: "preset" as const,
+  };
+
+  it("returns the materialized PPL day with dayOfWeek set", () => {
     const week = materializeTrainingWeek(
-      buildCatalogWeek(),
+      buildPplWeek(),
       EMPTY_PREFS,
       EQUIP,
       "balanced",
       "standard",
+      undefined,
+      undefined,
+      buildProgramProfileInputFromSettings(presetSettings),
+      presetSettings,
     );
-    const built = buildGeneratedDayPlan(1, EMPTY_PREFS, EQUIP, "balanced", "standard");
+    const built = buildGeneratedDayPlan(
+      1,
+      EMPTY_PREFS,
+      EQUIP,
+      "balanced",
+      "standard",
+      undefined,
+      undefined,
+      undefined,
+      presetSettings,
+    );
     expect(built.dayOfWeek).toBe(1);
     expect(built.rounds).toEqual(week[1]!.rounds);
   });
 
-  it("reflects program focus changes in round shaping", () => {
-    const minimal = buildGeneratedDayPlan(1, EMPTY_PREFS, EQUIP, "minimal_core", "compact");
+  it("reflects program focus changes in round shaping (catalog seed)", () => {
+    const layoutSettings = { ...DEFAULT_SETTINGS, programMode: "layout" as const };
+    const minimal = buildGeneratedDayPlan(
+      1,
+      EMPTY_PREFS,
+      EQUIP,
+      "minimal_core",
+      "compact",
+      undefined,
+      undefined,
+      buildProgramProfileInput("minimal_core"),
+      layoutSettings,
+    );
     const coreHeavy = buildGeneratedDayPlan(
       1,
       EMPTY_PREFS,
       EQUIP,
       "core_emphasis",
       "compact",
+      undefined,
+      undefined,
+      buildProgramProfileInput("core_emphasis"),
+      layoutSettings,
     );
     const countCore = (plan: DayPlan) =>
       plan.rounds[0]!.exercises.filter((ex) =>

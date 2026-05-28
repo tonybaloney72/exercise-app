@@ -21,6 +21,8 @@ Or run each new migration manually in the Supabase Dashboard → **SQL Editor** 
 | `20260520120000_cardio_exercise_logs_phase3.sql` | Cardio section in logs (phase 3a) |
 | `20260520120001_cardio_exercise_logs_phase3b.sql` | Cardio metrics on `exercise_logs` |
 | `20260520150000_workout_day_templates.sql` | Saved **workout day templates** (save/reuse in customize) |
+| `20260524120000_user_settings_weekly_ppl_schedule.sql` | Customizable 6-day P/P/L week schedule |
+| `20260525120000_user_settings_program_mode_preset.sql` | `program_mode` value `priorities` → `preset` |
 
 If a column or RPC is missing, authenticated users may see failed saves or settings that do not persist.
 

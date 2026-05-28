@@ -76,8 +76,7 @@ export const PROGRESSION_FAMILIES: ProgressionFamilyDef[] = [
     label: "Bodyweight squat",
     category: "LB",
     entries: [
-      { exerciseId: "HC-137", step: 1 },
-      { exerciseId: "LB-1", step: 2 },
+      { exerciseId: "LB-1", step: 1 },
       { exerciseId: "LB-7", step: 2 },
       { exerciseId: "LB-5", step: 2 },
     ],

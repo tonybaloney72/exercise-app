@@ -195,6 +195,8 @@ function pickUserSettingsFields(
     defaultCoolDown: state.defaultCoolDown,
     weeklyRestDays: state.weeklyRestDays,
     weeklyRestDaysCustomized: state.weeklyRestDaysCustomized,
+    weeklyPplSchedule: state.weeklyPplSchedule,
+    weeklyPplScheduleCustomized: state.weeklyPplScheduleCustomized,
     weeklyCardioByDay: state.weeklyCardioByDay,
     weeklyCardioCustomized: state.weeklyCardioCustomized,
     expertiseByGroup: state.expertiseByGroup,

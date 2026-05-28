@@ -84,8 +84,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     expertiseLevel: "beginner",
     muscleGroups: ["Spinal Erectors"],
     defaultReps: "10",
-    notes:
-      "Prone on floor; extend spine with no equipment. Progress to HC-007 when ready.",
+    notes: "Prone on floor; extend spine with no equipment.",
     source: "Repetitions Fitness RPT",
     videoUrl: "https://www.youtube.com/watch?v=r5tpJxceonM",
     isTimeBased: false,
@@ -1744,7 +1743,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
     muscleGroups: ["Adductors"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
       "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
     source: "Dr. Carl Baird",
@@ -1834,20 +1833,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Muscle focus: Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
     source: "Sears",
     videoUrl: "https://www.youtube.com/watch?v=5cnJKhhw2as",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-137",
-    name: "Deep Squat",
-    category: "LB",
-    equipment: ["bodyweight"],
-    expertiseLevel: "novice",
-    muscleGroups: ["Adductors"],
-    defaultReps: "10",
-    notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
-    source: "YOGABODY",
-    videoUrl: "https://www.youtube.com/watch?v=G-uQoo9TpuU",
     isTimeBased: false,
   },
   {
@@ -2572,9 +2557,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   {
     id: "HC-195",
     name: "Inverted Deadlift",
-    category: "CS",
-    equipment: ["bodyweight"],
-    expertiseLevel: "intermediate",
+    category: "UPL",
+    equipment: ["pull_up_bar"],
+    expertiseLevel: "expert",
     muscleGroups: ["Spinal Erectors"],
     defaultReps: "10",
     notes:
@@ -2582,6 +2567,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     source: "PractiCali_Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=vKKGdwyA8Lc",
     isTimeBased: false,
+    secondaryCategory: "CS",
   },
   {
     id: "HC-196",
@@ -3560,16 +3546,17 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   {
     id: "HC-271",
     name: "Wall Toe Raise",
-    category: "LB",
+    category: "SW",
     equipment: ["bodyweight"],
-    expertiseLevel: "intermediate",
-    muscleGroups: ["Tibialis"],
+    expertiseLevel: "beginner",
+    muscleGroups: ["Mobility", "Tibialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Tibialis. Reference: Hybrid Calisthenics exercise library.",
+      "Back against wall, lift toes toward shins with heels down — tibialis / ankle prep for lower-body days.",
     source: "Do Better Fitness",
     videoUrl: "https://www.youtube.com/watch?v=awSgbYEXPY8",
     isTimeBased: false,
+    secondaryCategory: "LB",
   },
   {
     id: "HC-272",

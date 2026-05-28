@@ -6,6 +6,14 @@ import {
   weeklyCardioEqual,
 } from "@/lib/cardioActivities";
 import {
+  resolveWeeklyPplSchedule,
+  sanitizePplWeeklyCardioByDayForSchedule,
+  sanitizeWeeklyPplSchedule,
+  suggestWeeklyCardioFromPplSchedule,
+  weeklyPplScheduleEqual,
+} from "@/lib/pplWeekSchedule";
+import { isPresetProgramMode } from "@/lib/weekSeed";
+import {
   applyRestDayToPlan,
   resolveRestDayMode,
   sanitizeWeeklyRestDays,
@@ -13,14 +21,28 @@ import {
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan, ExerciseEquipment, UserSettings } from "@/types";
 
+export function suggestWeeklyCardioForSettings(
+  settings: UserSettings,
+): Record<number, import("@/types").CardioActivityKind[]> {
+  return isPresetProgramMode(settings.programMode)
+    ? suggestWeeklyCardioFromPplSchedule(resolveWeeklyPplSchedule(settings))
+    : suggestWeeklyCardioFromCatalog();
+}
+
 export function resolveWeeklyCardioByDay(
   settings: UserSettings,
 ): Record<number, import("@/types").CardioActivityKind[]> {
-  const catalog = suggestWeeklyCardioFromCatalog();
-  if (!settings.weeklyCardioCustomized) {
-    return catalog;
+  const fallback = suggestWeeklyCardioForSettings(settings);
+  const resolved = !settings.weeklyCardioCustomized
+    ? fallback
+    : sanitizeWeeklyCardioByDay(settings.weeklyCardioByDay, fallback);
+  if (!isPresetProgramMode(settings.programMode)) {
+    return resolved;
   }
-  return sanitizeWeeklyCardioByDay(settings.weeklyCardioByDay, catalog);
+  return sanitizePplWeeklyCardioByDayForSchedule(
+    resolved,
+    resolveWeeklyPplSchedule(settings),
+  );
 }
 
 /** Apply settings rest + cardio before generator materialization. */
@@ -36,18 +58,28 @@ export function prepareCatalogDayForUser(
   return normalizeDayPlanCardio(next);
 }
 
-export function prepareCatalogWeekForUser(
-  catalogWeek: TrainingWeekDays,
+/** Apply settings rest + cardio before generator materialization. */
+export function prepareWeekSeedForUser(
+  seedWeek: TrainingWeekDays,
   settings: UserSettings,
   availableEquipment: ExerciseEquipment[],
 ): TrainingWeekDays {
   const out: TrainingWeekDays = {};
   for (let i = 0; i < 7; i++) {
-    const day = catalogWeek[i];
+    const day = seedWeek[i];
     if (!day) continue;
     out[i] = prepareCatalogDayForUser(day, settings, availableEquipment);
   }
   return out;
+}
+
+/** @deprecated Use {@link prepareWeekSeedForUser}. */
+export function prepareCatalogWeekForUser(
+  catalogWeek: TrainingWeekDays,
+  settings: UserSettings,
+  availableEquipment: ExerciseEquipment[],
+): TrainingWeekDays {
+  return prepareWeekSeedForUser(catalogWeek, settings, availableEquipment);
 }
 
 export function weeklyCardioSettingsChanged(
@@ -71,11 +103,34 @@ export function weeklyCardioSettingsChanged(
   return false;
 }
 
+export function weeklyPplScheduleSettingsChanged(
+  partial: Partial<UserSettings>,
+  current: UserSettings,
+): boolean {
+  if (!isPresetProgramMode(current.programMode)) return false;
+  if (partial.weeklyPplSchedule != null) {
+    const next = sanitizeWeeklyPplSchedule(
+      partial.weeklyPplSchedule,
+      resolveWeeklyPplSchedule(current),
+    );
+    const prev = resolveWeeklyPplSchedule(current);
+    if (!weeklyPplScheduleEqual(next, prev)) return true;
+  }
+  if (
+    partial.weeklyPplScheduleCustomized != null &&
+    partial.weeklyPplScheduleCustomized !== current.weeklyPplScheduleCustomized
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export function weeklyRestSettingsChanged(
   partial: Partial<UserSettings>,
   current: UserSettings,
 ): boolean {
-  if (partial.weeklyRestDays != null) {
+  if (weeklyPplScheduleSettingsChanged(partial, current)) return true;
+  if (partial.weeklyRestDays != null && !isPresetProgramMode(current.programMode)) {
     const next = sanitizeWeeklyRestDays(partial.weeklyRestDays);
     const prev = sanitizeWeeklyRestDays(current.weeklyRestDays);
     for (let d = 0; d < 7; d++) {

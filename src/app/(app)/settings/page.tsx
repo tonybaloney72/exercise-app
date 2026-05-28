@@ -11,18 +11,20 @@ import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
 import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import { ROUND_DENSITY_OPTIONS } from "@/lib/programProfile";
+import { PPL_ROUND_DENSITY_OPTIONS } from "@/lib/pplRoundDensity";
+import {
+  pplWeeklyCardioEligibleDaysFromSchedule,
+  resolveWeeklyPplSchedule,
+  sanitizePplWeeklyCardioByDayForSchedule,
+} from "@/lib/pplWeekSchedule";
 import ProgramModeSelector from "@/components/settings/ProgramModeSelector";
 import WeekModeOptionsPanel from "@/components/settings/WeekModeOptionsPanel";
-import TrainingPriorityCustomize from "@/components/settings/TrainingPriorityCustomize";
 import ExpertiseByGroupEditor from "@/components/settings/ExpertiseByGroupEditor";
 import WeeklyCategoryLayoutEditor from "@/components/settings/WeeklyCategoryLayoutEditor";
+import PplWeekScheduleEditor from "@/components/settings/PplWeekScheduleEditor";
 import WeeklyRestDaysEditor from "@/components/settings/WeeklyRestDaysEditor";
 import WeeklyCardioEditor from "@/components/settings/WeeklyCardioEditor";
 import type { ProgramMode } from "@/lib/weeklyCategoryLayout";
-import {
-  scoresFromPreset,
-  TRAINING_PRIORITY_OPTIONS,
-} from "@/lib/trainingPriorities";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { createClient } from "@/lib/supabase/client";
@@ -299,7 +301,8 @@ export default function SettingsPage() {
             checked={settings.progressionFamiliesEnabled}
             onChange={() =>
               void settings.updateSettings({
-                progressionFamiliesEnabled: !settings.progressionFamiliesEnabled,
+                progressionFamiliesEnabled:
+                  !settings.progressionFamiliesEnabled,
               })
             }
           />
@@ -349,82 +352,6 @@ export default function SettingsPage() {
               </WeekModeOptionsPanel>
             )}
 
-            {settings.programMode === "priorities" && (
-              <WeekModeOptionsPanel
-                title="Step 2 · Priority preset"
-                hint="The catalog still rotates push, pull, legs, and core across the week. Presets tilt how hard each group shows up on each day."
-              >
-                <div
-                  className="space-y-2"
-                  role="radiogroup"
-                  aria-label="Training priority preset"
-                >
-                  {TRAINING_PRIORITY_OPTIONS.map((option) => {
-                    const selected =
-                      !settings.trainingPriorityCustomized &&
-                      settings.trainingPriorityPreset === option.value;
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        role="radio"
-                        aria-checked={selected}
-                        onClick={() =>
-                          void settings.updateSettings({
-                            trainingPriorityPreset: option.value,
-                            trainingPriorityScores: scoresFromPreset(
-                              option.value,
-                            ),
-                            trainingPriorityCustomized: false,
-                          })
-                        }
-                        className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
-                          selected
-                            ? "border-accent bg-accent/10"
-                            : "border-border bg-surface-hover hover:border-accent/30"
-                        }`}
-                      >
-                        <span
-                          className={`block text-sm font-medium ${
-                            selected ? "text-accent" : "text-foreground"
-                          }`}
-                        >
-                          {option.label}
-                        </span>
-                        <span className="mt-0.5 block text-xs leading-snug text-muted">
-                          {option.description}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </WeekModeOptionsPanel>
-            )}
-
-            {settings.programMode === "priorities" && (
-              <TrainingPriorityCustomize
-                scores={settings.trainingPriorityScores}
-                customized={settings.trainingPriorityCustomized}
-                activePreset={settings.trainingPriorityPreset}
-                onPresetSelect={(preset) => {
-                  void settings.updateSettings({
-                    trainingPriorityPreset: preset,
-                    trainingPriorityScores: scoresFromPreset(preset),
-                    trainingPriorityCustomized: false,
-                  });
-                }}
-                onScoresChange={(
-                  trainingPriorityScores,
-                  trainingPriorityCustomized,
-                ) => {
-                  void settings.updateSettings({
-                    trainingPriorityScores,
-                    trainingPriorityCustomized,
-                  });
-                }}
-              />
-            )}
-
             {settings.programMode === "layout" && (
               <WeekModeOptionsPanel
                 title="Step 2 · Groups per day"
@@ -445,33 +372,70 @@ export default function SettingsPage() {
               </WeekModeOptionsPanel>
             )}
 
-            <CollapsibleSection
-              embedded
-              title="Day type"
-              hint="Workout, active recovery, stretches-only, or full rest — per weekday."
-              defaultOpen={false}
-            >
-              <WeeklyRestDaysEditor
-                value={settings.weeklyRestDays}
-                onChange={(weeklyRestDays, weeklyRestDaysCustomized) => {
-                  void settings.updateSettings({
-                    weeklyRestDays,
-                    weeklyRestDaysCustomized,
-                  });
-                }}
-              />
-            </CollapsibleSection>
+            {settings.programMode === "preset" ? (
+              <CollapsibleSection
+                embedded
+                title="Week schedule"
+                hint="Which days are push, pull, legs, or rest. Changes apply to today and upcoming generated days."
+                defaultOpen
+              >
+                <PplWeekScheduleEditor
+                  value={settings.weeklyPplSchedule}
+                  onChange={(weeklyPplSchedule, weeklyPplScheduleCustomized) => {
+                    void settings.updateSettings({
+                      weeklyPplSchedule,
+                      weeklyPplScheduleCustomized,
+                    });
+                  }}
+                />
+              </CollapsibleSection>
+            ) : (
+              <CollapsibleSection
+                embedded
+                title="Day type"
+                hint="Workout, active recovery, stretches-only, or full rest — per weekday."
+                defaultOpen={false}
+              >
+                <WeeklyRestDaysEditor
+                  value={settings.weeklyRestDays}
+                  onChange={(weeklyRestDays, weeklyRestDaysCustomized) => {
+                    void settings.updateSettings({
+                      weeklyRestDays,
+                      weeklyRestDaysCustomized,
+                    });
+                  }}
+                />
+              </CollapsibleSection>
+            )}
             <CollapsibleSection
               embedded
               title="Cardio & endurance"
-              hint="Jog, walk, cycle, hike, or swim per day — log time and distance in the workout."
+              hint={
+                settings.programMode === "preset"
+                  ? "Push and pull days: pick jog, walk, cycle, etc. Logged in the Cardio section (time and distance), not as strength rounds."
+                  : "Jog, walk, cycle, hike, or swim per day — log time and distance in the workout."
+              }
               defaultOpen={false}
             >
               <WeeklyCardioEditor
                 value={settings.weeklyCardioByDay}
+                editableDays={
+                  settings.programMode === "preset"
+                    ? pplWeeklyCardioEligibleDaysFromSchedule(
+                        resolveWeeklyPplSchedule(settings),
+                      )
+                    : undefined
+                }
                 onChange={(weeklyCardioByDay, weeklyCardioCustomized) => {
+                  const next =
+                    settings.programMode === "preset"
+                      ? sanitizePplWeeklyCardioByDayForSchedule(
+                          weeklyCardioByDay,
+                          resolveWeeklyPplSchedule(settings),
+                        )
+                      : weeklyCardioByDay;
                   void settings.updateSettings({
-                    weeklyCardioByDay,
+                    weeklyCardioByDay: next,
                     weeklyCardioCustomized,
                   });
                 }}
@@ -479,15 +443,14 @@ export default function SettingsPage() {
             </CollapsibleSection>
             {settings.programMode !== "custom" && (
               <>
-                <section className="border-t border-border pt-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted mb-3">
-                    Generated week options
-                  </p>
-                </section>
                 <CollapsibleSection
                   embedded
                   title="Round density"
-                  hint="How many exercises per round when your week is generated"
+                  hint={
+                    settings.programMode === "preset"
+                      ? "Exercises per working round (rounds 1–3) and size of the leg-day core block"
+                      : "How many exercises per round when your week is generated"
+                  }
                   defaultOpen={false}
                 >
                   <div
@@ -495,7 +458,10 @@ export default function SettingsPage() {
                     role="radiogroup"
                     aria-label="Round density"
                   >
-                    {ROUND_DENSITY_OPTIONS.map((option) => {
+                    {(settings.programMode === "preset"
+                      ? PPL_ROUND_DENSITY_OPTIONS
+                      : ROUND_DENSITY_OPTIONS
+                    ).map((option) => {
                       const selected = settings.roundDensity === option.value;
                       return (
                         <button

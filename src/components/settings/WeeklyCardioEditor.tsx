@@ -13,28 +13,58 @@ const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 type Props = {
   value: WeeklyCardioByDay;
   onChange: (next: WeeklyCardioByDay, customized: boolean) => void;
+  /** When set, only these weekdays (0=Sun … 6=Sat) are shown and editable. */
+  editableDays?: readonly number[];
 };
 
-export default function WeeklyCardioEditor({ value, onChange }: Props) {
+export default function WeeklyCardioEditor({
+  value,
+  onChange,
+  editableDays,
+}: Props) {
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+
+  const visibleDays =
+    editableDays != null
+      ? DAY_NAMES.map((shortName, dayOfWeek) => ({ shortName, dayOfWeek })).filter(
+          ({ dayOfWeek }) => editableDays.includes(dayOfWeek),
+        )
+      : DAY_NAMES.map((shortName, dayOfWeek) => ({ shortName, dayOfWeek }));
 
   function toggleKind(dayOfWeek: number, kind: CardioActivityKind) {
     const current = value[dayOfWeek] ?? [];
     const next = current.includes(kind)
       ? current.filter((k) => k !== kind)
       : [...current, kind];
-    onChange({ ...value, [dayOfWeek]: next }, true);
+    const merged = { ...value, [dayOfWeek]: next };
+    if (editableDays != null) {
+      for (let dow = 0; dow < 7; dow++) {
+        if (!editableDays.includes(dow)) merged[dow] = [];
+      }
+    }
+    onChange(merged, true);
   }
 
   return (
     <section className="space-y-2">
       <p className="text-xs text-muted leading-snug">
-        Choose endurance work for each day (jog, walk, cycle, hike, swim). Enable{" "}
-        <strong className="text-foreground">Bicycle / indoor bike</strong> under Your equipment
-        for cycle. Log time and distance in the workout like a jog.
+        {editableDays != null ? (
+          <>
+            Endurance for <strong className="text-foreground">push, pull, and Sunday recovery</strong>{" "}
+            only — leg days use a core block instead. Enable{" "}
+            <strong className="text-foreground">Bicycle / indoor bike</strong> under Your equipment
+            for cycle.
+          </>
+        ) : (
+          <>
+            Choose endurance work for each day (jog, walk, cycle, hike, swim). Enable{" "}
+            <strong className="text-foreground">Bicycle / indoor bike</strong> under Your equipment
+            for cycle. Log time and distance in the workout like a jog.
+          </>
+        )}
       </p>
       <ul className="space-y-2">
-        {DAY_NAMES.map((shortName, dayOfWeek) => (
+        {visibleDays.map(({ shortName, dayOfWeek }) => (
           <li
             key={dayOfWeek}
             className="rounded-lg border border-border bg-surface-hover/50 px-3 py-2 space-y-2"

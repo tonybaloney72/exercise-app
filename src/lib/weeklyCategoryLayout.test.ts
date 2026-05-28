@@ -4,11 +4,18 @@ import {
   categoriesForDayLayout,
   groupsForCatalogDay,
   layoutEqual,
+  sanitizeProgramMode,
   suggestLayoutFromCatalog,
   weeklyCategoryLayoutFingerprint,
 } from "@/lib/weeklyCategoryLayout";
 
 describe("weeklyCategoryLayout", () => {
+  it("sanitizeProgramMode maps legacy priorities to preset", () => {
+    expect(sanitizeProgramMode("priorities")).toBe("preset");
+    expect(sanitizeProgramMode("preset")).toBe("preset");
+    expect(sanitizeProgramMode(undefined)).toBe("preset");
+  });
+
   it("suggestLayoutFromCatalog derives groups per day", () => {
     const layout = suggestLayoutFromCatalog();
     const mon = getCatalogPlanForDay(1);

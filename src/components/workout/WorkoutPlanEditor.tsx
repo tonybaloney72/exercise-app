@@ -250,7 +250,7 @@ export default function WorkoutPlanEditor({
 
   const removeRound = (roundIndex: number) => {
     setDraft((prev) => {
-      if (prev.rounds.length <= 1) return prev;
+      if (prev.rounds.length === 0) return prev;
       const next = prev.rounds.filter((_, ri) => ri !== roundIndex);
       return { ...prev, rounds: renumberRounds(next) };
     });
@@ -368,6 +368,16 @@ export default function WorkoutPlanEditor({
         </button>
       </div>
 
+      {draft.rounds.length === 0 ? (
+        <SurfaceCard className="px-4 py-3">
+          <p className="text-sm text-muted leading-snug">
+            No strength rounds scheduled. Use{" "}
+            <span className="font-medium text-foreground">Add round</span> to
+            plan exercises, or add stretches and cardio below.
+          </p>
+        </SurfaceCard>
+      ) : null}
+
       {draft.rounds.map((round, roundIndex) => (
         <CollapsibleSection
           key={round.roundNumber}
@@ -384,7 +394,7 @@ export default function WorkoutPlanEditor({
             <div className="flex w-full items-center justify-between gap-3">
               <button
                 type="button"
-                disabled={draft.rounds.length <= 1 || saving}
+                disabled={saving}
                 onClick={() => removeRound(roundIndex)}
                 className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-40"
               >

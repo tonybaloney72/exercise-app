@@ -18,7 +18,7 @@ export function useDayPlan(dateKey: string): {
   const equipmentKey = useSettingsStore((s) => s.availableEquipment.join(","));
   const programProfileKey = useSettingsStore(
     (s) =>
-      `${s.programMode}:${s.trainingPriorityPreset}:${s.trainingPriorityCustomized}:${JSON.stringify(s.trainingPriorityScores)}:${JSON.stringify(s.weeklyCategoryLayout)}:${s.weeklyCategoryLayoutCustomized}:${s.roundDensity}`,
+      `${s.programMode}:${s.trainingPriorityPreset}:${s.trainingPriorityCustomized}:${JSON.stringify(s.trainingPriorityScores)}:${JSON.stringify(s.weeklyCategoryLayout)}:${s.weeklyCategoryLayoutCustomized}:${s.roundDensity}:${JSON.stringify(s.weeklyPplSchedule)}:${s.weeklyPplScheduleCustomized}:${JSON.stringify(s.weeklyRestDays)}:${s.weeklyRestDaysCustomized}`,
   );
   const stretchDefaultsKey = useSettingsStore((s) =>
     [...s.defaultWarmUp, ...s.defaultCoolDown]

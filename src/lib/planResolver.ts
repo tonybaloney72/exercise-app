@@ -1,4 +1,4 @@
-import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
+import { buildWeekSeedFromSettings } from "@/lib/weekSeed";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   collectDislikedIds,
@@ -16,6 +16,7 @@ import {
   regenDayIndicesForPrefsChange,
 } from "@/lib/trainingWeekRegen";
 import { sanitizeProgramMode } from "@/lib/weeklyCategoryLayout";
+import { stripPhantomRestDayRounds } from "@/lib/restDays";
 import { isPrescribedPlanFrozenForDate } from "@/lib/workoutSessionGuard";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import {
@@ -67,6 +68,15 @@ function repoModeForPlans(mode: AuthMode): AuthMode {
   return mode === "authenticated" ? "authenticated" : "guest";
 }
 
+function normalizeWeekDays(days: TrainingWeekDays): TrainingWeekDays {
+  const out: TrainingWeekDays = {};
+  for (let dow = 0; dow < 7; dow++) {
+    const day = days[dow];
+    if (day) out[dow] = stripPhantomRestDayRounds(day);
+  }
+  return out;
+}
+
 async function loadGeneratorInputs(mode: AuthMode): Promise<{
   prefs: ExercisePreferenceMap;
   settings: UserSettings;
@@ -99,7 +109,7 @@ function programProfileFromSettings(settings: UserSettings) {
   return buildProgramProfileInputFromSettings(settings);
 }
 
-function materializeWeekFromCatalog(
+function materializeWeekFromSeed(
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
   trainingPriorityPreset: TrainingPriorityPreset,
@@ -110,7 +120,7 @@ function materializeWeekFromCatalog(
   settings: UserSettings,
 ): TrainingWeekDays {
   return materializeTrainingWeek(
-    buildCatalogWeek(),
+    buildWeekSeedFromSettings(settings),
     prefs,
     availableEquipment,
     trainingPriorityPreset,
@@ -160,7 +170,7 @@ async function refreshPersistedWeek(
   const isCustomProgram = programMode === "custom";
 
   const profile = programProfileFromSettings(settings);
-  const materialized = materializeWeekFromCatalog(
+  const materialized = materializeWeekFromSeed(
     prefs,
     availableEquipment,
     trainingPriorityPreset,
@@ -252,7 +262,7 @@ export async function refreshCustomWeekSchedule(
   }
 
   const profile = programProfileFromSettings(settings);
-  const shells = materializeWeekFromCatalog(
+  const shells = materializeWeekFromSeed(
     prefs,
     availableEquipment,
     trainingPriorityPreset,
@@ -293,7 +303,7 @@ async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays
     exerciseSettings,
   } = await loadGeneratorInputs(mode);
   const scope = mode === "authenticated" ? "authenticated" : "guest";
-  return materializeWeekFromCatalog(
+  return materializeWeekFromSeed(
     prefs,
     availableEquipment,
     trainingPriorityPreset,
@@ -367,9 +377,9 @@ export async function resolveTrainingWeekForAuth(
     throw new Error("Invalid date key");
   }
   if (mode !== "authenticated") {
-    return resolveMaterializedWeek(mode);
+    return normalizeWeekDays(await resolveMaterializedWeek(mode));
   }
-  return loadOrSeedPersistedWeek(anchor.weekKey);
+  return normalizeWeekDays(await loadOrSeedPersistedWeek(anchor.weekKey));
 }
 
 /**
@@ -390,5 +400,5 @@ export async function resolveDayPlanForAuth(
   if (!plan) {
     throw new Error(`No plan for dayOfWeek ${dow}`);
   }
-  return plan;
+  return stripPhantomRestDayRounds(plan);
 }

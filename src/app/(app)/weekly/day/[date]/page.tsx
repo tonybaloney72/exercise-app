@@ -12,6 +12,7 @@ import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
 import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
+import { isFullRestDay, isOptionalRestDay, REST_DAY_DESCRIPTIONS } from "@/lib/restDays";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import {
@@ -182,10 +183,11 @@ export default function WeeklyDayPage() {
 
   const showCustomizeSlot =
     !!planKey &&
+    !!plan &&
     !logForDay &&
-    when !== "future" &&
     !continueWorkoutHere &&
-    !editingCompletedHere;
+    !editingCompletedHere &&
+    (when !== "future" || isOptionalRestDay(plan));
 
   if (!parsed) {
     return (
@@ -307,6 +309,18 @@ export default function WeeklyDayPage() {
           </span>
         )}
       </div>
+
+      {isOptionalRestDay(plan) && !showPlanEditor && !customizing && (
+        <SurfaceCard className="px-4 py-3">
+          <p className="text-sm text-muted leading-snug">
+            {isFullRestDay(plan)
+              ? REST_DAY_DESCRIPTIONS.full_rest
+              : REST_DAY_DESCRIPTIONS.stretches}{" "}
+            Use <span className="font-medium text-foreground">Edit workout</span>{" "}
+            to add optional exercises, stretches, or cardio.
+          </p>
+        </SurfaceCard>
+      )}
 
       {canCustomize && showCustomizeSlot && !showPlanEditor && (
         <button

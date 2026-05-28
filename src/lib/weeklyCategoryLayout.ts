@@ -11,16 +11,19 @@ import type { DayPlan, ExerciseCategory } from "@/types";
 /** Sun (0) … Sat (6) → enabled emphasis groups that day. */
 export type WeeklyCategoryLayout = Record<number, EmphasisGroup[]>;
 
-export type ProgramMode = "priorities" | "layout" | "custom";
+export type ProgramMode = "preset" | "layout" | "custom";
+
+/** @deprecated Use {@link ProgramMode} `"preset"`. */
+export type LegacyProgramModePriorities = "priorities";
 
 export const PROGRAM_MODE_LABELS: Record<
   ProgramMode,
   { label: string; description: string }
 > = {
-  priorities: {
-    label: "Priorities",
+  preset: {
+    label: "6 Day P/P/L",
     description:
-      "Preset or custom scores tilt the mix within each catalog-themed day.",
+      "Push, pull, and legs on a fixed weekly calendar. Rounds 1–3 repeat the same exercises; cardio uses the endurance block (not strength rounds). Customize rest days below for a lighter week.",
   },
   layout: {
     label: "Weekly layout",
@@ -34,11 +37,13 @@ export const PROGRAM_MODE_LABELS: Record<
   },
 };
 
+/** Canonical mode id; accepts legacy DB value `priorities` until all rows are migrated. */
 export function sanitizeProgramMode(raw: unknown): ProgramMode {
-  if (raw === "layout" || raw === "custom" || raw === "priorities") {
+  if (raw === "priorities") return "preset";
+  if (raw === "preset" || raw === "layout" || raw === "custom") {
     return raw;
   }
-  return "priorities";
+  return "preset";
 }
 
 /** Groups implied by catalog `strengthFocus` / `coreGroups` / jog. */

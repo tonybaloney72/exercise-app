@@ -52,6 +52,9 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "SC-20": "SC-15",
   "SC-28": "SC-8",
   "HC-243": "SW-10",
+  // P3 — dedupe / consolidate (May 2026)
+  "PC-25": "PC-22",
+  "HC-137": "SC-23",
 };
 
 /** Ids that redirect to a canonical entry; excluded from generator / swap pools. */
@@ -88,6 +91,7 @@ export const REMOVED_HYBRID_EXERCISE_IDS = new Set<string>([
   "HC-292",
   "HC-295",
   "HC-243",
+  "HC-137",
 ]);
 
 /** Catalog stretch ids removed (workout id kept). */

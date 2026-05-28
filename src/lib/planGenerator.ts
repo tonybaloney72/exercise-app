@@ -33,7 +33,8 @@ import {
   type WeeklyCategoryLayout,
 } from "@/lib/weeklyCategoryLayout";
 import { PROGRESSION_FAMILIES_VERSION } from "@/lib/progressionFamilies";
-import { prepareCatalogWeekForUser } from "@/lib/weekPlanPreferences";
+import { pplTemplateFingerprint } from "@/lib/pplWeekTemplate";
+import { prepareWeekSeedForUser } from "@/lib/weekPlanPreferences";
 import type {
   DayPlan,
   ExerciseEquipment,
@@ -65,11 +66,13 @@ export function computePrefsFingerprint(
   defaultCoolDown: StretchEntry[] = [],
   trainingPriorityScores?: TrainingPriorityScores,
   trainingPriorityCustomized = false,
-  programMode: ProgramMode = "priorities",
+  programMode: ProgramMode = "preset",
   weeklyCategoryLayout?: WeeklyCategoryLayout,
   weeklyCategoryLayoutCustomized = false,
   weeklyRestDays?: UserSettings["weeklyRestDays"],
   weeklyRestDaysCustomized = false,
+  weeklyPplSchedule?: UserSettings["weeklyPplSchedule"],
+  weeklyPplScheduleCustomized = false,
   weeklyCardioByDay?: UserSettings["weeklyCardioByDay"],
   weeklyCardioCustomized = false,
   expertiseByGroup?: UserSettings["expertiseByGroup"],
@@ -100,12 +103,18 @@ export function computePrefsFingerprint(
         )
       : "wcl:default";
   const prioritySeg =
-    mode === "priorities"
-      ? trainingPriorityFingerprint(
+    mode === "preset"
+      ? `${pplTemplateFingerprint({
+          programMode: "preset",
+          weeklyPplSchedule,
+          weeklyPplScheduleCustomized,
+          weeklyRestDays,
+          weeklyRestDaysCustomized,
+        } as UserSettings)}|${trainingPriorityFingerprint(
           trainingPriorityPreset,
           scores,
           trainingPriorityCustomized,
-        )
+        )}`
       : "tp:layout";
   const restSeg = weeklyRestDaysCustomized
     ? `wrd:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${weeklyRestDays?.[d] ?? "workout"}`).join(",")}`
@@ -134,11 +143,13 @@ export function computePrefsFingerprintFromSettings(
     settings.defaultCoolDown,
     resolveTrainingPriorityScores(settings),
     settings.trainingPriorityCustomized ?? false,
-    settings.programMode ?? "priorities",
+    settings.programMode ?? "preset",
     settings.weeklyCategoryLayout,
     settings.weeklyCategoryLayoutCustomized ?? false,
     settings.weeklyRestDays,
     settings.weeklyRestDaysCustomized ?? false,
+    settings.weeklyPplSchedule,
+    settings.weeklyPplScheduleCustomized ?? false,
     settings.weeklyCardioByDay,
     settings.weeklyCardioCustomized ?? false,
     settings.expertiseByGroup,
@@ -283,7 +294,7 @@ export function materializeTrainingWeek(
     profileInput ??
     buildProgramProfileInput(trainingPriorityPreset);
   const seedWeek = userSettings
-    ? prepareCatalogWeekForUser(catalogWeek, userSettings, availableEquipment)
+    ? prepareWeekSeedForUser(catalogWeek, userSettings, availableEquipment)
     : catalogWeek;
   const profiled = applyProgramProfileToWeek(
     seedWeek,

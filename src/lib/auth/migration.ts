@@ -1,4 +1,13 @@
-import { clearLocalData, localExerciseSettingsRepo, localSettingsRepo, localWorkoutRepo } from "@/lib/repos/local";
+import {
+  clearLocalData,
+  localExerciseSettingsRepo,
+  localSettingsRepo,
+  localWorkoutRepo,
+} from "@/lib/repos/local";
+import {
+  hasLocalStoredSettings,
+  mergeMigratedSettings,
+} from "@/lib/auth/mergeMigratedSettings";
 import {
   supabaseExerciseSettingsRepo,
   supabaseSettingsRepo,
@@ -17,24 +26,28 @@ function flagKey(userId: string): string {
  * on this device, then clears local data. Idempotent: a per-user flag in
  * localStorage prevents this from running twice on the same device.
  *
- * Strategy is "local data wins by id" — uuid collisions are unrealistic,
- * so cloud data is preserved and local data is added. After this runs,
- * localStorage is reserved for guest mode only.
+ * Settings: only written when this profile has guest settings in localStorage.
+ * Cloud `equipment_onboarding_completed` is never downgraded by defaults.
  */
 export async function migrateLocalDataIfNeeded(userId: string): Promise<void> {
   if (typeof window === "undefined") return;
   if (localStorage.getItem(flagKey(userId)) === "1") return;
 
   try {
-    const [localHistory, localSettings, localExerciseSettings] =
-      await Promise.all([
-        localWorkoutRepo.loadHistory(),
-        localSettingsRepo.load(),
-        localExerciseSettingsRepo.loadAll(),
-      ]);
+    const [localHistory, localExerciseSettings] = await Promise.all([
+      localWorkoutRepo.loadHistory(),
+      localExerciseSettingsRepo.loadAll(),
+    ]);
 
-    // Always upsert settings (defaults are harmless if the user never customized).
-    await supabaseSettingsRepo.save(localSettings);
+    if (hasLocalStoredSettings()) {
+      const [cloudSettings, localSettings] = await Promise.all([
+        supabaseSettingsRepo.load(),
+        localSettingsRepo.load(),
+      ]);
+      await supabaseSettingsRepo.save(
+        mergeMigratedSettings(cloudSettings, localSettings),
+      );
+    }
 
     for (const [exerciseId, values] of Object.entries(localExerciseSettings)) {
       try {
@@ -53,7 +66,6 @@ export async function migrateLocalDataIfNeeded(userId: string): Promise<void> {
         await supabaseWorkoutRepo.saveWorkout(hydrateWorkoutLog(log));
       } catch (err) {
         console.error("[migrateLocalDataIfNeeded] failed to save workout", log.id, err);
-        // Keep going — partial migration is better than aborting halfway.
       }
     }
 
@@ -61,6 +73,5 @@ export async function migrateLocalDataIfNeeded(userId: string): Promise<void> {
     localStorage.setItem(flagKey(userId), "1");
   } catch (err) {
     console.error("[migrateLocalDataIfNeeded] aborted", err);
-    // Don't set the flag — try again next session.
   }
 }

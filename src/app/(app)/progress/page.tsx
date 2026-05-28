@@ -38,7 +38,9 @@ function isRotatingCardioSlot(
 }
 import Link from "next/link";
 import EmptyState from "@/components/common/EmptyState";
-import SurfaceCard, { surfaceCardClassName } from "@/components/common/SurfaceCard";
+import SurfaceCard, {
+  surfaceCardClassName,
+} from "@/components/common/SurfaceCard";
 import { ProgressHistoryLink } from "@/components/progress/ProgressSubnavLink";
 import {
   formatWorkoutHistoryDayLabel,
@@ -91,7 +93,9 @@ export default function ProgressPage() {
     let currentStreak = 0;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const sortedDates = [...new Set(completedHistory.map((w) => w.date))].sort().reverse();
+    const sortedDates = [...new Set(completedHistory.map((w) => w.date))]
+      .sort()
+      .reverse();
 
     for (let i = 0; i < sortedDates.length; i++) {
       const expected = new Date(today);
@@ -112,14 +116,18 @@ export default function ProgressPage() {
 
   const statCards = useMemo(() => {
     const base = [
-      { label: "Total Workouts", value: String(stats.totalWorkouts), icon: "💪" },
+      {
+        label: "Total Workouts",
+        value: String(stats.totalWorkouts),
+        icon: "💪",
+      },
       {
         label: "Current Streak",
         value: `${stats.currentStreak} day${stats.currentStreak !== 1 ? "s" : ""}`,
         icon: "🔥",
       },
       {
-        label: `Completed / planned (so far) · ${stats.weekPlan.spanShort}`,
+        label: `Completed / planned`,
         value: `${stats.weekPlan.completed} / ${stats.weekPlan.planned}`,
         icon: "✅",
       },
@@ -183,7 +191,9 @@ export default function ProgressPage() {
               <p className="mt-2 text-xl font-bold tabular-nums text-foreground">
                 {card.value}
               </p>
-              <p className="text-[11px] leading-snug text-muted">{card.label}</p>
+              <p className="text-[11px] leading-snug text-muted">
+                {card.label}
+              </p>
             </motion.div>
           ),
         )}
