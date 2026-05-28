@@ -32,8 +32,12 @@ import {
 } from "@/lib/trainingPriorities";
 import {
   categoriesForDayLayout,
+  layoutGroupForCategory,
+  layoutGroupsForDay,
   resolveWeeklyCategoryLayout,
+  type LayoutGroup,
   type WeeklyCategoryLayout,
+  LAYOUT_GROUP_TO_CATEGORY,
 } from "@/lib/weeklyCategoryLayout";
 
 export type ProgramProfileInput = {
@@ -195,6 +199,50 @@ function expandedCategoryPool(
   return out;
 }
 
+function layoutGroupsForProfileDay(
+  plan: DayPlan,
+  profile: ProgramProfileInput,
+): LayoutGroup[] {
+  if (!profile.layoutMode || !profile.weeklyCategoryLayout) return [];
+  const groups = profile.weeklyCategoryLayout[plan.dayOfWeek] ?? [];
+  return layoutGroupsForDay(plan, groups);
+}
+
+function pickCategoryToAddForLayout(
+  current: RoundExercise[],
+  plan: DayPlan,
+  profile: ProgramProfileInput,
+  pool: ExerciseCategory[],
+  roundNumber: number,
+): ExerciseCategory | null {
+  const enabledGroups = layoutGroupsForProfileDay(plan, profile);
+  if (enabledGroups.length === 0 || pool.length === 0) return null;
+
+  const groupCounts = new Map<LayoutGroup, number>();
+  for (const s of current) {
+    const lg = layoutGroupForCategory(s.category);
+    if (lg) groupCounts.set(lg, (groupCounts.get(lg) ?? 0) + 1);
+  }
+
+  const roundOffset = (roundNumber - 1) % enabledGroups.length;
+  const rotatedGroups = [
+    ...enabledGroups.slice(roundOffset),
+    ...enabledGroups.slice(0, roundOffset),
+  ];
+  const rankedGroups = [...rotatedGroups].sort((a, b) => {
+    const ca = groupCounts.get(a) ?? 0;
+    const cb = groupCounts.get(b) ?? 0;
+    if (ca !== cb) return ca - cb;
+    return rotatedGroups.indexOf(a) - rotatedGroups.indexOf(b);
+  });
+
+  for (const group of rankedGroups) {
+    const cat = LAYOUT_GROUP_TO_CATEGORY[group];
+    if (pool.includes(cat)) return cat;
+  }
+  return pool[0] ?? null;
+}
+
 function pickCategoryToAdd(
   current: RoundExercise[],
   plan: DayPlan,
@@ -206,6 +254,17 @@ function pickCategoryToAdd(
     (cat) => categoryPriorityScore(cat, weights) > 0,
   );
   if (pool.length === 0) return null;
+
+  if (profile.layoutMode) {
+    return pickCategoryToAddForLayout(
+      current,
+      plan,
+      profile,
+      pool,
+      roundNumber,
+    );
+  }
+
   const roundOffset = (roundNumber - 1) % Math.max(1, pool.length);
   const rotated = [...pool.slice(roundOffset), ...pool.slice(0, roundOffset)];
   const counts = new Map<ExerciseCategory, number>();

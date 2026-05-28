@@ -1,15 +1,80 @@
+import { CATEGORIES } from "@/data/categories";
 import { planHasJog } from "@/lib/cardioActivities";
 import { TRAINING_WEEK_CATALOG } from "@/data/trainingWeekCatalog";
-import {
-  EMPHASIS_GROUP_ORDER,
-  GROUP_TO_CATEGORIES,
-  emphasisGroupForCategory,
-  type EmphasisGroup,
-} from "@/lib/trainingPriorities";
 import type { DayPlan, ExerciseCategory } from "@/types";
 
-/** Sun (0) … Sat (6) → enabled emphasis groups that day. */
-export type WeeklyCategoryLayout = Record<number, EmphasisGroup[]>;
+/** Per-day allowlist for Weekly layout mode (finer than training-priority `EmphasisGroup`). */
+export type LayoutGroup =
+  | "core_front"
+  | "core_lower"
+  | "core_rotational"
+  | "core_stability"
+  | "cardio"
+  | "lower"
+  | "upper_push"
+  | "upper_pull";
+
+export const LAYOUT_GROUP_ORDER: LayoutGroup[] = [
+  "core_front",
+  "core_lower",
+  "core_rotational",
+  "core_stability",
+  "cardio",
+  "lower",
+  "upper_push",
+  "upper_pull",
+];
+
+export const LAYOUT_GROUP_LABELS: Record<LayoutGroup, string> = {
+  core_front: CATEGORIES.CF.shortName,
+  core_lower: CATEGORIES.CL.shortName,
+  core_rotational: CATEGORIES.CR.shortName,
+  core_stability: CATEGORIES.CS.shortName,
+  cardio: "Cardio",
+  lower: "Lower",
+  upper_push: "Push",
+  upper_pull: "Pull",
+};
+
+export const LAYOUT_GROUP_TO_CATEGORY: Record<LayoutGroup, ExerciseCategory> = {
+  core_front: "CF",
+  core_lower: "CL",
+  core_rotational: "CR",
+  core_stability: "CS",
+  cardio: "PC",
+  lower: "LB",
+  upper_push: "UP",
+  upper_pull: "UPL",
+};
+
+const CATEGORY_TO_LAYOUT_GROUP: Partial<Record<ExerciseCategory, LayoutGroup>> = {
+  CF: "core_front",
+  CL: "core_lower",
+  CR: "core_rotational",
+  CS: "core_stability",
+  PC: "cardio",
+  LB: "lower",
+  UP: "upper_push",
+  UPL: "upper_pull",
+};
+
+const CORE_LAYOUT_GROUPS: LayoutGroup[] = [
+  "core_front",
+  "core_lower",
+  "core_rotational",
+  "core_stability",
+];
+
+const LEGACY_EMPHASIS_GROUPS = new Set([
+  "core",
+  "cardio",
+  "lower",
+  "upper_push",
+  "upper_pull",
+]);
+
+/** Sun (0) … Sat (6) → enabled layout groups that day. */
+export type WeeklyCategoryLayout = Record<number, LayoutGroup[]>;
 
 export type ProgramMode = "preset" | "layout" | "custom";
 
@@ -46,11 +111,17 @@ export function sanitizeProgramMode(raw: unknown): ProgramMode {
   return "preset";
 }
 
+export function layoutGroupForCategory(
+  category: ExerciseCategory,
+): LayoutGroup | null {
+  return CATEGORY_TO_LAYOUT_GROUP[category] ?? null;
+}
+
 /** Groups implied by catalog `strengthFocus` / `coreGroups` / jog. */
-export function groupsForCatalogDay(plan: DayPlan): EmphasisGroup[] {
-  const found = new Set<EmphasisGroup>();
+export function groupsForCatalogDay(plan: DayPlan): LayoutGroup[] {
+  const found = new Set<LayoutGroup>();
   for (const cat of [...plan.strengthFocus, ...plan.coreGroups]) {
-    const group = emphasisGroupForCategory(cat);
+    const group = layoutGroupForCategory(cat);
     if (group) found.add(group);
   }
   const hasPc =
@@ -59,7 +130,7 @@ export function groupsForCatalogDay(plan: DayPlan): EmphasisGroup[] {
     plan.strengthFocus.includes("PC") ||
     plan.coreGroups.includes("PC");
   if (hasPc) found.add("cardio");
-  return EMPHASIS_GROUP_ORDER.filter((g) => found.has(g));
+  return LAYOUT_GROUP_ORDER.filter((g) => found.has(g));
 }
 
 export function suggestLayoutFromCatalog(): WeeklyCategoryLayout {
@@ -68,6 +139,29 @@ export function suggestLayoutFromCatalog(): WeeklyCategoryLayout {
     out[plan.dayOfWeek] = groupsForCatalogDay(plan);
   }
   return out;
+}
+
+function coreLayoutGroupsForCatalogDay(dayOfWeek: number): LayoutGroup[] {
+  const plan = TRAINING_WEEK_CATALOG.find((d) => d.dayOfWeek === dayOfWeek);
+  if (!plan) return [...CORE_LAYOUT_GROUPS];
+  return groupsForCatalogDay(plan).filter((g) => CORE_LAYOUT_GROUPS.includes(g));
+}
+
+function normalizeLayoutGroupToken(
+  item: string,
+  dayOfWeek: number,
+): LayoutGroup[] {
+  if ((LAYOUT_GROUP_ORDER as string[]).includes(item)) {
+    return [item as LayoutGroup];
+  }
+  if (item === "core") {
+    const fromCatalog = coreLayoutGroupsForCatalogDay(dayOfWeek);
+    return fromCatalog.length > 0 ? fromCatalog : [...CORE_LAYOUT_GROUPS];
+  }
+  if (LEGACY_EMPHASIS_GROUPS.has(item) && item !== "core") {
+    return [item as LayoutGroup];
+  }
+  return [];
 }
 
 export function sanitizeWeeklyCategoryLayout(
@@ -82,14 +176,11 @@ export function sanitizeWeeklyCategoryLayout(
       out[dow] = [...(fallback[dow] ?? [])];
       continue;
     }
-    const groups: EmphasisGroup[] = [];
+    const groups: LayoutGroup[] = [];
     for (const item of dayRaw) {
-      if (
-        typeof item === "string" &&
-        (EMPHASIS_GROUP_ORDER as string[]).includes(item) &&
-        !groups.includes(item as EmphasisGroup)
-      ) {
-        groups.push(item as EmphasisGroup);
+      if (typeof item !== "string") continue;
+      for (const g of normalizeLayoutGroupToken(item, dow)) {
+        if (!groups.includes(g)) groups.push(g);
       }
     }
     out[dow] = groups;
@@ -114,25 +205,36 @@ export function resolveWeeklyCategoryLayout(settings: {
   weeklyCategoryLayoutCustomized?: boolean;
 }): WeeklyCategoryLayout {
   if (settings.weeklyCategoryLayoutCustomized && settings.weeklyCategoryLayout) {
-    return settings.weeklyCategoryLayout;
+    return sanitizeWeeklyCategoryLayout(settings.weeklyCategoryLayout);
   }
   return suggestLayoutFromCatalog();
 }
 
-/** Map enabled groups for a day to exercise categories (respects jog only when cardio on). */
+/** Map enabled layout groups for a day to exercise categories (respects jog only when cardio on). */
 export function categoriesForDayLayout(
   plan: DayPlan,
-  groups: EmphasisGroup[],
+  groups: LayoutGroup[],
 ): ExerciseCategory[] {
   if (groups.length === 0) return [];
   const out: ExerciseCategory[] = [];
   for (const group of groups) {
-    for (const cat of GROUP_TO_CATEGORIES[group]) {
-      if (cat === "PC" && !planHasJog(plan) && group === "cardio") continue;
-      if (!out.includes(cat)) out.push(cat);
-    }
+    const cat = LAYOUT_GROUP_TO_CATEGORY[group];
+    if (cat === "PC" && !planHasJog(plan) && group === "cardio") continue;
+    if (!out.includes(cat)) out.push(cat);
   }
   return out;
+}
+
+/** Layout groups enabled for a day (for equal-weight round fill). */
+export function layoutGroupsForDay(
+  plan: DayPlan,
+  groups: LayoutGroup[],
+): LayoutGroup[] {
+  if (groups.length === 0) return [];
+  return groups.filter((group) => {
+    if (group === "cardio" && !planHasJog(plan)) return false;
+    return true;
+  });
 }
 
 export function weeklyCategoryLayoutFingerprint(
@@ -147,18 +249,7 @@ export function weeklyCategoryLayoutFingerprint(
   return `wcl:${seg}`;
 }
 
-export function describeDayLayout(groups: EmphasisGroup[]): string {
+export function describeDayLayout(groups: LayoutGroup[]): string {
   if (groups.length === 0) return "Rest — no generated exercises";
-  return groups
-    .map((g) => {
-      const labels: Record<EmphasisGroup, string> = {
-        core: "Core",
-        cardio: "Cardio",
-        lower: "Lower",
-        upper_push: "Push",
-        upper_pull: "Pull",
-      };
-      return labels[g];
-    })
-    .join(" · ");
+  return groups.map((g) => LAYOUT_GROUP_LABELS[g]).join(" · ");
 }

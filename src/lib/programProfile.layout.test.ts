@@ -55,4 +55,34 @@ describe("programProfile layout mode", () => {
       expect(["UP", "UPL"]).toContain(c);
     }
   });
+
+  it("respects core subdivisions without pulling all four core categories", () => {
+    const mon = getCatalogPlanForDay(1);
+    const layout: WeeklyCategoryLayout = {
+      1: ["upper_push", "core_front"],
+    };
+    const profile = buildProgramProfileInput("balanced", undefined, false, {
+      layoutMode: true,
+      weeklyCategoryLayout: layout,
+    });
+    const out = applyProgramProfileToDayPlan(
+      mon,
+      "balanced",
+      "standard",
+      [...DEFAULT_AVAILABLE_EQUIPMENT],
+      EMPTY_PREFS,
+      undefined,
+      "layout-core-sub",
+      profile,
+    );
+    const cats = new Set(
+      out.rounds.flatMap((r) => r.exercises.map((e) => e.category)),
+    );
+    for (const c of cats) {
+      expect(["UP", "CF"]).toContain(c);
+    }
+    expect(cats.has("CL")).toBe(false);
+    expect(cats.has("CR")).toBe(false);
+    expect(cats.has("CS")).toBe(false);
+  });
 });
