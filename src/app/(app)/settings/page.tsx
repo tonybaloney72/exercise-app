@@ -371,11 +371,18 @@ export default function SettingsPage() {
 
             {settings.programMode === "custom" &&
             settings.customBuildStyle === "guided" ? (
-              <p className="text-xs text-muted leading-snug rounded-lg border border-border bg-surface-hover/40 px-3 py-2">
-                Guided week uses your saved blueprint to generate exercises.
-                The step-by-step week editor is coming soon — for now, switch to
-                manual or adjust PPL if you need full control today.
-              </p>
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/weekly/build-guided"
+                  className="w-full rounded-xl bg-accent py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+                >
+                  Plan guided week
+                </Link>
+                <p className="text-xs text-muted leading-snug">
+                  Walk through Sun–Sat: day type, rounds, groups per round, and
+                  optional cardio. We generate exercises from your plan.
+                </p>
+              </div>
             ) : null}
 
             {settings.programMode === "preset" ? (

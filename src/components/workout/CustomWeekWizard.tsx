@@ -17,6 +17,7 @@ import { toastSaveError } from "@/utils/saveErrorToast";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
 import type { DayPlan } from "@/types";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { getWeekDateKeys } from "@/utils/weekCalendar";
@@ -35,6 +36,7 @@ export default function CustomWeekWizard() {
   const router = useRouter();
   const mode = useAuthStore((s) => s.mode);
   const programMode = useSettingsStore((s) => s.programMode);
+  const customBuildStyle = useSettingsStore((s) => s.customBuildStyle);
   const hydrated = useSettingsStore((s) => s.hydrated);
 
   const weekDateKeys = useMemo(() => getWeekDateKeys(), []);
@@ -70,8 +72,14 @@ export default function CustomWeekWizard() {
     }
     if (programMode !== "custom") {
       router.replace("/settings");
+      return;
     }
-  }, [hydrated, mode, programMode, router]);
+    if (
+      isGuidedCustomSettings({ programMode, customBuildStyle })
+    ) {
+      router.replace("/weekly/build-guided");
+    }
+  }, [customBuildStyle, hydrated, mode, programMode, router]);
 
   const plan = localWeek?.[activeDow] ?? null;
   const dateKey = weekDateKeys[activeDow] ?? "";

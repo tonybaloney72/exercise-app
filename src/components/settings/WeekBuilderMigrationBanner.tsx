@@ -20,7 +20,7 @@ export default function WeekBuilderMigrationBanner({ onDismiss }: Props) {
           <strong className="text-foreground">PPL</strong> or{" "}
           <strong className="text-foreground">Custom</strong> (guided or manual).
           If you used Weekly layout, your week was converted to a guided blueprint
-          — the full week editor arrives in a later update.
+          — open the guided week planner to review and save.
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
