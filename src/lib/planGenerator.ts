@@ -25,17 +25,13 @@ import {
   trainingPriorityFingerprint,
   type TrainingPriorityScores,
 } from "@/lib/trainingPriorities";
+import { sanitizeProgramMode, type ProgramMode } from "@/lib/weeklyCategoryLayout";
 import {
-  resolveWeeklyCategoryLayout,
-  sanitizeProgramMode,
-  weeklyCategoryLayoutFingerprint,
-  type ProgramMode,
-  type WeeklyCategoryLayout,
-} from "@/lib/weeklyCategoryLayout";
-import {
-  sanitizeWeeklyLayoutDayStructure,
-  weeklyLayoutDayStructureFingerprint,
-} from "@/lib/weeklyLayoutDayStructure";
+  resolveWeekBlueprint,
+  weeklyBlueprintFingerprint,
+  type CustomBuildStyle,
+  type WeekBlueprint,
+} from "@/lib/weekBlueprint";
 import { PROGRESSION_FAMILIES_VERSION } from "@/lib/progressionFamilies";
 import { pplTemplateFingerprint } from "@/lib/pplWeekTemplate";
 import { prepareWeekSeedForUser } from "@/lib/weekPlanPreferences";
@@ -71,10 +67,9 @@ export function computePrefsFingerprint(
   trainingPriorityScores?: TrainingPriorityScores,
   trainingPriorityCustomized = false,
   programMode: ProgramMode = "preset",
-  weeklyCategoryLayout?: WeeklyCategoryLayout,
-  weeklyCategoryLayoutCustomized = false,
-  weeklyLayoutDayStructure?: UserSettings["weeklyLayoutDayStructure"],
-  weeklyLayoutDayStructureCustomized = false,
+  customBuildStyle: CustomBuildStyle = "manual",
+  weekBlueprint?: WeekBlueprint,
+  weekBlueprintCustomized = false,
   weeklyRestDays?: UserSettings["weeklyRestDays"],
   weeklyRestDaysCustomized = false,
   weeklyPplSchedule?: UserSettings["weeklyPplSchedule"],
@@ -98,22 +93,16 @@ export function computePrefsFingerprint(
     trainingPriorityScores ??
     resolveTrainingPriorityScores({ trainingPriorityPreset });
   const mode = sanitizeProgramMode(programMode);
-  const resolvedLayout =
-    weeklyCategoryLayout ??
-    resolveWeeklyCategoryLayout({
-      weeklyCategoryLayout,
-      weeklyCategoryLayoutCustomized,
-    });
-  const layoutSeg =
-    mode === "layout"
-      ? `${weeklyCategoryLayoutFingerprint(resolvedLayout)}|${weeklyLayoutDayStructureFingerprint(
-          sanitizeWeeklyLayoutDayStructure(
-            weeklyLayoutDayStructure,
-            resolvedLayout,
-          ),
-          resolvedLayout,
-        )}`
-      : "wcl:default";
+  const resolvedBlueprint = resolveWeekBlueprint({
+    weekBlueprint,
+    weekBlueprintCustomized,
+  });
+  const blueprintSeg =
+    mode === "custom" && customBuildStyle === "guided"
+      ? weeklyBlueprintFingerprint(resolvedBlueprint)
+      : mode === "custom"
+        ? "wbp:manual"
+        : "wbp:off";
   const prioritySeg =
     mode === "preset"
       ? `${pplTemplateFingerprint({
@@ -127,18 +116,18 @@ export function computePrefsFingerprint(
           scores,
           trainingPriorityCustomized,
         )}`
-      : "tp:layout";
+      : "tp:custom";
   const restSeg =
-    mode === "layout"
-      ? "wrd:layout"
-      : mode === "custom"
-        ? "wrd:custom"
-        : weeklyRestDaysCustomized
-          ? `wrd:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${weeklyRestDays?.[d] ?? "workout"}`).join(",")}`
-          : "wrd:default";
+    mode === "custom"
+      ? "wrd:custom"
+      : weeklyRestDaysCustomized
+        ? `wrd:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${weeklyRestDays?.[d] ?? "workout"}`).join(",")}`
+        : "wrd:default";
   const cardioSeg =
     mode === "custom"
-      ? "wc:custom"
+      ? customBuildStyle === "guided"
+        ? "wc:guided"
+        : "wc:custom"
       : weeklyCardioCustomized
         ? `wc:${[0, 1, 2, 3, 4, 5, 6].map((d) => `${d}:${(weeklyCardioByDay?.[d] ?? []).join("+") || "-"}`).join(",")}`
         : "wc:default";
@@ -147,7 +136,7 @@ export function computePrefsFingerprint(
   )}`;
   const progressionSeg = `pf:${PROGRESSION_FAMILIES_VERSION}`;
   const progressionFilterSeg = `pff:${progressionFamiliesEnabled ? 1 : 0}`;
-  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pm:${mode}|${prioritySeg}|${layoutSeg}|rd:${roundDensity}|${restSeg}|${cardioSeg}|${expertiseSeg}|${progressionSeg}|${progressionFilterSeg}|${stretches}`;
+  return `d:${disliked.join(",")}|fv:${favorites.join(",")}|e:${equip.join(",")}|pm:${mode}|cbs:${customBuildStyle}|${prioritySeg}|${blueprintSeg}|rd:${roundDensity}|${restSeg}|${cardioSeg}|${expertiseSeg}|${progressionSeg}|${progressionFilterSeg}|${stretches}`;
 }
 
 export function computePrefsFingerprintFromSettings(
@@ -164,10 +153,9 @@ export function computePrefsFingerprintFromSettings(
     resolveTrainingPriorityScores(settings),
     settings.trainingPriorityCustomized ?? false,
     settings.programMode ?? "preset",
-    settings.weeklyCategoryLayout,
-    settings.weeklyCategoryLayoutCustomized ?? false,
-    settings.weeklyLayoutDayStructure,
-    settings.weeklyLayoutDayStructureCustomized ?? false,
+    settings.customBuildStyle ?? "manual",
+    settings.weekBlueprint,
+    settings.weekBlueprintCustomized ?? false,
     settings.weeklyRestDays,
     settings.weeklyRestDaysCustomized ?? false,
     settings.weeklyPplSchedule,

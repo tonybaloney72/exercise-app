@@ -109,7 +109,11 @@ describe("buildGeneratedDayPlan", () => {
   });
 
   it("reflects program focus changes in round shaping (catalog seed)", () => {
-    const layoutSettings = { ...DEFAULT_SETTINGS, programMode: "layout" as const };
+    const layoutSettings = {
+      ...DEFAULT_SETTINGS,
+      programMode: "custom" as const,
+      customBuildStyle: "guided" as const,
+    };
     const minimal = buildGeneratedDayPlan(
       1,
       EMPTY_PREFS,

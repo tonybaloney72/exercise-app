@@ -18,12 +18,14 @@ import {
   sanitizePplWeeklyCardioByDayForSchedule,
 } from "@/lib/pplWeekSchedule";
 import ProgramModeSelector from "@/components/settings/ProgramModeSelector";
-import WeekModeOptionsPanel from "@/components/settings/WeekModeOptionsPanel";
+import CustomBuildStyleSelector from "@/components/settings/CustomBuildStyleSelector";
+import WeekBuilderMigrationBanner from "@/components/settings/WeekBuilderMigrationBanner";
 import ExpertiseByGroupEditor from "@/components/settings/ExpertiseByGroupEditor";
-import WeeklyCategoryLayoutEditor from "@/components/settings/WeeklyCategoryLayoutEditor";
 import PplWeekScheduleEditor from "@/components/settings/PplWeekScheduleEditor";
+import type { CustomBuildStyle } from "@/lib/weekBlueprint";
 import WeeklyCardioEditor from "@/components/settings/WeeklyCardioEditor";
 import type { ProgramMode } from "@/lib/weeklyCategoryLayout";
+import type { UserSettings } from "@/types";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { createClient } from "@/lib/supabase/client";
@@ -318,14 +320,41 @@ export default function SettingsPage() {
             defaultOpen={false}
             contentClassName="space-y-4 p-4"
           >
+            {!settings.weekBuilderMigrationAcknowledged ? (
+              <WeekBuilderMigrationBanner
+                onDismiss={() =>
+                  void settings.updateSettings({
+                    weekBuilderMigrationAcknowledged: true,
+                  })
+                }
+              />
+            ) : null}
+
             <ProgramModeSelector
               value={settings.programMode}
-              onChange={(programMode: ProgramMode) =>
-                void settings.updateSettings({ programMode })
-              }
+              onChange={(programMode: ProgramMode) => {
+                const patch: Partial<UserSettings> = { programMode };
+                if (
+                  programMode === "custom" &&
+                  settings.programMode !== "custom"
+                ) {
+                  patch.customBuildStyle = "guided";
+                }
+                void settings.updateSettings(patch);
+              }}
             />
 
-            {settings.programMode === "custom" && (
+            {settings.programMode === "custom" ? (
+              <CustomBuildStyleSelector
+                value={settings.customBuildStyle}
+                onChange={(customBuildStyle: CustomBuildStyle) =>
+                  void settings.updateSettings({ customBuildStyle })
+                }
+              />
+            ) : null}
+
+            {settings.programMode === "custom" &&
+            settings.customBuildStyle === "manual" ? (
               <div className="flex flex-col gap-2">
                 <Link
                   href="/weekly/build"
@@ -335,36 +364,19 @@ export default function SettingsPage() {
                 </Link>
                 <p className="text-xs text-muted leading-snug">
                   Or open <strong className="text-foreground">Weekly</strong>{" "}
-                  and customize individual days. Your week stays manual until
-                  you reset it or switch mode.
+                  and customize individual days.
                 </p>
               </div>
-            )}
+            ) : null}
 
-            {settings.programMode === "layout" && (
-              <CollapsibleSection
-                embedded
-                title="Groups per day"
-                hint="Turn groups on or off for each day."
-                defaultOpen={false}
-              >
-                <WeeklyCategoryLayoutEditor
-                  layout={settings.weeklyCategoryLayout}
-                  dayStructure={settings.weeklyLayoutDayStructure}
-                  onChange={(
-                    weeklyCategoryLayout,
-                    weeklyLayoutDayStructure,
-                  ) => {
-                    void settings.updateSettings({
-                      weeklyCategoryLayout,
-                      weeklyCategoryLayoutCustomized: true,
-                      weeklyLayoutDayStructure,
-                      weeklyLayoutDayStructureCustomized: true,
-                    });
-                  }}
-                />
-              </CollapsibleSection>
-            )}
+            {settings.programMode === "custom" &&
+            settings.customBuildStyle === "guided" ? (
+              <p className="text-xs text-muted leading-snug rounded-lg border border-border bg-surface-hover/40 px-3 py-2">
+                Guided week uses your saved blueprint to generate exercises.
+                The step-by-step week editor is coming soon — for now, switch to
+                manual or adjust PPL if you need full control today.
+              </p>
+            ) : null}
 
             {settings.programMode === "preset" ? (
               <CollapsibleSection

@@ -41,6 +41,9 @@ import {
   LAYOUT_GROUP_TO_CATEGORY,
 } from "@/lib/weeklyCategoryLayout";
 import type { WeeklyLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
+import { materializeBlueprintDayPlanFromSettings } from "@/lib/blueprintDayMaterializer";
+import type { WeekBlueprint } from "@/lib/weekBlueprint";
+import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
 
 export type ProgramProfileInput = {
   preset: TrainingPriorityPreset;
@@ -54,6 +57,9 @@ export type ProgramProfileInput = {
   customMode?: boolean;
   /** Preset mode: PPL day pools + round budgets; no cross-day category injection. */
   pplMode?: boolean;
+  /** Guided custom: week blueprint drives per-round materialization. */
+  blueprintMode?: boolean;
+  weekBlueprint?: WeekBlueprint;
 };
 
 export function buildProgramProfileInput(
@@ -66,6 +72,8 @@ export function buildProgramProfileInput(
     weeklyLayoutDayStructure?: WeeklyLayoutDayStructure;
     customMode?: boolean;
     pplMode?: boolean;
+    blueprintMode?: boolean;
+    weekBlueprint?: WeekBlueprint;
   },
 ): ProgramProfileInput {
   const resolved = scores ?? scoresFromPreset(preset);
@@ -78,22 +86,23 @@ export function buildProgramProfileInput(
     weeklyLayoutDayStructure: options?.weeklyLayoutDayStructure,
     customMode: options?.customMode,
     pplMode: options?.pplMode,
+    blueprintMode: options?.blueprintMode,
+    weekBlueprint: options?.weekBlueprint,
   };
 }
 
 export function buildProgramProfileInputFromSettings(
   settings: UserSettings,
 ): ProgramProfileInput {
+  if (isGuidedCustomSettings(settings)) {
+    return buildProgramProfileInput("balanced", scoresFromPreset("balanced"), false, {
+      blueprintMode: true,
+      weekBlueprint: settings.weekBlueprint,
+    });
+  }
   if (settings.programMode === "custom") {
     return buildProgramProfileInput("balanced", scoresFromPreset("balanced"), false, {
       customMode: true,
-    });
-  }
-  if (settings.programMode === "layout") {
-    return buildProgramProfileInput("balanced", scoresFromPreset("balanced"), false, {
-      layoutMode: true,
-      weeklyCategoryLayout: resolveWeeklyCategoryLayout(settings),
-      weeklyLayoutDayStructure: settings.weeklyLayoutDayStructure,
     });
   }
   const preset = settings.trainingPriorityPreset ?? "balanced";
@@ -171,7 +180,8 @@ export function isPplProgramProfile(profile: ProgramProfileInput): boolean {
   return (
     profile.pplMode === true &&
     !profile.layoutMode &&
-    !profile.customMode
+    !profile.customMode &&
+    !profile.blueprintMode
   );
 }
 
@@ -505,6 +515,20 @@ export function applyProgramProfileToDayPlan(
       favoriteIds,
       profile.weeklyCategoryLayout ?? {},
       profile.weeklyLayoutDayStructure,
+      exerciseSettings,
+      varietySeed,
+      expertiseFilter,
+    );
+  }
+
+  if (profile.blueprintMode && userSettings) {
+    return materializeBlueprintDayPlanFromSettings(
+      plan,
+      { ...userSettings, weekBlueprint: profile.weekBlueprint ?? userSettings.weekBlueprint },
+      density,
+      availableEquipment,
+      dislikedIds,
+      favoriteIds,
       exerciseSettings,
       varietySeed,
       expertiseFilter,

@@ -23,7 +23,6 @@ import {
 } from "@/lib/restDays";
 import {
   layoutEqual,
-  sanitizeProgramMode,
   sanitizeWeeklyCategoryLayout,
   suggestLayoutFromCatalog,
 } from "@/lib/weeklyCategoryLayout";
@@ -32,6 +31,17 @@ import {
   suggestWeeklyLayoutDayStructure,
   weeklyLayoutDayStructureEqual,
 } from "@/lib/weeklyLayoutDayStructure";
+import {
+  isLegacyLayoutProgramMode,
+  sanitizeProgramMode as sanitizeProgramModeFromLayout,
+} from "@/lib/weeklyCategoryLayout";
+import {
+  migrateLayoutToBlueprint,
+  sanitizeCustomBuildStyle,
+  sanitizeWeekBlueprint,
+  suggestWeekBlueprintFromCatalog,
+  weekBlueprintEqual,
+} from "@/lib/weekBlueprint";
 import {
   DEFAULT_EXPERTISE_BY_GROUP,
   sanitizeExpertiseByGroup,
@@ -69,7 +79,9 @@ export function normalizeUserSettings(
     scores = scoresFromPreset("balanced");
   }
 
-  const programMode = sanitizeProgramMode(partial.programMode);
+  const rawProgramMode = partial.programMode;
+  const migratingFromLayout = isLegacyLayoutProgramMode(rawProgramMode);
+  const programMode = sanitizeProgramModeFromLayout(rawProgramMode);
   const catalogLayout = suggestLayoutFromCatalog();
   const weeklyCategoryLayout = sanitizeWeeklyCategoryLayout(
     partial.weeklyCategoryLayout,
@@ -138,6 +150,41 @@ export function normalizeUserSettings(
     partial.progressionFamiliesEnabled ??
     DEFAULT_SETTINGS.progressionFamiliesEnabled;
 
+  const catalogBlueprint = suggestWeekBlueprintFromCatalog();
+  let weekBlueprint = sanitizeWeekBlueprint(
+    partial.weekBlueprint,
+    catalogBlueprint,
+  );
+  if (
+    migratingFromLayout &&
+    partial.weekBlueprint == null &&
+    !partial.weekBlueprintCustomized
+  ) {
+    weekBlueprint = migrateLayoutToBlueprint(
+      weeklyCategoryLayout,
+      weeklyLayoutDayStructure,
+      weeklyCardioByDay,
+    );
+  }
+  const weekBlueprintCustomized =
+    partial.weekBlueprintCustomized ??
+    (partial.weekBlueprint != null &&
+      !weekBlueprintEqual(weekBlueprint, catalogBlueprint));
+
+  let customBuildStyle = sanitizeCustomBuildStyle(
+    partial.customBuildStyle ??
+      (programMode === "custom" && !migratingFromLayout
+        ? "manual"
+        : "guided"),
+  );
+  if (migratingFromLayout && partial.customBuildStyle == null) {
+    customBuildStyle = "guided";
+  }
+
+  const weekBuilderMigrationAcknowledged =
+    partial.weekBuilderMigrationAcknowledged ??
+    DEFAULT_SETTINGS.weekBuilderMigrationAcknowledged;
+
   return {
     ...DEFAULT_SETTINGS,
     ...rest,
@@ -149,6 +196,10 @@ export function normalizeUserSettings(
     trainingPriorityScores: scores,
     trainingPriorityCustomized: customized,
     programMode,
+    customBuildStyle,
+    weekBlueprint,
+    weekBlueprintCustomized,
+    weekBuilderMigrationAcknowledged,
     weeklyCategoryLayout,
     weeklyCategoryLayoutCustomized,
     weeklyLayoutDayStructure,

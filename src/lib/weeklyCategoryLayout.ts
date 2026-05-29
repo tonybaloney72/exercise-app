@@ -77,10 +77,13 @@ const LEGACY_EMPHASIS_GROUPS = new Set([
 /** Sun (0) … Sat (6) → enabled layout groups that day. */
 export type WeeklyCategoryLayout = Record<number, LayoutGroup[]>;
 
-export type ProgramMode = "preset" | "layout" | "custom";
+export type ProgramMode = "preset" | "custom";
 
 /** @deprecated Use {@link ProgramMode} `"preset"`. */
 export type LegacyProgramModePriorities = "priorities";
+
+/** @deprecated Migrated to {@link ProgramMode} `"custom"` + guided blueprint. */
+export type LegacyProgramModeLayout = "layout";
 
 export const PROGRAM_MODE_LABELS: Record<
   ProgramMode,
@@ -91,25 +94,22 @@ export const PROGRAM_MODE_LABELS: Record<
     description:
       "Push, pull, and legs on a fixed weekly calendar. Rounds 1–3 repeat the same exercises; cardio uses the endurance block. Customize rest days below for a lighter week.",
   },
-  layout: {
-    label: "Weekly layout",
-    description:
-      "Choose which groups run each day; turn all groups off for a rest day. We pick exercises inside enabled groups.",
-  },
   custom: {
-    label: "Custom week",
+    label: "Custom",
     description:
-      "You build every day on Weekly — rounds, cardio, and rest are up to you on each day.",
+      "Guided: describe your week and we generate exercises. Manual: you pick every movement yourself.",
   },
 };
 
-/** Canonical mode id; accepts legacy DB value `priorities` until all rows are migrated. */
+/** Canonical mode id; accepts legacy DB values until all rows are migrated. */
 export function sanitizeProgramMode(raw: unknown): ProgramMode {
-  if (raw === "priorities") return "preset";
-  if (raw === "preset" || raw === "layout" || raw === "custom") {
-    return raw;
-  }
+  if (raw === "priorities" || raw === "preset") return "preset";
+  if (raw === "layout" || raw === "custom") return "custom";
   return "preset";
+}
+
+export function isLegacyLayoutProgramMode(raw: unknown): boolean {
+  return raw === "layout";
 }
 
 export function layoutGroupForCategory(

@@ -16,6 +16,10 @@ import { DEFAULT_WEEKLY_REST_DAYS } from "@/lib/restDays";
 import { suggestLayoutFromCatalog } from "@/lib/weeklyCategoryLayout";
 import { suggestWeeklyLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
 import {
+  suggestWeekBlueprintFromCatalog,
+  type CustomBuildStyle,
+} from "@/lib/weekBlueprint";
+import {
   GUEST_FALLBACK_COOL_DOWN,
   GUEST_FALLBACK_WARM_UP,
 } from "@/lib/stretchDefaults";
@@ -98,6 +102,10 @@ export const DEFAULT_SETTINGS: UserSettings = {
   trainingPriorityScores: scoresFromPreset("balanced"),
   trainingPriorityCustomized: false,
   programMode: "preset",
+  customBuildStyle: "manual" as CustomBuildStyle,
+  weekBlueprint: suggestWeekBlueprintFromCatalog(),
+  weekBlueprintCustomized: false,
+  weekBuilderMigrationAcknowledged: false,
   weeklyCategoryLayout: suggestLayoutFromCatalog(),
   weeklyCategoryLayoutCustomized: false,
   weeklyLayoutDayStructure: suggestWeeklyLayoutDayStructure(

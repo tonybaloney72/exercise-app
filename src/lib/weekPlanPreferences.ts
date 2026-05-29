@@ -12,6 +12,14 @@ import {
   suggestWeeklyCardioFromPplSchedule,
   weeklyPplScheduleEqual,
 } from "@/lib/pplWeekSchedule";
+import {
+  applyDayBlueprintMetadata,
+  resolveDayBlueprintForSettings,
+  sanitizeWeekBlueprint,
+  suggestWeekBlueprintFromCatalog,
+  weekBlueprintEqual,
+} from "@/lib/weekBlueprint";
+import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
 import { isPresetProgramMode } from "@/lib/weekSeed";
 import {
   applyRestDayToPlan,
@@ -51,6 +59,12 @@ export function prepareCatalogDayForUser(
   settings: UserSettings,
   availableEquipment: ExerciseEquipment[],
 ): DayPlan {
+  if (isGuidedCustomSettings(settings)) {
+    const day = resolveDayBlueprintForSettings(settings, plan.dayOfWeek);
+    return normalizeDayPlanCardio(
+      applyDayBlueprintMetadata(plan, day, availableEquipment),
+    );
+  }
   if (settings.programMode === "custom") {
     return normalizeDayPlanCardio({ ...plan, restDayMode: "workout" });
   }
@@ -83,6 +97,39 @@ export function prepareCatalogWeekForUser(
   availableEquipment: ExerciseEquipment[],
 ): TrainingWeekDays {
   return prepareWeekSeedForUser(catalogWeek, settings, availableEquipment);
+}
+
+export function weekBlueprintSettingsChanged(
+  partial: Partial<UserSettings>,
+  current: UserSettings,
+): boolean {
+  const nextMode = partial.programMode ?? current.programMode;
+  const nextStyle = partial.customBuildStyle ?? current.customBuildStyle;
+  const guidedRelevant =
+    (nextMode === "custom" && nextStyle === "guided") ||
+    isGuidedCustomSettings(current);
+  if (!guidedRelevant) return false;
+  if (partial.weekBlueprint != null) {
+    const next = sanitizeWeekBlueprint(partial.weekBlueprint);
+    const prev = sanitizeWeekBlueprint(
+      current.weekBlueprint,
+      suggestWeekBlueprintFromCatalog(),
+    );
+    if (!weekBlueprintEqual(next, prev)) return true;
+  }
+  if (
+    partial.weekBlueprintCustomized != null &&
+    partial.weekBlueprintCustomized !== current.weekBlueprintCustomized
+  ) {
+    return true;
+  }
+  if (
+    partial.customBuildStyle != null &&
+    partial.customBuildStyle !== current.customBuildStyle
+  ) {
+    return true;
+  }
+  return false;
 }
 
 export function weeklyCardioSettingsChanged(
@@ -134,10 +181,7 @@ export function weeklyRestSettingsChanged(
   current: UserSettings,
 ): boolean {
   if (weeklyPplScheduleSettingsChanged(partial, current)) return true;
-  if (
-    current.programMode === "custom" ||
-    current.programMode === "layout"
-  ) {
+  if (current.programMode === "custom") {
     return false;
   }
   if (partial.weeklyRestDays != null) {

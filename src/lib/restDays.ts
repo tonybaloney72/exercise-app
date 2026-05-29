@@ -90,7 +90,7 @@ export function resolveRestDayMode(
     const entry = schedule[dayOfWeek] ?? "full_rest";
     return pplScheduleToRestDayMode(entry);
   }
-  if (settings.programMode === "layout" || settings.programMode === "custom") {
+  if (settings.programMode === "custom") {
     return "workout";
   }
   if (settings.weeklyRestDaysCustomized && settings.weeklyRestDays) {

@@ -24,6 +24,7 @@ Or run each new migration manually in the Supabase Dashboard → **SQL Editor** 
 | `20260524120000_user_settings_weekly_ppl_schedule.sql` | Customizable 6-day P/P/L week schedule |
 | `20260525120000_user_settings_program_mode_preset.sql` | `program_mode` value `priorities` → `preset` |
 | `20260526120000_user_settings_weekly_layout_day_structure.sql` | Weekly layout per-day structure (blocks / repeat / mixed) |
+| `20260527120000_user_settings_week_blueprint.sql` | Week blueprint + custom build style (guided / manual); migration flag |
 
 If a column or RPC is missing, authenticated users may see failed saves or settings that do not persist.
 

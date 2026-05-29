@@ -250,6 +250,10 @@ import type {
   WeeklyCategoryLayout,
 } from "@/lib/weeklyCategoryLayout";
 import type { WeeklyLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
+import type {
+  CustomBuildStyle,
+  WeekBlueprint,
+} from "@/lib/weekBlueprint";
 
 /** Training priority preset (replaces legacy “program focus” naming in UI). */
 export type TrainingPriorityPreset =
@@ -296,9 +300,16 @@ export interface UserSettings {
   trainingPriorityScores: TrainingPriorityScores;
   /** True when scores differ from the selected preset template. */
   trainingPriorityCustomized: boolean;
-  /** How automated weeks are built: preset (6-day P/P/L), per-day layout, or manual. */
+  /** How automated weeks are built: PPL preset or custom (guided / manual). */
   programMode: ProgramMode;
-  /** Per-day enabled groups (layout mode). */
+  /** Custom mode: guided blueprint vs manual exercise picking. */
+  customBuildStyle: CustomBuildStyle;
+  /** Guided custom: per-day / per-round week blueprint. */
+  weekBlueprint: WeekBlueprint;
+  weekBlueprintCustomized: boolean;
+  /** User dismissed the week-builder migration notice. */
+  weekBuilderMigrationAcknowledged: boolean;
+  /** @deprecated Legacy layout mode — migrated to {@link weekBlueprint}. */
   weeklyCategoryLayout: WeeklyCategoryLayout;
   /** When false, layout is derived from catalog until user edits. */
   weeklyCategoryLayoutCustomized: boolean;

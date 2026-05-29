@@ -35,10 +35,11 @@ describe("restDays", () => {
     expect(resolveRestDayMode(1, settings)).toBe("workout");
   });
 
-  it("weekly layout mode always uses workout (rest via empty groups)", () => {
+  it("manual custom mode always uses workout in resolveRestDayMode", () => {
     const settings = {
-      programMode: "layout" as const,
-      weeklyRestDays: { 0: "active_recovery" as const },
+      programMode: "custom" as const,
+      customBuildStyle: "manual" as const,
+      weeklyRestDays: { 0: "full_rest" as const },
       weeklyRestDaysCustomized: true,
       weeklyPplSchedule: DEFAULT_SETTINGS.weeklyPplSchedule,
       weeklyPplScheduleCustomized: DEFAULT_SETTINGS.weeklyPplScheduleCustomized,

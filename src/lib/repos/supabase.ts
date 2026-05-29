@@ -109,6 +109,10 @@ interface SettingsRow {
   training_priority_customized?: boolean;
   training_priority_scores?: unknown;
   program_mode?: string;
+  custom_build_style?: string;
+  week_blueprint?: unknown;
+  week_blueprint_customized?: boolean;
+  week_builder_migration_acknowledged?: boolean;
   weekly_category_layout?: unknown;
   weekly_category_layout_customized?: boolean;
   weekly_layout_day_structure?: unknown;
@@ -340,6 +344,14 @@ function rowToSettings(row: SettingsRow): UserSettings {
       row.training_priority_scores,
     ),
     programMode: sanitizeProgramMode(row.program_mode),
+    customBuildStyle:
+      row.custom_build_style === "guided" || row.custom_build_style === "manual"
+        ? row.custom_build_style
+        : undefined,
+    weekBlueprint: row.week_blueprint as UserSettings["weekBlueprint"],
+    weekBlueprintCustomized: row.week_blueprint_customized ?? false,
+    weekBuilderMigrationAcknowledged:
+      row.week_builder_migration_acknowledged ?? false,
     weeklyCategoryLayout: sanitizeWeeklyCategoryLayout(
       row.weekly_category_layout,
     ),
@@ -381,6 +393,10 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     training_priority_customized: s.trainingPriorityCustomized,
     training_priority_scores: s.trainingPriorityScores,
     program_mode: s.programMode,
+    custom_build_style: s.customBuildStyle,
+    week_blueprint: s.weekBlueprint,
+    week_blueprint_customized: s.weekBlueprintCustomized,
+    week_builder_migration_acknowledged: s.weekBuilderMigrationAcknowledged,
     weekly_category_layout: s.weeklyCategoryLayout,
     weekly_category_layout_customized: s.weeklyCategoryLayoutCustomized,
     weekly_layout_day_structure: s.weeklyLayoutDayStructure,

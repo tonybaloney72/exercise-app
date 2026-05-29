@@ -67,10 +67,11 @@ describe("programProfile layout mode", () => {
       weeklyCategoryLayout: layout,
     });
     const userSettings = {
-      programMode: "layout",
+      programMode: "custom",
+      customBuildStyle: "guided",
       weeklyCardioCustomized: true,
       weeklyCardioByDay: { 0: ["jog"] },
-    } as UserSettings;
+    } as unknown as UserSettings;
     const out = applyProgramProfileToDayPlan(
       { ...sun, hasJog: true, cardioActivities: [{ kind: "jog", exerciseId: "END-JOG" }] },
       "balanced",

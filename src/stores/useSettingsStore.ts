@@ -20,12 +20,12 @@ import {
 } from "@/utils/saveErrorToast";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import {
+  weekBlueprintSettingsChanged,
   weeklyCardioSettingsChanged,
   weeklyRestSettingsChanged,
 } from "@/lib/weekPlanPreferences";
 import { expertiseByGroupEqual } from "@/lib/expertiseLevels";
-import { layoutEqual } from "@/lib/weeklyCategoryLayout";
-import { weeklyLayoutDayStructureEqual } from "@/lib/weeklyLayoutDayStructure";
+import { weekBlueprintEqual } from "@/lib/weekBlueprint";
 import type { ExerciseEquipment, UserSettings } from "@/types";
 
 interface SettingsState extends UserSettings {
@@ -65,24 +65,15 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           JSON.stringify(current.trainingPriorityScores)) ||
       (partial.trainingPriorityCustomized != null &&
         partial.trainingPriorityCustomized !== current.trainingPriorityCustomized) ||
-      (partial.weeklyCategoryLayout != null &&
-        !layoutEqual(
-          partial.weeklyCategoryLayout,
-          current.weeklyCategoryLayout,
-        )) ||
-      (partial.weeklyCategoryLayoutCustomized != null &&
-        partial.weeklyCategoryLayoutCustomized !==
-          current.weeklyCategoryLayoutCustomized) ||
-      (partial.weeklyLayoutDayStructure != null &&
-        !weeklyLayoutDayStructureEqual(
-          partial.weeklyLayoutDayStructure,
-          current.weeklyLayoutDayStructure,
-        )) ||
-      (partial.weeklyLayoutDayStructureCustomized != null &&
-        partial.weeklyLayoutDayStructureCustomized !==
-          current.weeklyLayoutDayStructureCustomized) ||
+      (partial.customBuildStyle != null &&
+        partial.customBuildStyle !== current.customBuildStyle) ||
+      (partial.weekBlueprint != null &&
+        !weekBlueprintEqual(partial.weekBlueprint, current.weekBlueprint)) ||
+      (partial.weekBlueprintCustomized != null &&
+        partial.weekBlueprintCustomized !== current.weekBlueprintCustomized) ||
       (partial.roundDensity != null &&
         partial.roundDensity !== current.roundDensity);
+    const blueprintChanged = weekBlueprintSettingsChanged(partial, current);
     const stretchDefaultsChanged =
       (partial.defaultWarmUp != null &&
         !stretchListsEqual(current.defaultWarmUp, partial.defaultWarmUp)) ||
@@ -116,11 +107,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         await refreshCurrentTrainingWeek("program", "full");
       } else if (
         weekScheduleChanged &&
-        updated.programMode === "custom"
+        updated.programMode === "custom" &&
+        updated.customBuildStyle === "manual"
       ) {
         await refreshCurrentCustomWeekSchedule();
       } else if (
         programProfileChanged ||
+        blueprintChanged ||
         weekScheduleChanged ||
         expertiseChanged ||
         progressionFamiliesChanged
@@ -197,6 +190,10 @@ function pickUserSettingsFields(
     trainingPriorityScores: state.trainingPriorityScores,
     trainingPriorityCustomized: state.trainingPriorityCustomized,
     programMode: state.programMode,
+    customBuildStyle: state.customBuildStyle,
+    weekBlueprint: state.weekBlueprint,
+    weekBlueprintCustomized: state.weekBlueprintCustomized,
+    weekBuilderMigrationAcknowledged: state.weekBuilderMigrationAcknowledged,
     weeklyCategoryLayout: state.weeklyCategoryLayout,
     weeklyCategoryLayoutCustomized: state.weeklyCategoryLayoutCustomized,
     weeklyLayoutDayStructure: state.weeklyLayoutDayStructure,
