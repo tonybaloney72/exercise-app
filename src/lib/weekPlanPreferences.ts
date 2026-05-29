@@ -19,7 +19,7 @@ import {
   suggestWeekBlueprintFromCatalog,
   weekBlueprintEqual,
 } from "@/lib/weekBlueprint";
-import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
+import { isGuidedCustomSettings, isManualCustomSettings } from "@/lib/weekBlueprintPolicy";
 import { isPresetProgramMode } from "@/lib/weekSeed";
 import {
   applyRestDayToPlan,
@@ -198,4 +198,17 @@ export function weeklyRestSettingsChanged(
     return true;
   }
   return false;
+}
+
+/** Manual custom weeks keep user-built exercise picks on prefs refresh; guided regens. */
+export function shouldPreserveStoredCustomWeekOnPrefsRefresh(
+  settings: Pick<UserSettings, "programMode" | "customBuildStyle">,
+  scope: "prefs" | "full",
+  storedDaysComplete: boolean,
+): boolean {
+  return (
+    scope === "prefs" &&
+    isManualCustomSettings(settings) &&
+    storedDaysComplete
+  );
 }

@@ -42,6 +42,7 @@ import {
   type ProgramProfileInput,
 } from "@/lib/programProfile";
 import { buildVarietySeed, varietySeedForCurrentWeek } from "@/lib/planVariety";
+import { shouldPreserveStoredCustomWeekOnPrefsRefresh } from "@/lib/weekPlanPreferences";
 import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
 import {
   parseLocalDateKey,
@@ -184,8 +185,6 @@ async function refreshPersistedWeek(
   const repo = getTrainingWeekRepo("authenticated");
   const persisted = await repo.loadWeek(weekKey);
   const storedDays = persisted?.days ?? null;
-  const customWeekSource =
-    isCustomProgram || isUserCustomizedWeekSource(persisted?.source);
 
   if (scope === "full" || !weekDaysComplete(storedDays)) {
     const source = isCustomProgram
@@ -199,10 +198,11 @@ async function refreshPersistedWeek(
   }
 
   if (
-    scope === "prefs" &&
-    isCustomProgram &&
-    customWeekSource &&
-    weekDaysComplete(storedDays)
+    shouldPreserveStoredCustomWeekOnPrefsRefresh(
+      settings,
+      scope,
+      weekDaysComplete(storedDays),
+    )
   ) {
     await persistTrainingWeek(weekKey, storedDays, {
       source: TRAINING_WEEK_SOURCE_CUSTOM_V1,

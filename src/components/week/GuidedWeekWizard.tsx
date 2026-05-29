@@ -10,7 +10,10 @@ import {
   describeDayBlueprint,
   shortDayBlueprintLabel,
 } from "@/lib/weekBlueprintDraft";
-import { resolveWeekBlueprint, sanitizeWeekBlueprint } from "@/lib/weekBlueprint";
+import {
+  resolveWeekBlueprint,
+  sanitizeWeekBlueprint,
+} from "@/lib/weekBlueprint";
 import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
 import { analyzeWeekBlueprint } from "@/lib/weekBlueprintWarnings";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -112,7 +115,10 @@ export default function GuidedWeekWizard() {
         {globalWarnings.length > 0 ? (
           <SurfaceCard className="border-amber-500/30 bg-amber-500/5 p-4 space-y-1">
             {globalWarnings.map((w) => (
-              <p key={w.id} className="text-sm text-amber-700 dark:text-amber-300">
+              <p
+                key={w.id}
+                className="text-sm text-amber-700 dark:text-amber-300"
+              >
                 {w.message}
               </p>
             ))}
@@ -176,10 +182,11 @@ export default function GuidedWeekWizard() {
       <div className="flex gap-1.5 overflow-x-auto pb-1">
         {DAY_ABBRS.map((label, dow) => {
           const selected = dow === activeDow;
-          const dayDraft =
-            draft[dow] ?? { dayKind: "full_rest" as const, rounds: [] };
-          const isToday =
-            weekDateKeys[dow] === formatLocalDateKey(new Date());
+          const dayDraft = draft[dow] ?? {
+            dayKind: "full_rest" as const,
+            rounds: [],
+          };
+          const isToday = weekDateKeys[dow] === formatLocalDateKey(new Date());
           return (
             <button
               key={label}
@@ -198,7 +205,9 @@ export default function GuidedWeekWizard() {
                 {shortDayBlueprintLabel(dayDraft)}
               </span>
               {isToday ? (
-                <span className="mt-0.5 block text-[9px] text-accent">Today</span>
+                <span className="mt-0.5 block text-[9px] text-accent">
+                  Today
+                </span>
               ) : null}
             </button>
           );
@@ -214,10 +223,7 @@ export default function GuidedWeekWizard() {
       />
 
       <SurfaceCard className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted">
-          {activeDow > 0 ? `Previous: ${DAY_ABBRS[activeDow - 1]}` : "Start of week"}
-        </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap justify-between">
           {activeDow > 0 && (
             <button
               type="button"
