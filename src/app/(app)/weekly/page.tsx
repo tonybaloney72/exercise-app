@@ -19,7 +19,6 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 import {
   categoriesPresentInPlan,
-  planDaySubtitle,
 } from "@/lib/planDisplayCategories";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
@@ -59,8 +58,17 @@ export default function WeeklyPage() {
   }, [mode, todayKey]);
 
   const programMode = useSettingsStore((s) => s.programMode);
+  const customBuildStyle = useSettingsStore((s) => s.customBuildStyle);
   const isCustomWeek =
     programMode === "custom" || isUserCustomizedWeekSource(weekSource);
+  const weekBuilderHref =
+    programMode === "custom" && customBuildStyle === "guided"
+      ? "/weekly/build-guided"
+      : "/weekly/build";
+  const weekBuilderLabel =
+    programMode === "custom" && customBuildStyle === "guided"
+      ? "Plan guided week"
+      : "Open week builder";
 
   async function handleResetWeek() {
     setResettingWeek(true);
@@ -91,15 +99,6 @@ export default function WeeklyPage() {
     });
   }, []);
 
-  const trainingPriorityPreset = useSettingsStore(
-    (s) => s.trainingPriorityPreset,
-  );
-  const trainingPriorityScores = useSettingsStore(
-    (s) => s.trainingPriorityScores,
-  );
-  const trainingPriorityCustomized = useSettingsStore(
-    (s) => s.trainingPriorityCustomized,
-  );
   const {
     weekByDow,
     loading: weekLoading,
@@ -210,14 +209,15 @@ export default function WeeklyPage() {
             Custom week builder
           </h2>
           <p className="mt-1 text-xs text-muted leading-snug">
-            Walk through Sun–Sat and add rounds, exercises, and stretches for
-            each day.
+            {programMode === "custom" && customBuildStyle === "guided"
+              ? "Describe your week structure and we generate exercises — or switch to manual in Settings."
+              : "Walk through Sun–Sat, start from a template, and tweak exercises each day."}
           </p>
           <Link
-            href="/weekly/build"
+            href={weekBuilderHref}
             className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-accent py-3 text-sm font-semibold text-white hover:bg-accent/90"
           >
-            Open week builder
+            {weekBuilderLabel}
           </Link>
         </SurfaceCard>
       )}
@@ -280,13 +280,6 @@ export default function WeeklyPage() {
                           </span>
                         )}
                       </div>
-                      <p className="mt-0.5 text-xs text-muted">
-                        {planDaySubtitle(plan, trainingPriorityPreset, {
-                          preferMaterialized: isCustomWeek,
-                          customized: trainingPriorityCustomized,
-                          scores: trainingPriorityScores,
-                        })}
-                      </p>
                     </div>
                   </div>
 

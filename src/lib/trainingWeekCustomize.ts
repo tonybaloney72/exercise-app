@@ -33,6 +33,7 @@ import {
   getSettingsRepo,
   getTrainingWeekRepo,
   type ExerciseSettingsMap,
+  type TrainingWeekDays,
 } from "@/lib/repos";
 import type {
   DayPlan,
@@ -46,8 +47,49 @@ import type { ExercisePreferenceMap } from "@/lib/repos";
 import { normalizeDayPlanCardio } from "@/lib/cardioActivities";
 import { stripPhantomRestDayRounds } from "@/lib/restDays";
 import { weekAnchorFromDateKey } from "@/utils/weekCalendar";
+import { isManualCustomSettings } from "@/lib/weekBlueprintPolicy";
+import {
+  buildDayPlanFromBlueprint,
+  buildWeekPlansFromBlueprint,
+  resolveBlueprintForManualSeed,
+} from "@/lib/manualWeekSeed";
+import type { WeekBlueprintPresetId } from "@/lib/weekBlueprintPresets";
+import type { WeekBlueprint } from "@/lib/weekBlueprint";
 
 export { isUserCustomizedWeekSource } from "@/lib/planGenerator";
+
+/** Persist blueprint-generated exercises as a manual custom week. */
+export async function seedManualWeekFromBlueprint(
+  dateKeyInWeek: string,
+  blueprint: WeekBlueprint,
+): Promise<TrainingWeekDays> {
+  const anchor = weekAnchorFromDateKey(dateKeyInWeek);
+  if (!anchor) {
+    throw new Error("Invalid date key");
+  }
+
+  const { weekKey } = anchor;
+  const rawWeek = await buildWeekPlansFromBlueprint(blueprint, weekKey);
+  const week: TrainingWeekDays = {};
+  for (let dow = 0; dow < 7; dow++) {
+    const day = rawWeek[dow];
+    if (!day) continue;
+    week[dow] = prepareDayPlanForEditor(day);
+  }
+
+  const [prefs, settings] = await Promise.all([
+    getExercisePreferenceRepo("authenticated").loadAll(),
+    getSettingsRepo("authenticated").load(),
+  ]);
+  const fingerprint = computePrefsFingerprintFromSettings(prefs, settings);
+
+  await getTrainingWeekRepo("authenticated").saveSeededWeek(weekKey, week, {
+    source: TRAINING_WEEK_SOURCE_CUSTOM_V1,
+    prefsFingerprint: fingerprint,
+  });
+
+  return week;
+}
 
 /** Deep copy for editor draft state. */
 export function cloneDayPlan(plan: DayPlan): DayPlan {
@@ -228,17 +270,28 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
   const roundDensity = settings.roundDensity ?? "standard";
 
   const profile = buildProgramProfileInputFromSettings(settings);
-  const freshDay = buildGeneratedDayPlan(
-    dow,
-    prefs,
-    availableEquipment,
-    trainingPriorityPreset,
-    roundDensity,
-    exerciseSettings,
-    buildVarietySeed(weekKey, "authenticated"),
-    profile,
-    settings,
-  );
+  const useBlueprintReset =
+    isManualCustomSettings(settings) && settings.weekBlueprintCustomized;
+
+  const freshDay = useBlueprintReset
+    ? prepareDayPlanForEditor(
+        await buildDayPlanFromBlueprint(
+          dow,
+          resolveBlueprintForManualSeed(settings),
+          weekKey,
+        ),
+      )
+    : buildGeneratedDayPlan(
+        dow,
+        prefs,
+        availableEquipment,
+        trainingPriorityPreset,
+        roundDensity,
+        exerciseSettings,
+        buildVarietySeed(weekKey, "authenticated"),
+        profile,
+        settings,
+      );
 
   const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");
   const merged = {

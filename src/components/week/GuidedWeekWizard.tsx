@@ -6,6 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import GuidedDayBlueprintEditor from "@/components/week/GuidedDayBlueprintEditor";
+import WeekWizardShell, {
+  WeekWizardNavFooter,
+} from "@/components/week/WeekWizardShell";
 import {
   describeDayBlueprint,
   shortDayBlueprintLabel,
@@ -16,12 +19,11 @@ import {
 } from "@/lib/weekBlueprint";
 import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
 import { analyzeWeekBlueprint } from "@/lib/weekBlueprintWarnings";
+import { WEEK_DAY_ABBRS } from "@/lib/weekWizardConstants";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { getWeekDateKeys } from "@/utils/weekCalendar";
-
-const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 type WizardStep = "day" | "review";
 
@@ -126,7 +128,7 @@ export default function GuidedWeekWizard() {
         ) : null}
 
         <ul className="space-y-2">
-          {DAY_ABBRS.map((label, dow) => (
+          {WEEK_DAY_ABBRS.map((label, dow) => (
             <li
               key={label}
               className="rounded-lg border border-border bg-surface-hover/40 px-3 py-2"
@@ -162,58 +164,37 @@ export default function GuidedWeekWizard() {
   const isToday = weekDateKeys[activeDow] === formatLocalDateKey(new Date());
 
   return (
-    <div className="py-6 space-y-5 pb-24">
-      <div>
-        <Link
-          href="/settings"
-          className="text-sm font-medium text-accent hover:text-accent/80"
-        >
-          ← Settings
-        </Link>
-        <h1 className="mt-2 text-2xl font-bold text-foreground">
-          Plan your week
-        </h1>
-        <p className="mt-1 text-sm text-muted">
-          Day {activeDow + 1} of 7 · {DAY_ABBRS[activeDow]}
-          {isToday ? " · Today" : ""}
-        </p>
-      </div>
-
-      <div className="flex gap-1.5 overflow-x-auto pb-1">
-        {DAY_ABBRS.map((label, dow) => {
-          const selected = dow === activeDow;
-          const dayDraft = draft[dow] ?? {
-            dayKind: "full_rest" as const,
-            rounds: [],
-          };
-          const isToday = weekDateKeys[dow] === formatLocalDateKey(new Date());
-          return (
-            <button
-              key={label}
-              type="button"
-              onClick={() => setActiveDow(dow)}
-              className={`shrink-0 rounded-lg border px-3 py-2 text-center transition-colors ${
-                selected
-                  ? "border-accent bg-accent/15 text-accent"
-                  : "border-border bg-surface text-muted hover:text-foreground"
-              }`}
-            >
-              <span className="block text-caption font-semibold uppercase">
-                {label}
-              </span>
-              <span className="mt-0.5 block text-xs">
-                {shortDayBlueprintLabel(dayDraft)}
-              </span>
-              {isToday ? (
-                <span className="mt-0.5 block text-[9px] text-accent">
-                  Today
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
-      </div>
-
+    <WeekWizardShell
+      backHref="/settings"
+      backLabel="← Settings"
+      title="Plan your week"
+      subtitle={`Day ${activeDow + 1} of 7 · ${WEEK_DAY_ABBRS[activeDow]}${isToday ? " · Today" : ""}`}
+      activeDow={activeDow}
+      weekDateKeys={weekDateKeys}
+      stripSecondary={(dow) =>
+        shortDayBlueprintLabel(
+          draft[dow] ?? { dayKind: "full_rest", rounds: [] },
+        )
+      }
+      onSelectDow={setActiveDow}
+      footer={
+        <WeekWizardNavFooter
+          activeDow={activeDow}
+          onPrev={activeDow > 0 ? () => setActiveDow(activeDow - 1) : undefined}
+          onNext={
+            activeDow < 6
+              ? () => setActiveDow(activeDow + 1)
+              : () => setStep("review")
+          }
+          nextLabel={
+            activeDow < 6
+              ? `${WEEK_DAY_ABBRS[activeDow + 1]} →`
+              : "Review week"
+          }
+          nextPrimary
+        />
+      }
+    >
       <GuidedDayBlueprintEditor
         dayOfWeek={activeDow}
         day={day}
@@ -222,36 +203,13 @@ export default function GuidedWeekWizard() {
         onChange={setDraft}
       />
 
-      <SurfaceCard className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap justify-between">
-          {activeDow > 0 && (
-            <button
-              type="button"
-              onClick={() => setActiveDow(activeDow - 1)}
-              className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-surface-hover"
-            >
-              ← {DAY_ABBRS[activeDow - 1]}
-            </button>
-          )}
-          {activeDow < 6 ? (
-            <button
-              type="button"
-              onClick={() => setActiveDow(activeDow + 1)}
-              className="rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white hover:bg-accent/90"
-            >
-              {DAY_ABBRS[activeDow + 1]} →
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setStep("review")}
-              className="rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white hover:bg-accent/90"
-            >
-              Review week
-            </button>
-          )}
-        </div>
-      </SurfaceCard>
-    </div>
+      <p className="text-xs text-muted text-center">
+        Want to hand-pick every exercise?{" "}
+        <Link href="/weekly/build" className="text-accent hover:underline">
+          Switch to manual week
+        </Link>{" "}
+        after saving — or change build style in Settings.
+      </p>
+    </WeekWizardShell>
   );
 }

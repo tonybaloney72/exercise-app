@@ -198,7 +198,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
           </label>
           <label className="block">
             <span className="text-caption text-muted uppercase tracking-wider">
-              Time (MM:SS or minutes)
+              Time (MM:SS)
             </span>
             <input
               type="text"
@@ -210,7 +210,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
                   behavior: "smooth",
                 })
               }
-              placeholder="32:00"
+              placeholder="9:30 or 930"
               className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
             />
           </label>

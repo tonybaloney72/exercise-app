@@ -3,7 +3,30 @@ import {
   countdownRingProgress,
   countdownRemainingMs,
   displayCountdownSeconds,
+  parseTimeInput,
 } from "@/utils/time";
+
+describe("parseTimeInput", () => {
+  it("parses MM:SS with colon", () => {
+    expect(parseTimeInput("9:30")).toBe(570);
+    expect(parseTimeInput("17:35")).toBe(1055);
+  });
+
+  it("parses numeric entry without colon", () => {
+    expect(parseTimeInput("930")).toBe(570);
+    expect(parseTimeInput("1735")).toBe(1055);
+    expect(parseTimeInput("32")).toBe(1920);
+    expect(parseTimeInput("9.5")).toBe(570);
+  });
+
+  it("returns undefined for empty or invalid input", () => {
+    expect(parseTimeInput("")).toBeUndefined();
+    expect(parseTimeInput("   ")).toBeUndefined();
+    expect(parseTimeInput("abc")).toBeUndefined();
+    expect(parseTimeInput("9999")).toBeUndefined();
+    expect(parseTimeInput("12345")).toBeUndefined();
+  });
+});
 
 describe("countdown display helpers", () => {
   it("displayCountdownSeconds uses ceiling buckets", () => {

@@ -363,8 +363,8 @@ export default function SettingsPage() {
                   Open week builder
                 </Link>
                 <p className="text-xs text-muted leading-snug">
-                  Or open <strong className="text-foreground">Weekly</strong>{" "}
-                  and customize individual days.
+                  Pick every exercise yourself, or start from a template (upper/lower
+                  or PPL) and tweak in the editor.
                 </p>
               </div>
             ) : null}
