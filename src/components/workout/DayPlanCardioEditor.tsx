@@ -41,7 +41,7 @@ export default function DayPlanCardioEditor({ plan, onChange }: Props) {
         Cardio & endurance
       </p>
       <p className="text-sm text-muted leading-snug">
-        Add or remove activities for this day only. Saves with your customized plan.
+        Add or remove activities for today's workout.
       </p>
       <span className="flex flex-wrap gap-1">
         {CARDIO_ACTIVITY_ORDER.map((kind) => {

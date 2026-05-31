@@ -20,7 +20,10 @@ import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
 import { buildStretchUsedExerciseIds } from "@/lib/stretchDefaults";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
-import { getPlanAddCandidates, getPlanSlotCandidates } from "@/lib/planSlotCandidates";
+import {
+  getPlanAddCandidates,
+  getPlanSlotCandidates,
+} from "@/lib/planSlotCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
 import { laterRoundOccurrencesByExerciseId } from "@/lib/exerciseSwap";
 import { analyzeDayPlanBalance } from "@/lib/workoutBalanceAlerts";
@@ -82,9 +85,13 @@ export default function WorkoutPlanEditor({
   saveLabel = "Save this day",
   onDirtyChange,
 }: WorkoutPlanEditorProps) {
-  const [draft, setDraft] = useState(() => prepareDayPlanForEditor(initialPlan));
+  const [draft, setDraft] = useState(() =>
+    prepareDayPlanForEditor(initialPlan),
+  );
   const [pickTarget, setPickTarget] = useState<PickTarget | null>(null);
-  const [categoryPickRound, setCategoryPickRound] = useState<number | null>(null);
+  const [categoryPickRound, setCategoryPickRound] = useState<number | null>(
+    null,
+  );
   const [resetConfirm, setResetConfirm] = useState(false);
 
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
@@ -215,7 +222,11 @@ export default function WorkoutPlanEditor({
     [pickTarget],
   );
 
-  const updateReps = (roundIndex: number, slotIndex: number, targetReps: string) => {
+  const updateReps = (
+    roundIndex: number,
+    slotIndex: number,
+    targetReps: string,
+  ) => {
     setDraft((prev) => {
       const rounds = prev.rounds.map((r, ri) =>
         ri === roundIndex
@@ -323,11 +334,14 @@ export default function WorkoutPlanEditor({
         const id = draft[pickTarget.section]?.[pickTarget.index]?.exerciseId;
         return exerciseMap[id ?? ""]?.name ?? "Stretch";
       }
-      return stretchCategory(pickTarget.section) === "SW" ? "Warm-up stretch" : "Cool-down stretch";
+      return stretchCategory(pickTarget.section) === "SW"
+        ? "Warm-up stretch"
+        : "Cool-down stretch";
     }
     if (pickTarget.kind === "swap") {
       const id =
-        draft.rounds[pickTarget.roundIndex]?.exercises[pickTarget.slotIndex]?.exerciseId;
+        draft.rounds[pickTarget.roundIndex]?.exercises[pickTarget.slotIndex]
+          ?.exerciseId;
       return exerciseMap[id ?? ""]?.name ?? "Exercise";
     }
     return CATEGORIES[pickTarget.category].name;
@@ -421,54 +435,19 @@ export default function WorkoutPlanEditor({
         </CollapsibleSection>
       ))}
 
-      {balanceAlerts.length > 0 && (
-        <SurfaceCard
-          className={`space-y-2 p-4 ${
-            hasBalanceWarning
-              ? "border-amber-500/50 bg-amber-500/10"
-              : "border-border"
-          }`}
-        >
-          <p
-            className={`text-xs font-semibold uppercase tracking-wider ${
-              hasBalanceWarning ? "text-amber-800 dark:text-amber-200" : "text-muted"
-            }`}
-          >
-            Balance notes
-          </p>
-          <ul className="space-y-2">
-            {balanceAlerts.map((alert) => (
-              <li
-                key={alert.id}
-                className={`text-sm leading-snug ${
-                  alert.severity === "warning"
-                    ? "text-amber-900 dark:text-amber-100"
-                    : "text-muted"
-                }`}
-              >
-                {alert.message}
-              </li>
-            ))}
-          </ul>
-        </SurfaceCard>
-      )}
-
-      <p className="px-1 pt-2 text-xs font-medium uppercase tracking-wider text-muted">
-        Stretches (optional)
-      </p>
-      <p className="px-1 text-xs text-muted leading-snug">
-        Defaults live in Settings. Override warm-up or cool-down for this day only.
-      </p>
-
       <StretchPlanSection
         title="Warm-up"
         collapsible
         defaultOpen={false}
         entries={stretchLists.warmUp}
         onAdd={() => openPickModal({ kind: "stretch", section: "warmUp" })}
-        onChange={(index) => openPickModal({ kind: "stretch", section: "warmUp", index })}
+        onChange={(index) =>
+          openPickModal({ kind: "stretch", section: "warmUp", index })
+        }
         onRemove={(index) => removeStretch("warmUp", index)}
-        onUpdateTarget={(index, target) => updateStretchTarget("warmUp", index, target)}
+        onUpdateTarget={(index, target) =>
+          updateStretchTarget("warmUp", index, target)
+        }
       />
 
       <StretchPlanSection
@@ -477,9 +456,13 @@ export default function WorkoutPlanEditor({
         defaultOpen={false}
         entries={stretchLists.coolDown}
         onAdd={() => openPickModal({ kind: "stretch", section: "coolDown" })}
-        onChange={(index) => openPickModal({ kind: "stretch", section: "coolDown", index })}
+        onChange={(index) =>
+          openPickModal({ kind: "stretch", section: "coolDown", index })
+        }
         onRemove={(index) => removeStretch("coolDown", index)}
-        onUpdateTarget={(index, target) => updateStretchTarget("coolDown", index, target)}
+        onUpdateTarget={(index, target) =>
+          updateStretchTarget("coolDown", index, target)
+        }
       />
 
       <WorkoutDayTemplateToolbar
@@ -487,20 +470,6 @@ export default function WorkoutPlanEditor({
         disabled={saving}
         onApply={(next) => setDraft(prepareDayPlanForEditor(next))}
       />
-
-      <SurfaceCard className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted leading-snug">
-          Reset warm-up and cool-down from Settings defaults and this day&apos;s focus.
-        </p>
-        <button
-          type="button"
-          disabled={saving}
-          onClick={rebuildWorkoutStretches}
-          className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover disabled:opacity-50"
-        >
-          Rebuild stretch lists
-        </button>
-      </SurfaceCard>
 
       <div className="flex gap-3">
         {!embedded && (
@@ -525,7 +494,8 @@ export default function WorkoutPlanEditor({
 
       <div className="rounded-xl border border-border bg-surface px-4 py-3 space-y-2">
         <p className="text-xs text-muted">
-          Discard unsaved edits and restore this day&apos;s auto-generated workout.
+          Discard unsaved edits and restore this day&apos;s auto-generated
+          workout.
         </p>
         {resetConfirm ? (
           <div className="flex flex-wrap gap-2 pt-1">
@@ -569,7 +539,11 @@ export default function WorkoutPlanEditor({
         onClose={() => setCategoryPickRound(null)}
         onPick={(category) => {
           if (categoryPickRound === null) return;
-          openPickModal({ kind: "add", roundIndex: categoryPickRound, category });
+          openPickModal({
+            kind: "add",
+            roundIndex: categoryPickRound,
+            category,
+          });
           setCategoryPickRound(null);
         }}
       />
@@ -600,9 +574,10 @@ export default function WorkoutPlanEditor({
         onPick={applyPick}
         onClearSwap={() => {
           if (pickTarget?.kind !== "swap") return;
-          const original = initialPlan.rounds[pickTarget.roundIndex]?.exercises[
-            pickTarget.slotIndex
-          ];
+          const original =
+            initialPlan.rounds[pickTarget.roundIndex]?.exercises[
+              pickTarget.slotIndex
+            ];
           if (!original) return;
           setDraft((prev) => {
             const rounds = prev.rounds.map((r) => ({

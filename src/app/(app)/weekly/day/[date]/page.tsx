@@ -12,7 +12,11 @@ import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
 import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
-import { isFullRestDay, isOptionalRestDay, REST_DAY_DESCRIPTIONS } from "@/lib/restDays";
+import {
+  isFullRestDay,
+  isOptionalRestDay,
+  REST_DAY_DESCRIPTIONS,
+} from "@/lib/restDays";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import {
@@ -121,7 +125,9 @@ export default function WeeklyDayPage() {
 
   const weekDates = useMemo(
     () =>
-      getWeekDateKeys().map((key) => parseLocalDateKey(key)).filter((d): d is Date => d != null),
+      getWeekDateKeys()
+        .map((key) => parseLocalDateKey(key))
+        .filter((d): d is Date => d != null),
     [],
   );
   const { weekByDow } = useTrainingWeekPlans(weekDates);
@@ -250,8 +256,7 @@ export default function WeeklyDayPage() {
       const source = await getWeekSourceForDate(dateKey);
       setWeekSource(source);
     } catch (e: unknown) {
-      const message =
-        e instanceof Error ? e.message : "Could not save changes";
+      const message = e instanceof Error ? e.message : "Could not save changes";
       setSaveError(message);
       toastSaveError("workout plan", e);
     } finally {
@@ -291,11 +296,6 @@ export default function WeeklyDayPage() {
           <h1 className="text-2xl font-bold text-foreground">
             {formatPageTitle(dateKey)}
           </h1>
-          {isCustomWeek && canCustomize && (
-            <p className="text-xs text-accent/90 pt-1">
-              This week has custom edits — reset the full week from Weekly overview.
-            </p>
-          )}
         </motion.div>
       </div>
 
@@ -316,8 +316,9 @@ export default function WeeklyDayPage() {
             {isFullRestDay(plan)
               ? REST_DAY_DESCRIPTIONS.full_rest
               : REST_DAY_DESCRIPTIONS.stretches}{" "}
-            Use <span className="font-medium text-foreground">Edit workout</span>{" "}
-            to add optional exercises, stretches, or cardio.
+            Use{" "}
+            <span className="font-medium text-foreground">Edit workout</span> to
+            add optional exercises, stretches, or cardio.
           </p>
         </SurfaceCard>
       )}
@@ -338,7 +339,7 @@ export default function WeeklyDayPage() {
       {mode === "guest" && showCustomizeSlot && !customizing && (
         <AccountFeatureGate
           feature="customizeDay"
-          title="Customize this day&apos;s workout"
+          title="Customize this day's workout"
         />
       )}
 
@@ -412,7 +413,9 @@ export default function WeeklyDayPage() {
                   Log workout for this day
                 </Link>
               ) : (
-                <p className="text-xs text-muted">{backfillEligibility.reason}</p>
+                <p className="text-xs text-muted">
+                  {backfillEligibility.reason}
+                </p>
               )}
             </SurfaceCard>
           ) : continueWorkoutHere ? (
