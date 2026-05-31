@@ -46,7 +46,7 @@ type Props = {
   day: DayBlueprint;
   blueprint: WeekBlueprint;
   warnings: WeekBlueprintWarning[];
-  onChange: (next: WeekBlueprint) => void;
+  onChange: (updater: (prev: WeekBlueprint) => WeekBlueprint) => void;
 };
 
 export default function GuidedDayBlueprintEditor({
@@ -91,7 +91,9 @@ export default function GuidedDayBlueprintEditor({
               role="radio"
               aria-checked={day.dayKind === kind}
               onClick={() =>
-                onChange(setDayKindInBlueprint(blueprint, dayOfWeek, kind))
+                onChange((prev) =>
+                  setDayKindInBlueprint(prev, dayOfWeek, kind),
+                )
               }
               className={uiChoicePillClass(day.dayKind === kind)}
             >
@@ -126,9 +128,9 @@ export default function GuidedDayBlueprintEditor({
                     <button
                       type="button"
                       onClick={() =>
-                        onChange(
+                        onChange((prev) =>
                           removeRoundInBlueprint(
-                            blueprint,
+                            prev,
                             dayOfWeek,
                             roundIndex,
                           ),
@@ -154,9 +156,9 @@ export default function GuidedDayBlueprintEditor({
                         type="button"
                         aria-pressed={on}
                         onClick={() =>
-                          onChange(
+                          onChange((prev) =>
                             toggleGroupInRound(
-                              blueprint,
+                              prev,
                               dayOfWeek,
                               roundIndex,
                               group,
@@ -192,14 +194,15 @@ export default function GuidedDayBlueprintEditor({
                     onChange={(e) => {
                       const raw = e.target.value.trim();
                       onChange(
-                        setRoundExerciseCount(
-                          blueprint,
-                          dayOfWeek,
-                          roundIndex,
-                          raw === ""
-                            ? undefined
-                            : Number.parseInt(raw, 10) || undefined,
-                        ),
+                        (prev) =>
+                          setRoundExerciseCount(
+                            prev,
+                            dayOfWeek,
+                            roundIndex,
+                            raw === ""
+                              ? undefined
+                              : Number.parseInt(raw, 10) || undefined,
+                          ),
                       );
                     }}
                     className={uiRoundCountInput}
@@ -212,9 +215,9 @@ export default function GuidedDayBlueprintEditor({
                     <button
                       type="button"
                       onClick={() =>
-                        onChange(
+                        onChange((prev) =>
                           applyRoundCloneFromPrior(
-                            blueprint,
+                            prev,
                             dayOfWeek,
                             roundIndex,
                             "repeat",
@@ -228,9 +231,9 @@ export default function GuidedDayBlueprintEditor({
                     <button
                       type="button"
                       onClick={() =>
-                        onChange(
+                        onChange((prev) =>
                           applyRoundCloneFromPrior(
-                            blueprint,
+                            prev,
                             dayOfWeek,
                             roundIndex,
                             "structure",
@@ -250,7 +253,7 @@ export default function GuidedDayBlueprintEditor({
               <button
                 type="button"
                 onClick={() =>
-                  onChange(addRoundInBlueprint(blueprint, dayOfWeek))
+                  onChange((prev) => addRoundInBlueprint(prev, dayOfWeek))
                 }
                 className="w-full rounded-lg border border-dashed border-border px-3 py-2.5 text-sm font-medium text-muted hover:border-accent/40 hover:text-foreground"
               >
@@ -266,7 +269,9 @@ export default function GuidedDayBlueprintEditor({
           <DayBlueprintCardioEditor
             value={day.cardio ?? []}
             onChange={(cardio) =>
-              onChange(setDayCardioInBlueprint(blueprint, dayOfWeek, cardio))
+              onChange((prev) =>
+                setDayCardioInBlueprint(prev, dayOfWeek, cardio),
+              )
             }
           />
         </>

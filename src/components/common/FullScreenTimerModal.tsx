@@ -29,6 +29,10 @@ export default function FullScreenTimerModal() {
 
   const open = mode !== "idle";
   const panelRef = useRef<HTMLDivElement>(null);
+  const isRest = mode === "rest";
+  const isSetTimer = mode === "setTimer";
+  const isCountdown = isRest || isSetTimer;
+  const countdownComplete = isCountdown && !running && seconds === 0;
 
   useFocusTrap({
     open,
@@ -42,6 +46,11 @@ export default function FullScreenTimerModal() {
     function onKey(e: KeyboardEvent) {
       if (e.key === " ") {
         e.preventDefault();
+        if (countdownComplete) {
+          primeTimerAudio();
+          resetRest();
+          return;
+        }
         if (running) pause();
         else {
           primeTimerAudio();
@@ -51,13 +60,10 @@ export default function FullScreenTimerModal() {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, running, pause, resume]);
+  }, [open, running, pause, resume, countdownComplete, resetRest]);
 
   if (!open) return null;
 
-  const isRest = mode === "rest";
-  const isSetTimer = mode === "setTimer";
-  const isCountdown = isRest || isSetTimer;
   const progress =
     isCountdown && restTotalSeconds > 0
       ? countdownRingProgress(countdownRemainingMs, restTotalSeconds)
@@ -173,49 +179,73 @@ export default function FullScreenTimerModal() {
       )}
 
       <div className="flex items-center gap-3">
-        {running ? (
-          <button
-            type="button"
-            onClick={pause}
-            className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 text-white transition-colors hover:bg-white/10"
-            aria-label="Pause"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="6" y="5" width="4" height="14" rx="1" />
-              <rect x="14" y="5" width="4" height="14" rx="1" />
-            </svg>
-          </button>
+        {countdownComplete ? (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                primeTimerAudio();
+                resetRest();
+              }}
+              className="rounded-full border border-white/30 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10"
+            >
+              Restart
+            </button>
+            <button
+              type="button"
+              onClick={stop}
+              className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
+            >
+              Close
+            </button>
+          </>
         ) : (
-          <button
-            type="button"
-            onClick={() => {
-              primeTimerAudio();
-              resume();
-            }}
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30 transition-transform active:scale-95"
-            aria-label="Play"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="6 4 20 12 6 20 6 4" />
-            </svg>
-          </button>
-        )}
-        {isCountdown ? (
-          <button
-            type="button"
-            onClick={stop}
-            className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
-          >
-            Stop
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={resetStopwatch}
-            className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
-          >
-            Reset
-          </button>
+          <>
+            {running ? (
+              <button
+                type="button"
+                onClick={pause}
+                className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 text-white transition-colors hover:bg-white/10"
+                aria-label="Pause"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="5" width="4" height="14" rx="1" />
+                  <rect x="14" y="5" width="4" height="14" rx="1" />
+                </svg>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  primeTimerAudio();
+                  resume();
+                }}
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30 transition-transform active:scale-95"
+                aria-label="Resume"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="6 4 20 12 6 20 6 4" />
+                </svg>
+              </button>
+            )}
+            {isCountdown ? (
+              <button
+                type="button"
+                onClick={stop}
+                className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
+              >
+                Stop
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={resetStopwatch}
+                className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
+              >
+                Reset
+              </button>
+            )}
+          </>
         )}
       </div>
     </motion.div>

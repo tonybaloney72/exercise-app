@@ -25,7 +25,6 @@ import {
   weeklyRestSettingsChanged,
 } from "@/lib/weekPlanPreferences";
 import { expertiseByGroupEqual } from "@/lib/expertiseLevels";
-import { weekBlueprintEqual } from "@/lib/weekBlueprint";
 import type { ExerciseEquipment, UserSettings } from "@/types";
 
 interface SettingsState extends UserSettings {
@@ -53,6 +52,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         current.availableEquipment,
         partial.availableEquipment,
       );
+    const blueprintChanged = weekBlueprintSettingsChanged(partial, current);
     const programProfileChanged =
       (partial.programMode != null &&
         partial.programMode !== current.programMode) ||
@@ -67,13 +67,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         partial.trainingPriorityCustomized !== current.trainingPriorityCustomized) ||
       (partial.customBuildStyle != null &&
         partial.customBuildStyle !== current.customBuildStyle) ||
-      (partial.weekBlueprint != null &&
-        !weekBlueprintEqual(partial.weekBlueprint, current.weekBlueprint)) ||
-      (partial.weekBlueprintCustomized != null &&
-        partial.weekBlueprintCustomized !== current.weekBlueprintCustomized) ||
       (partial.roundDensity != null &&
         partial.roundDensity !== current.roundDensity);
-    const blueprintChanged = weekBlueprintSettingsChanged(partial, current);
     const stretchDefaultsChanged =
       (partial.defaultWarmUp != null &&
         !stretchListsEqual(current.defaultWarmUp, partial.defaultWarmUp)) ||
@@ -87,9 +82,6 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const expertiseChanged =
       partial.expertiseByGroup != null &&
       !expertiseByGroupEqual(partial.expertiseByGroup, current.expertiseByGroup);
-    const progressionFamiliesChanged =
-      partial.progressionFamiliesEnabled != null &&
-      partial.progressionFamiliesEnabled !== current.progressionFamiliesEnabled;
 
     set((s) => ({ ...s, ...updated }));
     try {
@@ -103,7 +95,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     if (useAuthStore.getState().mode !== "authenticated") return;
 
     try {
-      if (programModeChanged) {
+      if (programModeChanged || blueprintChanged) {
         await refreshCurrentTrainingWeek("program", "full");
       } else if (
         weekScheduleChanged &&
@@ -113,10 +105,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         await refreshCurrentCustomWeekSchedule();
       } else if (
         programProfileChanged ||
-        blueprintChanged ||
         weekScheduleChanged ||
-        expertiseChanged ||
-        progressionFamiliesChanged
+        expertiseChanged
       ) {
         await refreshCurrentTrainingWeek("program");
       } else if (equipmentChanged) {
@@ -209,7 +199,6 @@ function pickUserSettingsFields(
     weeklyCardioByDay: state.weeklyCardioByDay,
     weeklyCardioCustomized: state.weeklyCardioCustomized,
     expertiseByGroup: state.expertiseByGroup,
-    progressionFamiliesEnabled: state.progressionFamiliesEnabled,
   };
 }
 

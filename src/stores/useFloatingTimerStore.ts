@@ -154,10 +154,15 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   resume: () =>
     set((s) => {
       if (s.mode === "rest" || s.mode === "setTimer") {
+        const seconds =
+          s.seconds <= 0 && s.restTotalSeconds > 0
+            ? s.restTotalSeconds
+            : s.seconds;
         return {
           running: true,
-          countdownEndsAtMs: countdownEndsAtFromSeconds(s.seconds),
-          countdownRemainingMs: s.seconds * 1000,
+          seconds,
+          countdownEndsAtMs: countdownEndsAtFromSeconds(seconds),
+          countdownRemainingMs: seconds * 1000,
         };
       }
       if (s.mode === "stopwatch") {

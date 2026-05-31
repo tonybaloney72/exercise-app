@@ -126,6 +126,44 @@ function sanitizeRoundBlueprint(
   };
 }
 
+export function roundBlueprintGroupsEqual(
+  a: RoundBlueprint,
+  b: RoundBlueprint,
+): boolean {
+  if (a.groups.length !== b.groups.length) return false;
+  return a.groups.every((g, i) => g === b.groups[i]);
+}
+
+/** Drop repeat-clone specs when groups no longer match the source round. */
+export function sanitizeRoundCloneMetadata(
+  rounds: RoundBlueprint[],
+): RoundBlueprint[] {
+  return rounds.map((round, index) => {
+    if (round.cloneOfRoundIndex == null || !round.cloneMode) return round;
+    const sourceIndex = round.cloneOfRoundIndex;
+    if (
+      sourceIndex < 0 ||
+      sourceIndex >= rounds.length ||
+      sourceIndex >= index
+    ) {
+      return {
+        ...round,
+        cloneOfRoundIndex: undefined,
+        cloneMode: undefined,
+      };
+    }
+    const source = rounds[sourceIndex];
+    if (!source || !roundBlueprintGroupsEqual(round, source)) {
+      return {
+        ...round,
+        cloneOfRoundIndex: undefined,
+        cloneMode: undefined,
+      };
+    }
+    return round;
+  });
+}
+
 function sanitizeDayBlueprint(
   raw: unknown,
   dow: number,
@@ -163,7 +201,7 @@ function sanitizeDayBlueprint(
     return { dayKind, rounds: [], cardio: [] };
   }
 
-  return { dayKind, rounds, cardio };
+  return { dayKind, rounds: sanitizeRoundCloneMetadata(rounds), cardio };
 }
 
 export function sanitizeWeekBlueprint(

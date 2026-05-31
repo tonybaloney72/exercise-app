@@ -64,25 +64,6 @@ describe("generator expertise cap", () => {
     expect(candidates.some((ex) => ex.id === "HC-184")).toBe(false);
   });
 
-  it("does not prescribe knee or incline push regressions when push cap is advanced", () => {
-    const shaped = applyProgramProfileToDayPlan(
-      monday,
-      "balanced",
-      "full",
-      EQUIP,
-      EMPTY_PREFS,
-      undefined,
-      undefined,
-      undefined,
-      userSettingsWithPushCap("advanced"),
-    );
-    const ids = shaped.rounds.flatMap((r) =>
-      r.exercises.map((e) => e.exerciseId),
-    );
-    expect(ids).not.toContain("UP-1");
-    expect(ids).not.toContain("UP-6");
-  });
-
   it("includes expert push moves when push cap is expert", () => {
     const filter = resolveExpertiseFilter({
       expertiseByGroup: userSettingsWithPushCap("expert").expertiseByGroup,

@@ -64,4 +64,24 @@ describe("weekBlueprint", () => {
     expect(blueprint[1]?.dayKind).toBe("workout");
     expect((blueprint[1]?.rounds.length ?? 0) > 0).toBe(true);
   });
+
+  it("sanitize strips repeat-clone when groups differ from source round", () => {
+    const sanitized = sanitizeWeekBlueprint({
+      1: {
+        dayKind: "workout",
+        rounds: [
+          { groups: ["cardio"], exerciseCount: 5 },
+          {
+            groups: ["upper_push"],
+            exerciseCount: 5,
+            cloneOfRoundIndex: 0,
+            cloneMode: "repeat",
+          },
+        ],
+      },
+    });
+    expect(sanitized[1]?.rounds[1]?.cloneOfRoundIndex).toBeUndefined();
+    expect(sanitized[1]?.rounds[1]?.cloneMode).toBeUndefined();
+    expect(sanitized[1]?.rounds[1]?.groups).toEqual(["upper_push"]);
+  });
 });

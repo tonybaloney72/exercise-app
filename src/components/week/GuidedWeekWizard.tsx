@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import GuidedDayBlueprintEditor from "@/components/week/GuidedDayBlueprintEditor";
@@ -40,14 +40,20 @@ export default function GuidedWeekWizard() {
   );
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const draftInitializedRef = useRef(false);
 
   const weekDateKeys = useMemo(() => getWeekDateKeys(), []);
   const warnings = useMemo(() => analyzeWeekBlueprint(draft), [draft]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    draftInitializedRef.current = false;
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated || draftInitializedRef.current) return;
+    draftInitializedRef.current = true;
     setDraft(sanitizeWeekBlueprint(resolveWeekBlueprint(settings)));
-  }, [hydrated, settings.weekBlueprint, settings.weekBlueprintCustomized]);
+  }, [hydrated, settings]);
 
   useEffect(() => {
     if (!hydrated || mode === "loading") return;
@@ -109,8 +115,7 @@ export default function GuidedWeekWizard() {
             Review your week
           </h1>
           <p className="mt-1 text-sm text-muted">
-            Save to regenerate exercises from this plan (future days and today
-            if you have not started).
+            Save to regenerate the whole week from this plan.
           </p>
         </div>
 
@@ -200,7 +205,7 @@ export default function GuidedWeekWizard() {
         day={day}
         blueprint={draft}
         warnings={warnings}
-        onChange={setDraft}
+        onChange={(updater) => setDraft(updater)}
       />
 
       <p className="text-xs text-muted text-center">

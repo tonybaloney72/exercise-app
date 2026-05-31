@@ -89,18 +89,11 @@ export default function WorkoutPlanEditor({
 
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
   const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
-  const progressionFamiliesEnabled = useSettingsStore(
-    (s) => s.progressionFamiliesEnabled,
-  );
   const prefs = useExercisePreferencesStore((s) => s.byExerciseId);
   const dislikedIds = useMemo(() => collectDislikedIds(prefs), [prefs]);
   const expertiseFilter = useMemo(
-    () =>
-      resolveExpertiseFilter({
-        expertiseByGroup,
-        progressionFamiliesEnabled,
-      }),
-    [expertiseByGroup, progressionFamiliesEnabled],
+    () => resolveExpertiseFilter({ expertiseByGroup }),
+    [expertiseByGroup],
   );
   const balanceAlerts = useMemo(() => analyzeDayPlanBalance(draft), [draft]);
   const hasBalanceWarning = balanceAlerts.some((a) => a.severity === "warning");

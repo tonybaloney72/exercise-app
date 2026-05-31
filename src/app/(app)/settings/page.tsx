@@ -287,21 +287,10 @@ export default function SettingsPage() {
       <AnimatedSection delay={0.048}>
         <CollapsibleSection
           title="Exercise difficulty"
-          hint="Skill caps and optional progression filtering for plans"
+          hint="Skill caps for generated plans and swap suggestions"
           defaultOpen={false}
           contentClassName="space-y-3 p-4"
         >
-          <SettingsSwitch
-            title="Avoid easy regressions"
-            description="When on, generated workouts and swaps skip easier steps in curated progressions (e.g. knee push-ups if your push level is Advanced). Skill caps below still apply."
-            checked={settings.progressionFamiliesEnabled}
-            onChange={() =>
-              void settings.updateSettings({
-                progressionFamiliesEnabled:
-                  !settings.progressionFamiliesEnabled,
-              })
-            }
-          />
           <ExpertiseByGroupEditor
             byGroup={settings.expertiseByGroup}
             onChange={(expertiseByGroup) => {

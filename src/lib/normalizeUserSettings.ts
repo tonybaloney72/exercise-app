@@ -146,10 +146,6 @@ export function normalizeUserSettings(
     DEFAULT_EXPERTISE_BY_GROUP,
   );
 
-  const progressionFamiliesEnabled =
-    partial.progressionFamiliesEnabled ??
-    DEFAULT_SETTINGS.progressionFamiliesEnabled;
-
   const catalogBlueprint = suggestWeekBlueprintFromCatalog();
   let weekBlueprint = sanitizeWeekBlueprint(
     partial.weekBlueprint,
@@ -173,9 +169,12 @@ export function normalizeUserSettings(
 
   let customBuildStyle = sanitizeCustomBuildStyle(
     partial.customBuildStyle ??
-      (programMode === "custom" && !migratingFromLayout
-        ? "manual"
-        : "guided"),
+      (programMode === "custom" &&
+      (partial.weekBlueprintCustomized === true || partial.weekBlueprint != null)
+        ? "guided"
+        : programMode === "custom" && !migratingFromLayout
+          ? "manual"
+          : "guided"),
   );
   if (migratingFromLayout && partial.customBuildStyle == null) {
     customBuildStyle = "guided";
@@ -189,7 +188,6 @@ export function normalizeUserSettings(
     ...DEFAULT_SETTINGS,
     ...rest,
     expertiseByGroup,
-    progressionFamiliesEnabled,
     equipmentOnboardingCompleted:
       partial.equipmentOnboardingCompleted ?? DEFAULT_SETTINGS.equipmentOnboardingCompleted,
     trainingPriorityPreset: preset,

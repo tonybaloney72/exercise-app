@@ -19,7 +19,10 @@ import type {
   RoundBlueprint,
   WeekBlueprint,
 } from "@/lib/weekBlueprint";
-import { resolveWeekBlueprint } from "@/lib/weekBlueprint";
+import {
+  resolveWeekBlueprint,
+  roundBlueprintGroupsEqual,
+} from "@/lib/weekBlueprint";
 import type {
   DayPlan,
   ExerciseCategory,
@@ -244,16 +247,19 @@ export function materializeBlueprintDayPlan(
     const sourceIndex = spec.cloneOfRoundIndex;
     const cloneMode = spec.cloneMode;
 
-    if (
-      sourceIndex != null &&
-      cloneMode === "repeat" &&
-      built[sourceIndex]?.length
-    ) {
-      built.push(cloneExercises(built[sourceIndex]!));
-      for (const ex of built[built.length - 1]!) {
-        usedInDay.add(ex.exerciseId);
+    if (sourceIndex != null && cloneMode === "repeat") {
+      const sourceSpec = dayBlueprint.rounds[sourceIndex];
+      const canRepeatClone =
+        sourceSpec != null &&
+        roundBlueprintGroupsEqual(spec, sourceSpec) &&
+        built[sourceIndex]?.length;
+      if (canRepeatClone) {
+        built.push(cloneExercises(built[sourceIndex]!));
+        for (const ex of built[built.length - 1]!) {
+          usedInDay.add(ex.exerciseId);
+        }
+        continue;
       }
-      continue;
     }
 
     let exercises: RoundExercise[];

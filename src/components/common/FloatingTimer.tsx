@@ -46,6 +46,9 @@ export default function FloatingTimer() {
   const idle = mode === "idle";
   const minimized = !idle && presentation === "minimized";
   const fullscreen = !idle && presentation === "fullscreen";
+  const isCountdown = mode === "rest" || mode === "setTimer";
+  const countdownComplete = isCountdown && !running && seconds === 0;
+  const resetRest = useFloatingTimerStore((s) => s.resetRest);
 
   useEffect(() => {
     if (idle || !running) return;
@@ -243,16 +246,42 @@ export default function FloatingTimer() {
               <button
                 type="button"
                 onClick={() => {
+                  if (countdownComplete) {
+                    primeTimerAudio();
+                    resetRest();
+                    return;
+                  }
                   if (running) pause();
                   else {
                     primeTimerAudio();
                     resume();
                   }
                 }}
-                aria-label={running ? "Pause timer" : "Resume timer"}
+                aria-label={
+                  countdownComplete
+                    ? "Restart timer"
+                    : running
+                      ? "Pause timer"
+                      : "Resume timer"
+                }
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/90 hover:bg-white/15 transition-colors"
               >
-                {running ? (
+                {countdownComplete ? (
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.25"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5" />
+                  </svg>
+                ) : running ? (
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <rect x="6" y="5" width="4" height="14" rx="1" />
                     <rect x="14" y="5" width="4" height="14" rx="1" />
@@ -266,7 +295,7 @@ export default function FloatingTimer() {
               <button
                 type="button"
                 onClick={stop}
-                aria-label="Stop timer"
+                aria-label={countdownComplete ? "Close timer" : "Stop timer"}
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/80 hover:text-white hover:bg-white/15 transition-colors"
               >
                 <svg

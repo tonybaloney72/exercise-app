@@ -1,5 +1,4 @@
 import type { Exercise } from "@/types";
-import { applyProgressionMetadata } from "@/lib/progressionFamilies";
 import { enduranceExercises } from "./enduranceExercises";
 import { hybridCalisthenicsExercises } from "./hybridCalisthenicsExercises";
 
@@ -4061,11 +4060,11 @@ const catalogExercises: Exercise[] = [
   },
 ];
 
-export const exercises: Exercise[] = applyProgressionMetadata([
+export const exercises: Exercise[] = [
   ...catalogExercises,
   ...enduranceExercises,
   ...hybridCalisthenicsExercises,
-]);
+];
 
 function buildExerciseMap(): Record<string, Exercise> {
   const map = Object.fromEntries(exercises.map((e) => [e.id, e])) as Record<

@@ -70,4 +70,18 @@ describe("useFloatingTimerStore syncTimerClock", () => {
     useFloatingTimerStore.getState().syncTimerClock();
     expect(useFloatingTimerStore.getState().seconds).toBe(5);
   });
+
+  it("resume at zero restarts countdown from full duration", () => {
+    useFloatingTimerStore.getState().startRest(90, true);
+    vi.advanceTimersByTime(90_000);
+    useFloatingTimerStore.getState().syncTimerClock();
+    expect(useFloatingTimerStore.getState().seconds).toBe(0);
+    expect(useFloatingTimerStore.getState().running).toBe(false);
+
+    useFloatingTimerStore.getState().resume();
+    const s = useFloatingTimerStore.getState();
+    expect(s.seconds).toBe(90);
+    expect(s.running).toBe(true);
+    expect(s.countdownEndsAtMs).not.toBeNull();
+  });
 });

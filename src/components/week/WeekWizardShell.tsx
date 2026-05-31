@@ -63,9 +63,13 @@ export default function WeekWizardShell({
               <span className="block text-caption font-semibold uppercase">
                 {label}
               </span>
-              <span className="mt-0.5 block text-xs">{stripSecondary(dow)}</span>
+              <span className="mt-0.5 block text-xs">
+                {stripSecondary(dow)}
+              </span>
               {isToday ? (
-                <span className="mt-0.5 block text-[9px] text-accent">Today</span>
+                <span className="mt-0.5 block text-[9px] text-accent">
+                  Today
+                </span>
               ) : null}
             </button>
           );
@@ -96,15 +100,14 @@ export function WeekWizardNavFooter({
   prevDisabled?: boolean;
   nextDisabled?: boolean;
 }) {
+  const showPrev = activeDow > 0 && onPrev;
+
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-      <p className="text-xs text-muted">
-        {activeDow > 0
-          ? `Previous: ${WEEK_DAY_ABBRS[activeDow - 1]}`
-          : "Start of week"}
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {activeDow > 0 && onPrev ? (
+      <div
+        className={`flex w-full ${showPrev ? "justify-between" : "justify-end"}`}
+      >
+        {showPrev ? (
           <button
             type="button"
             disabled={prevDisabled}

@@ -80,20 +80,14 @@ export default function ExerciseRow({
   const setPreference = useExercisePreferencesStore((s) => s.setPreference);
   const exercisePreference = preferenceMap[effectiveId];
   const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
-  const progressionFamiliesEnabled = useSettingsStore(
-    (s) => s.progressionFamiliesEnabled,
-  );
 
   const swapPrefs = useMemo(
     () => ({
       availableEquipment,
       dislikedExerciseIds: collectDislikedIds(preferenceMap),
-      expertiseFilter: resolveExpertiseFilter({
-        expertiseByGroup,
-        progressionFamiliesEnabled,
-      }),
+      expertiseFilter: resolveExpertiseFilter({ expertiseByGroup }),
     }),
-    [availableEquipment, preferenceMap, expertiseByGroup, progressionFamiliesEnabled],
+    [availableEquipment, preferenceMap, expertiseByGroup],
   );
 
   const swapCandidates = useMemo(

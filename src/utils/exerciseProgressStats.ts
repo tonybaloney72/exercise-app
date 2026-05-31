@@ -1,5 +1,6 @@
 import type { WorkoutLog } from "@/types";
 import { exerciseMap } from "@/data/exercises";
+import { effectiveExerciseId } from "@/utils/exerciseLogDefaults";
 
 export interface ExerciseProgressPoint {
   date: string;
@@ -37,7 +38,7 @@ export function listExercisesWithNumericProgress(
           !log.skipped &&
           (log.actualReps != null || log.actualDuration != null)
         ) {
-          ids.add(log.exerciseId);
+          ids.add(effectiveExerciseId(log));
         }
       }
     }
@@ -68,7 +69,13 @@ export function buildExerciseProgressSeries(
 
     for (const r of w.rounds) {
       for (const log of r.exercises) {
-        if (log.exerciseId !== exerciseId || !log.completed || log.skipped) continue;
+        if (
+          effectiveExerciseId(log) !== exerciseId ||
+          !log.completed ||
+          log.skipped
+        ) {
+          continue;
+        }
         if (log.actualReps != null) {
           reps += log.actualReps;
           hadReps = true;

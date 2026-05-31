@@ -28,14 +28,6 @@ describe("expertiseLevels", () => {
   it("resolveExpertiseFilter always returns sanitized caps", () => {
     const filter = resolveExpertiseFilter({});
     expect(filter.byGroup.upper_push).toBe("intermediate");
-    expect(filter.progressionFamiliesEnabled).toBe(true);
-  });
-
-  it("resolveExpertiseFilter respects progressionFamiliesEnabled false", () => {
-    const filter = resolveExpertiseFilter({
-      progressionFamiliesEnabled: false,
-    });
-    expect(filter.progressionFamiliesEnabled).toBe(false);
   });
 
   it("caps expert handstand pushup for novice push", () => {

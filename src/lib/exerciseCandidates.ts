@@ -10,7 +10,6 @@ import {
   exerciseMeetsExpertiseCap,
   type ExpertiseFilter,
 } from "@/lib/expertiseLevels";
-import { exerciseMeetsProgressionMinStep } from "@/lib/progressionFilter";
 import type { Exercise, ExerciseCategory, ExerciseEquipment } from "@/types";
 
 export type { ExpertiseFilter } from "@/lib/expertiseLevels";
@@ -59,13 +58,7 @@ export function getReplacementCandidates(options: {
       !dislikedExerciseIds?.has(ex.id) &&
       exerciseMatchesEquipment(ex.equipment, availableEquipment) &&
       (!expertiseFilter ||
-        (exerciseMeetsExpertiseCap(ex, category, expertiseFilter.byGroup) &&
-          (!expertiseFilter.progressionFamiliesEnabled ||
-            exerciseMeetsProgressionMinStep(
-              ex.id,
-              category,
-              expertiseFilter.byGroup,
-            )))),
+        exerciseMeetsExpertiseCap(ex, category, expertiseFilter.byGroup)),
   );
 }
 

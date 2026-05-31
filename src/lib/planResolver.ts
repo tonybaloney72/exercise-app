@@ -43,6 +43,7 @@ import {
 } from "@/lib/programProfile";
 import { buildVarietySeed, varietySeedForCurrentWeek } from "@/lib/planVariety";
 import { shouldPreserveStoredCustomWeekOnPrefsRefresh } from "@/lib/weekPlanPreferences";
+import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
 import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
 import {
   parseLocalDateKey,
@@ -169,6 +170,7 @@ async function refreshPersistedWeek(
 
   const programMode = sanitizeProgramMode(settings.programMode);
   const isCustomProgram = programMode === "custom";
+  const effectiveScope = isGuidedCustomSettings(settings) ? "full" : scope;
 
   const profile = programProfileFromSettings(settings);
   const materialized = materializeWeekFromSeed(
@@ -186,7 +188,7 @@ async function refreshPersistedWeek(
   const persisted = await repo.loadWeek(weekKey);
   const storedDays = persisted?.days ?? null;
 
-  if (scope === "full" || !weekDaysComplete(storedDays)) {
+  if (effectiveScope === "full" || !weekDaysComplete(storedDays)) {
     const source = isCustomProgram
       ? TRAINING_WEEK_SOURCE_CUSTOM_V1
       : TRAINING_WEEK_SOURCE_GENERATED_V1;
@@ -200,7 +202,7 @@ async function refreshPersistedWeek(
   if (
     shouldPreserveStoredCustomWeekOnPrefsRefresh(
       settings,
-      scope,
+      effectiveScope,
       weekDaysComplete(storedDays),
     )
   ) {
@@ -326,6 +328,7 @@ async function loadOrSeedPersistedWeek(
     trainingPriorityPreset,
     roundDensity,
     fingerprint,
+    settings,
   } = await loadGeneratorInputs("authenticated");
   const dislikedIds = collectDislikedIds(prefs);
 
@@ -341,7 +344,13 @@ async function loadOrSeedPersistedWeek(
       dislikedIds,
     )
   ) {
-    return refreshPersistedWeek(weekStartSundayKey, "prefs");
+    const scope =
+      isGuidedCustomSettings(settings) &&
+      storedDays != null &&
+      weekDaysComplete(storedDays)
+        ? "full"
+        : "prefs";
+    return refreshPersistedWeek(weekStartSundayKey, scope);
   }
 
   if (!weekDaysComplete(storedDays)) {

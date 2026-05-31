@@ -2455,20 +2455,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   },
 
   {
-    id: "HC-186",
-    name: "Heel Walk",
-    category: "LB",
-    equipment: ["bodyweight"],
-    expertiseLevel: "beginner",
-    muscleGroups: ["Tibialis"],
-    defaultReps: "10",
-    notes:
-      "Muscle focus: Tibialis. Reference: Hybrid Calisthenics exercise library.",
-    source: "Baptist Health",
-    videoUrl: "https://www.youtube.com/watch?v=aZ15aYKjx58",
-    isTimeBased: false,
-  },
-  {
     id: "HC-187",
     name: "High Cable Curl",
     category: "UPL",
@@ -2852,20 +2838,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
     source: "Klub 20 Gym Beaconsfield",
     videoUrl: "https://www.youtube.com/watch?v=4LoAmWp_h9g",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-216",
-    name: "Fire Hydrant",
-    category: "LB",
-    equipment: ["bodyweight"],
-    expertiseLevel: "intermediate",
-    muscleGroups: ["Abductors"],
-    defaultReps: "10",
-    notes:
-      "Muscle focus: Abductors. Reference: Hybrid Calisthenics exercise library.",
-    source: "AgaAndGina Channel",
-    videoUrl: "https://www.youtube.com/watch?v=IRkRgk2Gc1E",
     isTimeBased: false,
   },
   {
