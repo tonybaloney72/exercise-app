@@ -752,7 +752,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     name: "Band-resisted Pushup",
     category: "UP",
     equipment: ["resistance_band"],
-    expertiseLevel: "novice",
+    expertiseLevel: "advanced",
     muscleGroups: ["Pectoralis Major", "Triceps"],
     defaultReps: "10",
     notes:
@@ -1699,7 +1699,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     name: "Close Grip Pushup",
     category: "UP",
     equipment: ["bodyweight"],
-    expertiseLevel: "novice",
+    expertiseLevel: "advanced",
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
@@ -2971,7 +2971,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     name: "Pushup",
     category: "UP",
     equipment: ["bodyweight"],
-    expertiseLevel: "novice",
+    expertiseLevel: "advanced",
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
