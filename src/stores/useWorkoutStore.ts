@@ -1108,7 +1108,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       durationSeconds: hasDuration ? input.durationSeconds : undefined,
     });
 
-    const persistCompleted = async (log: WorkoutLog): Promise<boolean> => {
+    const persistCompletedWorkout = async (log: WorkoutLog): Promise<boolean> => {
       const saved = hydrateWorkoutLog(
         workoutLogForPersistence({ ...log, paused: false }),
       );
@@ -1126,24 +1126,31 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       }
     };
 
+    const commitInProgressQuickCardio = (log: WorkoutLog): void => {
+      const saved = hydrateWorkoutLog(
+        workoutLogForPersistence({ ...log, paused: false, endTime: undefined }),
+      );
+      const mode = useAuthStore.getState().mode;
+      const historyBefore = get().workoutHistory;
+      set({
+        activeWorkout: saved,
+        pausedWorkoutDate: null,
+        ...(mode === "authenticated"
+          ? { workoutHistory: upsertWorkoutInHistory(historyBefore, saved) }
+          : {}),
+      });
+      if (mode === "authenticated") {
+        void flushPersistInProgressWorkout(saved, { paused: false });
+      } else {
+        saveActiveWorkoutDraft(draftScope(), saved, { paused: false });
+      }
+    };
+
     const state = get();
     const active = state.activeWorkout;
 
     if (active && !active.endTime && active.date === dateKey) {
-      const updated = hydrateWorkoutLog(appendCardioRow(active, row));
-      set({ activeWorkout: updated });
-      const mode = useAuthStore.getState().mode;
-      if (mode === "authenticated") {
-        set({
-          workoutHistory: upsertWorkoutInHistory(
-            get().workoutHistory,
-            updated,
-          ),
-        });
-        void flushPersistInProgressWorkout(updated, { paused: false });
-      } else {
-        saveActiveWorkoutDraft(draftScope(), updated, { paused: false });
-      }
+      commitInProgressQuickCardio(appendCardioRow(active, row));
       return true;
     }
 
@@ -1153,32 +1160,38 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
 
     const completed = findCompletedWorkoutForDate(state.workoutHistory, dateKey);
     if (completed) {
-      return persistCompleted(appendCardioRow(completed, row));
+      return persistCompletedWorkout(appendCardioRow(completed, row));
     }
 
     const inProgress = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
     if (inProgress) {
-      return false;
+      commitInProgressQuickCardio(appendCardioRow(inProgress, row));
+      return true;
     }
 
     const dayOfWeek =
       parseLocalDateKey(dateKey)?.getDay() ?? plan.dayOfWeek;
     const nowIso = new Date().toISOString();
+    const weekAnchor = weekKeyFromDateKey(dateKey) ?? undefined;
+    const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(
+      plan,
+      weekAnchor,
+    );
     const fresh: WorkoutLog = {
       id: uuidv4(),
       date: dateKey,
       dayOfWeek,
       cardioExercises: [row],
-      warmUpCompleted: true,
-      warmUpExercises: [],
-      coolDownCompleted: true,
-      coolDownExercises: [],
+      warmUpCompleted: false,
+      warmUpExercises: warmUp.map(buildStretchExerciseLog),
+      coolDownCompleted: false,
+      coolDownExercises: coolDown.map(buildStretchExerciseLog),
       rounds: buildEmptyRoundLogs(plan),
       startTime: nowIso,
-      endTime: nowIso,
       paused: false,
     };
-    return persistCompleted(fresh);
+    commitInProgressQuickCardio(fresh);
+    return true;
   },
 
   skipExercise: (roundNumber, exerciseId) =>
