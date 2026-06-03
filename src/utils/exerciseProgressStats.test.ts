@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildExerciseProgressSeries,
+  formatExerciseProgressSetBreakdown,
   listExercisesWithNumericProgress,
 } from "@/utils/exerciseProgressStats";
 import type { WorkoutLog } from "@/types";
@@ -59,5 +60,81 @@ describe("exerciseProgressStats", () => {
     const history = [workoutWithSwap("2026-05-18", "LB-99", "LB-12", 12)];
 
     expect(buildExerciseProgressSeries(history, "LB-99")).toEqual([]);
+  });
+
+  it("tracks set count and per-set reps while chart value stays total", () => {
+    const history: WorkoutLog[] = [
+      {
+        id: "w1",
+        date: "2026-05-19",
+        dayOfWeek: 1,
+        warmUpCompleted: false,
+        warmUpExercises: [],
+        coolDownCompleted: false,
+        coolDownExercises: [],
+        cardioExercises: [],
+        rounds: [
+          {
+            roundNumber: 1,
+            exercises: [
+              {
+                exerciseId: "UP-1",
+                completed: true,
+                skipped: false,
+                actualReps: 10,
+              },
+            ],
+          },
+        ],
+        notes: "",
+      },
+      {
+        id: "w2",
+        date: "2026-05-20",
+        dayOfWeek: 2,
+        warmUpCompleted: false,
+        warmUpExercises: [],
+        coolDownCompleted: false,
+        coolDownExercises: [],
+        cardioExercises: [],
+        rounds: [
+          {
+            roundNumber: 1,
+            exercises: [
+              {
+                exerciseId: "UP-1",
+                completed: true,
+                skipped: false,
+                actualReps: 10,
+              },
+            ],
+          },
+          {
+            roundNumber: 2,
+            exercises: [
+              {
+                exerciseId: "UP-1",
+                completed: true,
+                skipped: false,
+                actualReps: 10,
+              },
+            ],
+          },
+        ],
+        notes: "",
+      },
+    ];
+
+    const series = buildExerciseProgressSeries(history, "UP-1");
+    expect(series).toHaveLength(2);
+    expect(series[0]?.value).toBe(10);
+    expect(series[0]?.setCount).toBe(1);
+    expect(series[0]?.repsPerSet).toEqual([10]);
+    expect(series[1]?.value).toBe(20);
+    expect(series[1]?.setCount).toBe(2);
+    expect(series[1]?.repsPerSet).toEqual([10, 10]);
+    expect(formatExerciseProgressSetBreakdown(series[1]!)).toBe(
+      "2 sets (10 + 10)",
+    );
   });
 });

@@ -11,9 +11,13 @@ import {
   CartesianGrid,
 } from "recharts";
 import type { WorkoutLog } from "@/types";
+import { resolveExerciseDisplayName } from "@/lib/exerciseDisplayName";
 import {
   buildExerciseProgressSeries,
+  exerciseProgressTooltipLines,
+  formatExerciseProgressSetsCell,
   listExercisesWithNumericProgress,
+  type ExerciseProgressPoint,
 } from "@/utils/exerciseProgressStats";
 import { formatSecondsToMMSS } from "@/utils/time";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
@@ -55,7 +59,9 @@ export default function ExerciseProgressChart({ history }: Props) {
   const yLabel = axisMode === "duration" ? "Time (sec)" : "Reps";
 
   const exerciseName = useMemo(
-    () => options.find((o) => o.id === exerciseId)?.name ?? exerciseId,
+    () =>
+      options.find((o) => o.id === exerciseId)?.name ??
+      resolveExerciseDisplayName(exerciseId),
     [options, exerciseId],
   );
 
@@ -87,8 +93,8 @@ export default function ExerciseProgressChart({ history }: Props) {
           Exercise over time
         </h2>
         <p className="text-xs text-muted mt-0.5">
-          Reps or logged duration per workout (summed if the exercise appears in
-          multiple rounds)
+          Total reps or time per day; hover a point or open Sessions to see how
+          many sets you logged
         </p>
       </div>
 
@@ -129,12 +135,10 @@ export default function ExerciseProgressChart({ history }: Props) {
         bodyClassName="overflow-y-auto overscroll-contain px-2 pb-3"
         headerExtra={
           <p className="shrink-0 border-b border-border px-4 py-2 text-sm leading-snug text-muted">
-            One row per workout. Numbers are{" "}
-            <span className="text-foreground">what you logged </span>
-            (summed across rounds), not the prescribed targets. The line chart
-            uses <span className="text-foreground">total time</span> for
-            time-based exercises when duration was logged; otherwise it uses{" "}
-            <span className="text-foreground">total reps</span>.
+            One row per workout. <span className="text-foreground">Sets</span>{" "}
+            lists each logged set; reps and time columns are day totals. The line
+            chart uses total time for time-based exercises when duration was
+            logged; otherwise total reps.
           </p>
         }
       >
@@ -148,8 +152,9 @@ export default function ExerciseProgressChart({ history }: Props) {
             <thead>
               <tr className="border-b border-border text-muted">
                 <th className="px-2 py-2 font-medium">Date</th>
-                <th className="px-2 py-2 font-medium">Reps (logged)</th>
-                <th className="px-2 py-2 font-medium">Time (logged)</th>
+                <th className="px-2 py-2 font-medium">Sets</th>
+                <th className="px-2 py-2 font-medium">Reps (total)</th>
+                <th className="px-2 py-2 font-medium">Time (total)</th>
               </tr>
             </thead>
             <tbody>
@@ -160,6 +165,9 @@ export default function ExerciseProgressChart({ history }: Props) {
                 >
                   <td className="whitespace-nowrap px-2 py-2 font-mono text-foreground">
                     {row.date}
+                  </td>
+                  <td className="px-2 py-2 text-foreground">
+                    {formatExerciseProgressSetsCell(row)}
                   </td>
                   <td className="px-2 py-2 tabular-nums text-foreground">
                     {row.reps > 0 ? row.reps : "—"}
@@ -234,28 +242,13 @@ export default function ExerciseProgressChart({ history }: Props) {
                   return row?.xLabel ?? "";
                 }}
                 formatter={(value, _name, item) => {
-                  const p = item?.payload as
-                    | {
-                        mode?: string;
-                        reps?: number;
-                        durationSec?: number;
-                      }
-                    | undefined;
-                  const v = Number(value ?? 0);
-                  if (p?.mode === "duration") {
-                    const line = `${formatSecondsToMMSS(v) || `${v}s`} total`;
-                    if (p.reps && p.reps > 0)
-                      return [line, `Also ${p.reps} reps logged`];
-                    return [line, "Duration"];
-                  }
-                  const line = `${v} reps`;
-                  if (p?.durationSec && p.durationSec > 0) {
-                    return [
-                      line,
-                      `${formatSecondsToMMSS(p.durationSec) || `${p.durationSec}s`} logged`,
-                    ];
-                  }
-                  return [line, "Reps"];
+                  const p = item?.payload as ExerciseProgressPoint | undefined;
+                  if (!p) return [String(value ?? 0), ""];
+                  const { primary, secondary } = exerciseProgressTooltipLines(
+                    p,
+                    Number(value ?? 0),
+                  );
+                  return [primary, secondary];
                 }}
               />
               <Line

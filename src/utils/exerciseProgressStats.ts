@@ -1,5 +1,6 @@
 import type { WorkoutLog } from "@/types";
 import { exerciseMap } from "@/data/exercises";
+import { resolveExerciseDisplayName } from "@/lib/exerciseDisplayName";
 import { effectiveExerciseId } from "@/utils/exerciseLogDefaults";
 
 export interface ExerciseProgressPoint {
@@ -10,6 +11,12 @@ export interface ExerciseProgressPoint {
   mode: "reps" | "duration";
   reps: number;
   durationSec: number;
+  /** Completed logs for this exercise that day (one per round slot). */
+  setCount: number;
+  /** Per-set logged reps, in workout order. */
+  repsPerSet: number[];
+  /** Per-set logged duration (seconds), in workout order. */
+  durationPerSet: number[];
 }
 
 function parseDateKeyMs(key: string): number {
@@ -44,7 +51,7 @@ export function listExercisesWithNumericProgress(
     }
   }
   return [...ids]
-    .map((id) => ({ id, name: exerciseMap[id]?.name ?? id }))
+    .map((id) => ({ id, name: resolveExerciseDisplayName(id) }))
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
 }
 
@@ -66,6 +73,9 @@ export function buildExerciseProgressSeries(
     let durationSec = 0;
     let hadReps = false;
     let hadDur = false;
+    let setCount = 0;
+    const repsPerSet: number[] = [];
+    const durationPerSet: number[] = [];
 
     for (const r of w.rounds) {
       for (const log of r.exercises) {
@@ -76,12 +86,19 @@ export function buildExerciseProgressSeries(
         ) {
           continue;
         }
+        if (log.actualReps == null && log.actualDuration == null) {
+          continue;
+        }
+
+        setCount += 1;
         if (log.actualReps != null) {
           reps += log.actualReps;
+          repsPerSet.push(log.actualReps);
           hadReps = true;
         }
         if (log.actualDuration != null) {
           durationSec += log.actualDuration;
+          durationPerSet.push(log.actualDuration);
           hadDur = true;
         }
       }
@@ -105,6 +122,9 @@ export function buildExerciseProgressSeries(
       mode,
       reps,
       durationSec,
+      setCount,
+      repsPerSet,
+      durationPerSet,
     });
   }
 
@@ -118,4 +138,70 @@ export function buildExerciseProgressSeries(
     normalized = points;
   }
   return normalized;
+}
+
+function formatDurationSeconds(sec: number): string {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m > 0 && s > 0) return `${m}m ${s}s`;
+  if (m > 0) return `${m}m`;
+  return `${s}s`;
+}
+
+/** e.g. `2 sets (10 + 10)` or `1 set (45s)` */
+export function formatExerciseProgressSetBreakdown(
+  point: ExerciseProgressPoint,
+): string {
+  const label = point.setCount === 1 ? "1 set" : `${point.setCount} sets`;
+  if (point.mode === "duration" && point.durationPerSet.length > 0) {
+    const parts = point.durationPerSet.map(formatDurationSeconds);
+    return `${label} (${parts.join(" + ")})`;
+  }
+  if (point.repsPerSet.length > 0) {
+    return `${label} (${point.repsPerSet.join(" + ")})`;
+  }
+  return label;
+}
+
+/** Primary + secondary lines for chart tooltip. */
+export function exerciseProgressTooltipLines(
+  point: ExerciseProgressPoint,
+  chartValue: number,
+): { primary: string; secondary: string } {
+  const breakdown = formatExerciseProgressSetBreakdown(point);
+  if (point.mode === "duration") {
+    const total =
+      formatDurationSeconds(chartValue) ||
+      `${Math.round(chartValue)}s total`;
+    const primary = `${total} · ${breakdown}`;
+    if (point.reps > 0) {
+      return { primary, secondary: `${point.reps} reps also logged` };
+    }
+    return { primary, secondary: "Total time that day" };
+  }
+  const primary = `${chartValue} reps · ${breakdown}`;
+  if (point.durationSec > 0) {
+    return {
+      primary,
+      secondary: `${formatDurationSeconds(point.durationSec)} time also logged`,
+    };
+  }
+  return { primary, secondary: "Total reps that day" };
+}
+
+/** Compact sets column for the sessions table. */
+export function formatExerciseProgressSetsCell(
+  point: ExerciseProgressPoint,
+): string {
+  if (point.setCount === 0) return "—";
+  if (point.mode === "duration" && point.durationPerSet.length > 0) {
+    const parts = point.durationPerSet.map(formatDurationSeconds);
+    if (point.setCount === 1) return parts[0] ?? "1 set";
+    return `${point.setCount} (${parts.join(", ")})`;
+  }
+  if (point.repsPerSet.length > 0) {
+    if (point.setCount === 1) return String(point.repsPerSet[0]);
+    return `${point.setCount} (${point.repsPerSet.join(", ")})`;
+  }
+  return String(point.setCount);
 }
