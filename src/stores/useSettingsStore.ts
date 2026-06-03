@@ -199,6 +199,7 @@ function pickUserSettingsFields(
     weeklyCardioByDay: state.weeklyCardioByDay,
     weeklyCardioCustomized: state.weeklyCardioCustomized,
     expertiseByGroup: state.expertiseByGroup,
+    weightLog: state.weightLog,
   };
 }
 

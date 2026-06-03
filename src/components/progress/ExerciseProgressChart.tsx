@@ -19,8 +19,6 @@ import { formatSecondsToMMSS } from "@/utils/time";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
-import ExportChartButton from "@/components/progress/ExportChartButton";
-
 const tooltipStyle = {
   backgroundColor: "var(--surface)",
   border: "1px solid var(--border-color)",
@@ -84,21 +82,14 @@ export default function ExerciseProgressChart({ history }: Props) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-foreground">
-            Exercise over time
-          </h2>
-          <p className="text-xs text-muted mt-0.5">
-            Reps or logged duration per workout (summed if the exercise appears in
-            multiple rounds)
-          </p>
-        </div>
-        <ExportChartButton
-          containerRef={chartRef}
-          filename={exerciseName || exerciseId}
-          disabled={series.length === 0}
-        />
+      <div>
+        <h2 className="text-sm font-semibold text-foreground">
+          Exercise over time
+        </h2>
+        <p className="text-xs text-muted mt-0.5">
+          Reps or logged duration per workout (summed if the exercise appears in
+          multiple rounds)
+        </p>
       </div>
 
       <div className="flex gap-2">

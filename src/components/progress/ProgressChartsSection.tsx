@@ -3,22 +3,16 @@
 import { useMemo, useRef } from "react";
 import {
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
   PieChart,
   Pie,
   Cell,
+  Tooltip,
 } from "recharts";
 import type { WorkoutLog } from "@/types";
 import { CATEGORIES } from "@/data/categories";
-import { weeklyWorkoutCounts, trainingCategoryTotals } from "@/utils/progressStats";
+import { trainingCategoryTotals } from "@/utils/progressStats";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
-import ExportChartButton from "@/components/progress/ExportChartButton";
 
 const tooltipStyle = {
   backgroundColor: "var(--surface)",
@@ -28,16 +22,12 @@ const tooltipStyle = {
   fontSize: 12,
 };
 
-const axisTick = { fill: "var(--muted)", fontSize: 11 };
-
 interface Props {
   history: WorkoutLog[];
 }
 
 export default function ProgressChartsSection({ history }: Props) {
-  const weeklyChartRef = useRef<HTMLDivElement>(null);
   const categoryChartRef = useRef<HTMLDivElement>(null);
-  const weekly = useMemo(() => weeklyWorkoutCounts(history, 8), [history]);
   const categoryData = useMemo(() => {
     const rows = trainingCategoryTotals(history);
     return rows.map((r) => ({
@@ -55,144 +45,90 @@ export default function ProgressChartsSection({ history }: Props) {
   }
 
   return (
-    <div className="space-y-5">
-      <div>
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-foreground">
-              Workouts per week
-            </h2>
-            <p className="text-xs text-muted mt-0.5">
-              Sunday–Saturday weeks; label is the week&apos;s start date
-            </p>
-          </div>
-          <ExportChartButton
-            containerRef={weeklyChartRef}
-            filename="workouts-per-week"
-          />
+    <div>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-foreground">
+            Training focus
+          </h2>
+          <p className="text-xs text-muted mt-0.5">
+            Completed strength exercises by category (stretches excluded)
+          </p>
         </div>
-        <SurfaceCard ref={weeklyChartRef} className="mt-3 h-56 w-full p-2 pt-3">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={weekly} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
-              <CartesianGrid
-                stroke="var(--border-color)"
-                strokeDasharray="4 4"
-                vertical={false}
-              />
-              <XAxis dataKey="label" tick={axisTick} tickLine={false} axisLine={false} />
-              <YAxis
-                allowDecimals={false}
-                width={36}
-                tick={axisTick}
-                tickLine={false}
-                axisLine={false}
-              />
-              <Tooltip
-                cursor={{ fill: "var(--surface-hover)" }}
-                contentStyle={tooltipStyle}
-                formatter={(value) => [`${Number(value ?? 0)}`, "Workouts"]}
-                labelFormatter={(label) => `Week of ${label}`}
-              />
-              <Bar
-                dataKey="count"
-                name="Workouts"
-                fill="var(--accent)"
-                radius={[6, 6, 0, 0]}
-                maxBarSize={40}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </SurfaceCard>
       </div>
-
-      <div>
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-foreground">
-              Training focus
-            </h2>
-            <p className="text-xs text-muted mt-0.5">
-              Completed strength exercises by category (stretches excluded)
-            </p>
-          </div>
-          {hasCategoryData && (
-            <ExportChartButton
-              containerRef={categoryChartRef}
-              filename="training-focus"
-            />
-          )}
-        </div>
-        {hasCategoryData ? (
-          <SurfaceCard
-            ref={categoryChartRef}
-            className="mt-3 w-full overflow-hidden p-0"
-          >
-            <div className="h-[220px] w-full px-4 pt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
-                  <Pie
-                    data={categoryData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="48%"
-                    innerRadius={44}
-                    outerRadius={68}
-                    paddingAngle={2}
-                  >
-                    {categoryData.map((entry) => (
-                      <Cell
-                        key={entry.category}
-                        fill={entry.fill}
-                        stroke="var(--background)"
-                        strokeWidth={1}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={tooltipStyle}
-                    formatter={(value, _name, item) => {
-                      const v = Number(value ?? 0);
-                      const total = categoryData.reduce((s, d) => s + d.value, 0);
-                      const pct = total ? Math.round((v / total) * 100) : 0;
-                      const label =
-                        item && "payload" in item && item.payload && typeof item.payload === "object"
-                          ? (item.payload as { name?: string }).name
-                          : undefined;
-                      return [`${v} (${pct}%)`, label ?? "Sets"];
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <ul
-              className="flex flex-wrap justify-center gap-x-4 gap-y-2.5 px-4 pb-4 pt-1"
-              aria-label="Category legend"
-            >
-              {categoryData.map((entry) => (
-                <li
-                  key={entry.category}
-                  className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-muted"
+      {hasCategoryData ? (
+        <SurfaceCard
+          ref={categoryChartRef}
+          className="mt-3 w-full overflow-hidden p-0"
+        >
+          <div className="h-[220px] w-full px-4 pt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+                <Pie
+                  data={categoryData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="48%"
+                  innerRadius={44}
+                  outerRadius={68}
+                  paddingAngle={2}
                 >
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-sm"
-                    style={{ backgroundColor: entry.fill }}
-                    aria-hidden
-                  />
-                  {entry.name}
-                </li>
-              ))}
-            </ul>
-          </SurfaceCard>
-        ) : (
-          <SurfaceCard className="mt-3 border-dashed bg-surface/50 px-4 py-8">
-            <EmptyState
-              title="No logged strength sets yet — finish round exercises to see this chart."
-              className="text-xs"
-            />
-          </SurfaceCard>
-        )}
-      </div>
+                  {categoryData.map((entry) => (
+                    <Cell
+                      key={entry.category}
+                      fill={entry.fill}
+                      stroke="var(--background)"
+                      strokeWidth={1}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  formatter={(value, _name, item) => {
+                    const v = Number(value ?? 0);
+                    const total = categoryData.reduce((s, d) => s + d.value, 0);
+                    const pct = total ? Math.round((v / total) * 100) : 0;
+                    const label =
+                      item &&
+                      "payload" in item &&
+                      item.payload &&
+                      typeof item.payload === "object"
+                        ? (item.payload as { name?: string }).name
+                        : undefined;
+                    return [`${v} (${pct}%)`, label ?? "Sets"];
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <ul
+            className="flex flex-wrap justify-center gap-x-4 gap-y-2.5 px-4 pb-4 pt-1"
+            aria-label="Category legend"
+          >
+            {categoryData.map((entry) => (
+              <li
+                key={entry.category}
+                className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-muted"
+              >
+                <span
+                  className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                  style={{ backgroundColor: entry.fill }}
+                  aria-hidden
+                />
+                {entry.name}
+              </li>
+            ))}
+          </ul>
+        </SurfaceCard>
+      ) : (
+        <SurfaceCard className="mt-3 border-dashed bg-surface/50 px-4 py-8">
+          <EmptyState
+            title="No logged strength sets yet — finish round exercises to see this chart."
+            className="text-xs"
+          />
+        </SurfaceCard>
+      )}
     </div>
   );
 }

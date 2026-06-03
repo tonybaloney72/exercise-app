@@ -123,6 +123,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   weeklyCardioByDay: suggestWeeklyCardioFromCatalog(),
   weeklyCardioCustomized: false,
   expertiseByGroup: { ...DEFAULT_EXPERTISE_BY_GROUP },
+  weightLog: [],
 };
 
 /** Stretch defaults seeded for guest localStorage when none are stored. */

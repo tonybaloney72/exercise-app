@@ -35,6 +35,7 @@ import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 import QuickActivityLog from "@/components/workout/QuickActivityLog";
+import WeightLogCard from "@/components/workout/WeightLogCard";
 
 function formatSessionHeaderDate(dateKey: string): string {
   const d = parseLocalDateKey(dateKey);
@@ -427,8 +428,9 @@ function TodayPageInner() {
       )}
 
       {showQuickActivityLog && (
-        <AnimatedSection delay={0.18}>
+        <AnimatedSection className="space-y-3" delay={0.18}>
           <QuickActivityLog plan={plan} dateKey={todayKey} />
+          <WeightLogCard dateKey={todayKey} />
         </AnimatedSection>
       )}
     </div>

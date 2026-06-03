@@ -10,6 +10,7 @@ import { resolveTrainingWeekForAuth } from "@/lib/planResolver";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import ProgressChartsSection from "@/components/progress/ProgressChartsSection";
+import WeightProgressChart from "@/components/progress/WeightProgressChart";
 import ExerciseProgressChart from "@/components/progress/ExerciseProgressChart";
 import CardioProgressSection from "@/components/progress/CardioProgressSection";
 import {
@@ -200,6 +201,8 @@ export default function ProgressPage() {
       </div>
 
       {completedHistory.length > 0 && <ProgressHistoryLink />}
+
+      <WeightProgressChart />
 
       <ProgressChartsSection history={completedHistory} />
 
