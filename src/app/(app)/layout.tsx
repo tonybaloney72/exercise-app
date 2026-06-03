@@ -1,5 +1,5 @@
 import BottomNav from "@/components/layout/BottomNav";
-import EquipmentOnboardingGate from "@/components/onboarding/EquipmentOnboardingGate";
+import OnboardingGate from "@/components/onboarding/OnboardingGate";
 import AppSettingsSync from "@/components/layout/AppSettingsSync";
 import WakeLockSync from "@/components/layout/WakeLockSync";
 import AppToaster from "@/components/layout/AppToaster";
@@ -27,7 +27,7 @@ export default async function AppLayout({
         initialGuest={isGuest}
       />
       <AppSettingsSync />
-      <EquipmentOnboardingGate />
+      <OnboardingGate />
       <WakeLockSync />
       <AppToaster />
       <main className="flex-1 pb-20">

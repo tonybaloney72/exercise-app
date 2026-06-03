@@ -288,7 +288,7 @@ export interface UserSettings {
    * Exercises with an `equipment` tag require at least one matching entry.
    */
   availableEquipment: ExerciseEquipment[];
-  /** First-run equipment picker completed or skipped. */
+  /** First-run multi-step onboarding completed or skipped via Skip setup. */
   equipmentOnboardingCompleted: boolean;
   trainingPriorityPreset: TrainingPriorityPreset;
   /** Per-group emphasis 0–4 (Skip … Peak). Drives week generation. */

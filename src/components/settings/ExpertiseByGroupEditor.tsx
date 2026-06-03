@@ -16,20 +16,33 @@ import type { ExpertiseByGroup, ExpertiseLevel } from "@/types";
 type Props = {
   byGroup: ExpertiseByGroup;
   onChange: (byGroup: ExpertiseByGroup) => void;
+  /** Shorter copy for onboarding (no settings-only hints). */
+  variant?: "settings" | "onboarding";
 };
 
-export default function ExpertiseByGroupEditor({ byGroup, onChange }: Props) {
+export default function ExpertiseByGroupEditor({
+  byGroup,
+  onChange,
+  variant = "settings",
+}: Props) {
   function setGroupLevel(group: EmphasisGroup, level: ExpertiseLevel) {
     onChange({ ...byGroup, [group]: level });
   }
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted leading-relaxed">
-        Plans and swaps only use exercises at or below each group&apos;s level.
-        Turn off &ldquo;Avoid easy regressions&rdquo; above to allow easier
-        steps in a progression (e.g. incline push-ups) regardless of cap.
-      </p>
+      {variant === "settings" ? (
+        <p className="text-sm text-muted leading-relaxed">
+          Plans and swaps only use exercises at or below each group&apos;s level.
+          Turn off &ldquo;Avoid easy regressions&rdquo; above to allow easier
+          steps in a progression (e.g. incline push-ups) regardless of cap.
+        </p>
+      ) : (
+        <p className="text-sm text-muted leading-relaxed">
+          We&apos;ll match plans and swaps to exercises at or below each
+          group&apos;s level. You can change these anytime in Settings.
+        </p>
+      )}
 
       <div className="space-y-3">
         {EMPHASIS_GROUP_ORDER.map((group) => (
