@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { exercises } from "@/data/exercises";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
+import CollapsibleSection from "@/components/common/CollapsibleSection";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { EQUIPMENT_LABELS, exerciseMatchesEquipment } from "@/data/equipment";
 import EmptyState from "@/components/common/EmptyState";
@@ -35,16 +36,57 @@ import {
   TIMER_DURATION_PRESET_SECONDS,
 } from "@/utils/effectiveExerciseSettings";
 
+const chipRowClass = "flex gap-2 overflow-x-auto pb-1 scrollbar-hide";
+
+function LibraryFilterRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <p className="text-sm font-medium text-muted px-1">
+        {label}
+        <span className="font-normal text-muted/80">
+          {" "}
+          · tap to select multiple
+        </span>
+      </p>
+      <div className={`${chipRowClass} -mx-4 px-4`}>{children}</div>
+    </div>
+  );
+}
+
 export default function LibraryPage() {
   const [search, setSearch] = useState("");
-  const [activeFilter, setActiveFilter] = useState<ExerciseCategory | "all">(
-    "all",
-  );
+  const [selectedCategories, setSelectedCategories] = useState<
+    Set<ExerciseCategory>
+  >(() => new Set());
+  const [selectedDifficulties, setSelectedDifficulties] = useState<
+    Set<ExpertiseLevel>
+  >(() => new Set());
   const [showUnavailable, setShowUnavailable] = useState(false);
   const [withinMyLevel, setWithinMyLevel] = useState(false);
-  const [activeDifficulty, setActiveDifficulty] = useState<
-    ExpertiseLevel | "all"
-  >("all");
+
+  function toggleCategory(cat: ExerciseCategory) {
+    setSelectedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  }
+
+  function toggleDifficulty(level: ExpertiseLevel) {
+    setSelectedDifficulties((prev) => {
+      const next = new Set(prev);
+      if (next.has(level)) next.delete(level);
+      else next.add(level);
+      return next;
+    });
+  }
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
   const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
   const authMode = useAuthStore((s) => s.mode);
@@ -70,10 +112,10 @@ export default function LibraryPage() {
         (ex.muscleGroups?.some((m) => m.toLowerCase().includes(q)) ?? false);
 
       const matchesCategory =
-        activeFilter === "all" || ex.category === activeFilter;
+        selectedCategories.size === 0 || selectedCategories.has(ex.category);
 
       const matchesDifficulty =
-        activeDifficulty === "all" || level === activeDifficulty;
+        selectedDifficulties.size === 0 || selectedDifficulties.has(level);
 
       const matchesEquipment =
         showUnavailable ||
@@ -93,8 +135,8 @@ export default function LibraryPage() {
     });
   }, [
     search,
-    activeFilter,
-    activeDifficulty,
+    selectedCategories,
+    selectedDifficulties,
     showUnavailable,
     withinMyLevel,
     availableEquipment,
@@ -110,6 +152,17 @@ export default function LibraryPage() {
     return groups;
   }, [filtered]);
 
+  const visibleCategories = useMemo(
+    () => CATEGORY_ORDER.filter((cat) => (grouped[cat]?.length ?? 0) > 0),
+    [grouped],
+  );
+
+  const filtersActive =
+    selectedCategories.size > 0 ||
+    selectedDifficulties.size > 0 ||
+    showUnavailable ||
+    withinMyLevel;
+
   return (
     <div className="py-6 space-y-5">
       <div>
@@ -122,34 +175,6 @@ export default function LibraryPage() {
       {authMode === "guest" && (
         <AccountFeatureGate feature="libraryPreferences" />
       )}
-
-      <label className="flex items-start gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={showUnavailable}
-          onChange={(e) => setShowUnavailable(e.target.checked)}
-          className="mt-0.5 h-4 w-4 rounded border-border accent-accent"
-        />
-        <span className="text-xs text-muted leading-relaxed">
-          Show exercises that need equipment you haven&apos;t selected <br />
-          <span className="text-foreground">Settings → Your equipment</span>
-        </span>
-      </label>
-
-      <label className="flex items-start gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={withinMyLevel}
-          onChange={(e) => setWithinMyLevel(e.target.checked)}
-          className="mt-0.5 h-4 w-4 rounded border-border accent-accent"
-        />
-        <span className="text-xs text-muted leading-relaxed">
-          Only show exercises at or below my skill level <br />
-          <span className="text-foreground">
-            Settings → Exercise difficulty
-          </span>
-        </span>
-      </label>
 
       {/* Search */}
       <div className="relative">
@@ -176,42 +201,48 @@ export default function LibraryPage() {
         />
       </div>
 
-      {/* Category filter chips */}
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
-        <button
-          onClick={() => setActiveFilter("all")}
-          className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-            activeFilter === "all"
-              ? "bg-accent text-white"
-              : "bg-surface text-muted hover:text-foreground border border-border"
-          }`}
-        >
-          All
-        </button>
-        {CATEGORY_ORDER.map((cat) => (
+      <CollapsibleSection
+        flat
+        title="Filters"
+        hint={""}
+        defaultOpen
+        contentClassName="space-y-4"
+      >
+        <LibraryFilterRow label="Category">
           <button
-            key={cat}
-            onClick={() => setActiveFilter(cat === activeFilter ? "all" : cat)}
+            type="button"
+            onClick={() => setSelectedCategories(new Set())}
             className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-              activeFilter === cat
-                ? `${CATEGORIES[cat].bgColor} ${CATEGORIES[cat].textColor}`
+              selectedCategories.size === 0
+                ? "bg-accent text-white"
                 : "bg-surface text-muted hover:text-foreground border border-border"
             }`}
           >
-            {CATEGORIES[cat].shortName}
+            All
           </button>
-        ))}
-      </div>
+          {CATEGORY_ORDER.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              aria-pressed={selectedCategories.has(cat)}
+              onClick={() => toggleCategory(cat)}
+              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                selectedCategories.has(cat)
+                  ? `${CATEGORIES[cat].bgColor} ${CATEGORIES[cat].textColor}`
+                  : "bg-surface text-muted hover:text-foreground border border-border"
+              }`}
+            >
+              {CATEGORIES[cat].shortName}
+            </button>
+          ))}
+        </LibraryFilterRow>
 
-      {/* Difficulty filter chips */}
-      <div className="space-y-1.5">
-        <p className="text-sm font-medium text-muted px-1">Difficulty</p>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+        <LibraryFilterRow label="Difficulty">
           <button
             type="button"
-            onClick={() => setActiveDifficulty("all")}
+            onClick={() => setSelectedDifficulties(new Set())}
             className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-              activeDifficulty === "all"
+              selectedDifficulties.size === 0
                 ? "bg-accent text-white"
                 : "bg-surface text-muted hover:text-foreground border border-border"
             }`}
@@ -222,13 +253,10 @@ export default function LibraryPage() {
             <button
               key={level}
               type="button"
-              onClick={() =>
-                setActiveDifficulty(
-                  level === activeDifficulty ? "all" : level,
-                )
-              }
+              aria-pressed={selectedDifficulties.has(level)}
+              onClick={() => toggleDifficulty(level)}
               className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                activeDifficulty === level
+                selectedDifficulties.has(level)
                   ? "bg-accent text-white"
                   : "bg-surface text-muted hover:text-foreground border border-border"
               }`}
@@ -236,41 +264,90 @@ export default function LibraryPage() {
               {EXPERTISE_LEVEL_LABELS[level]}
             </button>
           ))}
-        </div>
-      </div>
+        </LibraryFilterRow>
+
+        <LibraryFilterRow label="More">
+          <button
+            type="button"
+            onClick={() => {
+              setShowUnavailable(false);
+              setWithinMyLevel(false);
+            }}
+            className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+              !showUnavailable && !withinMyLevel
+                ? "bg-accent text-white"
+                : "bg-surface text-muted hover:text-foreground border border-border"
+            }`}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            aria-pressed={showUnavailable}
+            title="Show exercises that need equipment you haven't selected (Settings → Your equipment)"
+            onClick={() => setShowUnavailable((v) => !v)}
+            className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+              showUnavailable
+                ? "bg-accent text-white"
+                : "bg-surface text-muted hover:text-foreground border border-border"
+            }`}
+          >
+            Need equipment
+          </button>
+          <button
+            type="button"
+            aria-pressed={withinMyLevel}
+            title="Only show exercises at or below my skill level (Settings → Exercise difficulty)"
+            onClick={() => setWithinMyLevel((v) => !v)}
+            className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+              withinMyLevel
+                ? "bg-accent text-white"
+                : "bg-surface text-muted hover:text-foreground border border-border"
+            }`}
+          >
+            My level
+          </button>
+        </LibraryFilterRow>
+      </CollapsibleSection>
 
       {/* Exercise list */}
       <div className="space-y-6">
         <AnimatePresence mode="popLayout">
-          {CATEGORY_ORDER.filter((cat) => grouped[cat]?.length).map((cat) => (
-            <motion.div
-              key={cat}
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-2"
-            >
-              <div className="flex items-center gap-2">
-                <div
-                  className="h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: CATEGORIES[cat].color }}
-                />
-                <h2 className="text-sm font-semibold text-foreground">
-                  {CATEGORIES[cat].name}
-                </h2>
-                <span className="text-xs text-muted">
-                  ({grouped[cat].length})
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                {grouped[cat].map((ex) => (
-                  <ExerciseCard key={ex.id} exercise={ex} />
-                ))}
-              </div>
-            </motion.div>
-          ))}
+          {visibleCategories.map((cat, index) => {
+            const count = grouped[cat]!.length;
+            return (
+              <motion.div
+                key={cat}
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="space-y-2"
+              >
+                <CollapsibleSection
+                  flat
+                  hintInline
+                  title={
+                    <span className="inline-flex items-center gap-2">
+                      <span
+                        className="h-2.5 w-2.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: CATEGORIES[cat].color }}
+                        aria-hidden
+                      />
+                      {CATEGORIES[cat].name}
+                    </span>
+                  }
+                  hint={String(count)}
+                  defaultOpen={false}
+                  contentClassName="space-y-1"
+                >
+                  {grouped[cat]!.map((ex) => (
+                    <ExerciseCard key={ex.id} exercise={ex} />
+                  ))}
+                </CollapsibleSection>
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
 
         {filtered.length === 0 && (
@@ -543,7 +620,8 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                     strokeLinejoin="round"
                     aria-hidden
                   >
-                    {exerciseVideoLinkLabel(exercise.videoUrl) === "Watch video" ? (
+                    {exerciseVideoLinkLabel(exercise.videoUrl) ===
+                    "Watch video" ? (
                       <polygon points="5 3 19 12 5 21 5 3" />
                     ) : (
                       <>

@@ -6,12 +6,16 @@ import SurfaceCard from "@/components/common/SurfaceCard";
 import ExpandChevron from "@/components/workout/ExpandChevron";
 
 interface CollapsibleSectionProps {
-  title: string;
+  title: ReactNode;
   /** Subtitle under the title (shown open and collapsed). */
   hint?: string;
   defaultOpen?: boolean;
   /** Nested panel inside another card (no outer SurfaceCard). */
   embedded?: boolean;
+  /** Page-background headers (e.g. Library) — no card chrome, compact title row. */
+  flat?: boolean;
+  /** With `flat`, show hint in parentheses beside the title instead of below. */
+  hintInline?: boolean;
   /** Classes on the expanded content wrapper. */
   contentClassName?: string;
   /** @deprecated Use `toolbar` — actions in the header crowd mobile layouts. */
@@ -27,6 +31,8 @@ export default function CollapsibleSection({
   hint,
   defaultOpen = true,
   embedded = false,
+  flat = false,
+  hintInline = false,
   contentClassName,
   headerActions,
   toolbar,
@@ -36,15 +42,21 @@ export default function CollapsibleSection({
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const panelToolbar = toolbar ?? headerActions;
 
-  const titleClass = embedded
-    ? "text-sm font-semibold text-foreground"
-    : "text-base font-semibold text-foreground";
+  const titleClass =
+    flat || embedded
+      ? "text-sm font-semibold text-foreground"
+      : "text-base font-semibold text-foreground";
 
-  const headerButtonClass = embedded
-    ? "flex w-full items-start gap-2 border-t border-border py-3 text-left"
-    : "flex w-full items-start gap-2 border-b border-border px-4 py-3 text-left";
+  const headerButtonClass = flat
+    ? `flex w-full gap-2 py-0.5 text-left ${
+        hintInline ? "items-center" : "items-start"
+      }`
+    : embedded
+      ? "flex w-full items-start gap-2 border-t border-border py-3 text-left"
+      : "flex w-full items-start gap-2 border-b border-border px-4 py-3 text-left";
 
-  const bodyClass = contentClassName ?? (embedded ? "space-y-3" : undefined);
+  const bodyClass =
+    contentClassName ?? (embedded || flat ? "space-y-3" : undefined);
 
   const panel = (
     <>
@@ -56,10 +68,21 @@ export default function CollapsibleSection({
       >
         <ExpandChevron open={isOpen} className="mt-0.5" />
         <span className="min-w-0 flex-1">
-          <span className={`block ${titleClass}`}>{title}</span>
-          {hint ? (
-            <span className="mt-0.5 block text-sm leading-snug text-muted">{hint}</span>
-          ) : null}
+          {flat && hintInline && hint ? (
+            <span className="inline-flex flex-wrap items-center gap-2">
+              <span className={titleClass}>{title}</span>
+              <span className="text-xs text-muted">({hint})</span>
+            </span>
+          ) : (
+            <>
+              <span className={`block ${titleClass}`}>{title}</span>
+              {hint && !(flat && hintInline) ? (
+                <span className="mt-0.5 block text-sm leading-snug text-muted">
+                  {hint}
+                </span>
+              ) : null}
+            </>
+          )}
         </span>
       </button>
 
@@ -94,7 +117,7 @@ export default function CollapsibleSection({
     </>
   );
 
-  if (embedded) {
+  if (embedded || flat) {
     return <div className={className}>{panel}</div>;
   }
 
