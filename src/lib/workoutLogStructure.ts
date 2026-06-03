@@ -103,6 +103,17 @@ export function addRoundAt(log: WorkoutLog): WorkoutLog {
   };
 }
 
+export function removeRoundAt(
+  log: WorkoutLog,
+  roundNumber: number,
+): WorkoutLog {
+  if (log.rounds.length <= 1) return log;
+  const remaining = log.rounds
+    .filter((r) => r.roundNumber !== roundNumber)
+    .map((r, index) => ({ ...r, roundNumber: index + 1 }));
+  return { ...log, rounds: remaining };
+}
+
 export function removeRoundExerciseAt(
   log: WorkoutLog,
   roundNumber: number,

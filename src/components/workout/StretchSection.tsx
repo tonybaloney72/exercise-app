@@ -361,6 +361,8 @@ function StretchRow({
               : "text-foreground"
           }
           onNameClick={() => setExpanded(!expanded)}
+          expanded={expanded}
+          onToggleExpand={() => setExpanded(!expanded)}
           menuItems={overflowItems}
           detailText={detailText}
           showTimerPill={showTimerPill}

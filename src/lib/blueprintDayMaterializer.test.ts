@@ -44,6 +44,27 @@ describe("materializeBlueprintDayPlan", () => {
     expect(roundCategories[4]).toEqual(["UP"]);
   });
 
+  it("clears catalog jog when blueprint cardio is empty", () => {
+    const mon = getCatalogPlanForDay(1);
+    expect(mon.hasJog).toBe(true);
+
+    const out = materializeBlueprintDayPlan(
+      mon,
+      {
+        dayKind: "workout",
+        rounds: [{ groups: ["upper_push"], exerciseCount: 3 }],
+        cardio: [],
+      },
+      "standard",
+      EQUIP,
+      new Set(),
+      new Set(),
+    );
+
+    expect(out.hasJog).toBe(false);
+    expect(out.cardioActivities ?? []).toHaveLength(0);
+  });
+
   it("materializes Wed-style mix (1 cardio + core + 2 lower)", () => {
     const wed = getCatalogPlanForDay(3);
     const blueprint: DayBlueprint = {

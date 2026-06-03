@@ -92,7 +92,7 @@ export function planHasJog(plan: DayPlan): boolean {
 }
 
 export function resolveCardioActivities(plan: DayPlan): CardioActivity[] {
-  if (plan.cardioActivities && plan.cardioActivities.length > 0) {
+  if (plan.cardioActivities != null) {
     return plan.cardioActivities;
   }
   if (plan.hasJog) {

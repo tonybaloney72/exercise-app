@@ -312,6 +312,7 @@ export function resolveDayBlueprintForSettings(
     resolveWeekBlueprint(settings)[dayOfWeek] ?? {
       dayKind: "full_rest",
       rounds: [],
+      cardio: [],
     }
   );
 }

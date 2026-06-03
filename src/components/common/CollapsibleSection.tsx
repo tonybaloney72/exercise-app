@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import SurfaceCard from "@/components/common/SurfaceCard";
+import ExpandChevron from "@/components/workout/ExpandChevron";
 
 interface CollapsibleSectionProps {
   title: string;
@@ -19,27 +20,6 @@ interface CollapsibleSectionProps {
   toolbar?: ReactNode;
   children: ReactNode;
   className?: string;
-}
-
-function Chevron({ open }: { open: boolean }) {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={`mt-0.5 shrink-0 text-muted transition-transform ${
-        open ? "rotate-180" : ""
-      }`}
-      aria-hidden
-    >
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  );
 }
 
 export default function CollapsibleSection({
@@ -74,7 +54,7 @@ export default function CollapsibleSection({
         aria-expanded={isOpen}
         className={headerButtonClass}
       >
-        <Chevron open={isOpen} />
+        <ExpandChevron open={isOpen} className="mt-0.5" />
         <span className="min-w-0 flex-1">
           <span className={`block ${titleClass}`}>{title}</span>
           {hint ? (

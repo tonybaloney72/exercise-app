@@ -102,6 +102,14 @@ describe("guided week materialization (user layout)", () => {
     expect(roundCategories(6, week)).toEqual(roundCategories(3, week));
   });
 
+  it("does not add jog/endurance when blueprint cardio is empty", () => {
+    for (const dow of [1, 2, 3, 4, 5, 6]) {
+      const plan = week[dow]!;
+      expect(plan.hasJog).toBe(false);
+      expect(plan.cardioActivities ?? []).toHaveLength(0);
+    }
+  });
+
   it("materializes push rounds when repeat-clone metadata mismatches groups", () => {
     const blueprint = userWeekBlueprint();
     for (const dow of [1, 2, 4, 5]) {

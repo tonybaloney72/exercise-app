@@ -64,6 +64,7 @@ export default function WorkoutSession({
     saveEditedWorkout,
     cancelEditingWorkout,
     addRoundToWorkout,
+    removeRoundFromWorkout,
     removeRoundExercise,
     addRoundExercise,
     removeWarmUpStretchFromWorkout,
@@ -246,6 +247,8 @@ export default function WorkoutSession({
             round={round}
             roundLog={roundLog}
             disableRestTimer={isEditing}
+            canRemoveRound={activeWorkout.rounds.length > 1}
+            onRemoveRound={() => removeRoundFromWorkout(round.roundNumber)}
             onAddExercise={() => setCategoryPickRound(round.roundNumber)}
             onRemoveExercise={(slotIndex) =>
               removeRoundExercise(round.roundNumber, slotIndex)

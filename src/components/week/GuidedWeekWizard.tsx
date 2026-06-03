@@ -183,21 +183,32 @@ export default function GuidedWeekWizard() {
       }
       onSelectDow={setActiveDow}
       footer={
-        <WeekWizardNavFooter
-          activeDow={activeDow}
-          onPrev={activeDow > 0 ? () => setActiveDow(activeDow - 1) : undefined}
-          onNext={
-            activeDow < 6
-              ? () => setActiveDow(activeDow + 1)
-              : () => setStep("review")
-          }
-          nextLabel={
-            activeDow < 6
-              ? `${WEEK_DAY_ABBRS[activeDow + 1]} →`
-              : "Review week"
-          }
-          nextPrimary
-        />
+        <div className="space-y-2">
+          {activeDow < 6 ? (
+            <button
+              type="button"
+              onClick={() => setStep("review")}
+              className="w-full rounded-lg border border-border py-2.5 text-xs font-semibold text-foreground transition-colors hover:bg-surface-hover"
+            >
+              Review week
+            </button>
+          ) : null}
+          <WeekWizardNavFooter
+            activeDow={activeDow}
+            onPrev={activeDow > 0 ? () => setActiveDow(activeDow - 1) : undefined}
+            onNext={
+              activeDow < 6
+                ? () => setActiveDow(activeDow + 1)
+                : () => setStep("review")
+            }
+            nextLabel={
+              activeDow < 6
+                ? `${WEEK_DAY_ABBRS[activeDow + 1]} →`
+                : "Review week"
+            }
+            nextPrimary
+          />
+        </div>
       }
     >
       <GuidedDayBlueprintEditor

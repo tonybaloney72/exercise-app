@@ -1,4 +1,7 @@
-import { normalizeDayPlanCardio } from "@/lib/cardioActivities";
+import {
+  applyWeeklyCardioToDay,
+  normalizeDayPlanCardio,
+} from "@/lib/cardioActivities";
 import {
   collectDislikedIds,
   collectFavoriteIds,
@@ -301,7 +304,11 @@ export function materializeBlueprintDayPlan(
     exercises,
   }));
 
-  return normalizeDayPlanCardio({ ...plan, rounds });
+  return applyWeeklyCardioToDay(
+    { ...plan, rounds },
+    dayBlueprint.cardio ?? [],
+    availableEquipment,
+  );
 }
 
 export function materializeBlueprintDayPlanFromSettings(

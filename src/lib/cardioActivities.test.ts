@@ -19,6 +19,17 @@ describe("cardioActivities", () => {
     expect(resolveCardioActivities(norm).map((a) => a.kind)).toEqual(["jog"]);
   });
 
+  it("treats empty cardioActivities as no endurance block (not legacy hasJog)", () => {
+    const mon = getCatalogPlanForDay(1);
+    const cleared = normalizeDayPlanCardio({
+      ...mon,
+      cardioActivities: [],
+      hasJog: true,
+    });
+    expect(resolveCardioActivities(cleared)).toEqual([]);
+    expect(cleared.hasJog).toBe(false);
+  });
+
   it("applies weekly cardio from settings", () => {
     const tue = getCatalogPlanForDay(2);
     const settings: UserSettings = {

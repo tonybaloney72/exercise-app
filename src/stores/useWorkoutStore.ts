@@ -86,6 +86,7 @@ import {
 import {
   addCardioKind,
   addRoundAt,
+  removeRoundAt,
   removeCardioAt,
   removeCoolDownStretchAt,
   removeRoundExerciseAt,
@@ -306,6 +307,7 @@ interface WorkoutState {
   saveEditedWorkout: () => Promise<WorkoutLog | null>;
   cancelEditingWorkout: () => void;
   addRoundToWorkout: () => void;
+  removeRoundFromWorkout: (roundNumber: number) => void;
   removeRoundExercise: (roundNumber: number, slotIndex: number) => void;
   addRoundExercise: (roundNumber: number, exerciseId: string) => void;
   removeWarmUpStretchFromWorkout: (exerciseId: string) => void;
@@ -948,6 +950,16 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       if (!state.activeWorkout) return state;
       return {
         activeWorkout: hydrateWorkoutLog(addRoundAt(state.activeWorkout)),
+      };
+    }),
+
+  removeRoundFromWorkout: (roundNumber) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog(
+          removeRoundAt(state.activeWorkout, roundNumber),
+        ),
       };
     }),
 

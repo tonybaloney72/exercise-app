@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   addRoundAt,
+  removeRoundAt,
   addWarmUpStretch,
   MAX_WORKOUT_ROUNDS,
   removeRoundExerciseAt,
@@ -52,6 +53,17 @@ describe("workoutLogStructure", () => {
     const next = removeRoundExerciseAt(emptyLog(), 1, 0);
     expect(next.rounds[0].exercises).toHaveLength(1);
     expect(next.rounds[0].exercises[0].exerciseId).toBe("CB-2");
+  });
+
+  it("removeRoundAt drops a round and renumbers", () => {
+    let log = addRoundAt(emptyLog());
+    log = removeRoundAt(log, 2);
+    expect(log.rounds).toHaveLength(1);
+    expect(log.rounds[0].roundNumber).toBe(1);
+  });
+
+  it("removeRoundAt keeps at least one round", () => {
+    expect(removeRoundAt(emptyLog(), 1).rounds).toHaveLength(1);
   });
 
   it("addWarmUpStretch appends unique stretch", () => {

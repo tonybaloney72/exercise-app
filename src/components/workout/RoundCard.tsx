@@ -7,12 +7,18 @@ import type { Round, RoundLog } from "@/types";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatTimerDisplay } from "@/utils/time";
+import ExpandChevron from "./ExpandChevron";
+import WorkoutRowOverflowMenu, {
+  type WorkoutRowMenuItem,
+} from "./WorkoutRowOverflowMenu";
 
 interface RoundCardProps {
   round: Round;
   roundLog: RoundLog;
   /** No rest countdown when editing a finished workout. */
   disableRestTimer?: boolean;
+  canRemoveRound?: boolean;
+  onRemoveRound?: () => void;
   onAddExercise?: () => void;
   onRemoveExercise?: (slotIndex: number) => void;
 }
@@ -21,6 +27,8 @@ export default function RoundCard({
   round,
   roundLog,
   disableRestTimer = false,
+  canRemoveRound = false,
+  onRemoveRound,
   onAddExercise,
   onRemoveExercise,
 }: RoundCardProps) {
@@ -60,6 +68,20 @@ export default function RoundCard({
     useFloatingTimerStore.getState().startRest(restBetweenRounds);
   }
 
+  const roundMenuItems: WorkoutRowMenuItem[] = [];
+  if (onAddExercise) {
+    roundMenuItems.push({
+      label: "Add Exercise",
+      onClick: onAddExercise,
+    });
+  }
+  if (canRemoveRound && onRemoveRound) {
+    roundMenuItems.push({
+      label: "Remove Round",
+      onClick: onRemoveRound,
+    });
+  }
+
   return (
     <div className="rounded-xl border border-border bg-surface">
       {/* Header */}
@@ -95,31 +117,10 @@ export default function RoundCard({
                 transition={{ duration: 0.3 }}
               />
             </div>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className={`text-muted transition-transform ${isOpen ? "rotate-180" : ""}`}
-              aria-hidden
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
+            <ExpandChevron open={isOpen} />
           </div>
         </button>
-        {onAddExercise ? (
-          <button
-            type="button"
-            onClick={onAddExercise}
-            className="shrink-0 rounded-md border border-border px-2 py-0.5 text-caption font-medium text-foreground hover:bg-surface-hover"
-          >
-            + Add
-          </button>
-        ) : null}
+        <WorkoutRowOverflowMenu items={roundMenuItems} />
       </div>
 
       {!isOpen && showRestPrompt && (

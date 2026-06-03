@@ -26,6 +26,7 @@ import TimerTargetControls from "./TimerTargetControls";
 import { formatLoggedDuration } from "@/utils/time";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import SwapExerciseModal from "./SwapExerciseModal";
+import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
 import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
 import { MenuIconDislike, MenuIconStar } from "./WorkoutRowMenuIcons";
@@ -296,7 +297,8 @@ export default function ExerciseRow({
             ) : undefined
           }
           onNameClick={() => setExpanded(!expanded)}
-          category={effectiveExercise.category}
+          expanded={expanded}
+          onToggleExpand={() => setExpanded(!expanded)}
           menuItems={overflowItems}
           detailText={detailText}
           showTimerPill={showTimerPill}
@@ -328,6 +330,7 @@ export default function ExerciseRow({
             className="overflow-hidden"
           >
             <div className="px-10 pb-3 space-y-3">
+              <CategoryBadge category={effectiveExercise.category} size="sm" />
               <p className="text-xs text-muted">{effectiveExercise.notes}</p>
 
               <div className="space-y-1.5">
