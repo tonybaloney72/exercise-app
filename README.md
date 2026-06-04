@@ -81,9 +81,14 @@ Open [http://localhost:3000](http://localhost:3000). Use **Sign up** / **Log in*
 | `npm run lint`       | ESLint                                            |
 | `npm run test`       | Vitest (single run)                               |
 | `npm run test:watch` | Vitest watch mode                                 |
-| `npm run fallow:audit` | Optional Fallow audit vs `main` (manual)        |
+| `npm run fallow:audit` | Optional Fallow audit vs `main`; prunes Fallow temp worktrees after |
+| `npm run fallow:prune-worktrees` | Drop stale `fallow-audit-base-cache-*` worktrees if Source Control lists them |
 | `npm run db:push`    | Apply Supabase migrations (requires Supabase CLI) |
 | `npm run icons`      | Regenerate PWA icons from brand assets            |
+
+### Fallow and git worktrees
+
+`fallow audit` (default `new-only` gate) keeps a reusable checkout of `main` under `%TEMP%/fallow-audit-base-cache-*` so it can tell new vs inherited findings. That shows up in the IDE as an extra worktree, not a real branch. `npm run fallow:audit` runs `git worktree prune` afterward so it usually disappears; if a run was interrupted, use `npm run fallow:prune-worktrees`. To skip the base snapshot entirely (no extra worktree, but no introduced/inherited split), use `fallow audit --base main --gate all`.
 
 ## Project layout (high level)
 
