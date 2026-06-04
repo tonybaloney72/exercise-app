@@ -197,7 +197,7 @@ export function layoutEqual(
   return true;
 }
 
-function resolveWeeklyCategoryLayout(settings: {
+export function resolveWeeklyCategoryLayout(settings: {
   weeklyCategoryLayout?: WeeklyCategoryLayout;
   weeklyCategoryLayoutCustomized?: boolean;
 }): WeeklyCategoryLayout {

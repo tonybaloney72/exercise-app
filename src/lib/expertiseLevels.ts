@@ -109,7 +109,7 @@ export function expertiseByGroupFingerprint(byGroup: ExpertiseByGroup): string {
     .join(",");
 }
 
-function describeExpertiseByGroup(byGroup: ExpertiseByGroup): string {
+export function describeExpertiseByGroup(byGroup: ExpertiseByGroup): string {
   return (Object.keys(DEFAULT_EXPERTISE_BY_GROUP) as EmphasisGroup[])
     .map((g) => `${EMPHASIS_GROUP_LABELS[g]} ${EXPERTISE_LEVEL_LABELS[byGroup[g]]}`)
     .join(" · ");
