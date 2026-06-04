@@ -67,5 +67,3 @@ export const useExerciseSettingsStore = create<ExerciseSettingsState>(
     },
   }),
 );
-
-export type { ResolvedExerciseSettings } from "@/utils/effectiveExerciseSettings";

@@ -9,7 +9,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import type { TrainingWeekRefreshReason } from "@/stores/useTrainingWeekRefreshStore";
 import { toastSaveError, toastSavePartialWarning } from "@/utils/saveErrorToast";
 
-export type SetExercisePreferenceOptions = {
+type SetExercisePreferenceOptions = {
   /**
    * When false, only saves the preference (no week regen / plan refetch).
    * Use during an active workout so the session UI stays stable.

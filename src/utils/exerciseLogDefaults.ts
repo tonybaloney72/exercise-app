@@ -26,7 +26,7 @@ function effectiveLoggingMode(log: ExerciseLog): ExerciseSetMode {
  * Derive stored metrics from the plan prescription string (e.g. "12", "10 each",
  * "20–30 sec") and whether the exercise is time-based in the library.
  */
-export function metricsFromPrescription(
+function metricsFromPrescription(
   prescription: string,
   isTimeBased: boolean,
 ): { actualReps?: number; actualDuration?: number } {
@@ -66,7 +66,7 @@ export function clearExerciseMetrics(log: ExerciseLog): ExerciseLog {
  * Ensures completed, non-skipped exercises always have `actualReps` and/or
  * `actualDuration` populated from prescription + library metadata.
  */
-export function ensureExerciseMetrics(log: ExerciseLog): ExerciseLog {
+function ensureExerciseMetrics(log: ExerciseLog): ExerciseLog {
   if (!log.completed || log.skipped) return log;
   if (log.actualReps != null || log.actualDuration != null) return log;
 

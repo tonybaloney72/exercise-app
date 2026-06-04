@@ -18,7 +18,7 @@ export function mergeWeekScheduleIntoStoredWeek(
   return merged;
 }
 
-export function mergeDayScheduleMetadata(existing: DayPlan, shell: DayPlan): DayPlan {
+function mergeDayScheduleMetadata(existing: DayPlan, shell: DayPlan): DayPlan {
   const merged = normalizeDayPlanCardio({
     ...existing,
     dayOfWeek: shell.dayOfWeek,

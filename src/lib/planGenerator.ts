@@ -49,7 +49,7 @@ export const TRAINING_WEEK_SOURCE_GENERATED_V1 = "generated_week_v1";
 export const TRAINING_WEEK_SOURCE_CUSTOM_V1 = "custom_week_v1";
 
 /** @deprecated Use {@link TRAINING_WEEK_SOURCE_GENERATED_V1}. */
-export const TRAINING_WEEK_SOURCE_DISLIKES_V1 = TRAINING_WEEK_SOURCE_GENERATED_V1;
+const TRAINING_WEEK_SOURCE_DISLIKES_V1 = TRAINING_WEEK_SOURCE_GENERATED_V1;
 
 export function isUserCustomizedWeekSource(source: string | null | undefined): boolean {
   return source === TRAINING_WEEK_SOURCE_CUSTOM_V1;
@@ -162,15 +162,6 @@ export function computePrefsFingerprintFromSettings(
   );
 }
 
-export {
-  collectDislikedIds,
-  collectFavoriteIds,
-  getReplacementCandidates,
-  pickDeterministicReplacement,
-  pickDislikeReplacement,
-  pickReplacementCandidate,
-} from "@/lib/exerciseCandidates";
-
 function replaceSlotIfDisliked(
   slot: RoundExercise,
   usedInRound: Set<string>,
@@ -221,7 +212,7 @@ function replaceSlotIfDisliked(
 }
 
 /** Apply dislike replacements to a single day plan (immutable copy). */
-export function applyDislikesToDayPlan(
+function applyDislikesToDayPlan(
   plan: DayPlan,
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],
@@ -261,7 +252,7 @@ export function applyDislikesToDayPlan(
   };
 }
 
-export function applyDislikesToWeek(
+function applyDislikesToWeek(
   week: TrainingWeekDays,
   prefs: ExercisePreferenceMap,
   availableEquipment: ExerciseEquipment[],

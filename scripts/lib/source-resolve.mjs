@@ -54,7 +54,7 @@ export function isVagueSource(label) {
   return /^video\s*\d+$/i.test(label.trim());
 }
 
-export async function resolveYoutubeChannelName(videoUrl, { fetchFn = fetch } = {}) {
+async function resolveYoutubeChannelName(videoUrl, { fetchFn = fetch } = {}) {
   const id = youtubeVideoId(videoUrl);
   if (!id) return null;
   if (oembedCache.has(id)) return oembedCache.get(id);

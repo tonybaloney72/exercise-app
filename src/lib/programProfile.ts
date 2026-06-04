@@ -10,6 +10,7 @@ import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import type { ExercisePreferenceMap, ExerciseSettingsMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { balancedRoundBudget } from "@/lib/balancedRoundBudget";
+import { dayPlanCategoryPool } from "@/lib/dayPlanCategoryPool";
 import { materializeLayoutDayPlan } from "@/lib/layoutDayMaterializer";
 import { materializePplDayPlan } from "@/lib/pplDayMaterializer";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
@@ -145,38 +146,21 @@ export const ROUND_DENSITY_OPTIONS: RoundDensityOption[] = [
 ];
 
 /** @deprecated Use {@link ROUND_DENSITY_OPTIONS}. */
-export const ROUND_DENSITY_LABELS: Record<RoundDensity, string> =
+const ROUND_DENSITY_LABELS: Record<RoundDensity, string> =
   Object.fromEntries(
     ROUND_DENSITY_OPTIONS.map((o) => [o.value, o.label]),
   ) as Record<RoundDensity, string>;
 
 function catalogDayCategoryPool(plan: DayPlan): ExerciseCategory[] {
-  const out: ExerciseCategory[] = [];
-  for (const c of plan.strengthFocus) {
-    if (!out.includes(c)) out.push(c);
-  }
-  for (const c of plan.coreGroups) {
-    if (!out.includes(c)) out.push(c);
-  }
-  if (plan.hasJog && !out.includes("PC")) out.push("PC");
-  if (out.length === 0) out.push("CS");
-  return out;
+  return dayPlanCategoryPool(plan);
 }
 
 /** PPL preset pools: day theme only; cardio finisher is not a strength-round PC slot. */
 function pplDayCategoryPool(plan: DayPlan): ExerciseCategory[] {
-  const out: ExerciseCategory[] = [];
-  for (const c of plan.strengthFocus) {
-    if (!out.includes(c)) out.push(c);
-  }
-  for (const c of plan.coreGroups) {
-    if (!out.includes(c)) out.push(c);
-  }
-  if (out.length === 0) out.push("CS");
-  return out;
+  return dayPlanCategoryPool(plan, { includePcWhenJog: false });
 }
 
-export function isPplProgramProfile(profile: ProgramProfileInput): boolean {
+function isPplProgramProfile(profile: ProgramProfileInput): boolean {
   return (
     profile.pplMode === true &&
     !profile.layoutMode &&

@@ -127,7 +127,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
 };
 
 /** Stretch defaults seeded for guest localStorage when none are stored. */
-export const GUEST_DEFAULT_SETTINGS: Pick<UserSettings, "defaultWarmUp" | "defaultCoolDown"> =
+const GUEST_DEFAULT_SETTINGS: Pick<UserSettings, "defaultWarmUp" | "defaultCoolDown"> =
   {
     defaultWarmUp: [...GUEST_FALLBACK_WARM_UP],
     defaultCoolDown: [...GUEST_FALLBACK_COOL_DOWN],

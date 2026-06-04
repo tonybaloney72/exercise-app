@@ -2,7 +2,7 @@
  * Heuristic expertiseLevel from exercise name, equipment, category, optional HC rank.
  */
 
-export const EXPERTISE_LEVELS = [
+const EXPERTISE_LEVELS = [
   "beginner",
   "novice",
   "intermediate",
@@ -12,16 +12,16 @@ export const EXPERTISE_LEVELS = [
 
 const LEVEL_RANK = Object.fromEntries(EXPERTISE_LEVELS.map((l, i) => [l, i]));
 
-export function maxLevel(a, b) {
+function maxLevel(a, b) {
   return LEVEL_RANK[a] >= LEVEL_RANK[b] ? a : b;
 }
 
-export function minLevel(a, b) {
+function minLevel(a, b) {
   return LEVEL_RANK[a] <= LEVEL_RANK[b] ? a : b;
 }
 
 /** HC progression index 1..N on a page → level. */
-export function expertiseFromProgressionIndex(index, total) {
+function expertiseFromProgressionIndex(index, total) {
   if (total <= 1) return "intermediate";
   const t = (index - 1) / Math.max(1, total - 1);
   if (t <= 0.15) return "beginner";

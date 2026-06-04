@@ -10,7 +10,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export const ROOT = join(__dirname, "../..");
 
 /** IDs with minimal catalog metadata (cardio logging only; skip media audit). */
-export const CATALOG_AUDIT_EXEMPT_ID_PREFIXES = ["END-"];
+const CATALOG_AUDIT_EXEMPT_ID_PREFIXES = ["END-"];
 
 export function isCatalogAuditExempt(exercise) {
   const id = exercise?.id ?? "";
@@ -153,7 +153,7 @@ export function loadAllExercises() {
   return all;
 }
 
-export function blockRegexForFile(filePath) {
+function blockRegexForFile(filePath) {
   if (filePath.includes("endurance")) {
     return /\n  \{[\s\S]*?\n  \},/g;
   }
@@ -164,7 +164,7 @@ export function blockRegexForFile(filePath) {
 }
 
 /** Index exercise blocks by id for in-file replacement. */
-export function indexBlocksById(text, blockRe) {
+function indexBlocksById(text, blockRe) {
   const map = new Map();
   let m;
   const re = blockRe ?? /\n  \{[\s\S]*?\n  \},|\n\t\{[\s\S]*?\n\t\},/g;
@@ -204,7 +204,7 @@ function blockIndent(block) {
   return block.includes("\n\t\t") ? "\t\t" : "  ";
 }
 
-export function upsertField(block, fieldName, value, { afterField = "category" } = {}) {
+function upsertField(block, fieldName, value, { afterField = "category" } = {}) {
   const indent = blockIndent(block);
 
   const fieldLineRe = new RegExp(`\\n${indent}${fieldName}:.*`, "m");
@@ -232,7 +232,7 @@ export function upsertField(block, fieldName, value, { afterField = "category" }
   return block.replace(nameRe, `$1${insertLine}`);
 }
 
-export function patchBlock(block, patch) {
+function patchBlock(block, patch) {
   let out = block;
 
   const indent = blockIndent(out);

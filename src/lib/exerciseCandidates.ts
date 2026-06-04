@@ -99,7 +99,7 @@ export function pickReplacementCandidate(
 }
 
 /** @deprecated Use {@link pickReplacementCandidate}. */
-export function pickDeterministicReplacement(candidates: Exercise[]): Exercise | null {
+function pickDeterministicReplacement(candidates: Exercise[]): Exercise | null {
   return pickReplacementCandidate(candidates);
 }
 

@@ -57,7 +57,7 @@ export function cardioKindAllowed(
   return required.every((eq) => availableEquipment.includes(eq));
 }
 
-export function activityForKind(kind: CardioActivityKind): CardioActivity {
+function activityForKind(kind: CardioActivityKind): CardioActivity {
   return {
     kind,
     exerciseId: CARDIO_KIND_TO_EXERCISE_ID[kind],
@@ -111,7 +111,7 @@ export function normalizeDayPlanCardio(plan: DayPlan): DayPlan {
   };
 }
 
-export function weeklyCardioFingerprint(
+function weeklyCardioFingerprint(
   byDay: Record<number, CardioActivityKind[]>,
 ): string {
   const seg = [0, 1, 2, 3, 4, 5, 6]

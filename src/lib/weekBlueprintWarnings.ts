@@ -127,6 +127,6 @@ export function warningsForDay(
   return warnings.filter((w) => w.dayOfWeek === dayOfWeek);
 }
 
-export function formatGroupList(groups: LayoutGroup[]): string {
+function formatGroupList(groups: LayoutGroup[]): string {
   return groups.map((g) => LAYOUT_GROUP_LABELS[g]).join(", ") || "None";
 }

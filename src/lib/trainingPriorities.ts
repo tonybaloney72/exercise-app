@@ -22,14 +22,6 @@ export type TrainingPriorityWeights = Record<EmphasisGroup, number>;
 export type TrainingPriorityScore = 0 | 1 | 2 | 3 | 4;
 export type TrainingPriorityScores = Record<EmphasisGroup, TrainingPriorityScore>;
 
-export const EMPHASIS_SCORE_LABELS = [
-  "Skip",
-  "Light",
-  "Moderate",
-  "Strong",
-  "Peak",
-] as const;
-
 export const EMPHASIS_GROUP_LABELS: Record<EmphasisGroup, string> = {
   core: "Core",
   cardio: "Cardio",
@@ -52,13 +44,13 @@ export const TRAINING_PRIORITY_PRESET_WEIGHTS: Record<
   strength: { core: 2, cardio: 2, lower: 3, upper_push: 2, upper_pull: 1 },
 };
 
-export type TrainingPriorityOption = {
+type TrainingPriorityOption = {
   value: TrainingPriorityPreset;
   label: string;
   description: string;
 };
 
-export const TRAINING_PRIORITY_OPTIONS: TrainingPriorityOption[] = [
+const TRAINING_PRIORITY_OPTIONS: TrainingPriorityOption[] = [
   {
     value: "balanced",
     label: "Balanced",
@@ -103,7 +95,7 @@ export const TRAINING_PRIORITY_OPTIONS: TrainingPriorityOption[] = [
   },
 ];
 
-export const GROUP_TO_CATEGORIES: Record<EmphasisGroup, ExerciseCategory[]> = {
+const GROUP_TO_CATEGORIES: Record<EmphasisGroup, ExerciseCategory[]> = {
   core: ["CF", "CL", "CR", "CS"],
   cardio: ["PC"],
   lower: ["LB"],
@@ -125,7 +117,7 @@ const EXTRA_CATEGORIES_BY_PRESET: Record<
   conditioning: ["PC"],
 };
 
-export function clampTrainingPriorityScore(raw: unknown): TrainingPriorityScore {
+function clampTrainingPriorityScore(raw: unknown): TrainingPriorityScore {
   const n = typeof raw === "number" ? Math.round(raw) : Number(raw);
   if (n <= 0) return 0;
   if (n >= 4) return 4;
@@ -146,7 +138,7 @@ export function sanitizeTrainingPriorityScores(
   return out;
 }
 
-export function scoresFromWeights(
+function scoresFromWeights(
   weights: TrainingPriorityWeights,
 ): TrainingPriorityScores {
   const out = {} as TrainingPriorityScores;
@@ -221,14 +213,14 @@ export function categoryPriorityScore(
   return weights[group];
 }
 
-export function extraCategoriesForPreset(
+function extraCategoriesForPreset(
   preset: TrainingPriorityPreset,
 ): ExerciseCategory[] {
   return [...EXTRA_CATEGORIES_BY_PRESET[preset]];
 }
 
 /** Groups scored ≥ 3 may add categories beyond the day theme (custom / A2). */
-export function extraCategoriesForScores(
+function extraCategoriesForScores(
   scores: TrainingPriorityScores,
 ): ExerciseCategory[] {
   const out: ExerciseCategory[] = [];
@@ -250,7 +242,7 @@ export function extraCategoriesForProfile(
   return extraCategoriesForScores(scores);
 }
 
-export function isBalancedPreset(preset: TrainingPriorityPreset): boolean {
+function isBalancedPreset(preset: TrainingPriorityPreset): boolean {
   return preset === "balanced";
 }
 

@@ -47,7 +47,7 @@ function parsePayload(raw: string): ActiveWorkoutDraftPayload | null {
 }
 
 /** Guests only — authenticated users persist in-progress rows via Supabase. */
-export function usesLocalWorkoutDraft(scope: DraftAuthScope): boolean {
+function usesLocalWorkoutDraft(scope: DraftAuthScope): boolean {
   return scope.mode !== "authenticated";
 }
 
@@ -166,7 +166,7 @@ export function cancelScheduledPersistActiveWorkoutDraft(): void {
   }
 }
 
-export function flushPersistActiveWorkoutDraft(
+function flushPersistActiveWorkoutDraft(
   scope: DraftAuthScope,
   log: WorkoutLog,
 ): void {

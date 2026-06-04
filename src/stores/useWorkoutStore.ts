@@ -38,6 +38,14 @@ import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStor
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { exerciseMap } from "@/data/exercises";
 import {
+  applyClampedTargetDuration,
+  mapRoundExercises,
+  mapStretchLogs,
+  skipExerciseLog,
+  stretchSectionComplete,
+  toggleExerciseCompletion,
+} from "@/lib/activeWorkoutMutations";
+import {
   clearExerciseMetrics,
   hydrateWorkoutLog,
 } from "@/utils/exerciseLogDefaults";
@@ -626,109 +634,82 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
   toggleWarmUpStretch: (exerciseId) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const warmUpExercises = state.activeWorkout.warmUpExercises.map((ex) => {
-        if (ex.exerciseId !== exerciseId) return ex;
-        const nextDone = !ex.completed;
-        if (!nextDone) {
-          return { ...clearExerciseMetrics(ex), completed: false, skipped: false };
-        }
-        return { ...ex, completed: true, skipped: false };
-      });
-      const warmUpCompleted = warmUpExercises.every((ex) => ex.completed || ex.skipped);
+      const warmUpExercises = mapStretchLogs(
+        state.activeWorkout.warmUpExercises,
+        exerciseId,
+        toggleExerciseCompletion,
+      );
       return {
-        activeWorkout: { ...state.activeWorkout, warmUpExercises, warmUpCompleted },
+        activeWorkout: {
+          ...state.activeWorkout,
+          warmUpExercises,
+          warmUpCompleted: stretchSectionComplete(warmUpExercises),
+        },
       };
     }),
 
   toggleCoolDownStretch: (exerciseId) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const coolDownExercises = state.activeWorkout.coolDownExercises.map((ex) => {
-        if (ex.exerciseId !== exerciseId) return ex;
-        const nextDone = !ex.completed;
-        if (!nextDone) {
-          return { ...clearExerciseMetrics(ex), completed: false, skipped: false };
-        }
-        return { ...ex, completed: true, skipped: false };
-      });
-      const coolDownCompleted = coolDownExercises.every((ex) => ex.completed || ex.skipped);
+      const coolDownExercises = mapStretchLogs(
+        state.activeWorkout.coolDownExercises,
+        exerciseId,
+        toggleExerciseCompletion,
+      );
       return {
-        activeWorkout: { ...state.activeWorkout, coolDownExercises, coolDownCompleted },
+        activeWorkout: {
+          ...state.activeWorkout,
+          coolDownExercises,
+          coolDownCompleted: stretchSectionComplete(coolDownExercises),
+        },
       };
     }),
 
   toggleExercise: (roundNumber, exerciseId) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const rounds = state.activeWorkout.rounds.map((r) => {
-        if (r.roundNumber !== roundNumber) return r;
-        return {
-          ...r,
-          exercises: r.exercises.map((ex) => {
-            if (ex.exerciseId !== exerciseId) return ex;
-            const nextDone = !ex.completed;
-            if (!nextDone) {
-              return { ...clearExerciseMetrics(ex), completed: false, skipped: false };
-            }
-            return { ...ex, completed: true, skipped: false };
-          }),
-        };
-      });
+      const rounds = mapRoundExercises(
+        state.activeWorkout.rounds,
+        roundNumber,
+        exerciseId,
+        toggleExerciseCompletion,
+      );
       return { activeWorkout: { ...state.activeWorkout, rounds } };
     }),
 
   setActualReps: (roundNumber, exerciseId, reps) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const rounds = state.activeWorkout.rounds.map((r) => {
-        if (r.roundNumber !== roundNumber) return r;
-        return {
-          ...r,
-          exercises: r.exercises.map((ex) => {
-            if (ex.exerciseId !== exerciseId) return ex;
-            return { ...ex, actualReps: reps ?? undefined };
-          }),
-        };
-      });
+      const rounds = mapRoundExercises(
+        state.activeWorkout.rounds,
+        roundNumber,
+        exerciseId,
+        (ex) => ({ ...ex, actualReps: reps ?? undefined }),
+      );
       return { activeWorkout: { ...state.activeWorkout, rounds } };
     }),
 
   setActualDuration: (roundNumber, exerciseId, seconds) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const rounds = state.activeWorkout.rounds.map((r) => {
-        if (r.roundNumber !== roundNumber) return r;
-        return {
-          ...r,
-          exercises: r.exercises.map((ex) => {
-            if (ex.exerciseId !== exerciseId) return ex;
-            return {
-              ...ex,
-              actualDuration: seconds ?? undefined,
-            };
-          }),
-        };
-      });
+      const rounds = mapRoundExercises(
+        state.activeWorkout.rounds,
+        roundNumber,
+        exerciseId,
+        (ex) => ({ ...ex, actualDuration: seconds ?? undefined }),
+      );
       return { activeWorkout: { ...state.activeWorkout, rounds } };
     }),
 
   setTargetDuration: (roundNumber, exerciseId, seconds) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const rounds = state.activeWorkout.rounds.map((r) => {
-        if (r.roundNumber !== roundNumber) return r;
-        return {
-          ...r,
-          exercises: r.exercises.map((ex) => {
-            if (ex.exerciseId !== exerciseId) return ex;
-            if (seconds == null || Number.isNaN(seconds)) {
-              return { ...ex, targetDurationSeconds: undefined };
-            }
-            const clamped = Math.min(999, Math.max(5, Math.round(seconds)));
-            return { ...ex, targetDurationSeconds: clamped };
-          }),
-        };
-      });
+      const rounds = mapRoundExercises(
+        state.activeWorkout.rounds,
+        roundNumber,
+        exerciseId,
+        (ex) => applyClampedTargetDuration(ex, seconds),
+      );
       return { activeWorkout: { ...state.activeWorkout, rounds } };
     }),
 
@@ -1209,96 +1190,92 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
   skipExercise: (roundNumber, exerciseId) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const rounds = state.activeWorkout.rounds.map((r) => {
-        if (r.roundNumber !== roundNumber) return r;
-        return {
-          ...r,
-          exercises: r.exercises.map((ex) => {
-            if (ex.exerciseId !== exerciseId) return ex;
-            return {
-              ...clearExerciseMetrics(ex),
-              skipped: true,
-              completed: false,
-            };
-          }),
-        };
-      });
+      const rounds = mapRoundExercises(
+        state.activeWorkout.rounds,
+        roundNumber,
+        exerciseId,
+        skipExerciseLog,
+      );
       return { activeWorkout: { ...state.activeWorkout, rounds } };
     }),
 
   unskipExercise: (roundNumber, exerciseId) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const rounds = state.activeWorkout.rounds.map((r) => {
-        if (r.roundNumber !== roundNumber) return r;
-        return {
-          ...r,
-          exercises: r.exercises.map((ex) => {
-            if (ex.exerciseId !== exerciseId) return ex;
-            return { ...ex, skipped: false };
-          }),
-        };
-      });
+      const rounds = mapRoundExercises(
+        state.activeWorkout.rounds,
+        roundNumber,
+        exerciseId,
+        (ex) => ({ ...ex, skipped: false }),
+      );
       return { activeWorkout: { ...state.activeWorkout, rounds } };
     }),
 
   skipWarmUpStretch: (exerciseId) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const warmUpExercises = state.activeWorkout.warmUpExercises.map((ex) => {
-        if (ex.exerciseId !== exerciseId) return ex;
-        return {
-          ...clearExerciseMetrics(ex),
-          skipped: true,
-          completed: false,
-        };
-      });
-      const warmUpCompleted = warmUpExercises.every((ex) => ex.completed || ex.skipped);
+      const warmUpExercises = mapStretchLogs(
+        state.activeWorkout.warmUpExercises,
+        exerciseId,
+        skipExerciseLog,
+      );
       return {
-        activeWorkout: { ...state.activeWorkout, warmUpExercises, warmUpCompleted },
+        activeWorkout: {
+          ...state.activeWorkout,
+          warmUpExercises,
+          warmUpCompleted: stretchSectionComplete(warmUpExercises),
+        },
       };
     }),
 
   unskipWarmUpStretch: (exerciseId) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const warmUpExercises = state.activeWorkout.warmUpExercises.map((ex) => {
-        if (ex.exerciseId !== exerciseId) return ex;
-        return { ...ex, skipped: false };
-      });
-      const warmUpCompleted = warmUpExercises.every((ex) => ex.completed || ex.skipped);
+      const warmUpExercises = mapStretchLogs(
+        state.activeWorkout.warmUpExercises,
+        exerciseId,
+        (ex) => ({ ...ex, skipped: false }),
+      );
       return {
-        activeWorkout: { ...state.activeWorkout, warmUpExercises, warmUpCompleted },
+        activeWorkout: {
+          ...state.activeWorkout,
+          warmUpExercises,
+          warmUpCompleted: stretchSectionComplete(warmUpExercises),
+        },
       };
     }),
 
   skipCoolDownStretch: (exerciseId) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const coolDownExercises = state.activeWorkout.coolDownExercises.map((ex) => {
-        if (ex.exerciseId !== exerciseId) return ex;
-        return {
-          ...clearExerciseMetrics(ex),
-          skipped: true,
-          completed: false,
-        };
-      });
-      const coolDownCompleted = coolDownExercises.every((ex) => ex.completed || ex.skipped);
+      const coolDownExercises = mapStretchLogs(
+        state.activeWorkout.coolDownExercises,
+        exerciseId,
+        skipExerciseLog,
+      );
       return {
-        activeWorkout: { ...state.activeWorkout, coolDownExercises, coolDownCompleted },
+        activeWorkout: {
+          ...state.activeWorkout,
+          coolDownExercises,
+          coolDownCompleted: stretchSectionComplete(coolDownExercises),
+        },
       };
     }),
 
   unskipCoolDownStretch: (exerciseId) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const coolDownExercises = state.activeWorkout.coolDownExercises.map((ex) => {
-        if (ex.exerciseId !== exerciseId) return ex;
-        return { ...ex, skipped: false };
-      });
-      const coolDownCompleted = coolDownExercises.every((ex) => ex.completed || ex.skipped);
+      const coolDownExercises = mapStretchLogs(
+        state.activeWorkout.coolDownExercises,
+        exerciseId,
+        (ex) => ({ ...ex, skipped: false }),
+      );
       return {
-        activeWorkout: { ...state.activeWorkout, coolDownExercises, coolDownCompleted },
+        activeWorkout: {
+          ...state.activeWorkout,
+          coolDownExercises,
+          coolDownCompleted: stretchSectionComplete(coolDownExercises),
+        },
       };
     }),
 
@@ -1345,54 +1322,44 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
   setWarmUpStretchTargetDuration: (exerciseId, seconds) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const warmUpExercises = state.activeWorkout.warmUpExercises.map((ex) => {
-        if (ex.exerciseId !== exerciseId) return ex;
-        if (seconds == null || Number.isNaN(seconds)) {
-          return { ...ex, targetDurationSeconds: undefined };
-        }
-        const clamped = Math.min(999, Math.max(5, Math.round(seconds)));
-        return { ...ex, targetDurationSeconds: clamped };
-      });
+      const warmUpExercises = mapStretchLogs(
+        state.activeWorkout.warmUpExercises,
+        exerciseId,
+        (ex) => applyClampedTargetDuration(ex, seconds),
+      );
       return { activeWorkout: { ...state.activeWorkout, warmUpExercises } };
     }),
 
   setCoolDownStretchTargetDuration: (exerciseId, seconds) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const coolDownExercises = state.activeWorkout.coolDownExercises.map((ex) => {
-        if (ex.exerciseId !== exerciseId) return ex;
-        if (seconds == null || Number.isNaN(seconds)) {
-          return { ...ex, targetDurationSeconds: undefined };
-        }
-        const clamped = Math.min(999, Math.max(5, Math.round(seconds)));
-        return { ...ex, targetDurationSeconds: clamped };
-      });
+      const coolDownExercises = mapStretchLogs(
+        state.activeWorkout.coolDownExercises,
+        exerciseId,
+        (ex) => applyClampedTargetDuration(ex, seconds),
+      );
       return { activeWorkout: { ...state.activeWorkout, coolDownExercises } };
     }),
 
   setWarmUpStretchActualDuration: (exerciseId, seconds) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const warmUpExercises = state.activeWorkout.warmUpExercises.map((ex) => {
-        if (ex.exerciseId !== exerciseId) return ex;
-        return {
-          ...ex,
-          actualDuration: seconds ?? undefined,
-        };
-      });
+      const warmUpExercises = mapStretchLogs(
+        state.activeWorkout.warmUpExercises,
+        exerciseId,
+        (ex) => ({ ...ex, actualDuration: seconds ?? undefined }),
+      );
       return { activeWorkout: { ...state.activeWorkout, warmUpExercises } };
     }),
 
   setCoolDownStretchActualDuration: (exerciseId, seconds) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const coolDownExercises = state.activeWorkout.coolDownExercises.map((ex) => {
-        if (ex.exerciseId !== exerciseId) return ex;
-        return {
-          ...ex,
-          actualDuration: seconds ?? undefined,
-        };
-      });
+      const coolDownExercises = mapStretchLogs(
+        state.activeWorkout.coolDownExercises,
+        exerciseId,
+        (ex) => ({ ...ex, actualDuration: seconds ?? undefined }),
+      );
       return { activeWorkout: { ...state.activeWorkout, coolDownExercises } };
     }),
 

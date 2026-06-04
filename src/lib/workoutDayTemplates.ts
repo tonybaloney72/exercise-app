@@ -7,7 +7,7 @@ import type {
 } from "@/types";
 
 export const MAX_WORKOUT_DAY_TEMPLATES = 30;
-export const TEMPLATE_NAME_MAX_LEN = 80;
+const TEMPLATE_NAME_MAX_LEN = 80;
 
 export function normalizeTemplateName(raw: string): string | null {
   const name = raw.trim().slice(0, TEMPLATE_NAME_MAX_LEN);

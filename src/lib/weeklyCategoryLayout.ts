@@ -79,12 +79,6 @@ export type WeeklyCategoryLayout = Record<number, LayoutGroup[]>;
 
 export type ProgramMode = "preset" | "custom";
 
-/** @deprecated Use {@link ProgramMode} `"preset"`. */
-export type LegacyProgramModePriorities = "priorities";
-
-/** @deprecated Migrated to {@link ProgramMode} `"custom"` + guided blueprint. */
-export type LegacyProgramModeLayout = "layout";
-
 export const PROGRAM_MODE_LABELS: Record<
   ProgramMode,
   { label: string; description: string }
@@ -203,7 +197,7 @@ export function layoutEqual(
   return true;
 }
 
-export function resolveWeeklyCategoryLayout(settings: {
+function resolveWeeklyCategoryLayout(settings: {
   weeklyCategoryLayout?: WeeklyCategoryLayout;
   weeklyCategoryLayoutCustomized?: boolean;
 }): WeeklyCategoryLayout {
@@ -255,7 +249,7 @@ export function weeklyCategoryLayoutFingerprint(
   return `wcl:${seg}`;
 }
 
-export function describeDayLayout(groups: LayoutGroup[]): string {
+function describeDayLayout(groups: LayoutGroup[]): string {
   if (groups.length === 0) return "Rest — no generated exercises";
   return groups.map((g) => LAYOUT_GROUP_LABELS[g]).join(" · ");
 }

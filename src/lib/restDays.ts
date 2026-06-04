@@ -37,7 +37,7 @@ const LEGACY_MODE_MAP: Record<string, RestDayMode> = {
   full: "full_rest",
 };
 
-export function sanitizeRestDayMode(raw: unknown): RestDayMode {
+function sanitizeRestDayMode(raw: unknown): RestDayMode {
   if (typeof raw === "string" && raw in REST_DAY_LABELS) {
     return raw as RestDayMode;
   }
@@ -66,7 +66,7 @@ export function weeklyRestDaysEqual(a: WeeklyRestDays, b: WeeklyRestDays): boole
   return true;
 }
 
-export function weeklyRestDaysFingerprint(days: WeeklyRestDays): string {
+function weeklyRestDaysFingerprint(days: WeeklyRestDays): string {
   const seg = [0, 1, 2, 3, 4, 5, 6]
     .map((dow) => `${dow}:${days[dow] ?? "workout"}`)
     .join("|");
@@ -138,7 +138,7 @@ export function applyRestDayToPlan(plan: DayPlan, mode: RestDayMode): DayPlan {
   }
 }
 
-export function isStretchOnlyRestDay(plan: DayPlan): boolean {
+function isStretchOnlyRestDay(plan: DayPlan): boolean {
   return plan.restDayMode === "stretches";
 }
 
@@ -190,6 +190,6 @@ export function shouldSkipStretchesForPlan(plan: DayPlan): boolean {
   return plan.restDayMode === "full_rest";
 }
 
-export function isActiveRecoveryDay(plan: DayPlan): boolean {
+function isActiveRecoveryDay(plan: DayPlan): boolean {
   return plan.restDayMode === "active_recovery";
 }

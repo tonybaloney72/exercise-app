@@ -8,20 +8,20 @@ export const LANDING_PATH = "/";
  * Paths a signed-in Supabase user should be redirected away from
  * (back to APP_HOME). Landing is handled separately.
  */
-export const AUTH_ONLY_PATHS = ["/login", "/signup", "/forgot-password"] as const;
+const AUTH_ONLY_PATHS = ["/login", "/signup", "/forgot-password"] as const;
 
 /**
  * Paths that are always public regardless of session state.
  * `/auth/callback` (code exchange) and `/auth/update-password`
  * (recovery flow) must remain reachable even with an active session.
  */
-export const PUBLIC_NEUTRAL_PATHS = ["/auth/callback", "/auth/update-password"] as const;
+const PUBLIC_NEUTRAL_PATHS = ["/auth/callback", "/auth/update-password"] as const;
 
 export function isAuthOnlyPath(pathname: string): boolean {
   return (AUTH_ONLY_PATHS as readonly string[]).includes(pathname);
 }
 
-export function isPublicNeutralPath(pathname: string): boolean {
+function isPublicNeutralPath(pathname: string): boolean {
   return PUBLIC_NEUTRAL_PATHS.some(
     (p) => pathname === p || pathname.startsWith(p + "/"),
   );

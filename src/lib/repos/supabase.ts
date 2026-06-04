@@ -207,6 +207,43 @@ function rowToWorkout(row: WorkoutRow): WorkoutLog {
   return hydrateCardioFromNotes(log);
 }
 
+type ExerciseLogSaveRow = {
+  section: Section;
+  round_number: number | null;
+  position: number;
+  exercise_id: string;
+  completed: boolean;
+  actual_reps: number | null;
+  actual_duration: number | null;
+  actual_distance_mi: number | null;
+  target_duration_seconds: number | null;
+  skipped: boolean;
+  swapped_with: string | null;
+  notes: string | null;
+};
+
+function exerciseLogToSaveRow(
+  section: Section,
+  roundNumber: number | null,
+  position: number,
+  ex: ExerciseLog,
+): ExerciseLogSaveRow {
+  return {
+    section,
+    round_number: roundNumber,
+    position,
+    exercise_id: ex.exerciseId,
+    completed: ex.completed,
+    actual_reps: ex.actualReps ?? null,
+    actual_duration: ex.actualDuration ?? null,
+    actual_distance_mi: ex.actualDistanceMi ?? null,
+    target_duration_seconds: ex.targetDurationSeconds ?? null,
+    skipped: ex.skipped,
+    swapped_with: ex.swappedWith ?? null,
+    notes: ex.notes ?? null,
+  };
+}
+
 /**
  * Flatten a WorkoutLog into the {workout, exerciseLogs[]} payload the
  * `save_workout` RPC expects. The RPC handles the user_id and ids itself.
@@ -225,89 +262,26 @@ function workoutToSavePayload(log: WorkoutLog) {
     paused: persisted.paused ?? false,
   };
 
-  const exerciseLogs: Array<{
-    section: Section;
-    round_number: number | null;
-    position: number;
-    exercise_id: string;
-    completed: boolean;
-    actual_reps: number | null;
-    actual_duration: number | null;
-    actual_distance_mi: number | null;
-    target_duration_seconds: number | null;
-    skipped: boolean;
-    swapped_with: string | null;
-    notes: string | null;
-  }> = [];
+  const exerciseLogs: ExerciseLogSaveRow[] = [];
 
   persisted.warmUpExercises.forEach((ex, i) =>
-    exerciseLogs.push({
-      section: "warm_up",
-      round_number: null,
-      position: i,
-      exercise_id: ex.exerciseId,
-      completed: ex.completed,
-      actual_reps: ex.actualReps ?? null,
-      actual_duration: ex.actualDuration ?? null,
-      actual_distance_mi: ex.actualDistanceMi ?? null,
-      target_duration_seconds: ex.targetDurationSeconds ?? null,
-      skipped: ex.skipped,
-      swapped_with: ex.swappedWith ?? null,
-      notes: ex.notes ?? null,
-    }),
+    exerciseLogs.push(exerciseLogToSaveRow("warm_up", null, i, ex)),
   );
 
   persisted.rounds.forEach((round) =>
     round.exercises.forEach((ex, i) =>
-      exerciseLogs.push({
-        section: "round",
-        round_number: round.roundNumber,
-        position: i,
-        exercise_id: ex.exerciseId,
-        completed: ex.completed,
-        actual_reps: ex.actualReps ?? null,
-        actual_duration: ex.actualDuration ?? null,
-        actual_distance_mi: ex.actualDistanceMi ?? null,
-        target_duration_seconds: ex.targetDurationSeconds ?? null,
-        skipped: ex.skipped,
-        swapped_with: ex.swappedWith ?? null,
-        notes: ex.notes ?? null,
-      }),
+      exerciseLogs.push(
+        exerciseLogToSaveRow("round", round.roundNumber, i, ex),
+      ),
     ),
   );
 
   persisted.coolDownExercises.forEach((ex, i) =>
-    exerciseLogs.push({
-      section: "cool_down",
-      round_number: null,
-      position: i,
-      exercise_id: ex.exerciseId,
-      completed: ex.completed,
-      actual_reps: ex.actualReps ?? null,
-      actual_duration: ex.actualDuration ?? null,
-      actual_distance_mi: ex.actualDistanceMi ?? null,
-      target_duration_seconds: ex.targetDurationSeconds ?? null,
-      skipped: ex.skipped,
-      swapped_with: ex.swappedWith ?? null,
-      notes: ex.notes ?? null,
-    }),
+    exerciseLogs.push(exerciseLogToSaveRow("cool_down", null, i, ex)),
   );
 
   ensureCardioExercises(persisted).forEach((ex, i) =>
-    exerciseLogs.push({
-      section: "cardio",
-      round_number: null,
-      position: i,
-      exercise_id: ex.exerciseId,
-      completed: ex.completed,
-      actual_reps: ex.actualReps ?? null,
-      actual_duration: ex.actualDuration ?? null,
-      actual_distance_mi: ex.actualDistanceMi ?? null,
-      target_duration_seconds: ex.targetDurationSeconds ?? null,
-      skipped: ex.skipped,
-      swapped_with: ex.swappedWith ?? null,
-      notes: ex.notes ?? null,
-    }),
+    exerciseLogs.push(exerciseLogToSaveRow("cardio", null, i, ex)),
   );
 
   return { workout, exerciseLogs };

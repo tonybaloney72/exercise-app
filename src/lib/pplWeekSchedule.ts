@@ -56,7 +56,7 @@ const DAY_NAMES = [
   "Saturday",
 ] as const;
 
-export function sanitizePplDaySchedule(raw: unknown): PplDaySchedule {
+function sanitizePplDaySchedule(raw: unknown): PplDaySchedule {
   if (typeof raw === "string" && raw in PPL_SCHEDULE_LABELS) {
     return raw as PplDaySchedule;
   }
@@ -132,11 +132,11 @@ export function pplScheduleToRestDayMode(entry: PplDaySchedule): RestDayMode {
   }
 }
 
-export function pplScheduleHasCardioFinisher(entry: PplDaySchedule): boolean {
+function pplScheduleHasCardioFinisher(entry: PplDaySchedule): boolean {
   return entry === "push" || entry === "pull" || entry === "active_recovery";
 }
 
-export function pplScheduleToMaterializerType(
+function pplScheduleToMaterializerType(
   entry: PplDaySchedule,
 ): PplDayType | null {
   switch (entry) {
@@ -210,7 +210,7 @@ function themeForSchedule(entry: PplDaySchedule): string {
   }
 }
 
-export function buildPplShellFromSchedule(
+function buildPplShellFromSchedule(
   dayOfWeek: number,
   entry: PplDaySchedule,
 ): PplDayShell {
@@ -281,7 +281,7 @@ export function sanitizePplWeeklyCardioByDayForSchedule(
   return out;
 }
 
-export function weeklyPplScheduleFingerprint(
+function weeklyPplScheduleFingerprint(
   schedule: WeeklyPplSchedule,
 ): string {
   const seg = [0, 1, 2, 3, 4, 5, 6]

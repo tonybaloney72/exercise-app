@@ -118,7 +118,7 @@ export const WARM_SESSION_CATALOG_POOLS = mergeThemedPools(
   buildWorkoutWarmCrossoverPools(),
 );
 
-export function warmUpCatalogPool(id: StretchThemePoolId): readonly StretchEntry[] {
+function warmUpCatalogPool(id: StretchThemePoolId): readonly StretchEntry[] {
   return WARM_UP_CATALOG_POOLS[id];
 }
 
@@ -129,7 +129,7 @@ export function warmSessionCatalogPool(
   return WARM_SESSION_CATALOG_POOLS[id];
 }
 
-export function coolDownCatalogPool(id: StretchThemePoolId): readonly StretchEntry[] {
+function coolDownCatalogPool(id: StretchThemePoolId): readonly StretchEntry[] {
   return COOL_DOWN_CATALOG_POOLS[id];
 }
 

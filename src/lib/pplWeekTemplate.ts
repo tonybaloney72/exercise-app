@@ -28,7 +28,7 @@ export type PplWeekVariant = "balanced";
 
 export type PplDayType = "active_recovery" | "push" | "pull" | "legs";
 
-export const PPL_DAY_TYPE_LABELS: Record<PplDayType, string> = {
+const PPL_DAY_TYPE_LABELS: Record<PplDayType, string> = {
   active_recovery: "Active recovery",
   push: "Push",
   pull: "Pull",
@@ -44,7 +44,7 @@ export const PPL_LEG_DAY_CORE_GROUPS: ExerciseCategory[] = [
 ];
 
 /** Light core on Sunday base shell (overridden to CS-only when rest = active_recovery). */
-export const PPL_RECOVERY_CORE_GROUPS: ExerciseCategory[] = ["CR", "CS"];
+const PPL_RECOVERY_CORE_GROUPS: ExerciseCategory[] = ["CR", "CS"];
 
 export interface PplDayShell {
   dayOfWeek: number;
@@ -126,7 +126,7 @@ export const PPL_BALANCED_SHELLS: readonly PplDayShell[] = [
   },
 ] as const;
 
-export function shellsForPplVariant(
+function shellsForPplVariant(
   variant: PplWeekVariant = "balanced",
 ): readonly PplDayShell[] {
   switch (variant) {
@@ -176,7 +176,7 @@ export function coreGroupsForPplDayType(
   }
 }
 
-export function getPplShellForDay(
+function getPplShellForDay(
   dayOfWeek: number,
   variant: PplWeekVariant = "balanced",
 ): PplDayShell {
@@ -195,7 +195,7 @@ export function getPplDayType(
 }
 
 /** Materialize a {@link DayPlan} seed from a PPL shell (empty exercise slots). */
-export function buildPplDayPlan(shell: PplDayShell): DayPlan {
+function buildPplDayPlan(shell: PplDayShell): DayPlan {
   return {
     dayOfWeek: shell.dayOfWeek,
     name: shell.name,

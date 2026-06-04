@@ -43,11 +43,6 @@ function recordStretchUsage(
   for (const e of entries) weekUsed.add(e.exerciseId);
 }
 
-export {
-  CATALOG_DEFAULT_COOL_DOWN,
-  CATALOG_DEFAULT_WARM_UP,
-} from "@/lib/stretchCatalogDefaults";
-
 /**
  * Deterministic pseudo-random subset: seed shuffles the pool (not catalog id order).
  * Same seed → same picks; different day/pool seeds → different spreads.

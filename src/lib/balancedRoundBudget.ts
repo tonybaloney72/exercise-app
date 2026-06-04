@@ -1,3 +1,4 @@
+import { dayPlanCategoryPool } from "@/lib/dayPlanCategoryPool";
 import type { DayPlan, ExerciseCategory } from "@/types";
 
 const FULL_BUDGET_SLOTS = 7;
@@ -11,16 +12,7 @@ function isRecoveryDay(plan: DayPlan): boolean {
 }
 
 function dayPool(plan: DayPlan): ExerciseCategory[] {
-  const out: ExerciseCategory[] = [];
-  for (const c of plan.strengthFocus) {
-    if (!out.includes(c)) out.push(c);
-  }
-  for (const c of plan.coreGroups) {
-    if (!out.includes(c)) out.push(c);
-  }
-  if (plan.hasJog && !out.includes("PC")) out.push("PC");
-  if (out.length === 0) out.push("CS");
-  return out;
+  return dayPlanCategoryPool(plan);
 }
 
 /** Full (7-slot) balanced recipe before density trim. */

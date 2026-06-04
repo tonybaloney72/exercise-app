@@ -135,7 +135,7 @@ export function roundBlueprintGroupsEqual(
 }
 
 /** Drop repeat-clone specs when groups no longer match the source round. */
-export function sanitizeRoundCloneMetadata(
+function sanitizeRoundCloneMetadata(
   rounds: RoundBlueprint[],
 ): RoundBlueprint[] {
   return rounds.map((round, index) => {
@@ -346,7 +346,7 @@ export function weeklyBlueprintFingerprint(blueprint: WeekBlueprint): string {
   return `wbp:${seg}`;
 }
 
-export function dayBlueprintKindToRestMode(kind: DayBlueprintKind): RestDayMode {
+function dayBlueprintKindToRestMode(kind: DayBlueprintKind): RestDayMode {
   switch (kind) {
     case "active_recovery":
       return "active_recovery";

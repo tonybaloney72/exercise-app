@@ -14,10 +14,10 @@ import { hydrateCardioFromNotes } from "@/lib/workoutCardioPersistence";
 import { migrateConsolidatedExerciseId } from "@/lib/exerciseIdConsolidation";
 
 /** Legacy cardio/plyo category code (renamed to {@link PC_CATEGORY}). */
-export const LEGACY_CP_CATEGORY = "CP" as const;
+const LEGACY_CP_CATEGORY = "CP" as const;
 
 /** Plyometric / cardio category code. */
-export const PC_CATEGORY = "PC" as const;
+const PC_CATEGORY = "PC" as const;
 
 const CP_ID_PREFIX = /^CP-(\d+.*)$/;
 
@@ -28,7 +28,7 @@ export function migrateExerciseId(id: string): string {
   return migrateConsolidatedExerciseId(afterCp);
 }
 
-export function migrateCategory(category: string): ExerciseCategory {
+function migrateCategory(category: string): ExerciseCategory {
   if (category === LEGACY_CP_CATEGORY) return PC_CATEGORY;
   return category as ExerciseCategory;
 }
@@ -42,7 +42,7 @@ function migrateRoundExercise(slot: RoundExercise): RoundExercise {
 }
 
 /** Normalize persisted or in-flight plans that still use `CP`. */
-export function migrateDayPlan(plan: DayPlan): DayPlan {
+function migrateDayPlan(plan: DayPlan): DayPlan {
   return normalizeDayPlanCardio({
     ...plan,
     strengthFocus: plan.strengthFocus.map((c) => migrateCategory(c)),
@@ -63,7 +63,7 @@ export function migrateTrainingWeekDays(days: TrainingWeekDays): TrainingWeekDay
   return out;
 }
 
-export function migrateExerciseLog(log: ExerciseLog): ExerciseLog {
+function migrateExerciseLog(log: ExerciseLog): ExerciseLog {
   return {
     ...log,
     exerciseId: migrateExerciseId(log.exerciseId),

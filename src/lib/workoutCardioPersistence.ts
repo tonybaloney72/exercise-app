@@ -24,7 +24,7 @@ function parseCardioFromNotes(notes: string | undefined): ExerciseLog[] | undefi
   }
 }
 
-export function embedCardioInNotes(
+function embedCardioInNotes(
   notes: string | undefined,
   cardioExercises: ExerciseLog[] | undefined,
 ): string | undefined {

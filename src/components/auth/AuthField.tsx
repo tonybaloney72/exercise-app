@@ -1,4 +1,4 @@
-export const authInputClassName =
+const authInputClassName =
   "w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted sm:px-4 sm:py-3";
 
 type AuthFieldProps = {

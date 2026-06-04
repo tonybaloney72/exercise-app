@@ -45,5 +45,5 @@ export const PPL_ROUND_DENSITY_OPTIONS: RoundDensityOption[] = [
   },
 ];
 
-export const PPL_PRESET_DESCRIPTION =
+const PPL_PRESET_DESCRIPTION =
   "Sun–Sat push / pull / legs split: rounds 1–3 repeat the same strength exercises (like 3 sets). Push and pull days add cardio in the Cardio & endurance section (time and distance). Leg days finish with one core block. Turn weekdays to active recovery, stretches only, or full rest below for a lighter week (e.g. 3-day P/P/L).";

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 const RADIUS = 45;
 
 /** Circumference for `r={RADIUS}` in a 0–100 viewBox (matches rest timer math). */
-export const COUNTDOWN_RING_CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+const COUNTDOWN_RING_CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 export type CountdownRingProps = {
   /** 1 = full ring (start), 0 = empty (end). */

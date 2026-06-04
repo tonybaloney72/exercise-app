@@ -5,7 +5,7 @@ import { primeTimerAudio, playTimerDoneAlert } from "@/utils/timerAlert";
 import { displayCountdownSeconds } from "@/utils/time";
 
 export type TimerMode = "idle" | "rest" | "stopwatch" | "setTimer";
-export type TimerPresentation = "fullscreen" | "minimized";
+type TimerPresentation = "fullscreen" | "minimized";
 
 interface FloatingTimerState {
   mode: TimerMode;

@@ -24,10 +24,10 @@ import { migrateExerciseId, migrateWorkoutLog } from "@/lib/cpToPcMigration";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import { DEFAULT_SETTINGS } from "./types";
 
-export const LOCAL_HISTORY_KEY = "exercise-app-history";
+const LOCAL_HISTORY_KEY = "exercise-app-history";
 export const LOCAL_SETTINGS_KEY = "exercise-app-settings";
-export const LOCAL_EXERCISE_SETTINGS_KEY = "exercise-app-exercise-settings";
-export const LOCAL_WORKOUT_TEMPLATES_KEY = "exercise-app-workout-day-templates";
+const LOCAL_EXERCISE_SETTINGS_KEY = "exercise-app-exercise-settings";
+const LOCAL_WORKOUT_TEMPLATES_KEY = "exercise-app-workout-day-templates";
 
 function isBrowser(): boolean {
   return typeof window !== "undefined";

@@ -339,9 +339,3 @@ export interface WeightLogEntry {
   weightLb: number;
 }
 
-export interface ProgressEntry {
-  date: string;
-  exerciseId: string;
-  reps: number;
-  notes?: string;
-}

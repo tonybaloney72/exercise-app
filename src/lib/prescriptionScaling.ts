@@ -16,7 +16,7 @@ import type {
 } from "@/types";
 
 /** Rep volume multiplier by declared cap for the exercise's emphasis group. */
-export const REP_VOLUME_MULTIPLIER: Record<ExpertiseLevel, number> = {
+const REP_VOLUME_MULTIPLIER: Record<ExpertiseLevel, number> = {
   beginner: 0.5,
   novice: 0.65,
   intermediate: 1,
@@ -25,7 +25,7 @@ export const REP_VOLUME_MULTIPLIER: Record<ExpertiseLevel, number> = {
 };
 
 /** Timer duration multiplier by declared cap for the exercise's emphasis group. */
-export const TIMER_DURATION_MULTIPLIER: Record<ExpertiseLevel, number> = {
+const TIMER_DURATION_MULTIPLIER: Record<ExpertiseLevel, number> = {
   beginner: 0.67,
   novice: 0.8,
   intermediate: 1,
@@ -100,7 +100,7 @@ export function scaleTimerSeconds(
   return Math.max(5, Math.min(999, rounded));
 }
 
-export function scaleCatalogTimerPrescription(
+function scaleCatalogTimerPrescription(
   defaultReps: string,
   category: ExerciseCategory,
   expertiseByGroup?: ExpertiseByGroup,
@@ -145,7 +145,7 @@ export function scaledDefaultTimerSeconds(
 }
 
 /** Best single rep target after expertise scaling (for resolved settings seed). */
-export function scaledRepTargetHint(
+function scaledRepTargetHint(
   defaultReps: string,
   category: ExerciseCategory,
   expertiseByGroup?: ExpertiseByGroup,

@@ -185,7 +185,7 @@ export function stretchWarmUpQuota(
 }
 
 /** Cool-down stretch count for a themed pool (derived from priority scores). */
-export function stretchCoolDownQuota(
+function stretchCoolDownQuota(
   pool: StretchThemePoolId,
   preset: TrainingPriorityPreset,
   scores?: TrainingPriorityScores,

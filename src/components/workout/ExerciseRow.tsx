@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import CompletionCheckmark from "@/components/common/CompletionCheckmark";
 import { exerciseMap } from "@/data/exercises";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
@@ -265,23 +266,7 @@ export default function ExerciseRow({
             backgroundColor: log.completed ? "var(--accent)" : "transparent",
           }}
         >
-          {log.completed && (
-            <motion.svg
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 15 }}
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M2.5 7.5L5.5 10.5L11.5 3.5" />
-            </motion.svg>
-          )}
+          {log.completed ? <CompletionCheckmark /> : null}
         </button>
 
         <WorkoutRowMetaLine

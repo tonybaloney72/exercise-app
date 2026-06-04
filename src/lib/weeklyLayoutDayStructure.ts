@@ -22,24 +22,6 @@ export type LayoutDayStructure = {
 /** Sun (0) … Sat (6) → day structure. */
 export type WeeklyLayoutDayStructure = Record<number, LayoutDayStructure>;
 
-export const LAYOUT_DAY_STRUCTURE_MODE_LABELS: Record<
-  LayoutDayStructureMode,
-  { label: string; hint: string }
-> = {
-  mixed: {
-    label: "Mixed",
-    hint: "Blend groups in each round; set total rounds below.",
-  },
-  blocks: {
-    label: "Blocks",
-    hint: "Separate rounds per group — e.g. 3× Pull then 1× Cardio.",
-  },
-  repeat: {
-    label: "Repeat",
-    hint: "Same exercises every round per group, then move on.",
-  },
-};
-
 const STRENGTH_LAYOUT_GROUPS = new Set<LayoutGroup>([
   "core_front",
   "core_lower",
@@ -50,7 +32,7 @@ const STRENGTH_LAYOUT_GROUPS = new Set<LayoutGroup>([
   "upper_pull",
 ]);
 
-export function isStrengthLayoutGroup(group: LayoutGroup): boolean {
+function isStrengthLayoutGroup(group: LayoutGroup): boolean {
   return STRENGTH_LAYOUT_GROUPS.has(group);
 }
 
@@ -79,7 +61,7 @@ export function defaultGroupRounds(
   return out;
 }
 
-export function defaultLayoutDayStructure(
+function defaultLayoutDayStructure(
   enabled: LayoutGroup[],
   catalogRoundCount = 3,
 ): LayoutDayStructure {
@@ -150,7 +132,7 @@ export function resolveMixedRoundCount(
   );
 }
 
-export function sanitizeLayoutDayStructure(
+function sanitizeLayoutDayStructure(
   raw: unknown,
   enabled: LayoutGroup[],
   catalogRoundCount = 3,
@@ -207,7 +189,7 @@ export function sanitizeWeeklyLayoutDayStructure(
   return out;
 }
 
-export function layoutDayStructureEqual(
+function layoutDayStructureEqual(
   a: LayoutDayStructure,
   b: LayoutDayStructure,
 ): boolean {
@@ -289,7 +271,7 @@ export function buildLayoutRoundSpecs(
   return specs;
 }
 
-export function totalLayoutRounds(specs: LayoutRoundSpec[]): number {
+function totalLayoutRounds(specs: LayoutRoundSpec[]): number {
   return specs.length;
 }
 
@@ -320,7 +302,7 @@ export function describeLayoutDayStructure(
   return `${parts.join(" · ")}${repeat}`;
 }
 
-export function weeklyLayoutDayStructureFingerprint(
+function weeklyLayoutDayStructureFingerprint(
   structure: WeeklyLayoutDayStructure,
   layout: WeeklyCategoryLayout,
 ): string {

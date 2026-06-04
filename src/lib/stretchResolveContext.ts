@@ -102,16 +102,6 @@ function stretchesForPlanInWeek(
   };
 }
 
-/** Resolve warm-up / cool-down using current settings + prefs (non-React). */
-export function resolveStretchesForPlan(
-  plan: DayPlan,
-  weekByDow?: TrainingWeekDays | null,
-): ResolvedDayStretches {
-  const ctx = buildStretchResolveContext();
-  if (weekByDow) return stretchesForPlanInWeek(plan, weekByDow, ctx);
-  return resolveStretchesForDay(plan, ctx);
-}
-
 /** Week-aware resolve for workout start (loads week containing `weekAnchorDateKey` when set). */
 export async function resolveStretchesForWorkoutStart(
   plan: DayPlan,

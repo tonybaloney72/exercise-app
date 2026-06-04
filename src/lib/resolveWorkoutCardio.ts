@@ -9,7 +9,7 @@ const ENDURANCE_EXERCISE_IDS = new Set<string>(
   Object.values(CARDIO_KIND_TO_EXERCISE_ID),
 );
 
-export function isEnduranceExerciseId(exerciseId: string): boolean {
+function isEnduranceExerciseId(exerciseId: string): boolean {
   return ENDURANCE_EXERCISE_IDS.has(exerciseId);
 }
 

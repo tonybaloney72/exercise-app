@@ -3,9 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { resolveTrainingWeekForAuth } from "@/lib/planResolver";
 import type { TrainingWeekDays } from "@/lib/repos";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useTrainingWeekRefreshStore } from "@/stores/useTrainingWeekRefreshStore";
-import { useSettingsStore } from "@/stores/useSettingsStore";
+import { usePlanResolverDeps } from "@/hooks/usePlanResolverDeps";
+import { selectProgramProfileKeyWeekPlans } from "@/lib/planResolverDeps";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /**
@@ -17,13 +16,8 @@ export function useTrainingWeekPlans(weekDates: Date[]): {
   loading: boolean;
   error: string | null;
 } {
-  const mode = useAuthStore((s) => s.mode);
-  const planRevision = useTrainingWeekRefreshStore((s) => s.planRevision);
-  const equipmentKey = useSettingsStore((s) => s.availableEquipment.join(","));
-  const programProfileKey = useSettingsStore(
-    (s) =>
-      `${s.programMode}:${s.customBuildStyle}:${s.weekBlueprintCustomized}:${JSON.stringify(s.weekBlueprint)}:${s.trainingPriorityPreset}:${s.trainingPriorityCustomized}:${JSON.stringify(s.trainingPriorityScores)}:${s.roundDensity}`,
-  );
+  const { mode, planRevision, equipmentKey, programProfileKey } =
+    usePlanResolverDeps(selectProgramProfileKeyWeekPlans);
 
   const anchorKey = useMemo(
     () => (weekDates.length > 0 ? formatLocalDateKey(weekDates[0]) : ""),

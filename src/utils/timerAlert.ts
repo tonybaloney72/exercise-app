@@ -61,7 +61,7 @@ function beep(
   osc.stop(startAt + durationSec + 0.02);
 }
 
-export function playTimerDoneChime(): void {
+function playTimerDoneChime(): void {
   const { timerSoundsEnabled } = useSettingsStore.getState();
   if (!timerSoundsEnabled) return;
   const ctx = getAudioContext();

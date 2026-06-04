@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { resolveDayPlanForAuth } from "@/lib/planResolver";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useTrainingWeekRefreshStore } from "@/stores/useTrainingWeekRefreshStore";
+import { usePlanResolverDeps } from "@/hooks/usePlanResolverDeps";
+import { selectProgramProfileKeyDayPlan } from "@/lib/planResolverDeps";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { DayPlan } from "@/types";
 import { parseLocalDateKey } from "@/utils/weekCalendar";
@@ -13,13 +13,8 @@ export function useDayPlan(dateKey: string): {
   loading: boolean;
   error: string | null;
 } {
-  const mode = useAuthStore((s) => s.mode);
-  const planRevision = useTrainingWeekRefreshStore((s) => s.planRevision);
-  const equipmentKey = useSettingsStore((s) => s.availableEquipment.join(","));
-  const programProfileKey = useSettingsStore(
-    (s) =>
-      `${s.programMode}:${s.customBuildStyle}:${s.weekBlueprintCustomized}:${JSON.stringify(s.weekBlueprint)}:${s.trainingPriorityPreset}:${s.trainingPriorityCustomized}:${JSON.stringify(s.trainingPriorityScores)}:${s.roundDensity}:${JSON.stringify(s.weeklyPplSchedule)}:${s.weeklyPplScheduleCustomized}:${JSON.stringify(s.weeklyRestDays)}:${s.weeklyRestDaysCustomized}`,
-  );
+  const { mode, planRevision, equipmentKey, programProfileKey } =
+    usePlanResolverDeps(selectProgramProfileKeyDayPlan);
   const stretchDefaultsKey = useSettingsStore((s) =>
     [...s.defaultWarmUp, ...s.defaultCoolDown]
       .map((e) => `${e.exerciseId}:${e.targetReps}`)

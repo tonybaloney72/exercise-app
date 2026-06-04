@@ -10,7 +10,7 @@ export function isPresetProgramMode(mode: ProgramMode | undefined): boolean {
 }
 
 /** @deprecated Use {@link isPresetProgramMode}. */
-export const isPrioritiesProgramMode = isPresetProgramMode;
+const isPrioritiesProgramMode = isPresetProgramMode;
 
 /** Sun–Sat theme shells before rest/cardio + generator fill. */
 export function buildWeekSeedForProgramMode(

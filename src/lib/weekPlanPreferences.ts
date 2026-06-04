@@ -29,7 +29,7 @@ import {
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan, ExerciseEquipment, UserSettings } from "@/types";
 
-export function suggestWeeklyCardioForSettings(
+function suggestWeeklyCardioForSettings(
   settings: UserSettings,
 ): Record<number, import("@/types").CardioActivityKind[]> {
   return isPresetProgramMode(settings.programMode)
@@ -37,7 +37,7 @@ export function suggestWeeklyCardioForSettings(
     : suggestWeeklyCardioFromCatalog();
 }
 
-export function resolveWeeklyCardioByDay(
+function resolveWeeklyCardioByDay(
   settings: UserSettings,
 ): Record<number, import("@/types").CardioActivityKind[]> {
   const fallback = suggestWeeklyCardioForSettings(settings);
@@ -91,7 +91,7 @@ export function prepareWeekSeedForUser(
 }
 
 /** @deprecated Use {@link prepareWeekSeedForUser}. */
-export function prepareCatalogWeekForUser(
+function prepareCatalogWeekForUser(
   catalogWeek: TrainingWeekDays,
   settings: UserSettings,
   availableEquipment: ExerciseEquipment[],
@@ -154,7 +154,7 @@ export function weeklyCardioSettingsChanged(
   return false;
 }
 
-export function weeklyPplScheduleSettingsChanged(
+function weeklyPplScheduleSettingsChanged(
   partial: Partial<UserSettings>,
   current: UserSettings,
 ): boolean {

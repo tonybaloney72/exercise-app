@@ -8,7 +8,7 @@ function cardioRows(log: WorkoutLog): ExerciseLog[] {
   return hydrateCardioFromNotes(log).cardioExercises ?? [];
 }
 
-export function createCardioInstanceId(): string {
+function createCardioInstanceId(): string {
   return uuidv4();
 }
 
@@ -85,7 +85,7 @@ function defaultPrescriptionForKind(kind: CardioActivityKind): string {
   return defaults[kind];
 }
 
-export function formatQuickCardioPrescription(input: {
+function formatQuickCardioPrescription(input: {
   distanceMi?: number;
   durationSeconds?: number;
 }): string {

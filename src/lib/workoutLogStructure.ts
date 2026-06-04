@@ -25,7 +25,7 @@ function seedTimerTargetSeconds(
   return Math.min(999, Math.max(5, sec));
 }
 
-export function buildStrengthExerciseLog(exerciseId: string): ExerciseLog {
+function buildStrengthExerciseLog(exerciseId: string): ExerciseLog {
   const meta = exerciseMap[exerciseId];
   const stored = undefined;
   const resolved = resolveExerciseSettings(
@@ -54,7 +54,7 @@ export function buildStrengthExerciseLog(exerciseId: string): ExerciseLog {
   };
 }
 
-export function buildStretchExerciseLogFromId(
+function buildStretchExerciseLogFromId(
   exerciseId: string,
   targetReps?: string,
 ): ExerciseLog {
@@ -129,7 +129,7 @@ export function removeRoundExerciseAt(
   return { ...log, rounds };
 }
 
-export function addRoundExerciseAt(
+function addRoundExerciseAt(
   log: WorkoutLog,
   roundNumber: number,
   exerciseId: string,
@@ -193,7 +193,7 @@ export function removeCoolDownStretchAt(
   };
 }
 
-export function addCoolDownStretch(
+function addCoolDownStretch(
   log: WorkoutLog,
   exerciseId: string,
 ): WorkoutLog {

@@ -339,5 +339,3 @@ export function materializeBlueprintDayPlanFromSettings(
     expertiseFilter,
   );
 }
-
-export type { WeekBlueprint };

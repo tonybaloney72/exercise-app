@@ -1,7 +1,7 @@
 import { buildWeekSeedFromSettings } from "@/lib/weekSeed";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import {
-  collectDislikedIds,
   computePrefsFingerprintFromSettings,
   isUserCustomizedWeekSource,
   materializeTrainingWeek,

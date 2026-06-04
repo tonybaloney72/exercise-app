@@ -56,7 +56,6 @@ import {
 import type { WeekBlueprintPresetId } from "@/lib/weekBlueprintPresets";
 import type { WeekBlueprint } from "@/lib/weekBlueprint";
 
-export { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 
 /** Persist blueprint-generated exercises as a manual custom week. */
 export async function seedManualWeekFromBlueprint(

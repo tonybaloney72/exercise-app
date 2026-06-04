@@ -70,7 +70,7 @@ export function buildStretchUsedExerciseIds(
   return used;
 }
 
-export function filterStretchesByDislikes(
+function filterStretchesByDislikes(
   entries: StretchEntry[],
   dislikedExerciseIds?: ReadonlySet<string>,
 ): StretchEntry[] {

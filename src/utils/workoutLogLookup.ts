@@ -70,7 +70,7 @@ export function shouldAutoRestoreInProgressFromHistory(
  * @deprecated Prefer `findCompletedWorkoutForDate` or `findInProgressWorkoutForDate`.
  * Returns any log tied to the day (including in-progress).
  */
-export function findWorkoutLogForDate(
+function findWorkoutLogForDate(
   workoutHistory: WorkoutLog[],
   dateKey: string,
 ): WorkoutLog | null {

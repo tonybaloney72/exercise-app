@@ -22,7 +22,7 @@ export function shouldRegenDayOfWeek(
 }
 
 /** Calendar date keys (YYYY-MM-DD) to regenerate for the current week. */
-export function regenDateKeysForWeekChange(
+function regenDateKeysForWeekChange(
   todayDateKey: string = formatLocalDateKey(),
   freezeState?: PrescribedPlanFreezeState,
 ): string[] {

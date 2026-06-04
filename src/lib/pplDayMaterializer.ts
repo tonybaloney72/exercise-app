@@ -300,4 +300,4 @@ export function materializePplDayPlan(
   };
 }
 
-export { WORKING_ROUNDS, PPL_LEG_CORE_ROUND };
+export { PPL_LEG_CORE_ROUND };

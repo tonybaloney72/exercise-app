@@ -30,7 +30,7 @@ export function mergeRegeneratedDays(
   return merged;
 }
 
-export function cloneTrainingWeekDays(week: TrainingWeekDays): TrainingWeekDays {
+function cloneTrainingWeekDays(week: TrainingWeekDays): TrainingWeekDays {
   const out: TrainingWeekDays = {};
   for (let dow = 0; dow < 7; dow++) {
     const plan = week[dow];

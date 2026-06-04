@@ -34,13 +34,9 @@ export type {
   WorkoutRepo,
   TrainingWeekDays,
   TrainingWeekRepo,
-  PersistedTrainingWeek,
-  SaveTrainingWeekOptions,
   WorkoutDayTemplateRepo,
-  SaveWorkoutDayTemplateInput,
 } from "./types";
 export { DEFAULT_SETTINGS } from "./types";
-export { clearLocalData } from "./local";
 
 export function getWorkoutRepo(mode?: AuthMode): WorkoutRepo {
   const m = mode ?? useAuthStore.getState().mode;

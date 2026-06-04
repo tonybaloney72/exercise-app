@@ -5,7 +5,7 @@ import { migrateExerciseId } from "@/lib/cpToPcMigration";
  * Human-readable names for exercise ids removed from the catalog but still
  * referenced in workout history. Add an entry when deleting an exercise.
  */
-export const ARCHIVED_EXERCISE_DISPLAY_NAMES: Record<string, string> = {
+const ARCHIVED_EXERCISE_DISPLAY_NAMES: Record<string, string> = {
   "PC-40": "Incline Plyo Push-Up",
   "PC-41": "Clap Push-Up",
 };

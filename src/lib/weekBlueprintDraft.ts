@@ -58,7 +58,7 @@ function buildDefaultRounds(
   return rounds;
 }
 
-export function defaultDayBlueprint(dow: number): DayBlueprint {
+function defaultDayBlueprint(dow: number): DayBlueprint {
   return {
     dayKind: "workout",
     rounds: buildDefaultRounds("workout", dow, []),
@@ -129,7 +129,7 @@ export function removeRoundInBlueprint(
   return { ...blueprint, [dow]: { ...day, rounds } };
 }
 
-export function setRoundCountInBlueprint(
+function setRoundCountInBlueprint(
   blueprint: WeekBlueprint,
   dow: number,
   count: number,
@@ -209,7 +209,7 @@ export function applyRoundCloneFromPrior(
   return { ...blueprint, [dow]: { ...day, rounds } };
 }
 
-export function cloneRoundInBlueprint(
+function cloneRoundInBlueprint(
   blueprint: WeekBlueprint,
   dow: number,
   sourceIndex: number,

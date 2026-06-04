@@ -9,7 +9,7 @@ import { fileURLToPath } from "url";
 import { youtubeVideoId } from "./source-resolve.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-export const YOUTUBE_SEARCH_CACHE_PATH = join(
+const YOUTUBE_SEARCH_CACHE_PATH = join(
   __dirname,
   "../../reports/youtube-search-cache.json",
 );
@@ -35,7 +35,7 @@ export function saveYoutubeSearchCache(path = YOUTUBE_SEARCH_CACHE_PATH) {
   writeFileSync(path, JSON.stringify(searchCache, null, 2));
 }
 
-export function watchUrlFromVideoId(id) {
+function watchUrlFromVideoId(id) {
   return `https://www.youtube.com/watch?v=${id}`;
 }
 

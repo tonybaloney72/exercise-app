@@ -36,7 +36,7 @@ export function isCyclingEquipmentName(name) {
 }
 
 /** Well-known moves that imply implements even when the name omits them. */
-export function equipmentFromNamedMove(name) {
+function equipmentFromNamedMove(name) {
   const n = name ?? "";
   if (/\bturkish\s+(sit[- ]?up|get[- ]?up)\b/i.test(n)) {
     return ["dumbbell", "kettlebell"];
@@ -87,7 +87,7 @@ const NOTE_EQUIPMENT_PATTERNS = [
   [/\bleg\s+press\b/i, "machine"],
 ];
 
-export function inferEquipmentFromNotes(notes) {
+function inferEquipmentFromNotes(notes) {
   if (!notes) return [];
   const found = new Set();
   for (const [re, tag] of NOTE_EQUIPMENT_PATTERNS) {

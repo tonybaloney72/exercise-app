@@ -124,7 +124,7 @@ export function migrateConsolidatedExerciseId(id: string): string {
   return current;
 }
 
-export function isRemovedFromLibrary(id: string): boolean {
+function isRemovedFromLibrary(id: string): boolean {
   return (
     REMOVED_HYBRID_EXERCISE_IDS.has(id) ||
     REMOVED_CATALOG_STRETCH_IDS.has(id)

@@ -40,7 +40,7 @@ function dateKeyBetweenInclusive(key: string, start: Date, end: Date): boolean {
   return t >= start.getTime() && t <= end.getTime();
 }
 
-export interface WeeklyWorkoutPoint {
+interface WeeklyWorkoutPoint {
   /** Short label for axis */
   label: string;
   count: number;
@@ -49,7 +49,7 @@ export interface WeeklyWorkoutPoint {
 /**
  * Last `numWeeks` calendar weeks (Sun–Sat), ending with the week that contains `reference`.
  */
-export function weeklyWorkoutCounts(
+function weeklyWorkoutCounts(
   history: WorkoutLog[],
   numWeeks: number,
   reference: Date = new Date(),
