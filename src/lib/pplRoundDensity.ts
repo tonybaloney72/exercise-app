@@ -1,4 +1,7 @@
-import { ROUND_DENSITY_TARGETS, type RoundDensityOption } from "@/lib/programProfile";
+import {
+  ROUND_DENSITY_TARGETS,
+  type RoundDensityOption,
+} from "@/lib/roundDensityConfig";
 import type { RoundDensity } from "@/types";
 
 /** Working rounds 1–3: same count as global round-density targets (3 / 5 / 7). */

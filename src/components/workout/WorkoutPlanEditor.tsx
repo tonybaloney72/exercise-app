@@ -16,7 +16,7 @@ import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
 import { exerciseMap } from "@/data/exercises";
 import { rebuildDerivedStretches } from "@/lib/dayStretchPlan";
-import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
+import { buildStretchResolveContext } from "@/lib/stretchResolveContextStores";
 import { buildStretchUsedExerciseIds } from "@/lib/stretchDefaults";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
@@ -86,7 +86,7 @@ export default function WorkoutPlanEditor({
   onDirtyChange,
 }: WorkoutPlanEditorProps) {
   const [draft, setDraft] = useState(() =>
-    prepareDayPlanForEditor(initialPlan),
+    prepareDayPlanForEditor(initialPlan, buildStretchResolveContext()),
   );
   const [pickTarget, setPickTarget] = useState<PickTarget | null>(null);
   const [categoryPickRound, setCategoryPickRound] = useState<number | null>(
@@ -468,7 +468,9 @@ export default function WorkoutPlanEditor({
       <WorkoutDayTemplateToolbar
         draft={draft}
         disabled={saving}
-        onApply={(next) => setDraft(prepareDayPlanForEditor(next))}
+        onApply={(next) =>
+          setDraft(prepareDayPlanForEditor(next, buildStretchResolveContext()))
+        }
       />
 
       <div className="flex gap-3">

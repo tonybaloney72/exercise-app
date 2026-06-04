@@ -12,7 +12,14 @@ import type {
   ExerciseSetMode,
   StretchEntry,
 } from "@/types";
-import { resolveStretchesForWorkoutStart } from "@/lib/stretchResolveContext";
+import {
+  resolveStretchesForWorkoutStart,
+  type LoadTrainingWeekForStretches,
+} from "@/lib/workoutStretchStart";
+import { buildStretchResolveContextFromInputs } from "@/lib/stretchResolveContext";
+import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
+import { registerPrescribedPlanFreezeStateReader } from "@/lib/planResolverFreezeState";
+import type { AuthMode } from "@/stores/useAuthStore";
 import {
   canResumeInProgressForDate,
   getBackfillEligibility,
@@ -100,6 +107,31 @@ import {
   removeRoundExerciseAt,
   removeWarmUpStretchAt,
 } from "@/lib/workoutLogStructure";
+
+const loadTrainingWeekForStretches: LoadTrainingWeekForStretches = async (
+  anchor: string,
+  mode: AuthMode,
+) => {
+  const { resolveTrainingWeekForAuth } = await import("@/lib/planResolver");
+  return resolveTrainingWeekForAuth(anchor, mode);
+};
+
+function stretchContextForWorkoutStart(weekAnchorDateKey?: string) {
+  const anchor =
+    (weekAnchorDateKey ? weekKeyFromDateKey(weekAnchorDateKey) : null) ??
+    weekKeyFromDateKey(formatLocalDateKey());
+  return buildStretchResolveContextFromInputs({
+    defaultWarmUp: useSettingsStore.getState().defaultWarmUp,
+    defaultCoolDown: useSettingsStore.getState().defaultCoolDown,
+    authMode: useAuthStore.getState().mode,
+    exercisePreferences: useExercisePreferencesStore.getState().byExerciseId,
+    trainingPriorityPreset: useSettingsStore.getState().trainingPriorityPreset,
+    trainingPriorityScores: resolveTrainingPriorityScores(useSettingsStore.getState()),
+    trainingPriorityCustomized:
+      useSettingsStore.getState().trainingPriorityCustomized,
+    weekRotationKey: anchor ?? undefined,
+  });
+}
 
 function draftScope(): DraftAuthScope {
   const auth = useAuthStore.getState();
@@ -407,9 +439,15 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     weekAnchorDateKey?: string,
   ) => {
     const state = get();
+    const authMode = useAuthStore.getState().mode;
     const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(
       plan,
-      weekAnchorDateKey,
+      stretchContextForWorkoutStart(weekAnchorDateKey),
+      {
+        weekAnchorDateKey,
+        authMode,
+        loadWeek: loadTrainingWeekForStretches,
+      },
     );
 
     const existing = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
@@ -1166,9 +1204,15 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       parseLocalDateKey(dateKey)?.getDay() ?? plan.dayOfWeek;
     const nowIso = new Date().toISOString();
     const weekAnchor = weekKeyFromDateKey(dateKey) ?? undefined;
+    const authMode = useAuthStore.getState().mode;
     const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(
       plan,
-      weekAnchor,
+      stretchContextForWorkoutStart(weekAnchor),
+      {
+        weekAnchorDateKey: weekAnchor,
+        authMode,
+        loadWeek: loadTrainingWeekForStretches,
+      },
     );
     const fresh: WorkoutLog = {
       id: uuidv4(),
@@ -1846,3 +1890,12 @@ if (typeof window !== "undefined") {
     schedulePersistActiveWorkoutDraft(draftScope(), log);
   });
 }
+
+registerPrescribedPlanFreezeStateReader(() => {
+  const state = useWorkoutStore.getState();
+  return {
+    activeWorkout: state.activeWorkout,
+    pausedWorkoutDate: state.pausedWorkoutDate,
+    workoutHistory: state.workoutHistory,
+  };
+});

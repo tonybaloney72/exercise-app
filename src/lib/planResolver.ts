@@ -17,7 +17,11 @@ import {
 } from "@/lib/trainingWeekRegen";
 import { sanitizeProgramMode } from "@/lib/weeklyCategoryLayout";
 import { stripPhantomRestDayRounds } from "@/lib/restDays";
-import { isPrescribedPlanFrozenForDate } from "@/lib/workoutSessionGuard";
+import { getPrescribedPlanFreezeState } from "@/lib/planResolverFreezeState";
+import { isPrescribedPlanFrozenFromState } from "@/lib/workoutSessionGuard";
+import type { RefreshTrainingWeekScope } from "@/lib/trainingWeekRefreshScope";
+
+export type { RefreshTrainingWeekScope } from "@/lib/trainingWeekRefreshScope";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import {
   getExercisePreferenceRepo,
@@ -134,10 +138,27 @@ function materializeWeekFromSeed(
   );
 }
 
-export type RefreshTrainingWeekScope = "prefs" | "full";
+async function prescribedPlanFreezeStateForRefresh(): Promise<
+  ReturnType<typeof getPrescribedPlanFreezeState>
+> {
+  const base = getPrescribedPlanFreezeState();
+  if (typeof window === "undefined") return base;
+  try {
+    const { useAuthStore } = await import("@/stores/useAuthStore");
+    const mode = useAuthStore.getState().mode;
+    if (mode !== "authenticated") return base;
+    const { getWorkoutRepo } = await import("@/lib/repos");
+    const history = await getWorkoutRepo(mode).loadHistory();
+    return { ...base, workoutHistory: history };
+  } catch {
+    return base;
+  }
+}
 
-function isTodayPrescribedPlanFrozen(): boolean {
-  return isPrescribedPlanFrozenForDate(formatLocalDateKey());
+async function isTodayPrescribedPlanFrozen(): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  const state = await prescribedPlanFreezeStateForRefresh();
+  return isPrescribedPlanFrozenFromState(formatLocalDateKey(), state);
 }
 
 async function persistTrainingWeek(
@@ -218,7 +239,7 @@ async function refreshPersistedWeek(
   const todayDow = todayParsed?.getDay() ?? 0;
   const indices = regenDayIndicesForPrefsChange({
     todayDayOfWeek: todayDow,
-    freezeTodayPlan: isTodayPrescribedPlanFrozen(),
+    freezeTodayPlan: await isTodayPrescribedPlanFrozen(),
   });
 
   const merged =

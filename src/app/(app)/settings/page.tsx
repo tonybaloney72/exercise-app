@@ -9,7 +9,7 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import AboutDeveloperSection from "@/components/settings/AboutDeveloperSection";
 import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
-import { buildStretchResolveContext } from "@/lib/stretchResolveContext";
+import { buildStretchResolveContext } from "@/lib/stretchResolveContextStores";
 import { ROUND_DENSITY_OPTIONS } from "@/lib/programProfile";
 import { PPL_ROUND_DENSITY_OPTIONS } from "@/lib/pplRoundDensity";
 import {

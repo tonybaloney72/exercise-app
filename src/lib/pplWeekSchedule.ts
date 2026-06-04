@@ -14,7 +14,7 @@ import {
   strengthFocusForPplDayType,
   type PplDayShell,
   type PplDayType,
-} from "@/lib/pplWeekTemplate";
+} from "@/lib/pplWeekTypes";
 import type { UserSettings } from "@/types";
 
 export const PPL_SCHEDULE_LABELS: Record<PplDaySchedule, string> = {

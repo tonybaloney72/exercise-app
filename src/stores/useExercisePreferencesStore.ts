@@ -4,7 +4,6 @@ import { create } from "zustand";
 import type { ExercisePreferenceKind } from "@/types";
 import { getExercisePreferenceRepo } from "@/lib/repos";
 import type { ExercisePreferenceMap } from "@/lib/repos";
-import { refreshCurrentTrainingWeek } from "@/lib/trainingWeekRefresh";
 import { useAuthStore } from "@/stores/useAuthStore";
 import type { TrainingWeekRefreshReason } from "@/stores/useTrainingWeekRefreshStore";
 import { toastSaveError, toastSavePartialWarning } from "@/utils/saveErrorToast";
@@ -82,6 +81,9 @@ export const useExercisePreferencesStore = create<ExercisePreferencesState>(
           ? "dislike"
           : "favorite";
         try {
+          const { refreshCurrentTrainingWeek } = await import(
+            "@/lib/trainingWeekRefresh"
+          );
           await refreshCurrentTrainingWeek(reason);
         } catch (err) {
           toastSavePartialWarning("Preference", err);

@@ -5,10 +5,6 @@ import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import { DEFAULT_SETTINGS, getSettingsRepo } from "@/lib/repos";
 import {
-  refreshCurrentCustomWeekSchedule,
-  refreshCurrentTrainingWeek,
-} from "@/lib/trainingWeekRefresh";
-import {
   pruneStoredStretchDefaults,
   stretchListsEqual,
 } from "@/lib/stretchDefaults";
@@ -95,6 +91,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     if (useAuthStore.getState().mode !== "authenticated") return;
 
     try {
+      const { refreshCurrentCustomWeekSchedule, refreshCurrentTrainingWeek } =
+        await import("@/lib/trainingWeekRefresh");
       if (programModeChanged || blueprintChanged) {
         await refreshCurrentTrainingWeek("program", "full");
       } else if (

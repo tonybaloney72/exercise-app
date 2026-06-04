@@ -1,24 +1,18 @@
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
-import {
-  resolveTrainingPriorityScores,
-  scoresFromPreset,
-} from "@/lib/trainingPriorities";
+import { scoresFromPreset } from "@/lib/trainingPriorities";
 import {
   resolveStretchesForDay,
   resolveStretchesForWeekSequential,
   type ResolvedDayStretches,
 } from "@/lib/dayStretchPlan";
-import { resolveTrainingWeekForAuth } from "@/lib/planResolver";
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import {
   resolveDefaultCoolDownFromSettings,
   resolveDefaultWarmUpFromSettings,
 } from "@/lib/stretchDefaults";
-import { useAuthStore, type AuthMode } from "@/stores/useAuthStore";
-import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
-import { useSettingsStore } from "@/stores/useSettingsStore";
-import { getWeekDateKeys, weekKeyFromDateKey } from "@/utils/weekCalendar";
+import type { AuthMode } from "@/stores/useAuthStore";
+import { getWeekDateKeys } from "@/utils/weekCalendar";
 import type { TrainingPriorityScores } from "@/lib/trainingPriorities";
 import type { DayPlan, StretchEntry, TrainingPriorityPreset } from "@/types";
 
@@ -69,22 +63,7 @@ export function buildStretchResolveContextFromInputs(inputs: {
   };
 }
 
-/** Sync context for stores / workout start (non-React). */
-export function buildStretchResolveContext(): StretchResolveContext {
-  return buildStretchResolveContextFromInputs({
-    defaultWarmUp: useSettingsStore.getState().defaultWarmUp,
-    defaultCoolDown: useSettingsStore.getState().defaultCoolDown,
-    authMode: useAuthStore.getState().mode,
-    exercisePreferences: useExercisePreferencesStore.getState().byExerciseId,
-    trainingPriorityPreset: useSettingsStore.getState().trainingPriorityPreset,
-    trainingPriorityScores: resolveTrainingPriorityScores(useSettingsStore.getState()),
-    trainingPriorityCustomized:
-      useSettingsStore.getState().trainingPriorityCustomized,
-    weekRotationKey: getWeekDateKeys()[0],
-  });
-}
-
-function stretchesForPlanInWeek(
+export function stretchesForPlanInWeek(
   plan: DayPlan,
   weekByDow: TrainingWeekDays,
   ctx: StretchResolveContext,
@@ -100,34 +79,4 @@ function stretchesForPlanInWeek(
     coolDown:
       weekAware.coolDown.length > 0 ? weekAware.coolDown : dayOnly.coolDown,
   };
-}
-
-/** Week-aware resolve for workout start (loads week containing `weekAnchorDateKey` when set). */
-export async function resolveStretchesForWorkoutStart(
-  plan: DayPlan,
-  weekAnchorDateKey?: string,
-): Promise<ResolvedDayStretches> {
-  const anchor =
-    (weekAnchorDateKey ? weekKeyFromDateKey(weekAnchorDateKey) : null) ??
-    getWeekDateKeys()[0]!;
-  const ctx = buildStretchResolveContextFromInputs({
-    defaultWarmUp: useSettingsStore.getState().defaultWarmUp,
-    defaultCoolDown: useSettingsStore.getState().defaultCoolDown,
-    authMode: useAuthStore.getState().mode,
-    exercisePreferences: useExercisePreferencesStore.getState().byExerciseId,
-    trainingPriorityPreset: useSettingsStore.getState().trainingPriorityPreset,
-    trainingPriorityScores: resolveTrainingPriorityScores(useSettingsStore.getState()),
-    trainingPriorityCustomized:
-      useSettingsStore.getState().trainingPriorityCustomized,
-    weekRotationKey: anchor,
-  });
-  const mode = useAuthStore.getState().mode;
-  if (mode === "loading") return resolveStretchesForDay(plan, ctx);
-  try {
-    const week = await resolveTrainingWeekForAuth(anchor, mode);
-    if (week) return stretchesForPlanInWeek(plan, week, ctx);
-  } catch {
-    /* fall through */
-  }
-  return resolveStretchesForDay(plan, ctx);
 }

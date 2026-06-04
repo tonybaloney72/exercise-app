@@ -22,7 +22,7 @@ vi.mock("@/utils/saveErrorToast", () => ({
   toastSaveError: vi.fn(),
 }));
 
-vi.mock("@/lib/stretchResolveContext", () => ({
+vi.mock("@/lib/workoutStretchStart", () => ({
   resolveStretchesForWorkoutStart: vi.fn().mockResolvedValue({
     warmUp: [],
     coolDown: [],
@@ -70,8 +70,9 @@ describe("quickLogCardio", () => {
     const state = useWorkoutStore.getState();
     expect(state.activeWorkout?.endTime).toBeUndefined();
     expect(state.activeWorkout?.startTime).toBeTruthy();
-    expect(state.activeWorkout?.cardioExercises).toHaveLength(1);
-    expect(state.activeWorkout?.cardioExercises[0]?.completed).toBe(true);
+    const cardioRows = state.activeWorkout?.cardioExercises;
+    expect(cardioRows).toHaveLength(1);
+    expect(cardioRows?.[0]?.completed).toBe(true);
     expect(state.activeWorkout?.warmUpCompleted).toBe(false);
     expect(state.activeWorkout?.coolDownCompleted).toBe(false);
     expect(state.activeWorkout?.rounds).toHaveLength(1);

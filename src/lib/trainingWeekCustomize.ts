@@ -16,11 +16,24 @@ import {
 } from "@/lib/programProfile";
 import { rebuildDerivedStretches, resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import { buildVarietySeed } from "@/lib/planVariety";
-import { refreshTrainingWeekContaining, resolveTrainingWeekForAuth } from "@/lib/planResolver";
 import {
-  buildStretchResolveContext,
+  buildStretchResolveContextFromInputs,
   type StretchResolveContext,
 } from "@/lib/stretchResolveContext";
+import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
+
+async function resolveTrainingWeekForAuthInCustomize(dateKey: string) {
+  const { resolveTrainingWeekForAuth } = await import("@/lib/planResolver");
+  return resolveTrainingWeekForAuth(dateKey, "authenticated");
+}
+
+async function refreshTrainingWeekContainingInCustomize(
+  dateKeyInWeek: string,
+  scope: "prefs" | "full",
+): Promise<void> {
+  const { refreshTrainingWeekContaining } = await import("@/lib/planResolver");
+  await refreshTrainingWeekContaining(dateKeyInWeek, scope);
+}
 import {
   cloneStretchEntries,
   hasStretchListOverride,
@@ -56,6 +69,21 @@ import {
 import type { WeekBlueprintPresetId } from "@/lib/weekBlueprintPresets";
 import type { WeekBlueprint } from "@/lib/weekBlueprint";
 
+async function stretchContextFromRepos(): Promise<StretchResolveContext> {
+  const [prefs, settings] = await Promise.all([
+    getExercisePreferenceRepo("authenticated").loadAll(),
+    getSettingsRepo("authenticated").load(),
+  ]);
+  return buildStretchResolveContextFromInputs({
+    defaultWarmUp: settings.defaultWarmUp,
+    defaultCoolDown: settings.defaultCoolDown,
+    authMode: "authenticated",
+    exercisePreferences: prefs,
+    trainingPriorityPreset: settings.trainingPriorityPreset,
+    trainingPriorityScores: resolveTrainingPriorityScores(settings),
+    trainingPriorityCustomized: settings.trainingPriorityCustomized,
+  });
+}
 
 /** Persist blueprint-generated exercises as a manual custom week. */
 export async function seedManualWeekFromBlueprint(
@@ -69,11 +97,12 @@ export async function seedManualWeekFromBlueprint(
 
   const { weekKey } = anchor;
   const rawWeek = await buildWeekPlansFromBlueprint(blueprint, weekKey);
+  const stretchCtx = await stretchContextFromRepos();
   const week: TrainingWeekDays = {};
   for (let dow = 0; dow < 7; dow++) {
     const day = rawWeek[dow];
     if (!day) continue;
-    week[dow] = prepareDayPlanForEditor(day);
+    week[dow] = prepareDayPlanForEditor(day, stretchCtx);
   }
 
   const [prefs, settings] = await Promise.all([
@@ -107,9 +136,11 @@ export function cloneDayPlan(plan: DayPlan): DayPlan {
 }
 
 /** Seed editor lists from resolved stretches (respects dislikes; matches day preview). */
-export function prepareDayPlanForEditor(plan: DayPlan): DayPlan {
+export function prepareDayPlanForEditor(
+  plan: DayPlan,
+  ctx: StretchResolveContext,
+): DayPlan {
   const cloned = cloneDayPlan(stripPhantomRestDayRounds(plan));
-  const ctx = buildStretchResolveContext();
   const resolved = resolveStretchesForDay(plan, ctx);
 
   const warmUp = hasStretchListOverride(plan.warmUp)
@@ -126,7 +157,7 @@ export function prepareDayPlanForEditor(plan: DayPlan): DayPlan {
 /** Strip legacy fields; only persist per-day stretch overrides when they differ from derived. */
 export function dayPlanForCustomSave(
   plan: DayPlan,
-  ctx: StretchResolveContext = buildStretchResolveContext(),
+  ctx: StretchResolveContext,
 ): DayPlan {
   const { defaultWarmUp: _w, defaultCoolDown: _c, ...rest } = plan as DayPlan & {
     defaultWarmUp?: StretchEntry[];
@@ -178,8 +209,9 @@ export async function saveCustomDayPlan(
   const { parsed, weekKey } = anchor;
   const dow = parsed.getDay();
 
-  const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");
-  const toSave = dayPlanForCustomSave(dayPlan);
+  const stretchCtx = await stretchContextFromRepos();
+  const week = await resolveTrainingWeekForAuthInCustomize(dateKey);
+  const toSave = dayPlanForCustomSave(dayPlan, stretchCtx);
   const merged = {
     ...week,
     [dow]: { ...toSave, dayOfWeek: dow },
@@ -201,7 +233,7 @@ export async function saveCustomDayPlan(
 export async function resetTrainingWeekToGenerated(
   dateKeyInWeek: string,
 ): Promise<void> {
-  await refreshTrainingWeekContaining(dateKeyInWeek, "full");
+  await refreshTrainingWeekContainingInCustomize(dateKeyInWeek, "full");
 }
 
 /** Fresh catalog + generator plan for one day-of-week (no persistence). */
@@ -272,6 +304,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
   const useBlueprintReset =
     isManualCustomSettings(settings) && settings.weekBlueprintCustomized;
 
+  const stretchCtx = await stretchContextFromRepos();
   const freshDay = useBlueprintReset
     ? prepareDayPlanForEditor(
         await buildDayPlanFromBlueprint(
@@ -279,6 +312,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
           resolveBlueprintForManualSeed(settings),
           weekKey,
         ),
+        stretchCtx,
       )
     : buildGeneratedDayPlan(
         dow,
@@ -292,7 +326,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
         settings,
       );
 
-  const week = await resolveTrainingWeekForAuth(dateKey, "authenticated");
+  const week = await resolveTrainingWeekForAuthInCustomize(dateKey);
   const merged = {
     ...week,
     [dow]: freshDay,

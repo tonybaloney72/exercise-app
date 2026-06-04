@@ -13,7 +13,7 @@ import {
 } from "@/lib/exerciseCandidates";
 import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import { inferPplDayTypeFromSeed } from "@/lib/pplWeekSchedule";
-import { strengthFocusForPplDayType } from "@/lib/pplWeekTemplate";
+import { strengthFocusForPplDayType } from "@/lib/pplWeekTypes";
 import {
   PPL_CORE_BLOCK_COUNT,
   PPL_LEG_CORE_ROUND,

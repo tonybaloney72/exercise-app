@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { exerciseMap } from "@/data/exercises";
-import { CARDIO_KIND_TO_EXERCISE_ID } from "@/lib/cardioActivities";
+import { CARDIO_KIND_TO_EXERCISE_ID } from "@/lib/cardioKinds";
 import { hydrateCardioFromNotes } from "@/lib/workoutCardioPersistence";
 import type { CardioActivityKind, ExerciseLog, WorkoutLog } from "@/types";
 

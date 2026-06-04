@@ -7,7 +7,7 @@ import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   parseRepTargetHint,
   parseTimerSecondsHint,
-} from "@/utils/effectiveExerciseSettings";
+} from "@/lib/exercisePrescriptionHints";
 import type {
   Exercise,
   ExerciseCategory,
