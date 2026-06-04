@@ -36,7 +36,6 @@ import {
   categoriesForDayLayout,
   layoutGroupForCategory,
   layoutGroupsForDay,
-  resolveWeeklyCategoryLayout,
   type LayoutGroup,
   type WeeklyCategoryLayout,
   LAYOUT_GROUP_TO_CATEGORY,
@@ -96,15 +95,25 @@ export function buildProgramProfileInputFromSettings(
   settings: UserSettings,
 ): ProgramProfileInput {
   if (isGuidedCustomSettings(settings)) {
-    return buildProgramProfileInput("balanced", scoresFromPreset("balanced"), false, {
-      blueprintMode: true,
-      weekBlueprint: settings.weekBlueprint,
-    });
+    return buildProgramProfileInput(
+      "balanced",
+      scoresFromPreset("balanced"),
+      false,
+      {
+        blueprintMode: true,
+        weekBlueprint: settings.weekBlueprint,
+      },
+    );
   }
   if (settings.programMode === "custom") {
-    return buildProgramProfileInput("balanced", scoresFromPreset("balanced"), false, {
-      customMode: true,
-    });
+    return buildProgramProfileInput(
+      "balanced",
+      scoresFromPreset("balanced"),
+      false,
+      {
+        customMode: true,
+      },
+    );
   }
   const preset = settings.trainingPriorityPreset ?? "balanced";
   return buildProgramProfileInput(
@@ -141,15 +150,15 @@ export const ROUND_DENSITY_OPTIONS: RoundDensityOption[] = [
   {
     value: "full",
     label: "Full",
-    description: "About 7 exercises per round — longer rounds when equipment allows.",
+    description:
+      "About 7 exercises per round — longer rounds when equipment allows.",
   },
 ];
 
 /** @deprecated Use {@link ROUND_DENSITY_OPTIONS}. */
-const ROUND_DENSITY_LABELS: Record<RoundDensity, string> =
-  Object.fromEntries(
-    ROUND_DENSITY_OPTIONS.map((o) => [o.value, o.label]),
-  ) as Record<RoundDensity, string>;
+const ROUND_DENSITY_LABELS: Record<RoundDensity, string> = Object.fromEntries(
+  ROUND_DENSITY_OPTIONS.map((o) => [o.value, o.label]),
+) as Record<RoundDensity, string>;
 
 function catalogDayCategoryPool(plan: DayPlan): ExerciseCategory[] {
   return dayPlanCategoryPool(plan);
@@ -471,10 +480,7 @@ export function applyProgramProfileToDayPlan(
     return { ...plan, rounds: [] };
   }
 
-  if (
-    profile.layoutMode &&
-    expandedCategoryPool(plan, profile).length === 0
-  ) {
+  if (profile.layoutMode && expandedCategoryPool(plan, profile).length === 0) {
     return { ...plan, rounds: [] };
   }
 
@@ -508,7 +514,10 @@ export function applyProgramProfileToDayPlan(
   if (profile.blueprintMode && userSettings) {
     return materializeBlueprintDayPlanFromSettings(
       plan,
-      { ...userSettings, weekBlueprint: profile.weekBlueprint ?? userSettings.weekBlueprint },
+      {
+        ...userSettings,
+        weekBlueprint: profile.weekBlueprint ?? userSettings.weekBlueprint,
+      },
       density,
       availableEquipment,
       dislikedIds,

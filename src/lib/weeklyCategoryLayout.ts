@@ -197,19 +197,6 @@ export function layoutEqual(
   return true;
 }
 
-export function resolveWeeklyCategoryLayout(settings: {
-  weeklyCategoryLayout?: WeeklyCategoryLayout;
-  weeklyCategoryLayoutCustomized?: boolean;
-}): WeeklyCategoryLayout {
-  if (
-    settings.weeklyCategoryLayoutCustomized &&
-    settings.weeklyCategoryLayout
-  ) {
-    return sanitizeWeeklyCategoryLayout(settings.weeklyCategoryLayout);
-  }
-  return suggestLayoutFromCatalog();
-}
-
 /** Map enabled layout groups for a day to exercise categories (respects jog only when cardio on). */
 export function categoriesForDayLayout(
   plan: DayPlan,

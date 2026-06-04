@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  describeExpertiseByGroup,
   EXPERTISE_LEVEL_LABELS,
   EXPERTISE_LEVEL_ORDER,
 } from "@/lib/expertiseLevels";
@@ -33,9 +32,10 @@ export default function ExpertiseByGroupEditor({
     <div className="space-y-3">
       {variant === "settings" ? (
         <p className="text-sm text-muted leading-relaxed">
-          Plans and swaps only use exercises at or below each group&apos;s level.
-          Turn off &ldquo;Avoid easy regressions&rdquo; above to allow easier
-          steps in a progression (e.g. incline push-ups) regardless of cap.
+          Plans and swaps only use exercises at or below each group&apos;s
+          level. Turn off &ldquo;Avoid easy regressions&rdquo; above to allow
+          easier steps in a progression (e.g. incline push-ups) regardless of
+          cap.
         </p>
       ) : (
         <p className="text-sm text-muted leading-relaxed">
