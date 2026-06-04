@@ -81,21 +81,9 @@ Open [http://localhost:3000](http://localhost:3000). Use **Sign up** / **Log in*
 | `npm run lint`       | ESLint                                            |
 | `npm run test`       | Vitest (single run)                               |
 | `npm run test:watch` | Vitest watch mode                                 |
-| `npm run fallow:audit` | Fallow audit vs `main` (same checks as pre-commit) |
-| `npm run fallow:hooks` | Reinstall Git pre-commit hook after clone           |
+| `npm run fallow:audit` | Optional Fallow audit vs `main` (manual)        |
 | `npm run db:push`    | Apply Supabase migrations (requires Supabase CLI) |
 | `npm run icons`      | Regenerate PWA icons from brand assets            |
-
-## Code quality (Fallow)
-
-Every `git commit` runs **Fallow audit** (dead code, duplication, complexity on changed files). The default gate is **new-only**: only issues introduced by your changes block the commit; inherited findings on touched files do not.
-
-- Hook installs automatically on `npm install` (`prepare` script).
-- After a fresh clone, run `npm run fallow:hooks` if commits are not gated.
-- Check before committing: `npm run fallow:audit`
-- Emergency bypass (one commit): `git commit --no-verify`
-
-Config: [.fallowrc.json](.fallowrc.json). Requires Git Bash or another environment where Git runs shell hooks (standard on Windows with Git for Windows).
 
 ## Project layout (high level)
 

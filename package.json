@@ -16,8 +16,6 @@
     "db:dump": "supabase db dump --linked -f supabase/schema.remote.sql",
     "icons": "node scripts/generate-pwa-icons.mjs",
     "fallow:audit": "fallow audit --base main --quiet",
-    "fallow:hooks": "node scripts/install-fallow-git-hook.mjs",
-    "prepare": "node scripts/install-fallow-git-hook.mjs",
     "audit:catalog": "node scripts/audit-catalog.mjs",
     "catalog:enrich": "node scripts/catalog-enrich.mjs",
     "catalog:scrape-hc": "node scripts/scrape-hc-progressions.mjs",
