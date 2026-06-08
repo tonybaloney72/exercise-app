@@ -29,7 +29,10 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { toastSaveError } from "@/utils/saveErrorToast";
-import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
+import {
+  findCompletedWorkoutForDate,
+  getPausedWorkoutDateForToday,
+} from "@/utils/workoutLogLookup";
 import { parseLocalDateKey } from "@/utils/weekCalendar";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
@@ -121,10 +124,14 @@ function TodayPageInner() {
     setShowWorkoutDetails(false);
     startEditingCompletedWorkout(completedLogForUi.id);
   };
+  const pausedDraftTodayKey = useMemo(
+    () => getPausedWorkoutDateForToday(workoutHistory, todayKey),
+    [workoutHistory, todayKey],
+  );
   const hasPausedDraftToday =
     !activeWorkout &&
     !completedLogForUi &&
-    pausedWorkoutDate === todayKey;
+    (pausedWorkoutDate === todayKey || pausedDraftTodayKey === todayKey);
 
   const canCustomize = mode === "authenticated" && !!plan;
   const showCustomizeSlot =

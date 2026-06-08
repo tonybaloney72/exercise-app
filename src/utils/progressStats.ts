@@ -126,9 +126,9 @@ export interface WeekToDatePlanAdherence {
 }
 
 /**
- * Sum of prescribed main-round exercises for Sun..today (calendar week),
- * vs completed (non-skipped) round exercises logged on those dates.
- * Uses the newest log per date when multiple exist. Matches Progress "recent workouts" round counts.
+ * Main-round exercises for Sun..today (calendar week) vs completed (non-skipped) logged.
+ * Days with a workout log use the log's exercise slots (session adds/removes are visible there).
+ * Days without a log yet use the current week plan prescription.
  */
 export function weekToDatePlanAdherence(
   history: WorkoutLog[],
@@ -153,9 +153,7 @@ export function weekToDatePlanAdherence(
     const log = history.find((w) => w.date === dateStr);
     const planSlots = plan ? countPlannedRoundExercises(plan) : 0;
     if (log) {
-      // Session edits (extra rounds/exercises) live on the log; don't show 59/47.
-      const logSlots = countRoundExerciseSlots(log);
-      planned += Math.max(planSlots, logSlots);
+      planned += countRoundExerciseSlots(log);
       completed += countCompletedRoundExercises(log);
     } else if (plan) {
       planned += planSlots;

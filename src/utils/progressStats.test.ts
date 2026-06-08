@@ -57,4 +57,52 @@ describe("weekToDatePlanAdherence", () => {
     expect(result.planned).toBe(3);
     expect(result.completed).toBe(3);
   });
+
+  it("uses log slot count when exercises were removed from the week plan", () => {
+    const sunday = new Date(2026, 4, 17, 12, 0, 0);
+    const weekByDow: Record<number, DayPlan> = {
+      0: {
+        dayOfWeek: 0,
+        name: "Sunday",
+        theme: "Test",
+        hasJog: false,
+        strengthFocus: ["PC"],
+        coreGroups: [],
+        rounds: [
+          {
+            roundNumber: 1,
+            exercises: [
+              { exerciseId: "PC-1", targetReps: "12", category: "PC" },
+              { exerciseId: "PC-2", targetReps: "12", category: "PC" },
+              { exerciseId: "PC-3", targetReps: "12", category: "PC" },
+              { exerciseId: "PC-4", targetReps: "12", category: "PC" },
+            ],
+          },
+        ],
+      },
+    };
+    const log: WorkoutLog = {
+      id: "w1",
+      date: "2026-05-17",
+      dayOfWeek: 0,
+      warmUpCompleted: true,
+      warmUpExercises: [],
+      coolDownCompleted: true,
+      coolDownExercises: [],
+      rounds: [
+        {
+          roundNumber: 1,
+          exercises: [
+            { exerciseId: "PC-1", completed: true, skipped: false },
+            { exerciseId: "PC-2", completed: true, skipped: false },
+          ],
+        },
+      ],
+      endTime: "2026-05-17T20:00:00.000Z",
+    };
+
+    const result = weekToDatePlanAdherence([log], weekByDow, sunday);
+    expect(result.planned).toBe(2);
+    expect(result.completed).toBe(2);
+  });
 });

@@ -90,7 +90,8 @@ const catalogExercises: Exercise[] = [
     expertiseLevel: "intermediate",
     muscleGroups: ["Abs"],
     defaultReps: "10",
-    notes: "Feet on chair, full sit-up",
+    notes:
+      "On back, feet in air like dead bug, sit up and reach for the ceiling",
     source: "CHRIS HERIA",
     videoUrl: "https://youtu.be/fZPS3DrShuE?si=mEE9MHh9QA4SdSnR&t=246",
     isTimeBased: false,

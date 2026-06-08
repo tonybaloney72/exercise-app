@@ -1,12 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import FloatingTimer from "@/components/common/FloatingTimer";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
+import WorkoutSession from "@/components/workout/WorkoutSession";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import { ProgressBackLink } from "@/components/progress/ProgressSubnavLink";
-import { planFromWorkoutLog } from "@/lib/workoutEditSession";
+import { useDayPlan } from "@/hooks/useDayPlan";
+import {
+  planFromWorkoutLog,
+  sessionPlanForWorkoutEdit,
+} from "@/lib/workoutEditSession";
 import { formatCompletedBannerTitle } from "@/lib/workoutHistoryGroups";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -34,15 +40,16 @@ function formatPageTitle(dateKey: string): string {
 
 export default function WorkoutHistoryDayPage() {
   const params = useParams();
-  const router = useRouter();
   const dateKey = typeof params.date === "string" ? params.date : "";
   const {
     workoutHistory,
     loadHistory,
     updateCompletedWorkoutNotes,
     activeWorkout,
+    startEditingCompletedWorkout,
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
+  const { plan: prescribedPlan } = useDayPlan(dateKey);
 
   useEffect(() => {
     if (mode === "loading") return;
@@ -54,7 +61,20 @@ export default function WorkoutHistoryDayPage() {
     [workoutHistory, dateKey],
   );
 
-  const plan = useMemo(() => (log ? planFromWorkoutLog(log) : null), [log]);
+  const reviewPlan = useMemo(() => (log ? planFromWorkoutLog(log) : null), [log]);
+  const sessionPlan = useMemo(() => {
+    if (!log) return null;
+    if (prescribedPlan) return sessionPlanForWorkoutEdit(log, prescribedPlan);
+    return reviewPlan;
+  }, [log, prescribedPlan, reviewPlan]);
+
+  const editingCompletedHere =
+    activeWorkout?.endTime != null && activeWorkout.date === dateKey;
+
+  const handleEditCompletedWorkout = () => {
+    if (!log) return;
+    startEditingCompletedWorkout(log.id);
+  };
 
   const inCurrentWeek = isDateKeyInCurrentCalendarWeek(dateKey);
   const parsed = parseLocalDateKey(dateKey);
@@ -84,7 +104,7 @@ export default function WorkoutHistoryDayPage() {
     );
   }
 
-  if (!log || !plan) {
+  if (!log || !reviewPlan) {
     const logHref = `/progress/history/${dateKey}/log`;
     return (
       <div className="py-8 space-y-4">
@@ -147,25 +167,30 @@ export default function WorkoutHistoryDayPage() {
 
       {inCurrentWeek ? (
         <p className="text-xs text-muted px-1">
-          This week is still open on{" "}
+          To change this week&apos;s prescribed plan (not the saved log), open{" "}
           <Link href={`/weekly/day/${dateKey}`} className="font-medium text-accent hover:underline">
             Weekly
           </Link>
-          {" "}if you want to edit the prescribed plan or workout structure.
+          .
         </p>
       ) : null}
 
-      <WorkoutDayReview
-        plan={plan}
-        log={log}
-        completedBannerTitle={formatCompletedBannerTitle(dateKey)}
-        onNotesChange={(notes) => updateCompletedWorkoutNotes(log.id, notes)}
-        onEditWorkout={
-          inCurrentWeek
-            ? () => router.push(`/weekly/day/${dateKey}`)
-            : undefined
-        }
-      />
+      {editingCompletedHere && sessionPlan && (
+        <>
+          <WorkoutSession plan={sessionPlan} hideSaveForLater />
+          <FloatingTimer />
+        </>
+      )}
+
+      {!editingCompletedHere && (
+        <WorkoutDayReview
+          plan={reviewPlan}
+          log={log}
+          completedBannerTitle={formatCompletedBannerTitle(dateKey)}
+          onNotesChange={(notes) => updateCompletedWorkoutNotes(log.id, notes)}
+          onEditWorkout={handleEditCompletedWorkout}
+        />
+      )}
     </div>
   );
 }

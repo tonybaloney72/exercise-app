@@ -450,6 +450,11 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       },
     );
 
+    const preservePausedDate =
+      state.pausedWorkoutDate && state.pausedWorkoutDate !== dateKey
+        ? state.pausedWorkoutDate
+        : null;
+
     const existing = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
     if (existing) {
       let log = hydrateWorkoutLog({ ...existing, paused: false });
@@ -467,7 +472,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       }
       const mode = useAuthStore.getState().mode;
       set({
-        pausedWorkoutDate: null,
+        pausedWorkoutDate: preservePausedDate,
         activeWorkout: log,
         ...(mode === "authenticated"
           ? { workoutHistory: upsertWorkoutInHistory(state.workoutHistory, log) }
@@ -498,7 +503,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     };
     const mode = useAuthStore.getState().mode;
     set({
-      pausedWorkoutDate: null,
+      pausedWorkoutDate: preservePausedDate,
       activeWorkout: log,
       ...(mode === "authenticated"
         ? { workoutHistory: upsertWorkoutInHistory(state.workoutHistory, log) }
@@ -1426,6 +1431,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     const completed = hydrateWorkoutLog(workoutLogForPersistence(finished));
     const historyBefore = state.workoutHistory;
     const auth = useAuthStore.getState().mode === "authenticated";
+    const historyAfter = upsertWorkoutInHistory(historyBefore, completed);
+    const pausedWorkoutDate = auth
+      ? getPausedWorkoutDateForToday(historyAfter, formatLocalDateKey())
+      : null;
 
     markWorkoutCompleting(inProgress.id);
     cancelScheduledPersistActiveWorkoutDraft();
@@ -1434,8 +1443,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     // Optimistic UI: update store first so the user gets immediate feedback.
     set({
       activeWorkout: null,
-      pausedWorkoutDate: null,
-      workoutHistory: upsertWorkoutInHistory(historyBefore, completed),
+      pausedWorkoutDate,
+      workoutHistory: historyAfter,
     });
 
     try {

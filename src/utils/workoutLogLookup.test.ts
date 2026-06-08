@@ -32,6 +32,18 @@ describe("workoutLogLookup", () => {
     expect(findInProgressWorkoutForDate(history, "2026-05-18")?.id).toBe("a");
   });
 
+  it("findCompletedWorkoutForDate uses log.date, not completion timestamp", () => {
+    const backfilled = emptyLog({
+      id: "past",
+      date: "2026-05-15",
+      endTime: "2026-05-18T22:00:00Z",
+    });
+    expect(findCompletedWorkoutForDate([backfilled], "2026-05-15")?.id).toBe(
+      "past",
+    );
+    expect(findCompletedWorkoutForDate([backfilled], "2026-05-18")).toBeNull();
+  });
+
   it("getPausedWorkoutDateFromHistory returns paused in-progress date", () => {
     const history = [
       emptyLog({ date: "2026-05-17", paused: true }),

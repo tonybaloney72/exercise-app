@@ -2917,12 +2917,12 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
     muscleGroups: ["Serratus Anterior"],
-    defaultReps: "30 sec",
+    defaultReps: "5",
     notes:
       "Muscle focus: Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
     source: "Dr. Kira Steele",
     videoUrl: "https://www.youtube.com/watch?v=UPxe-ciAovo",
-    isTimeBased: true,
+    isTimeBased: false,
   },
   {
     id: "HC-223",
@@ -3508,7 +3508,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Lateral Deltoids"],
-    defaultReps: "10",
+    defaultReps: "5 each side",
     notes:
       "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
     source: "Rehab Hero",

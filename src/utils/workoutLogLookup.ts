@@ -1,14 +1,6 @@
 import type { WorkoutLog } from "@/types";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
-function matchesCalendarDate(log: WorkoutLog, dateKey: string): boolean {
-  if (log.date === dateKey) return true;
-  if (log.endTime && formatLocalDateKey(new Date(log.endTime)) === dateKey) {
-    return true;
-  }
-  return false;
-}
-
 /** Logs with `endTime` set (excludes in-progress cloud drafts). */
 export function filterCompletedWorkouts(history: WorkoutLog[]): WorkoutLog[] {
   return history.filter((w) => w.endTime != null);
@@ -20,9 +12,7 @@ export function findCompletedWorkoutForDate(
   dateKey: string,
 ): WorkoutLog | null {
   return (
-    workoutHistory.find(
-      (w) => w.endTime != null && matchesCalendarDate(w, dateKey),
-    ) ?? null
+    workoutHistory.find((w) => w.endTime != null && w.date === dateKey) ?? null
   );
 }
 
