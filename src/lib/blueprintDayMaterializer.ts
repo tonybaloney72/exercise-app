@@ -25,6 +25,7 @@ import type {
 import {
   resolveWeekBlueprint,
   roundBlueprintGroupsEqual,
+  sanitizeBlueprintExerciseCount,
 } from "@/lib/weekBlueprint";
 import type {
   DayPlan,
@@ -102,7 +103,7 @@ function exerciseTargetForRound(
   density: RoundDensity,
 ): number {
   if (spec.exerciseCount != null) {
-    return Math.max(1, Math.min(8, spec.exerciseCount));
+    return sanitizeBlueprintExerciseCount(spec.exerciseCount);
   }
   return Math.max(2, Math.min(8, ROUND_DENSITY_TARGETS[density]));
 }
@@ -131,9 +132,7 @@ function materializeRoundFromBlueprint(
 
   const target = exerciseTargetForRound(spec, density);
   const categories: ExerciseCategory[] = [];
-  let guard = 0;
-  while (categories.length < target && guard < 12) {
-    guard += 1;
+  while (categories.length < target) {
     const poolRotated = [
       ...pool.slice((roundNumber - 1) % pool.length),
       ...pool.slice(0, (roundNumber - 1) % pool.length),

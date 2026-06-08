@@ -152,4 +152,22 @@ describe("materializeBlueprintDayPlan", () => {
     expect(roundCategories[3]).toEqual(["UP"]);
     expect(roundCategories[4]).toEqual(["UP"]);
   });
+
+  it("materializes the full explicit exercise count when above 8", () => {
+    const mon = getCatalogPlanForDay(1);
+    const out = materializeBlueprintDayPlan(
+      mon,
+      {
+        dayKind: "workout",
+        rounds: [{ groups: ["upper_push"], exerciseCount: 12 }],
+        cardio: [],
+      },
+      "standard",
+      EQUIP,
+      new Set(),
+      new Set(),
+    );
+
+    expect(out.rounds[0]!.exercises).toHaveLength(12);
+  });
 });

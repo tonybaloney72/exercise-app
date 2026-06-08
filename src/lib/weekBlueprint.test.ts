@@ -84,4 +84,24 @@ describe("weekBlueprint", () => {
     expect(sanitized[1]?.rounds[1]?.cloneMode).toBeUndefined();
     expect(sanitized[1]?.rounds[1]?.groups).toEqual(["upper_push"]);
   });
+
+  it("preserves explicit exercise counts above 8 when sanitizing", () => {
+    const sanitized = sanitizeWeekBlueprint({
+      1: {
+        dayKind: "workout",
+        rounds: [{ groups: ["upper_push"], exerciseCount: 12 }],
+      },
+    });
+    expect(sanitized[1]?.rounds[0]?.exerciseCount).toBe(12);
+  });
+
+  it("clamps explicit exercise counts below 1 to 1 when sanitizing", () => {
+    const sanitized = sanitizeWeekBlueprint({
+      1: {
+        dayKind: "workout",
+        rounds: [{ groups: ["upper_push"], exerciseCount: 0 }],
+      },
+    });
+    expect(sanitized[1]?.rounds[0]?.exerciseCount).toBe(1);
+  });
 });

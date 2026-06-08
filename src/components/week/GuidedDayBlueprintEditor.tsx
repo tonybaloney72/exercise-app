@@ -182,13 +182,12 @@ export default function GuidedDayBlueprintEditor({
                   </label>
                   <p className="text-[11px] text-muted leading-snug">
                     Optional — leave blank for ~{defaultExerciseCount}{" "}
-                    exercises.
+                    exercises, or enter any count (minimum 1).
                   </p>
                   <input
                     id={`round-${dayOfWeek}-${roundIndex}-count`}
                     type="number"
                     min={1}
-                    max={8}
                     inputMode="numeric"
                     value={round.exerciseCount ?? ""}
                     onChange={(e) => {

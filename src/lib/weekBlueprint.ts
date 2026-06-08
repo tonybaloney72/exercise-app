@@ -36,12 +36,17 @@ export type DayBlueprintKind =
 
 export type RoundBlueprint = {
   groups: LayoutGroup[];
-  /** Override exercises per round; otherwise uses round density. */
+  /** Override exercises per round; otherwise uses round density. No upper cap. */
   exerciseCount?: number;
   /** 0-based index of source round in the same day. */
   cloneOfRoundIndex?: number;
   cloneMode?: RoundCloneMode;
 };
+
+/** Guided blueprint per-round override: minimum 1, no maximum. */
+export function sanitizeBlueprintExerciseCount(n: number): number {
+  return Math.max(1, Math.round(n));
+}
 
 export type DayBlueprint = {
   dayKind: DayBlueprintKind;
@@ -103,7 +108,7 @@ function sanitizeRoundBlueprint(
 
   const exerciseCount =
     typeof o.exerciseCount === "number" && Number.isFinite(o.exerciseCount)
-      ? Math.max(1, Math.min(8, Math.round(o.exerciseCount)))
+      ? sanitizeBlueprintExerciseCount(o.exerciseCount)
       : undefined;
 
   const cloneOfRoundIndex =

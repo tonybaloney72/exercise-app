@@ -17,9 +17,7 @@ import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
-import {
-  categoriesPresentInPlan,
-} from "@/lib/planDisplayCategories";
+import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
@@ -308,12 +306,6 @@ export default function WeeklyPage() {
                         {completedLog.rounds.length} round
                         {completedLog.rounds.length !== 1 ? "s" : ""} ·{" "}
                         {loggedExerciseCount} logged
-                        {loggedExerciseCount !== planExerciseCount ? (
-                          <span className="text-muted/80">
-                            {" "}
-                            (plan had {planExerciseCount})
-                          </span>
-                        ) : null}
                       </>
                     ) : isFullRestDay(plan) ? (
                       <span>{REST_DAY_DESCRIPTIONS.full_rest}</span>

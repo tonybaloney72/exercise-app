@@ -1,11 +1,12 @@
 import { getCatalogPlanForDay } from "@/data/trainingWeekCatalog";
 import { groupsForCatalogDay } from "@/lib/weeklyCategoryLayout";
-import type {
-  DayBlueprint,
-  DayBlueprintKind,
-  RoundBlueprint,
-  RoundCloneMode,
-  WeekBlueprint,
+import {
+  sanitizeBlueprintExerciseCount,
+  type DayBlueprint,
+  type DayBlueprintKind,
+  type RoundBlueprint,
+  type RoundCloneMode,
+  type WeekBlueprint,
 } from "@/lib/weekBlueprint";
 
 export const DAY_BLUEPRINT_KIND_LABELS: Record<DayBlueprintKind, string> = {
@@ -181,8 +182,12 @@ export function setRoundExerciseCount(
   exerciseCount: number | undefined,
 ): WeekBlueprint {
   const day = blueprint[dow] ?? defaultDayBlueprint(dow);
+  const normalized =
+    typeof exerciseCount === "number" && Number.isFinite(exerciseCount)
+      ? sanitizeBlueprintExerciseCount(exerciseCount)
+      : undefined;
   const rounds = day.rounds.map((r, i) =>
-    i === roundIndex ? { ...r, exerciseCount } : r,
+    i === roundIndex ? { ...r, exerciseCount: normalized } : r,
   );
   return { ...blueprint, [dow]: { ...day, rounds } };
 }
