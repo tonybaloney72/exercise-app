@@ -5,7 +5,11 @@ import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
 import WorkoutSession from "@/components/workout/WorkoutSession";
 import FloatingTimer from "@/components/common/FloatingTimer";
-import { isOptionalRestDay, REST_DAY_DESCRIPTIONS, isFullRestDay } from "@/lib/restDays";
+import {
+  isOptionalRestDay,
+  REST_DAY_DESCRIPTIONS,
+  isFullRestDay,
+} from "@/lib/restDays";
 import type { DayPlan } from "@/types";
 
 export type TodayWorkoutPanelMode = "preview" | "plan-edit" | "session";
@@ -69,7 +73,7 @@ export default function TodayWorkoutPanel({
             type="button"
             disabled={saving}
             onClick={onCancelCustomize}
-            className={`${btnNeutral} flex-1 min-w-[8rem]`}
+            className={`${btnNeutral} flex-1 min-w-32`}
           >
             Cancel
           </button>
@@ -77,7 +81,7 @@ export default function TodayWorkoutPanel({
             type="button"
             disabled={saving}
             onClick={() => onSavePlan(draftRef.current)}
-            className={`${btnPrimary} flex-1 min-w-[8rem]`}
+            className={`${btnPrimary} flex-1 min-w-32`}
           >
             {saving ? "Saving…" : "Save plan"}
           </button>
@@ -104,7 +108,11 @@ export default function TodayWorkoutPanel({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <button type="button" onClick={onStart} className={`${btnPrimary} w-full`}>
+        <button
+          type="button"
+          onClick={onStart}
+          className={`${btnPrimary} w-full`}
+        >
           Start workout
         </button>
         {canCustomize || onCollapse ? (
