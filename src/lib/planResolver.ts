@@ -1,8 +1,8 @@
 import { buildWeekSeedFromSettings } from "@/lib/weekSeed";
-import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
+import { loadGeneratorInputs } from "@/lib/planGeneratorInputs";
+import { settingsHydrationKey } from "@/lib/settingsHydration";
 import {
-  computePrefsFingerprintFromSettings,
   isUserCustomizedWeekSource,
   materializeTrainingWeek,
   TRAINING_WEEK_SOURCE_CUSTOM_V1,
@@ -24,9 +24,6 @@ import type { RefreshTrainingWeekScope } from "@/lib/trainingWeekRefreshScope";
 export type { RefreshTrainingWeekScope } from "@/lib/trainingWeekRefreshScope";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import {
-  getExercisePreferenceRepo,
-  getExerciseSettingsRepo,
-  getSettingsRepo,
   getTrainingWeekRepo,
   type ExercisePreferenceMap,
   type ExerciseSettingsMap,
@@ -36,8 +33,8 @@ import type { AuthMode } from "@/stores/useAuthStore";
 import type {
   DayPlan,
   ExerciseEquipment,
-  TrainingPriorityPreset,
   RoundDensity,
+  TrainingPriorityPreset,
   UserSettings,
 } from "@/types";
 import {
@@ -48,31 +45,11 @@ import {
 import { buildVarietySeed, varietySeedForCurrentWeek } from "@/lib/planVariety";
 import { shouldPreserveStoredCustomWeekOnPrefsRefresh } from "@/lib/weekPlanPreferences";
 import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
-import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
 import {
   parseLocalDateKey,
   weekAnchorFromDateKey,
   weekKeyFromDateKey,
 } from "@/utils/weekCalendar";
-
-function settingsSlice(settings: UserSettings): {
-  availableEquipment: ExerciseEquipment[];
-  trainingPriorityPreset: TrainingPriorityPreset;
-  roundDensity: RoundDensity;
-} {
-  return {
-    availableEquipment:
-      settings.availableEquipment?.length > 0
-        ? settings.availableEquipment
-        : [...DEFAULT_AVAILABLE_EQUIPMENT],
-    trainingPriorityPreset: settings.trainingPriorityPreset ?? "balanced",
-    roundDensity: settings.roundDensity ?? "standard",
-  };
-}
-
-function repoModeForPlans(mode: AuthMode): AuthMode {
-  return mode === "authenticated" ? "authenticated" : "guest";
-}
 
 function normalizeWeekDays(days: TrainingWeekDays): TrainingWeekDays {
   const out: TrainingWeekDays = {};
@@ -81,34 +58,6 @@ function normalizeWeekDays(days: TrainingWeekDays): TrainingWeekDays {
     if (day) out[dow] = stripPhantomRestDayRounds(day);
   }
   return out;
-}
-
-async function loadGeneratorInputs(mode: AuthMode): Promise<{
-  prefs: ExercisePreferenceMap;
-  settings: UserSettings;
-  exerciseSettings: ExerciseSettingsMap;
-  availableEquipment: ExerciseEquipment[];
-  trainingPriorityPreset: TrainingPriorityPreset;
-  roundDensity: RoundDensity;
-  fingerprint: string;
-}> {
-  const repoMode = repoModeForPlans(mode);
-  const [prefs, settings, exerciseSettings] = await Promise.all([
-    getExercisePreferenceRepo(repoMode).loadAll(),
-    getSettingsRepo(repoMode).load(),
-    getExerciseSettingsRepo(repoMode).loadAll(),
-  ]);
-  const { availableEquipment, trainingPriorityPreset, roundDensity } =
-    settingsSlice(settings);
-  return {
-    prefs,
-    settings,
-    exerciseSettings,
-    availableEquipment,
-    trainingPriorityPreset,
-    roundDensity,
-    fingerprint: computePrefsFingerprintFromSettings(prefs, settings),
-  };
 }
 
 function programProfileFromSettings(settings: UserSettings) {
@@ -145,8 +94,14 @@ async function prescribedPlanFreezeStateForRefresh(): Promise<
   if (typeof window === "undefined") return base;
   try {
     const { useAuthStore } = await import("@/stores/useAuthStore");
-    const mode = useAuthStore.getState().mode;
+    const { useWorkoutStore } = await import("@/stores/useWorkoutStore");
+    const { mode, user } = useAuthStore.getState();
     if (mode !== "authenticated") return base;
+    const authKey = settingsHydrationKey(mode, user?.id);
+    const workoutState = useWorkoutStore.getState();
+    if (authKey && workoutState.historyLoadedForAuthKey === authKey) {
+      return { ...base, workoutHistory: workoutState.workoutHistory };
+    }
     const { getWorkoutRepo } = await import("@/lib/repos");
     const history = await getWorkoutRepo(mode).loadHistory();
     return { ...base, workoutHistory: history };
@@ -175,10 +130,15 @@ async function persistTrainingWeek(
   });
 }
 
+type PersistedWeekBundle = {
+  days: TrainingWeekDays;
+  source: string | null;
+};
+
 async function refreshPersistedWeek(
   weekKey: string,
   scope: RefreshTrainingWeekScope,
-): Promise<TrainingWeekDays> {
+): Promise<PersistedWeekBundle> {
   const {
     prefs,
     settings,
@@ -217,7 +177,7 @@ async function refreshPersistedWeek(
       source,
       prefsFingerprint: fingerprint,
     });
-    return materialized;
+    return { days: materialized, source };
   }
 
   if (
@@ -231,7 +191,7 @@ async function refreshPersistedWeek(
       source: TRAINING_WEEK_SOURCE_CUSTOM_V1,
       prefsFingerprint: fingerprint,
     });
-    return storedDays;
+    return { days: storedDays, source: TRAINING_WEEK_SOURCE_CUSTOM_V1 };
   }
 
   const todayKey = formatLocalDateKey();
@@ -259,7 +219,7 @@ async function refreshPersistedWeek(
     source,
     prefsFingerprint: fingerprint,
   });
-  return merged;
+  return { days: merged, source };
 }
 
 /** Update rest-day / cardio metadata on a custom week without clearing user-built rounds. */
@@ -341,7 +301,7 @@ async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays
 /** Load persisted week or materialize from catalog + profile + dislikes; persist when stale. */
 async function loadOrSeedPersistedWeek(
   weekStartSundayKey: string,
-): Promise<TrainingWeekDays> {
+): Promise<PersistedWeekBundle> {
   const repo = getTrainingWeekRepo("authenticated");
   const {
     prefs,
@@ -377,7 +337,34 @@ async function loadOrSeedPersistedWeek(
   if (!weekDaysComplete(storedDays)) {
     throw new Error("Persisted training week incomplete after materialization check");
   }
-  return storedDays;
+  return { days: storedDays, source: persisted?.source ?? null };
+}
+
+export type ResolvedTrainingWeekBundle = {
+  days: TrainingWeekDays;
+  source: string | null;
+};
+
+/** Resolved week plus persisted `source` metadata (authenticated only). */
+export async function resolveTrainingWeekBundleForAuth(
+  anyDateKeyInWeek: string,
+  mode: AuthMode,
+): Promise<ResolvedTrainingWeekBundle> {
+  const anchor = weekAnchorFromDateKey(anyDateKeyInWeek);
+  if (!anchor) {
+    throw new Error("Invalid date key");
+  }
+  if (mode !== "authenticated") {
+    return {
+      days: normalizeWeekDays(await resolveMaterializedWeek(mode)),
+      source: null,
+    };
+  }
+  const bundle = await loadOrSeedPersistedWeek(anchor.weekKey);
+  return {
+    days: normalizeWeekDays(bundle.days),
+    source: bundle.source,
+  };
 }
 
 /**
@@ -406,10 +393,8 @@ export async function resolveTrainingWeekForAuth(
   if (!anchor) {
     throw new Error("Invalid date key");
   }
-  if (mode !== "authenticated") {
-    return normalizeWeekDays(await resolveMaterializedWeek(mode));
-  }
-  return normalizeWeekDays(await loadOrSeedPersistedWeek(anchor.weekKey));
+  const bundle = await resolveTrainingWeekBundleForAuth(anyDateKeyInWeek, mode);
+  return bundle.days;
 }
 
 /**

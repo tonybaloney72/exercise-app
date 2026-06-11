@@ -21,13 +21,11 @@ import {
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import {
-  bumpTrainingWeekPlans,
+  bumpTrainingWeekPlansAfterCustomSave,
   resetTrainingDayToGenerated,
 } from "@/lib/trainingWeekRefresh";
-import {
-  getWeekSourceForDate,
-  saveCustomDayPlan,
-} from "@/lib/trainingWeekCustomize";
+import { saveCustomDayPlan } from "@/lib/trainingWeekCustomize";
+import { useWeekSourceForDate } from "@/hooks/useWeekSourceForDate";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getBackfillEligibility } from "@/lib/backfillWorkout";
@@ -117,7 +115,6 @@ export default function WeeklyDayPage() {
   const [customizing, setCustomizing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [weekSource, setWeekSource] = useState<string | null>(null);
 
   useEffect(() => {
     if (mode === "loading") return;
@@ -139,20 +136,7 @@ export default function WeeklyDayPage() {
   const { weekByDow } = useTrainingWeekPlans(weekDates);
 
   const canCustomize = mode === "authenticated" && !!planKey;
-
-  useEffect(() => {
-    if (!canCustomize) {
-      setWeekSource(null);
-      return;
-    }
-    let cancelled = false;
-    void getWeekSourceForDate(dateKey).then((source) => {
-      if (!cancelled) setWeekSource(source);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [canCustomize, dateKey, plan]);
+  const weekSource = useWeekSourceForDate(canCustomize ? dateKey : "");
 
   const isCustomWeek =
     programMode === "custom" || isUserCustomizedWeekSource(weekSource);
@@ -198,8 +182,7 @@ export default function WeeklyDayPage() {
     !!plan &&
     !logForDay &&
     !continueWorkoutHere &&
-    !editingCompletedHere &&
-    (when !== "future" || isOptionalRestDay(plan));
+    !editingCompletedHere;
 
   if (!parsed) {
     return (
@@ -256,11 +239,9 @@ export default function WeeklyDayPage() {
     setSaving(true);
     setSaveError(null);
     try {
-      await saveCustomDayPlan(dateKey, editedPlan);
-      bumpTrainingWeekPlans();
+      const mergedWeek = await saveCustomDayPlan(dateKey, editedPlan);
+      await bumpTrainingWeekPlansAfterCustomSave(dateKey, mergedWeek);
       setCustomizing(false);
-      const source = await getWeekSourceForDate(dateKey);
-      setWeekSource(source);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Could not save changes";
       setSaveError(message);
@@ -276,8 +257,6 @@ export default function WeeklyDayPage() {
     try {
       await resetTrainingDayToGenerated(dateKey);
       setCustomizing(false);
-      const source = await getWeekSourceForDate(dateKey);
-      setWeekSource(source);
     } catch (e: unknown) {
       setSaveError(e instanceof Error ? e.message : "Could not reset this day");
     } finally {
@@ -375,6 +354,7 @@ export default function WeeklyDayPage() {
           plan={plan}
           weekByDow={weekByDow}
           showTargetMuscleList={false}
+          isFutureDay
         />
       )}
 

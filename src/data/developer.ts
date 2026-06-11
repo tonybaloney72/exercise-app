@@ -21,7 +21,7 @@ export const DEVELOPER_LINKS: DeveloperLink[] = [
   },
   {
     label: "Portfolio",
-    href: "https://tonybaloney72.github.io/website/#/",
+    href: "https://anthony-bologna-portfolio.vercel.app/",
   },
 ];
 

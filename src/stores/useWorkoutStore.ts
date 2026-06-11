@@ -35,6 +35,7 @@ import {
 import { workoutLogForPersistence } from "@/lib/workoutCardioPersistence";
 import { getCardioLog, patchCardioLog } from "@/lib/cardioWorkoutLog";
 import { formatLocalDateKey } from "@/utils/localDateKey";
+import { settingsHydrationKey } from "@/lib/settingsHydration";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
   getSwapCandidates,
@@ -377,7 +378,11 @@ interface WorkoutState {
     input: { distanceMi?: number; durationSeconds?: number },
   ) => Promise<boolean>;
 
-  loadHistory: () => Promise<void>;
+  /** Auth session key when `workoutHistory` was last loaded from repos. */
+  historyLoadedForAuthKey: string | null;
+  loadHistory: (options?: { force?: boolean }) => Promise<void>;
+  /** Drop session cache so the next `loadHistory` refetches (e.g. auth change). */
+  invalidateHistory: (options?: { clearData?: boolean }) => void;
   /** Pause prior-day in-progress rows and clear a stale live session (midnight rules). */
   reconcileDayBoundary: () => Promise<void>;
   /** Delete an unfinished workout from a previous calendar day. */
@@ -443,6 +448,8 @@ function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
     }),
   }));
 }
+
+let historyLoadInFlight: Promise<void> | null = null;
 
 export const useWorkoutStore = create<WorkoutState>((set, get) => {
   const beginWorkoutSession = async (
@@ -532,6 +539,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
   activeWorkout: null,
   workoutHistory: [],
   pausedWorkoutDate: null,
+  historyLoadedForAuthKey: null,
   startWorkout: (plan) => {
     const now = new Date();
     const dateKey = formatLocalDateKey(now);
@@ -1833,9 +1841,35 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     }
   },
 
-  loadHistory: async () => {
-    const mode = useAuthStore.getState().mode;
+  invalidateHistory: (options) => {
+    historyLoadInFlight = null;
+    if (options?.clearData) {
+      set({
+        historyLoadedForAuthKey: null,
+        workoutHistory: [],
+        activeWorkout: null,
+        pausedWorkoutDate: null,
+      });
+      return;
+    }
+    set({ historyLoadedForAuthKey: null });
+  },
+
+  loadHistory: async (options) => {
+    const { mode, user } = useAuthStore.getState();
     if (mode === "loading") return; // Wait until AuthInitializer settles.
+    const authKey = settingsHydrationKey(mode, user?.id);
+    if (!authKey) return;
+
+    if (!options?.force && get().historyLoadedForAuthKey === authKey) {
+      return;
+    }
+    if (!options?.force && historyLoadInFlight) {
+      await historyLoadInFlight;
+      return;
+    }
+
+    const run = async () => {
     const scope = draftScope();
     const todayKey = formatLocalDateKey();
     let workoutHistory = (await getWorkoutRepo(mode).loadHistory()).map(
@@ -1935,8 +1969,17 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     set({
       workoutHistory,
       pausedWorkoutDate,
+      historyLoadedForAuthKey: authKey,
       ...(activeWorkout && !current.activeWorkout ? { activeWorkout } : {}),
     });
+    };
+
+    historyLoadInFlight = run();
+    try {
+      await historyLoadInFlight;
+    } finally {
+      historyLoadInFlight = null;
+    }
   },
   };
 });

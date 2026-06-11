@@ -12,7 +12,7 @@ import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import { cardioBadgesForPlan, restBadgeForPlan } from "@/lib/planCardioDisplay";
 import { isFullRestDay, REST_DAY_DESCRIPTIONS } from "@/lib/restDays";
 import { resetTrainingWeekToGenerated } from "@/lib/trainingWeekRefresh";
-import { getWeekSourceForDate } from "@/lib/trainingWeekCustomize";
+import { useWeekSourceForDate } from "@/hooks/useWeekSourceForDate";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -31,7 +31,6 @@ export default function WeeklyPage() {
   const { workoutHistory, loadHistory } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
   const todayKey = formatLocalDateKey();
-  const [weekSource, setWeekSource] = useState<string | null>(null);
   const [resettingWeek, setResettingWeek] = useState(false);
   const [resetWeekConfirm, setResetWeekConfirm] = useState(false);
   const [resetWeekError, setResetWeekError] = useState<string | null>(null);
@@ -41,19 +40,9 @@ export default function WeeklyPage() {
     loadHistory();
   }, [mode, loadHistory]);
 
-  useEffect(() => {
-    if (mode !== "authenticated") {
-      setWeekSource(null);
-      return;
-    }
-    let cancelled = false;
-    void getWeekSourceForDate(todayKey).then((source) => {
-      if (!cancelled) setWeekSource(source);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [mode, todayKey]);
+  const weekSource = useWeekSourceForDate(
+    mode === "authenticated" ? todayKey : "",
+  );
 
   const programMode = useSettingsStore((s) => s.programMode);
   const customBuildStyle = useSettingsStore((s) => s.customBuildStyle);
@@ -74,8 +63,6 @@ export default function WeeklyPage() {
     try {
       await resetTrainingWeekToGenerated(todayKey);
       setResetWeekConfirm(false);
-      const source = await getWeekSourceForDate(todayKey);
-      setWeekSource(source);
     } catch (e: unknown) {
       setResetWeekError(
         e instanceof Error ? e.message : "Could not reset training week",

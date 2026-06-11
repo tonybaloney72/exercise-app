@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { usePlanResolverDeps } from "@/hooks/usePlanResolverDeps";
-import { selectProgramProfileKeyProgress } from "@/lib/planResolverDeps";
+import { useEffect, useMemo } from "react";
+import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { motion } from "framer-motion";
-import { resolveTrainingWeekForAuth } from "@/lib/planResolver";
-import type { TrainingWeekDays } from "@/lib/repos";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import ProgressChartsSection from "@/components/progress/ProgressChartsSection";
 import WeightProgressChart from "@/components/progress/WeightProgressChart";
@@ -50,33 +48,23 @@ import { weekToDatePlanAdherence } from "@/utils/progressStats";
 import { filterCompletedWorkouts } from "@/utils/workoutLogLookup";
 
 export default function ProgressPage() {
+  const mode = useAuthStore((s) => s.mode);
   const { workoutHistory, loadHistory } = useWorkoutStore();
-  const { mode, planRevision, equipmentKey, programProfileKey } =
-    usePlanResolverDeps(selectProgramProfileKeyProgress);
-  const [weekByDow, setWeekByDow] = useState<TrainingWeekDays | null>(null);
+  const weekDates = useMemo(() => {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(now);
+      d.setDate(now.getDate() - dayOfWeek + i);
+      return d;
+    });
+  }, []);
+  const { weekByDow } = useTrainingWeekPlans(weekDates);
 
   useEffect(() => {
     if (mode === "loading") return;
     loadHistory();
   }, [mode, loadHistory]);
-
-  useEffect(() => {
-    if (mode === "loading") return;
-    const todayKey = formatLocalDateKey(new Date());
-    let cancelled = false;
-    void resolveTrainingWeekForAuth(todayKey, mode).then(
-      (w) => {
-        if (!cancelled) setWeekByDow(w);
-      },
-      (e: unknown) => {
-        console.error("[ProgressPage] resolveTrainingWeekForAuth", e);
-        if (!cancelled) setWeekByDow(null);
-      },
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [mode, planRevision, equipmentKey, programProfileKey]);
 
   const completedHistory = useMemo(
     () => filterCompletedWorkouts(workoutHistory),

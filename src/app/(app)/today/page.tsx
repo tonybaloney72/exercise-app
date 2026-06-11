@@ -16,13 +16,11 @@ import TodayWorkoutPanel, {
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
 import {
-  bumpTrainingWeekPlans,
+  bumpTrainingWeekPlansAfterCustomSave,
   resetTrainingDayToGenerated,
 } from "@/lib/trainingWeekRefresh";
-import {
-  getWeekSourceForDate,
-  saveCustomDayPlan,
-} from "@/lib/trainingWeekCustomize";
+import { saveCustomDayPlan } from "@/lib/trainingWeekCustomize";
+import { useWeekSourceForDate } from "@/hooks/useWeekSourceForDate";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
@@ -85,7 +83,6 @@ function TodayPageInner() {
   const [customizing, setCustomizing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [weekSource, setWeekSource] = useState<string | null>(null);
   const [showWorkoutDetails, setShowWorkoutDetails] = useState(false);
   const [workoutDetailOpen, setWorkoutDetailOpen] = useState(false);
 
@@ -142,20 +139,7 @@ function TodayPageInner() {
   const canEditPlan = canCustomize && showCustomizeSlot;
   const showGuestCustomizeGate =
     mode === "guest" && showCustomizeSlot && !customizing;
-
-  useEffect(() => {
-    if (!canCustomize) {
-      setWeekSource(null);
-      return;
-    }
-    let cancelled = false;
-    void getWeekSourceForDate(todayKey).then((source) => {
-      if (!cancelled) setWeekSource(source);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [canCustomize, todayKey]);
+  const weekSource = useWeekSourceForDate(canCustomize ? todayKey : "");
 
   useEffect(() => {
     setShowWorkoutDetails(false);
@@ -253,11 +237,9 @@ function TodayPageInner() {
     setSaving(true);
     setSaveError(null);
     try {
-      await saveCustomDayPlan(todayKey, editedPlan);
-      bumpTrainingWeekPlans();
+      const mergedWeek = await saveCustomDayPlan(todayKey, editedPlan);
+      await bumpTrainingWeekPlansAfterCustomSave(todayKey, mergedWeek);
       setCustomizing(false);
-      const source = await getWeekSourceForDate(todayKey);
-      setWeekSource(source);
       scrollTodayToTop();
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Could not save changes";
@@ -274,8 +256,6 @@ function TodayPageInner() {
     try {
       await resetTrainingDayToGenerated(todayKey);
       setCustomizing(false);
-      const source = await getWeekSourceForDate(todayKey);
-      setWeekSource(source);
     } catch (e: unknown) {
       setSaveError(e instanceof Error ? e.message : "Could not reset this day");
     } finally {

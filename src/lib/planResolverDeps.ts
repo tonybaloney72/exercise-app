@@ -1,5 +1,14 @@
 import type { UserSettings } from "@/types";
 
+/** Stable key when default warm-up / cool-down lists change. */
+export function selectStretchDefaultsKey(
+  s: Pick<UserSettings, "defaultWarmUp" | "defaultCoolDown">,
+): string {
+  return [...s.defaultWarmUp, ...s.defaultCoolDown]
+    .map((e) => `${e.exerciseId}:${e.targetReps}`)
+    .join("|");
+}
+
 /** Stable dependency key when equipment changes (plan regen). */
 export function selectEquipmentDependencyKey(
   s: Pick<UserSettings, "availableEquipment">,
@@ -7,8 +16,8 @@ export function selectEquipmentDependencyKey(
   return s.availableEquipment.join(",");
 }
 
-/** Full settings fingerprint used by day-plan resolution. */
-export function selectProgramProfileKeyDayPlan(
+/** Canonical settings fingerprint for training-week session cache + plan resolution. */
+export function selectTrainingWeekCacheKey(
   s: Pick<
     UserSettings,
     | "programMode"
@@ -28,26 +37,5 @@ export function selectProgramProfileKeyDayPlan(
   return `${s.programMode}:${s.customBuildStyle}:${s.weekBlueprintCustomized}:${JSON.stringify(s.weekBlueprint)}:${s.trainingPriorityPreset}:${s.trainingPriorityCustomized}:${JSON.stringify(s.trainingPriorityScores)}:${s.roundDensity}:${JSON.stringify(s.weeklyPplSchedule)}:${s.weeklyPplScheduleCustomized}:${JSON.stringify(s.weeklyRestDays)}:${s.weeklyRestDaysCustomized}`;
 }
 
-/** Week overview resolution (subset of day-plan deps). */
-export function selectProgramProfileKeyWeekPlans(
-  s: Pick<
-    UserSettings,
-    | "programMode"
-    | "customBuildStyle"
-    | "weekBlueprintCustomized"
-    | "weekBlueprint"
-    | "trainingPriorityPreset"
-    | "trainingPriorityCustomized"
-    | "trainingPriorityScores"
-    | "roundDensity"
-  >,
-): string {
-  return `${s.programMode}:${s.customBuildStyle}:${s.weekBlueprintCustomized}:${JSON.stringify(s.weekBlueprint)}:${s.trainingPriorityPreset}:${s.trainingPriorityCustomized}:${JSON.stringify(s.trainingPriorityScores)}:${s.roundDensity}`;
-}
-
-/** Progress page week resolve (preset + density only). */
-export function selectProgramProfileKeyProgress(
-  s: Pick<UserSettings, "trainingPriorityPreset" | "roundDensity">,
-): string {
-  return `${s.trainingPriorityPreset}:${s.roundDensity}`;
-}
+/** @deprecated Use {@link selectTrainingWeekCacheKey}. */
+export const selectProgramProfileKeyDayPlan = selectTrainingWeekCacheKey;

@@ -1,5 +1,6 @@
 import BottomNav from "@/components/layout/BottomNav";
 import OnboardingGate from "@/components/onboarding/OnboardingGate";
+import AppDataSync from "@/components/layout/AppDataSync";
 import AppSettingsSync from "@/components/layout/AppSettingsSync";
 import WakeLockSync from "@/components/layout/WakeLockSync";
 import AppToaster from "@/components/layout/AppToaster";
@@ -27,6 +28,7 @@ export default async function AppLayout({
         initialGuest={isGuest}
       />
       <AppSettingsSync />
+      <AppDataSync />
       <OnboardingGate />
       <WakeLockSync />
       <AppToaster />

@@ -201,7 +201,7 @@ export function dayPlanForCustomSave(
 export async function saveCustomDayPlan(
   dateKey: string,
   dayPlan: DayPlan,
-): Promise<void> {
+): Promise<TrainingWeekDays> {
   const anchor = weekAnchorFromDateKey(dateKey);
   if (!anchor) {
     throw new Error("Invalid date key");
@@ -227,6 +227,7 @@ export async function saveCustomDayPlan(
     source: TRAINING_WEEK_SOURCE_CUSTOM_V1,
     prefsFingerprint: fingerprint,
   });
+  return merged;
 }
 
 /** Regenerate the week from catalog + generator and clear custom edits. */
@@ -352,6 +353,14 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
 export async function getWeekSourceForDate(
   dateKey: string,
 ): Promise<string | null> {
+  if (typeof window !== "undefined") {
+    const { readWeekSourceFromCache } = await import(
+      "@/stores/useTrainingWeekStore"
+    );
+    const cached = readWeekSourceFromCache(dateKey);
+    if (cached !== undefined) return cached;
+  }
+
   const anchor = weekAnchorFromDateKey(dateKey);
   if (!anchor) return null;
   const { weekKey } = anchor;

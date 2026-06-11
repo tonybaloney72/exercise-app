@@ -1,10 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { resolveTrainingWeekForAuth } from "@/lib/planResolver";
-import type { TrainingWeekDays } from "@/lib/repos";
+import { useEffect, useMemo } from "react";
 import { usePlanResolverDeps } from "@/hooks/usePlanResolverDeps";
-import { selectProgramProfileKeyWeekPlans } from "@/lib/planResolverDeps";
+import { selectStretchDefaultsKey } from "@/lib/planResolverDeps";
+import { buildTrainingWeekDepsKey } from "@/lib/trainingWeekCacheKey";
+import { settingsHydrationMatchesAuth } from "@/lib/settingsHydration";
+import type { TrainingWeekDays } from "@/lib/repos";
+import { useAuthStore } from "@/stores/useAuthStore";
+import {
+  normalizeWeekAnchorKey,
+  useTrainingWeekStore,
+  weekCacheEntryMatches,
+} from "@/stores/useTrainingWeekStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /**
@@ -16,56 +24,75 @@ export function useTrainingWeekPlans(weekDates: Date[]): {
   loading: boolean;
   error: string | null;
 } {
-  const { mode, planRevision, equipmentKey, programProfileKey } =
-    usePlanResolverDeps(selectProgramProfileKeyWeekPlans);
+  const mode = useAuthStore((s) => s.mode);
+  const userId = useAuthStore((s) => s.user?.id);
+  const settingsHydrated = useSettingsStore((s) =>
+    settingsHydrationMatchesAuth(mode, userId, s.hydratedForAuthKey),
+  );
+  const { planRevision, equipmentKey, programProfileKey } =
+    usePlanResolverDeps();
+  const stretchDefaultsKey = useSettingsStore(selectStretchDefaultsKey);
 
-  const anchorKey = useMemo(
-    () => (weekDates.length > 0 ? formatLocalDateKey(weekDates[0]) : ""),
-    [weekDates],
+  const anchorKey = useMemo(() => {
+    if (weekDates.length === 0) return "";
+    return normalizeWeekAnchorKey(formatLocalDateKey(weekDates[0])) ?? "";
+  }, [weekDates]);
+
+  const depsKey = useMemo(
+    () =>
+      anchorKey && mode !== "loading"
+        ? buildTrainingWeekDepsKey({
+            mode,
+            equipmentKey,
+            programProfileKey,
+            stretchDefaultsKey,
+          })
+        : "",
+    [anchorKey, mode, equipmentKey, programProfileKey, stretchDefaultsKey],
   );
 
-  const [weekByDow, setWeekByDow] = useState<TrainingWeekDays | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const cacheMatches = useTrainingWeekStore((s) =>
+    weekCacheEntryMatches(s.entry, anchorKey, depsKey, planRevision),
+  );
+
+  const weekByDow = useTrainingWeekStore((s) => {
+    if (!weekCacheEntryMatches(s.entry, anchorKey, depsKey, planRevision)) {
+      return null;
+    }
+    return s.entry!.weekByDow;
+  });
+
+  const weekLoading = useTrainingWeekStore(
+    (s) => !!anchorKey && s.loadingAnchorKey === anchorKey,
+  );
+  const storeError = useTrainingWeekStore((s) => s.error);
 
   useEffect(() => {
-    if (!anchorKey) {
-      setWeekByDow(null);
-      setLoading(false);
-      setError(null);
-      return;
-    }
+    if (!anchorKey || mode === "loading" || !settingsHydrated) return;
+    void useTrainingWeekStore.getState().ensureWeek(anchorKey, mode, {
+      planRevision,
+      equipmentKey,
+      programProfileKey,
+      stretchDefaultsKey,
+    });
+  }, [
+    anchorKey,
+    mode,
+    settingsHydrated,
+    planRevision,
+    equipmentKey,
+    programProfileKey,
+    stretchDefaultsKey,
+    depsKey,
+  ]);
 
-    if (mode === "loading") {
-      setLoading(true);
-      return;
-    }
+  const waitingForWeek =
+    !!anchorKey &&
+    (mode === "loading" || !settingsHydrated || !cacheMatches || weekLoading);
 
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-
-    void resolveTrainingWeekForAuth(anchorKey, mode).then(
-      (w) => {
-        if (!cancelled) {
-          setWeekByDow(w);
-          setLoading(false);
-        }
-      },
-      (e: unknown) => {
-        console.error("[useTrainingWeekPlans]", e);
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Failed to load week");
-          setWeekByDow(null);
-          setLoading(false);
-        }
-      },
-    );
-
-    return () => {
-      cancelled = true;
-    };
-  }, [anchorKey, mode, planRevision, equipmentKey, programProfileKey]);
-
-  return { weekByDow, loading, error };
+  return {
+    weekByDow,
+    loading: waitingForWeek && storeError == null,
+    error: !!anchorKey && !waitingForWeek && weekByDow == null ? storeError : null,
+  };
 }

@@ -23,7 +23,10 @@ import {
   resolveBlueprintForManualSeed,
 } from "@/lib/manualWeekSeed";
 import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
-import { bumpTrainingWeekPlans } from "@/lib/trainingWeekRefresh";
+import {
+  bumpTrainingWeekPlansAfterCustomSave,
+  bumpTrainingWeekPlansFromDb,
+} from "@/lib/trainingWeekRefresh";
 import { WEEK_DAY_ABBRS } from "@/lib/weekWizardConstants";
 import { toastSaveError } from "@/utils/saveErrorToast";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
@@ -121,8 +124,8 @@ export default function CustomWeekWizard() {
       setSaving(true);
       setSaveError(null);
       try {
-        await saveCustomDayPlan(dateKey, edited);
-        bumpTrainingWeekPlans();
+        const mergedWeek = await saveCustomDayPlan(dateKey, edited);
+        await bumpTrainingWeekPlansAfterCustomSave(dateKey, mergedWeek);
         setLocalWeek((prev) =>
           prev ? { ...prev, [activeDow]: cloneDayPlan(edited) } : prev,
         );
@@ -147,7 +150,7 @@ export default function CustomWeekWizard() {
     setSaveError(null);
     try {
       const fresh = await resetDayToGenerated(dateKey);
-      bumpTrainingWeekPlans();
+      await bumpTrainingWeekPlansFromDb();
       setLocalWeek((prev) =>
         prev ? { ...prev, [activeDow]: cloneDayPlan(fresh) } : prev,
       );
@@ -173,7 +176,7 @@ export default function CustomWeekWizard() {
         weekDateKeys[0] ?? formatLocalDateKey(new Date()),
         blueprint,
       );
-      bumpTrainingWeekPlans();
+      await bumpTrainingWeekPlansFromDb();
       setLocalWeek(week);
       setDirty(false);
       setEditorKey((k) => k + 1);
