@@ -7,16 +7,14 @@ import AnimatedSection from "@/components/common/AnimatedSection";
 import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
-import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import PostWorkoutSummary from "@/components/workout/PostWorkoutSummary";
 import StaleWorkoutSessionsBanner from "@/components/workout/StaleWorkoutSessionsBanner";
-import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
-import FloatingTimer from "@/components/common/FloatingTimer";
+import TodayWorkoutPanel, {
+  type TodayWorkoutPanelMode,
+} from "@/components/workout/TodayWorkoutPanel";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
-import { isOptionalRestDay } from "@/lib/restDays";
-import { useSettingsStore } from "@/stores/useSettingsStore";
 import {
   bumpTrainingWeekPlans,
   resetTrainingDayToGenerated,
@@ -67,16 +65,16 @@ function TodayPageInner() {
   } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
   const todayKey = formatLocalDateKey();
-  const activePastSession =
-    Boolean(
-      activeWorkout &&
-        !activeWorkout.endTime &&
-        activeWorkout.date !== todayKey,
-    );
+  const activePastSession = Boolean(
+    activeWorkout && !activeWorkout.endTime && activeWorkout.date !== todayKey,
+  );
   const sessionDateKey =
     activeWorkout && !activeWorkout.endTime ? activeWorkout.date : todayKey;
-  const { plan: todayPlan, loading: planLoading, error: planError } =
-    useDayPlan(todayKey);
+  const {
+    plan: todayPlan,
+    loading: planLoading,
+    error: planError,
+  } = useDayPlan(todayKey);
   const { plan: sessionPlanFromDate } = useDayPlan(
     sessionDateKey !== todayKey ? sessionDateKey : "",
   );
@@ -89,6 +87,7 @@ function TodayPageInner() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [weekSource, setWeekSource] = useState<string | null>(null);
   const [showWorkoutDetails, setShowWorkoutDetails] = useState(false);
+  const [workoutDetailOpen, setWorkoutDetailOpen] = useState(false);
 
   const devForcePreWorkout =
     process.env.NODE_ENV === "development" &&
@@ -163,8 +162,16 @@ function TodayPageInner() {
   }, [todaysCompletedLog?.id]);
 
   useEffect(() => {
-    if (activeWorkout) setShowWorkoutDetails(false);
+    if (activeWorkout) {
+      setShowWorkoutDetails(false);
+      setCustomizing(false);
+      setWorkoutDetailOpen(true);
+    }
   }, [activeWorkout?.id]);
+
+  useEffect(() => {
+    if (customizing) setWorkoutDetailOpen(true);
+  }, [customizing]);
 
   if (planLoading) {
     return (
@@ -213,21 +220,34 @@ function TodayPageInner() {
   const editingCompletedSession =
     Boolean(activeWorkout?.endTime) && activeWorkout?.date === todayKey;
   const showPlanEditor = customizing && canEditPlan;
-  const showPreWorkoutActions =
-    !activeWorkout &&
-    !completedLogForUi &&
-    !hasPausedDraftToday &&
-    !showPlanEditor;
   const hideStaleBanner =
     Boolean(activeWorkout) || customizing || activePastSession;
   const isTodaySession =
-    !activeWorkout || activeWorkout.endTime != null || activeWorkout.date === todayKey;
+    !activeWorkout ||
+    activeWorkout.endTime != null ||
+    activeWorkout.date === todayKey;
   const showQuickActivityLog =
     isTodaySession &&
     !customizing &&
     !showPlanEditor &&
     !activeWorkout &&
     !hasPausedDraftToday;
+
+  const showWorkoutEntry =
+    !activeWorkout && !completedLogForUi && !hasPausedDraftToday;
+
+  const todayWorkoutPanelMode: TodayWorkoutPanelMode | null =
+    activeWorkout && isTodaySession
+      ? "session"
+      : showPlanEditor
+        ? "plan-edit"
+        : showWorkoutEntry && workoutDetailOpen
+          ? "preview"
+          : null;
+
+  function scrollTodayToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   async function handleSaveDay(editedPlan: DayPlan) {
     setSaving(true);
@@ -238,9 +258,9 @@ function TodayPageInner() {
       setCustomizing(false);
       const source = await getWeekSourceForDate(todayKey);
       setWeekSource(source);
+      scrollTodayToTop();
     } catch (e: unknown) {
-      const message =
-        e instanceof Error ? e.message : "Could not save changes";
+      const message = e instanceof Error ? e.message : "Could not save changes";
       setSaveError(message);
       toastSaveError("workout plan", e);
     } finally {
@@ -263,11 +283,32 @@ function TodayPageInner() {
     }
   }
 
+  function handleStartWorkout() {
+    if (!plan) return;
+    setSaveError(null);
+    setCustomizing(false);
+    setWorkoutDetailOpen(true);
+    scrollTodayToTop();
+    startWorkout(plan);
+  }
+
+  function handleOpenWorkoutDetail() {
+    setWorkoutDetailOpen(true);
+    scrollTodayToTop();
+  }
+
+  function handleCollapseWorkoutDetail() {
+    if (customizing || activeWorkout) return;
+    setWorkoutDetailOpen(false);
+    scrollTodayToTop();
+  }
+
   return (
     <div className="py-6 space-y-5">
       {devForcePreWorkout && (
         <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
-          Dev: pre-workout view forced (<code className="font-mono">?dev=start</code>
+          Dev: pre-workout view forced (
+          <code className="font-mono">?dev=start</code>
           ). Remove the query to see today&apos;s review again.
         </p>
       )}
@@ -278,18 +319,11 @@ function TodayPageInner() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-1"
       >
-        <p className="text-xs font-medium uppercase tracking-wider text-accent">
-          {plan.name}
-        </p>
-        <h1 className="text-2xl font-bold text-foreground">
-          {editingCompletedSession
-            ? "Edit today\u2019s workout"
-            : "Today\u2019s Workout"}
-        </h1>
+        <h1 className="text-2xl font-bold text-foreground">{plan.name}</h1>
       </motion.div>
 
-      {/* Category chips — hide during live session or after completion summary */}
-      {!completedLogForUi && !activeWorkout && (
+      {/* Category chips on today's plan (collapsed or expanded) */}
+      {!completedLogForUi && !activeWorkout && !customizing && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -310,7 +344,7 @@ function TodayPageInner() {
       {showGuestCustomizeGate && (
         <AccountFeatureGate
           feature="customizeDay"
-          title="Edit workout"
+          title="Customize today's plan"
         />
       )}
 
@@ -320,31 +354,88 @@ function TodayPageInner() {
         </p>
       )}
 
-      {showPlanEditor && (
-        <WorkoutPlanEditor
-          key={todayKey}
-          initialPlan={plan}
+      {showWorkoutEntry && !workoutDetailOpen && !customizing && (
+        <button
+          type="button"
+          onClick={handleOpenWorkoutDetail}
+          className="w-full rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
+        >
+          View Today's Workout
+        </button>
+      )}
+
+      {hasPausedDraftToday && (
+        <AnimatedSection className="space-y-3" delay={0.15}>
+          <SurfaceCard className="p-4 space-y-2">
+            <p className="text-sm font-medium text-foreground">
+              Workout in progress
+            </p>
+            <p className="text-xs text-muted">
+              You saved this session for later. Resume to pick up where you left
+              off, or discard to start fresh.
+            </p>
+          </SurfaceCard>
+          <button
+            type="button"
+            onClick={() => {
+              setWorkoutDetailOpen(true);
+              scrollTodayToTop();
+              resumeWorkout();
+            }}
+            className="w-full rounded-xl bg-accent py-4 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
+          >
+            Resume workout
+          </button>
+          <button
+            type="button"
+            onClick={() => discardWorkout()}
+            className="w-full rounded-xl border border-border bg-surface py-3 text-sm font-medium text-muted transition-colors hover:text-foreground"
+          >
+            Discard saved session
+          </button>
+        </AnimatedSection>
+      )}
+
+      {todayWorkoutPanelMode ? (
+        <TodayWorkoutPanel
+          mode={todayWorkoutPanelMode}
+          plan={plan}
+          todayKey={todayKey}
           isCustomWeek={isCustomWeek}
+          canCustomize={canEditPlan}
           saving={saving}
-          onSave={(edited) => void handleSaveDay(edited)}
-          onCancel={() => {
+          onStart={handleStartWorkout}
+          onCustomize={() => {
+            setSaveError(null);
+            setCustomizing(true);
+            scrollTodayToTop();
+          }}
+          onSavePlan={(edited) => void handleSaveDay(edited)}
+          onCancelCustomize={() => {
             setSaveError(null);
             setCustomizing(false);
+            scrollTodayToTop();
           }}
           onResetDay={() => void handleResetDay()}
+          onCollapse={
+            todayWorkoutPanelMode === "preview"
+              ? handleCollapseWorkoutDetail
+              : undefined
+          }
         />
-      )}
+      ) : null}
 
-      {/* Active workout session (today only — past days use /progress/history/[date]/log) */}
-      {activeWorkout && isTodaySession && (
-        <WorkoutSession plan={plan} />
-      )}
-      {activeWorkout && isTodaySession && <FloatingTimer />}
+      {showQuickActivityLog &&
+        !showTodaysCompletedReview &&
+        !workoutDetailOpen && (
+          <AnimatedSection className="space-y-3" delay={0.12}>
+            <QuickActivityLog plan={plan} dateKey={todayKey} />
+            <WeightLogCard dateKey={todayKey} />
+          </AnimatedSection>
+        )}
 
-      {/* Completed today — summary first, full log on demand (hidden while session is open) */}
-      {isTodaySession &&
-        showTodaysCompletedReview &&
-        !showWorkoutDetails && (
+      {/* Completed today — summary card unchanged */}
+      {isTodaySession && showTodaysCompletedReview && !showWorkoutDetails && (
         <PostWorkoutSummary
           plan={plan}
           log={completedLogForUi!}
@@ -353,9 +444,7 @@ function TodayPageInner() {
         />
       )}
 
-      {isTodaySession &&
-        showTodaysCompletedReview &&
-        showWorkoutDetails && (
+      {isTodaySession && showTodaysCompletedReview && showWorkoutDetails && (
         <div className="space-y-3">
           <button
             type="button"
@@ -378,64 +467,8 @@ function TodayPageInner() {
 
       <StaleWorkoutSessionsBanner hidden={hideStaleBanner} />
 
-      {hasPausedDraftToday && (
-        <AnimatedSection className="space-y-3" delay={0.15}>
-          <SurfaceCard className="p-4 space-y-2">
-            <p className="text-sm font-medium text-foreground">
-              Workout in progress
-            </p>
-            <p className="text-xs text-muted">
-              You saved this session for later. Resume to pick up where you left
-              off, or discard to start fresh.
-            </p>
-          </SurfaceCard>
-          <button
-            type="button"
-            onClick={() => resumeWorkout()}
-            className="w-full rounded-xl bg-accent py-4 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
-          >
-            Resume workout
-          </button>
-          <button
-            type="button"
-            onClick={() => discardWorkout()}
-            className="w-full rounded-xl border border-border bg-surface py-3 text-sm font-medium text-muted transition-colors hover:text-foreground"
-          >
-            Discard saved session
-          </button>
-        </AnimatedSection>
-      )}
-
-      {showPreWorkoutActions && (
-        <AnimatedSection className="space-y-4" delay={0.15}>
-          <div className="flex gap-2">
-            {canEditPlan ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setSaveError(null);
-                  setCustomizing(true);
-                }}
-                className="flex-1 rounded-xl border border-accent/40 bg-accent/10 py-3.5 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
-              >
-                Edit workout
-              </button>
-            ) : null}
-            <button
-              type="button"
-              onClick={() => startWorkout(plan)}
-              className={`rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] ${
-                canEditPlan ? "flex-1" : "w-full py-4 text-base"
-              }`}
-            >
-              Start workout
-            </button>
-          </div>
-        </AnimatedSection>
-      )}
-
-      {showQuickActivityLog && (
-        <AnimatedSection className="space-y-3" delay={0.18}>
+      {showQuickActivityLog && showTodaysCompletedReview && (
+        <AnimatedSection className="space-y-3" delay={0.12}>
           <QuickActivityLog plan={plan} dateKey={todayKey} />
           <WeightLogCard dateKey={todayKey} />
         </AnimatedSection>

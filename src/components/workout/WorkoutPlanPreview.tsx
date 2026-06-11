@@ -30,6 +30,8 @@ interface WorkoutPlanPreviewProps {
   isFutureDay?: boolean;
   /** When true, show target muscle breakdown (same as Today pre-workout) */
   showTargetMuscleList?: boolean;
+  /** Skip outer motion wrapper when nested in TodayWorkoutPanel. */
+  embedded?: boolean;
 }
 
 export default function WorkoutPlanPreview({
@@ -39,6 +41,7 @@ export default function WorkoutPlanPreview({
   bannerHint,
   isFutureDay,
   showTargetMuscleList,
+  embedded = false,
 }: WorkoutPlanPreviewProps) {
   const allCategories = [...plan.strengthFocus, ...plan.coreGroups];
   const { warmUp, coolDown } = useResolvedStretches(plan, weekByDow);
@@ -55,8 +58,8 @@ export default function WorkoutPlanPreview({
 
   const showBanner = Boolean(bannerTitle || bannerHint || isFutureDay);
 
-  return (
-    <AnimatedSection className="space-y-4" delay={0.05}>
+  const body = (
+    <>
       {showBanner && (
         <SurfaceCard className="p-4 space-y-1">
           {bannerTitle && (
@@ -188,6 +191,16 @@ export default function WorkoutPlanPreview({
           </div>
         </CollapsibleSection>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return <div className="space-y-4">{body}</div>;
+  }
+
+  return (
+    <AnimatedSection className="space-y-4" delay={0.05}>
+      {body}
     </AnimatedSection>
   );
 }
