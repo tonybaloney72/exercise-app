@@ -1,5 +1,5 @@
-import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import { computePrefsFingerprintFromSettings } from "@/lib/planGenerator";
+import { settingsSliceFromUserSettings } from "@/lib/planGeneratorInputsSlice";
 import {
   getExercisePreferenceRepo,
   getExerciseSettingsRepo,
@@ -7,7 +7,6 @@ import {
   type ExercisePreferenceMap,
   type ExerciseSettingsMap,
 } from "@/lib/repos";
-import { settingsHydrationMatchesAuth } from "@/lib/settingsHydration";
 import type { AuthMode } from "@/stores/useAuthStore";
 import type {
   ExerciseEquipment,
@@ -26,71 +25,29 @@ export type PlanGeneratorInputs = {
   fingerprint: string;
 };
 
-function settingsSlice(settings: UserSettings): {
-  availableEquipment: ExerciseEquipment[];
-  trainingPriorityPreset: TrainingPriorityPreset;
-  roundDensity: RoundDensity;
-} {
-  return {
-    availableEquipment:
-      settings.availableEquipment?.length > 0
-        ? settings.availableEquipment
-        : [...DEFAULT_AVAILABLE_EQUIPMENT],
-    trainingPriorityPreset: settings.trainingPriorityPreset ?? "balanced",
-    roundDensity: settings.roundDensity ?? "standard",
-  };
+type PlanGeneratorInputsStoreReader = (mode: AuthMode) => PlanGeneratorInputs | null;
+
+let readGeneratorInputsFromStores: PlanGeneratorInputsStoreReader | null = null;
+
+/** Registered at client bootstrap so plan resolution can read hydrated Zustand state. */
+export function registerPlanGeneratorInputsStoreReader(
+  reader: PlanGeneratorInputsStoreReader,
+): void {
+  readGeneratorInputsFromStores = reader;
 }
 
 function repoModeForPlans(mode: AuthMode): AuthMode {
   return mode === "authenticated" ? "authenticated" : "guest";
 }
 
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
-import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
-import { useSettingsStore } from "@/stores/useSettingsStore";
-
-/** Read generator inputs from hydrated Zustand stores when available (client only). */
-export function tryLoadGeneratorInputsFromStores(
-  mode: AuthMode,
-): PlanGeneratorInputs | null {
-  if (typeof window === "undefined" || mode === "loading") return null;
-
-  const { mode: authMode, user } = useAuthStore.getState();
-  const settingsState = useSettingsStore.getState();
-  if (
-    !settingsHydrationMatchesAuth(
-      authMode,
-      user?.id,
-      settingsState.hydratedForAuthKey,
-    )
-  ) {
-    return null;
-  }
-
-  const settings = settingsState;
-  const exerciseSettings = useExerciseSettingsStore.getState().byExerciseId;
-  const prefs = useExercisePreferencesStore.getState().byExerciseId;
-  const { availableEquipment, trainingPriorityPreset, roundDensity } =
-    settingsSlice(settings);
-
-  return {
-    prefs,
-    settings,
-    exerciseSettings,
-    availableEquipment,
-    trainingPriorityPreset,
-    roundDensity,
-    fingerprint: computePrefsFingerprintFromSettings(prefs, settings),
-  };
-}
-
 /** Generator inputs from Zustand when hydrated, otherwise from repos. */
 export async function loadGeneratorInputs(
   mode: AuthMode,
 ): Promise<PlanGeneratorInputs> {
-  const fromStores = tryLoadGeneratorInputsFromStores(mode);
-  if (fromStores) return fromStores;
+  if (typeof window !== "undefined" && readGeneratorInputsFromStores) {
+    const fromStores = readGeneratorInputsFromStores(mode);
+    if (fromStores) return fromStores;
+  }
 
   const repoMode = repoModeForPlans(mode);
   const [prefs, settings, exerciseSettings] = await Promise.all([
@@ -99,7 +56,7 @@ export async function loadGeneratorInputs(
     getExerciseSettingsRepo(repoMode).loadAll(),
   ]);
   const { availableEquipment, trainingPriorityPreset, roundDensity } =
-    settingsSlice(settings);
+    settingsSliceFromUserSettings(settings);
   return {
     prefs,
     settings,

@@ -36,6 +36,3 @@ export function selectTrainingWeekCacheKey(
 ): string {
   return `${s.programMode}:${s.customBuildStyle}:${s.weekBlueprintCustomized}:${JSON.stringify(s.weekBlueprint)}:${s.trainingPriorityPreset}:${s.trainingPriorityCustomized}:${JSON.stringify(s.trainingPriorityScores)}:${s.roundDensity}:${JSON.stringify(s.weeklyPplSchedule)}:${s.weeklyPplScheduleCustomized}:${JSON.stringify(s.weeklyRestDays)}:${s.weeklyRestDaysCustomized}`;
 }
-
-/** @deprecated Use {@link selectTrainingWeekCacheKey}. */
-export const selectProgramProfileKeyDayPlan = selectTrainingWeekCacheKey;

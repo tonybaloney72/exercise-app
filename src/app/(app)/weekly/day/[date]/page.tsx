@@ -20,10 +20,8 @@ import {
 } from "@/lib/restDays";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
-import {
-  bumpTrainingWeekPlansAfterCustomSave,
-  resetTrainingDayToGenerated,
-} from "@/lib/trainingWeekRefresh";
+import { bumpTrainingWeekPlansAfterCustomSave } from "@/lib/trainingWeekCacheRefresh";
+import { resetTrainingDayToGenerated } from "@/lib/trainingWeekRefresh";
 import { saveCustomDayPlan } from "@/lib/trainingWeekCustomize";
 import { useWeekSourceForDate } from "@/hooks/useWeekSourceForDate";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";

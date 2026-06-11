@@ -94,13 +94,11 @@ async function prescribedPlanFreezeStateForRefresh(): Promise<
   if (typeof window === "undefined") return base;
   try {
     const { useAuthStore } = await import("@/stores/useAuthStore");
-    const { useWorkoutStore } = await import("@/stores/useWorkoutStore");
     const { mode, user } = useAuthStore.getState();
     if (mode !== "authenticated") return base;
     const authKey = settingsHydrationKey(mode, user?.id);
-    const workoutState = useWorkoutStore.getState();
-    if (authKey && workoutState.historyLoadedForAuthKey === authKey) {
-      return { ...base, workoutHistory: workoutState.workoutHistory };
+    if (authKey && base.historyLoadedForAuthKey === authKey) {
+      return base;
     }
     const { getWorkoutRepo } = await import("@/lib/repos");
     const history = await getWorkoutRepo(mode).loadHistory();
@@ -276,7 +274,9 @@ export async function refreshCustomWeekSchedule(
 }
 
 /** In-memory materialized week (guest / anonymous) from catalog + local settings. */
-async function resolveMaterializedWeek(mode: AuthMode): Promise<TrainingWeekDays> {
+async function resolveMaterializedWeek(
+  mode: AuthMode,
+): Promise<TrainingWeekDays> {
   const {
     prefs,
     settings,
@@ -335,7 +335,9 @@ async function loadOrSeedPersistedWeek(
   }
 
   if (!weekDaysComplete(storedDays)) {
-    throw new Error("Persisted training week incomplete after materialization check");
+    throw new Error(
+      "Persisted training week incomplete after materialization check",
+    );
   }
   return { days: storedDays, source: persisted?.source ?? null };
 }
@@ -395,25 +397,4 @@ export async function resolveTrainingWeekForAuth(
   }
   const bundle = await resolveTrainingWeekBundleForAuth(anyDateKeyInWeek, mode);
   return bundle.days;
-}
-
-/**
- * Resolves the `DayPlan` for a local calendar day via the single plan resolver
- * (materialized week for guests; lazy-seeded DB week when signed in).
- */
-export async function resolveDayPlanForAuth(
-  dateKey: string,
-  mode: AuthMode,
-): Promise<DayPlan> {
-  const parsed = parseLocalDateKey(dateKey);
-  if (!parsed) {
-    throw new Error("Invalid date key");
-  }
-  const dow = parsed.getDay();
-  const days = await resolveTrainingWeekForAuth(dateKey, mode);
-  const plan = days[dow];
-  if (!plan) {
-    throw new Error(`No plan for dayOfWeek ${dow}`);
-  }
-  return stripPhantomRestDayRounds(plan);
 }

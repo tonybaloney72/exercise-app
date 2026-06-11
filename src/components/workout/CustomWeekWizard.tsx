@@ -23,10 +23,8 @@ import {
   resolveBlueprintForManualSeed,
 } from "@/lib/manualWeekSeed";
 import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
-import {
-  bumpTrainingWeekPlansAfterCustomSave,
-  bumpTrainingWeekPlansFromDb,
-} from "@/lib/trainingWeekRefresh";
+import { bumpTrainingWeekPlansAfterCustomSave } from "@/lib/trainingWeekCacheRefresh";
+import { bumpTrainingWeekPlansFromDb } from "@/lib/trainingWeekRefresh";
 import { WEEK_DAY_ABBRS } from "@/lib/weekWizardConstants";
 import { toastSaveError } from "@/utils/saveErrorToast";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";

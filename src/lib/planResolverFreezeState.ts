@@ -4,6 +4,7 @@ const emptyFreezeState: PrescribedPlanFreezeState = {
   activeWorkout: null,
   pausedWorkoutDate: null,
   workoutHistory: [],
+  historyLoadedForAuthKey: null,
 };
 
 let readFreezeState: () => PrescribedPlanFreezeState = () => emptyFreezeState;

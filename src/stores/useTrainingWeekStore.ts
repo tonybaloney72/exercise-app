@@ -67,15 +67,6 @@ export function weekCacheEntryMatches(
   );
 }
 
-/** Read cached week `source` when the entry matches `dateKey`, else `undefined`. */
-export function readWeekSourceFromCache(dateKey: string): string | null | undefined {
-  const anchorKey = normalizeWeekAnchorKey(dateKey);
-  if (!anchorKey) return undefined;
-  const entry = useTrainingWeekStore.getState().entry;
-  if (!entry || entry.anchorKey !== anchorKey) return undefined;
-  return entry.weekSource;
-}
-
 function cacheHit(
   entry: WeekCacheEntry | null,
   anchorKey: string,
@@ -125,9 +116,8 @@ export const useTrainingWeekStore = create<TrainingWeekState>((set, get) => ({
 
     const promise = (async () => {
       try {
-        const { resolveTrainingWeekBundleForAuth } = await import(
-          "@/lib/planResolver"
-        );
+        const { resolveTrainingWeekBundleForAuth } =
+          await import("@/lib/planResolver");
         const bundle = await resolveTrainingWeekBundleForAuth(anchorKey, mode);
         set({
           entry: {

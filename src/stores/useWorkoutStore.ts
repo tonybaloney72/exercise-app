@@ -2014,5 +2014,6 @@ registerPrescribedPlanFreezeStateReader(() => {
     activeWorkout: state.activeWorkout,
     pausedWorkoutDate: state.pausedWorkoutDate,
     workoutHistory: state.workoutHistory,
+    historyLoadedForAuthKey: state.historyLoadedForAuthKey,
   };
 });

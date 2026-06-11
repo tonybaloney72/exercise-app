@@ -8,6 +8,8 @@ export type PrescribedPlanFreezeState = {
   activeWorkout: WorkoutLog | null;
   pausedWorkoutDate: string | null;
   workoutHistory: WorkoutLog[];
+  /** Set when `workoutHistory` was loaded for the current auth session. */
+  historyLoadedForAuthKey?: string | null;
 };
 
 /** True when the user has started (or paused) a workout for this calendar date. */

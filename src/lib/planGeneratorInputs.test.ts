@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_SETTINGS } from "@/lib/repos";
-import { tryLoadGeneratorInputsFromStores } from "@/lib/planGeneratorInputs";
+import { tryLoadGeneratorInputsFromStores } from "@/lib/planGeneratorInputsFromStores";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";

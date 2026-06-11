@@ -14,7 +14,10 @@ import {
   buildProgramProfileInput,
   buildProgramProfileInputFromSettings,
 } from "@/lib/programProfile";
-import { rebuildDerivedStretches, resolveStretchesForDay } from "@/lib/dayStretchPlan";
+import {
+  rebuildDerivedStretches,
+  resolveStretchesForDay,
+} from "@/lib/dayStretchPlan";
 import { buildVarietySeed } from "@/lib/planVariety";
 import {
   buildStretchResolveContextFromInputs,
@@ -159,7 +162,11 @@ export function dayPlanForCustomSave(
   plan: DayPlan,
   ctx: StretchResolveContext,
 ): DayPlan {
-  const { defaultWarmUp: _w, defaultCoolDown: _c, ...rest } = plan as DayPlan & {
+  const {
+    defaultWarmUp: _w,
+    defaultCoolDown: _c,
+    ...rest
+  } = plan as DayPlan & {
     defaultWarmUp?: StretchEntry[];
     defaultCoolDown?: StretchEntry[];
   };
@@ -183,7 +190,8 @@ export function dayPlanForCustomSave(
       : undefined;
 
   const coolDown =
-    normalizedCool != null && !stretchListsEqual(normalizedCool, derived.coolDown)
+    normalizedCool != null &&
+    !stretchListsEqual(normalizedCool, derived.coolDown)
       ? normalizedCool
       : undefined;
 
@@ -337,8 +345,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
 
   const row = await getTrainingWeekRepo("authenticated").loadWeek(weekKey);
   const source =
-    settings.programMode === "custom" ||
-    isUserCustomizedWeekSource(row?.source)
+    settings.programMode === "custom" || isUserCustomizedWeekSource(row?.source)
       ? TRAINING_WEEK_SOURCE_CUSTOM_V1
       : TRAINING_WEEK_SOURCE_GENERATED_V1;
 
@@ -348,22 +355,4 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
   });
 
   return freshDay;
-}
-
-export async function getWeekSourceForDate(
-  dateKey: string,
-): Promise<string | null> {
-  if (typeof window !== "undefined") {
-    const { readWeekSourceFromCache } = await import(
-      "@/stores/useTrainingWeekStore"
-    );
-    const cached = readWeekSourceFromCache(dateKey);
-    if (cached !== undefined) return cached;
-  }
-
-  const anchor = weekAnchorFromDateKey(dateKey);
-  if (!anchor) return null;
-  const { weekKey } = anchor;
-  const row = await getTrainingWeekRepo("authenticated").loadWeek(weekKey);
-  return row?.source ?? null;
 }

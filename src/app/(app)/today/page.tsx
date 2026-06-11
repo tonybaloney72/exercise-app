@@ -15,10 +15,8 @@ import TodayWorkoutPanel, {
 } from "@/components/workout/TodayWorkoutPanel";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
-import {
-  bumpTrainingWeekPlansAfterCustomSave,
-  resetTrainingDayToGenerated,
-} from "@/lib/trainingWeekRefresh";
+import { bumpTrainingWeekPlansAfterCustomSave } from "@/lib/trainingWeekCacheRefresh";
+import { resetTrainingDayToGenerated } from "@/lib/trainingWeekRefresh";
 import { saveCustomDayPlan } from "@/lib/trainingWeekCustomize";
 import { useWeekSourceForDate } from "@/hooks/useWeekSourceForDate";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";

@@ -1,9 +1,5 @@
-import { trainingWeekStoreDepsFromSettings } from "@/lib/trainingWeekStoreDeps";
-import { TRAINING_WEEK_SOURCE_CUSTOM_V1 } from "@/lib/planGenerator";
 import type { RefreshTrainingWeekScope } from "@/lib/trainingWeekRefreshScope";
-import type { TrainingWeekDays } from "@/lib/repos";
 import type { TrainingWeekRefreshReason } from "@/stores/useTrainingWeekRefreshStore";
-import { applyCustomDaySaveToWeekCache } from "@/stores/useTrainingWeekStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /** Regenerate current Sun–Sat week (authenticated) and toast + refetch plans. */
@@ -15,11 +11,11 @@ export async function refreshCurrentTrainingWeek(
   if (useAuthStore.getState().mode !== "authenticated") return;
   const { refreshTrainingWeekContaining } = await import("@/lib/planResolver");
   await refreshTrainingWeekContaining(formatLocalDateKey(), scope);
-  const { useTrainingWeekStore } = await import("@/stores/useTrainingWeekStore");
+  const { useTrainingWeekStore } =
+    await import("@/stores/useTrainingWeekStore");
   useTrainingWeekStore.getState().invalidate();
-  const { useTrainingWeekRefreshStore } = await import(
-    "@/stores/useTrainingWeekRefreshStore"
-  );
+  const { useTrainingWeekRefreshStore } =
+    await import("@/stores/useTrainingWeekRefreshStore");
   useTrainingWeekRefreshStore.getState().notifyRefreshed(reason);
 }
 
@@ -29,11 +25,11 @@ export async function refreshCurrentCustomWeekSchedule(): Promise<void> {
   if (useAuthStore.getState().mode !== "authenticated") return;
   const { refreshCustomWeekSchedule } = await import("@/lib/planResolver");
   await refreshCustomWeekSchedule(formatLocalDateKey());
-  const { useTrainingWeekStore } = await import("@/stores/useTrainingWeekStore");
+  const { useTrainingWeekStore } =
+    await import("@/stores/useTrainingWeekStore");
   useTrainingWeekStore.getState().invalidate();
-  const { useTrainingWeekRefreshStore } = await import(
-    "@/stores/useTrainingWeekRefreshStore"
-  );
+  const { useTrainingWeekRefreshStore } =
+    await import("@/stores/useTrainingWeekRefreshStore");
   useTrainingWeekRefreshStore.getState().bumpPlanRevision();
 }
 
@@ -43,15 +39,14 @@ export async function resetTrainingWeekToGenerated(
 ): Promise<void> {
   const { useAuthStore } = await import("@/stores/useAuthStore");
   if (useAuthStore.getState().mode !== "authenticated") return;
-  const { resetTrainingWeekToGenerated: resetWeek } = await import(
-    "@/lib/trainingWeekCustomize"
-  );
+  const { resetTrainingWeekToGenerated: resetWeek } =
+    await import("@/lib/trainingWeekCustomize");
   await resetWeek(dateKeyInWeek);
-  const { useTrainingWeekStore } = await import("@/stores/useTrainingWeekStore");
+  const { useTrainingWeekStore } =
+    await import("@/stores/useTrainingWeekStore");
   useTrainingWeekStore.getState().invalidate();
-  const { useTrainingWeekRefreshStore } = await import(
-    "@/stores/useTrainingWeekRefreshStore"
-  );
+  const { useTrainingWeekRefreshStore } =
+    await import("@/stores/useTrainingWeekRefreshStore");
   useTrainingWeekRefreshStore.getState().notifyRefreshed("reset");
 }
 
@@ -63,19 +58,21 @@ export async function resetTrainingDayToGenerated(
   if (useAuthStore.getState().mode !== "authenticated") return;
   const { resetDayToGenerated } = await import("@/lib/trainingWeekCustomize");
   await resetDayToGenerated(dateKey);
-  const { useTrainingWeekStore } = await import("@/stores/useTrainingWeekStore");
+  const { useTrainingWeekStore } =
+    await import("@/stores/useTrainingWeekStore");
   useTrainingWeekStore.getState().invalidate();
   bumpTrainingWeekPlans();
 }
 
 /** Drop cached week plans so hooks resolve from repos on the next revision bump. */
-export async function invalidateTrainingWeekCache(): Promise<void> {
-  const { useTrainingWeekStore } = await import("@/stores/useTrainingWeekStore");
+async function invalidateTrainingWeekCache(): Promise<void> {
+  const { useTrainingWeekStore } =
+    await import("@/stores/useTrainingWeekStore");
   useTrainingWeekStore.getState().invalidate();
 }
 
 /** Refetch plan hooks after a custom day save (no banner). */
-export function bumpTrainingWeekPlans(): void {
+function bumpTrainingWeekPlans(): void {
   void import("@/stores/useTrainingWeekRefreshStore").then(
     ({ useTrainingWeekRefreshStore }) => {
       useTrainingWeekRefreshStore.getState().bumpPlanRevision();
@@ -87,29 +84,4 @@ export function bumpTrainingWeekPlans(): void {
 export async function bumpTrainingWeekPlansFromDb(): Promise<void> {
   await invalidateTrainingWeekCache();
   bumpTrainingWeekPlans();
-}
-
-/** Bump revision and merge saved week into the session cache (no DB resolve). */
-export async function bumpTrainingWeekPlansAfterCustomSave(
-  dateKey: string,
-  mergedWeek: TrainingWeekDays,
-): Promise<void> {
-  const { useTrainingWeekRefreshStore } = await import(
-    "@/stores/useTrainingWeekRefreshStore"
-  );
-  const { useAuthStore } = await import("@/stores/useAuthStore");
-  const { useSettingsStore } = await import("@/stores/useSettingsStore");
-
-  useTrainingWeekRefreshStore.getState().bumpPlanRevision();
-  const planRevision = useTrainingWeekRefreshStore.getState().planRevision;
-  const mode = useAuthStore.getState().mode;
-  if (mode === "loading") return;
-
-  const settings = useSettingsStore.getState();
-  applyCustomDaySaveToWeekCache(
-    dateKey,
-    mergedWeek,
-    { mode, ...trainingWeekStoreDepsFromSettings(mode, planRevision, settings) },
-    TRAINING_WEEK_SOURCE_CUSTOM_V1,
-  );
 }
