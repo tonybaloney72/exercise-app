@@ -1,6 +1,7 @@
 import { getCatalogPlanForDay } from "@/data/trainingWeekCatalog";
 import { groupsForCatalogDay } from "@/lib/weeklyCategoryLayout";
 import {
+  MAX_BLUEPRINT_ROUNDS,
   sanitizeBlueprintExerciseCount,
   sanitizeBlueprintRoundClones,
   type DayBlueprint,
@@ -9,6 +10,8 @@ import {
   type RoundCloneMode,
   type WeekBlueprint,
 } from "@/lib/weekBlueprint";
+
+export { MAX_BLUEPRINT_ROUNDS };
 
 export const DAY_BLUEPRINT_KIND_LABELS: Record<DayBlueprintKind, string> = {
   workout: "Workout",
@@ -19,7 +22,6 @@ export const DAY_BLUEPRINT_KIND_LABELS: Record<DayBlueprintKind, string> = {
 
 export const DEFAULT_WORKOUT_ROUND_COUNT = 3;
 export const DEFAULT_ACTIVE_RECOVERY_ROUND_COUNT = 1;
-export const MAX_BLUEPRINT_ROUNDS = 6;
 
 function catalogGroupsForDay(dow: number) {
   return groupsForCatalogDay(getCatalogPlanForDay(dow));
@@ -223,7 +225,7 @@ function setRoundCountInBlueprint(
   count: number,
 ): WeekBlueprint {
   const day = blueprint[dow] ?? defaultDayBlueprint(dow);
-  const n = Math.max(1, Math.min(6, count));
+  const n = Math.max(1, Math.min(MAX_BLUEPRINT_ROUNDS, count));
   const catalogGroups = groupsForCatalogDay(getCatalogPlanForDay(dow));
   const rounds: RoundBlueprint[] = [];
   for (let i = 0; i < n; i++) {

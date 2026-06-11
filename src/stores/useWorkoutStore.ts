@@ -98,9 +98,13 @@ import {
   buildCompletedQuickCardioRow,
   cardioRowKey,
 } from "@/lib/cardioInstances";
+import type { RoundCopyMode } from "@/lib/dayPlanRoundCopy";
 import {
   addCardioKind,
   addRoundAt,
+  applyRoundCopyFromPriorInWorkout,
+  insertEmptyRoundAt,
+  insertRoundCopyAt,
   removeRoundAt,
   removeCardioAt,
   removeCoolDownStretchAt,
@@ -347,6 +351,16 @@ interface WorkoutState {
   saveEditedWorkout: () => Promise<WorkoutLog | null>;
   cancelEditingWorkout: () => void;
   addRoundToWorkout: () => void;
+  insertEmptyRoundAtWorkout: (insertAt: number) => void;
+  insertRoundCopyAtWorkout: (
+    insertAt: number,
+    sourceRoundNumber: number,
+    mode: RoundCopyMode,
+  ) => void;
+  applyRoundCopyFromPriorWorkout: (
+    roundNumber: number,
+    mode: RoundCopyMode,
+  ) => void;
   removeRoundFromWorkout: (roundNumber: number) => void;
   removeRoundExercise: (roundNumber: number, slotIndex: number) => void;
   addRoundExercise: (roundNumber: number, exerciseId: string) => void;
@@ -974,6 +988,57 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       if (!state.activeWorkout) return state;
       return {
         activeWorkout: hydrateWorkoutLog(addRoundAt(state.activeWorkout)),
+      };
+    }),
+
+  insertEmptyRoundAtWorkout: (insertAt) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog(
+          insertEmptyRoundAt(state.activeWorkout, insertAt),
+        ),
+      };
+    }),
+
+  insertRoundCopyAtWorkout: (insertAt, sourceRoundNumber, mode) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const prefs = swapCandidatePrefsFromStores(
+        () => useSettingsStore.getState().availableEquipment,
+        () => useExercisePreferencesStore.getState().byExerciseId,
+        () => useSettingsStore.getState(),
+      );
+      return {
+        activeWorkout: hydrateWorkoutLog(
+          insertRoundCopyAt(
+            state.activeWorkout,
+            insertAt,
+            sourceRoundNumber,
+            mode,
+            prefs,
+          ),
+        ),
+      };
+    }),
+
+  applyRoundCopyFromPriorWorkout: (roundNumber, mode) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const prefs = swapCandidatePrefsFromStores(
+        () => useSettingsStore.getState().availableEquipment,
+        () => useExercisePreferencesStore.getState().byExerciseId,
+        () => useSettingsStore.getState(),
+      );
+      return {
+        activeWorkout: hydrateWorkoutLog(
+          applyRoundCopyFromPriorInWorkout(
+            state.activeWorkout,
+            roundNumber,
+            mode,
+            prefs,
+          ),
+        ),
       };
     }),
 

@@ -53,7 +53,7 @@ describe("weekBlueprintDraft", () => {
 
   it("insertRoundInBlueprint is a no-op at max rounds", () => {
     let blueprint = setDayKindInBlueprint({}, 0, "workout");
-    for (let i = 0; i < 3; i++) {
+    while ((blueprint[0]?.rounds.length ?? 0) < MAX_BLUEPRINT_ROUNDS) {
       blueprint = addRoundInBlueprint(blueprint, 0);
     }
     expect(blueprint[0]?.rounds).toHaveLength(MAX_BLUEPRINT_ROUNDS);

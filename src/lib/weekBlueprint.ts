@@ -1,5 +1,6 @@
 import { getCatalogPlanForDay } from "@/data/trainingWeekCatalog";
 import { applyWeeklyCardioToDay } from "@/lib/cardioActivities";
+import { MAX_DAY_ROUNDS } from "@/lib/dayRoundLimits";
 import {
   buildLayoutRoundSpecs,
   resolveLayoutDayStructure,
@@ -27,6 +28,9 @@ import type {
 export type CustomBuildStyle = "guided" | "manual";
 
 export type RoundCloneMode = "repeat" | "structure";
+
+/** Max strength rounds per guided-custom day (matches live workout / plan editor). */
+export const MAX_BLUEPRINT_ROUNDS = MAX_DAY_ROUNDS;
 
 export type DayBlueprintKind =
   | "workout"
@@ -114,7 +118,10 @@ function sanitizeRoundBlueprint(
   const cloneOfRoundIndex =
     typeof o.cloneOfRoundIndex === "number" &&
     Number.isFinite(o.cloneOfRoundIndex)
-      ? Math.max(0, Math.min(5, Math.round(o.cloneOfRoundIndex)))
+      ? Math.max(
+          0,
+          Math.min(MAX_BLUEPRINT_ROUNDS - 1, Math.round(o.cloneOfRoundIndex)),
+        )
       : undefined;
 
   const cloneMode =

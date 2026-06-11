@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { isDayPlanDraftDirty } from "@/lib/dayPlanDraft";
 import { useBalanceAlertToasts } from "@/hooks/useBalanceAlertToasts";
 import AnimatedSection from "@/components/common/AnimatedSection";
-import CollapsibleSection from "@/components/common/CollapsibleSection";
+import WorkoutSectionCard from "@/components/workout/WorkoutSectionCard";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryPickModal from "@/components/workout/CategoryPickModal";
 import DayPlanCardioEditor from "@/components/workout/DayPlanCardioEditor";
@@ -27,7 +27,14 @@ import {
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
 import { laterRoundOccurrencesByExerciseId } from "@/lib/exerciseSwap";
 import { analyzeDayPlanBalance } from "@/lib/workoutBalanceAlerts";
+import {
+  applyRoundCopyFromPriorInDayPlan,
+  insertEmptyRoundInDayPlan,
+  type RoundCopyMode,
+} from "@/lib/dayPlanRoundCopy";
 import { reorderRoundExercises } from "@/lib/reorderRoundExercises";
+import RoundStructureActions from "@/components/workout/RoundStructureActions";
+import { MAX_WORKOUT_ROUNDS } from "@/lib/workoutLogStructure";
 import { prepareDayPlanForEditor } from "@/lib/trainingWeekCustomize";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -59,6 +66,11 @@ function renumberRounds(rounds: Round[]): Round[] {
     ...round,
     roundNumber: index + 1,
   }));
+}
+
+function exerciseCountLabel(count: number): string {
+  if (count === 0) return "No exercises yet";
+  return `${count} exercise${count === 1 ? "" : "s"}`;
 }
 
 interface WorkoutPlanEditorProps {
@@ -105,6 +117,15 @@ export default function WorkoutPlanEditor({
   const balanceAlerts = useMemo(() => analyzeDayPlanBalance(draft), [draft]);
   const hasBalanceWarning = balanceAlerts.some((a) => a.severity === "warning");
   useBalanceAlertToasts(balanceAlerts);
+
+  const roundCopyPrefs = useMemo(
+    () => ({
+      availableEquipment,
+      dislikedExerciseIds: dislikedIds,
+      expertiseFilter,
+    }),
+    [availableEquipment, dislikedIds, expertiseFilter],
+  );
 
   useEffect(() => {
     onDirtyChange?.(isDayPlanDraftDirty(initialPlan, draft), draft);
@@ -242,14 +263,18 @@ export default function WorkoutPlanEditor({
     });
   };
 
-  const addRound = () => {
-    setDraft((prev) => ({
-      ...prev,
-      rounds: renumberRounds([
-        ...prev.rounds,
-        { roundNumber: prev.rounds.length + 1, exercises: [] },
-      ]),
-    }));
+  const appendRound = () => {
+    setDraft((prev) => insertEmptyRoundInDayPlan(prev, prev.rounds.length));
+  };
+
+  const insertRoundBelow = (roundIndex: number) => {
+    setDraft((prev) => insertEmptyRoundInDayPlan(prev, roundIndex + 1));
+  };
+
+  const applyCopyFromPrior = (roundIndex: number, mode: RoundCopyMode) => {
+    setDraft((prev) =>
+      applyRoundCopyFromPriorInDayPlan(prev, roundIndex, mode, roundCopyPrefs),
+    );
   };
 
   const removeRound = (roundIndex: number) => {
@@ -362,17 +387,22 @@ export default function WorkoutPlanEditor({
             Rounds
           </p>
           <p className="text-sm text-muted leading-snug">
-            Drag the grip to reorder exercises in a round.
+            New rounds start empty — choose Copy, different exercises, or
+            Customize.{" "}
+            <span className="font-medium text-foreground">Add round</span> appends
+            at the end.
           </p>
         </div>
-        <button
-          type="button"
-          disabled={saving || draft.rounds.length >= 6}
-          onClick={addRound}
-          className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover disabled:opacity-50"
-        >
-          + Add round
-        </button>
+        {draft.rounds.length < MAX_WORKOUT_ROUNDS ? (
+          <button
+            type="button"
+            disabled={saving}
+            onClick={appendRound}
+            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover disabled:opacity-50"
+          >
+            + Add round
+          </button>
+        ) : null}
       </div>
 
       {draft.rounds.length === 0 ? (
@@ -386,54 +416,61 @@ export default function WorkoutPlanEditor({
       ) : null}
 
       {draft.rounds.map((round, roundIndex) => (
-        <CollapsibleSection
+        <WorkoutSectionCard
           key={round.roundNumber}
           title={`Round ${round.roundNumber}`}
-          hint={
-            round.exercises.length === 0
-              ? "No exercises yet"
-              : `${round.exercises.length} exercise${
-                  round.exercises.length === 1 ? "" : "s"
-                }`
-          }
-          defaultOpen={roundIndex === 0}
-          toolbar={
-            <div className="flex w-full items-center justify-between gap-3">
-              <button
-                type="button"
-                disabled={saving}
-                onClick={() => removeRound(roundIndex)}
-                className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-40"
-              >
-                Remove round
-              </button>
-              <button
-                type="button"
-                onClick={() => setCategoryPickRound(roundIndex)}
-                className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover"
-              >
-                + Add exercise
-              </button>
-            </div>
+          defaultOpen={roundIndex === 0 || round.exercises.length === 0}
+          statusLabel={exerciseCountLabel(round.exercises.length)}
+          menuItems={[
+            {
+              label: "Add exercise",
+              onClick: () => setCategoryPickRound(roundIndex),
+            },
+            {
+              label: "Remove round",
+              onClick: () => removeRound(roundIndex),
+            },
+          ]}
+          footer={
+            <RoundStructureActions
+              roundIndex={roundIndex}
+              roundCount={draft.rounds.length}
+              isEmptyRound={round.exercises.length === 0}
+              disabled={saving}
+              onAddRoundBelow={() => insertRoundBelow(roundIndex)}
+              onCopyRepeat={() => applyCopyFromPrior(roundIndex, "repeat")}
+              onCopyStructure={() =>
+                applyCopyFromPrior(roundIndex, "structure")
+              }
+              onCustomize={() => setCategoryPickRound(roundIndex)}
+            />
           }
         >
-          <RoundExerciseSortableList
-            roundIndex={roundIndex}
-            exercises={round.exercises}
-            saving={saving}
-            onReorder={(fromIndex, toIndex) =>
-              reorderSlots(roundIndex, fromIndex, toIndex)
-            }
-            onChangeSlot={(slotIndex) =>
-              openPickModal({ kind: "swap", roundIndex, slotIndex })
-            }
-            onRemoveSlot={(slotIndex) => removeSlot(roundIndex, slotIndex)}
-            onUpdateReps={(slotIndex, targetReps) =>
-              updateReps(roundIndex, slotIndex, targetReps)
-            }
-          />
-        </CollapsibleSection>
+          {round.exercises.length > 0 ? (
+            <RoundExerciseSortableList
+              roundIndex={roundIndex}
+              exercises={round.exercises}
+              saving={saving}
+              onReorder={(fromIndex, toIndex) =>
+                reorderSlots(roundIndex, fromIndex, toIndex)
+              }
+              onChangeSlot={(slotIndex) =>
+                openPickModal({ kind: "swap", roundIndex, slotIndex })
+              }
+              onRemoveSlot={(slotIndex) => removeSlot(roundIndex, slotIndex)}
+              onUpdateReps={(slotIndex, targetReps) =>
+                updateReps(roundIndex, slotIndex, targetReps)
+              }
+            />
+          ) : null}
+        </WorkoutSectionCard>
       ))}
+
+      {draft.rounds.length >= MAX_WORKOUT_ROUNDS ? (
+        <p className="text-xs text-muted text-center px-1">
+          Maximum {MAX_WORKOUT_ROUNDS} rounds per day.
+        </p>
+      ) : null}
 
       <StretchPlanSection
         title="Warm-up"

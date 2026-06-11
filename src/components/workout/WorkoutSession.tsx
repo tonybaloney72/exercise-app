@@ -9,6 +9,7 @@ import WorkoutSessionStructurePick, {
   type SessionStructurePickTarget,
 } from "./WorkoutSessionStructurePick";
 import { resolveCardioActivities } from "@/lib/cardioActivities";
+import RoundStructureActions from "@/components/workout/RoundStructureActions";
 import { MAX_WORKOUT_ROUNDS } from "@/lib/workoutLogStructure";
 import { shouldSkipStretchesForPlan } from "@/lib/restDays";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
@@ -63,7 +64,8 @@ export default function WorkoutSession({
     pauseWorkout,
     saveEditedWorkout,
     cancelEditingWorkout,
-    addRoundToWorkout,
+    insertEmptyRoundAtWorkout,
+    applyRoundCopyFromPriorWorkout,
     removeRoundFromWorkout,
     removeRoundExercise,
     addRoundExercise,
@@ -236,35 +238,48 @@ export default function WorkoutSession({
         onRemoveCardio={removeCardioFromWorkout}
       />
 
-      {sessionPlan.rounds.map((round) => {
+      {sessionPlan.rounds.map((round, roundIndex) => {
         const roundLog = activeWorkout.rounds.find(
           (r) => r.roundNumber === round.roundNumber,
         );
         if (!roundLog) return null;
         return (
-          <RoundCard
-            key={round.roundNumber}
-            round={round}
-            roundLog={roundLog}
-            disableRestTimer={isEditing}
-            canRemoveRound={activeWorkout.rounds.length > 1}
-            onRemoveRound={() => removeRoundFromWorkout(round.roundNumber)}
-            onAddExercise={() => setCategoryPickRound(round.roundNumber)}
-            onRemoveExercise={(slotIndex) =>
-              removeRoundExercise(round.roundNumber, slotIndex)
-            }
-          />
+          <div key={round.roundNumber} className="space-y-2">
+            <RoundCard
+              round={round}
+              roundLog={roundLog}
+              disableRestTimer={isEditing}
+              canRemoveRound={activeWorkout.rounds.length > 1}
+              onRemoveRound={() => removeRoundFromWorkout(round.roundNumber)}
+              onAddExercise={() => setCategoryPickRound(round.roundNumber)}
+              onRemoveExercise={(slotIndex) =>
+                removeRoundExercise(round.roundNumber, slotIndex)
+              }
+            />
+            <RoundStructureActions
+              roundIndex={roundIndex}
+              roundCount={activeWorkout.rounds.length}
+              isEmptyRound={roundLog.exercises.length === 0}
+              onAddRoundBelow={() =>
+                insertEmptyRoundAtWorkout(roundIndex + 1)
+              }
+              onCopyRepeat={() =>
+                applyRoundCopyFromPriorWorkout(round.roundNumber, "repeat")
+              }
+              onCopyStructure={() =>
+                applyRoundCopyFromPriorWorkout(round.roundNumber, "structure")
+              }
+              onCustomize={() => setCategoryPickRound(round.roundNumber)}
+            />
+          </div>
         );
       })}
 
-      <button
-        type="button"
-        disabled={activeWorkout.rounds.length >= MAX_WORKOUT_ROUNDS}
-        onClick={() => addRoundToWorkout()}
-        className="w-full rounded-xl border border-dashed border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-accent/40 hover:bg-surface-hover disabled:opacity-50"
-      >
-        + Add round
-      </button>
+      {activeWorkout.rounds.length >= MAX_WORKOUT_ROUNDS ? (
+        <p className="text-xs text-muted text-center px-1">
+          Maximum {MAX_WORKOUT_ROUNDS} rounds per day.
+        </p>
+      ) : null}
 
       {!skipStretches && (
         <StretchSection

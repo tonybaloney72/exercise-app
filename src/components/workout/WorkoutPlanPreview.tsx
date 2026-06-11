@@ -1,9 +1,9 @@
 "use client";
 
 import AnimatedSection from "@/components/common/AnimatedSection";
-import CollapsibleSection from "@/components/common/CollapsibleSection";
 import SurfaceCard from "@/components/common/SurfaceCard";
-import CategoryBadge from "@/components/common/CategoryBadge";
+import WorkoutPlanExerciseRow from "@/components/workout/WorkoutPlanExerciseRow";
+import WorkoutSectionCard from "@/components/workout/WorkoutSectionCard";
 import { exerciseMap } from "@/data/exercises";
 import { CATEGORIES } from "@/data/categories";
 import { useResolvedStretches } from "@/hooks/useResolvedStretches";
@@ -15,7 +15,7 @@ import {
   CARDIO_ACTIVITY_LABELS,
   resolveCardioActivities,
 } from "@/lib/cardioActivities";
-import { isFullRestDay, REST_DAY_DESCRIPTIONS } from "@/lib/restDays";
+import { isFullRestDay } from "@/lib/restDays";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 
 interface WorkoutPlanPreviewProps {
@@ -32,6 +32,16 @@ interface WorkoutPlanPreviewProps {
   showTargetMuscleList?: boolean;
   /** Skip outer motion wrapper when nested in TodayWorkoutPanel. */
   embedded?: boolean;
+}
+
+function exerciseCountLabel(count: number): string {
+  if (count === 0) return "No exercises";
+  return `${count} exercise${count === 1 ? "" : "s"}`;
+}
+
+function stretchCountLabel(count: number): string {
+  if (count === 0) return "None";
+  return `${count} stretch${count === 1 ? "" : "es"}`;
 }
 
 export default function WorkoutPlanPreview({
@@ -104,92 +114,94 @@ export default function WorkoutPlanPreview({
         </SurfaceCard>
       )}
 
-      {!isFullRestDay(plan) && (
-        <CollapsibleSection title="Warm-Up Stretches" defaultOpen={false}>
-          <div className="divide-y divide-border px-2 py-1">
-            {warmUp.map((stretch) => {
-              const ex = exerciseMap[stretch.exerciseId];
-              if (!ex) return null;
-              return (
-                <PreviewRow
-                  key={stretch.exerciseId}
-                  name={ex.name}
-                  target={stretch.targetReps}
-                />
-              );
-            })}
-          </div>
-        </CollapsibleSection>
+      {!isFullRestDay(plan) && warmUp.length > 0 && (
+        <WorkoutSectionCard
+          title="Warm-Up Stretches"
+          defaultOpen={false}
+          statusLabel={stretchCountLabel(warmUp.length)}
+        >
+          {warmUp.map((stretch) => {
+            const ex = exerciseMap[stretch.exerciseId];
+            if (!ex) return null;
+            return (
+              <WorkoutPlanExerciseRow
+                key={stretch.exerciseId}
+                name={ex.name}
+                detailText={stretch.targetReps}
+                readOnly
+              />
+            );
+          })}
+        </WorkoutSectionCard>
       )}
 
       {!isFullRestDay(plan) && resolveCardioActivities(plan).length > 0 && (
-        <CollapsibleSection title="Cardio & endurance" defaultOpen>
-          <div className="divide-y divide-border px-2 py-1">
-            {resolveCardioActivities(plan).map((activity) => {
-              const meta = exerciseMap[activity.exerciseId];
-              return (
-                <PreviewRow
-                  key={activity.kind}
-                  name={meta?.name ?? CARDIO_ACTIVITY_LABELS[activity.kind]}
-                  target={
-                    activity.defaultPrescription ??
-                    meta?.defaultReps ??
-                    "Log time and distance when you start"
-                  }
-                />
-              );
-            })}
-          </div>
-        </CollapsibleSection>
+        <WorkoutSectionCard
+          title="Cardio & endurance"
+          defaultOpen
+          statusLabel={`${resolveCardioActivities(plan).length} activit${
+            resolveCardioActivities(plan).length === 1 ? "y" : "ies"
+          }`}
+        >
+          {resolveCardioActivities(plan).map((activity) => {
+            const meta = exerciseMap[activity.exerciseId];
+            return (
+              <WorkoutPlanExerciseRow
+                key={activity.kind}
+                name={meta?.name ?? CARDIO_ACTIVITY_LABELS[activity.kind]}
+                detailText={
+                  activity.defaultPrescription ??
+                  meta?.defaultReps ??
+                  "Log time and distance when you start"
+                }
+                readOnly
+              />
+            );
+          })}
+        </WorkoutSectionCard>
       )}
 
       {plan.rounds.map((round) => (
-        <CollapsibleSection
+        <WorkoutSectionCard
           key={round.roundNumber}
           title={`Round ${round.roundNumber}`}
           defaultOpen
+          statusLabel={exerciseCountLabel(round.exercises.length)}
         >
-          <div className="divide-y divide-border px-2 py-1">
-            {round.exercises.map((ex) => {
-              const meta = exerciseMap[ex.exerciseId];
-              if (!meta) return null;
-              return (
-                <div
-                  key={`${round.roundNumber}-${ex.exerciseId}`}
-                  className="flex items-start justify-between gap-2 px-2 py-2.5"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-foreground">
-                      {meta.name}
-                    </p>
-                    <p className="text-xs text-muted">
-                      {roundTargetLabel(ex.exerciseId, ex.targetReps)}
-                    </p>
-                  </div>
-                  <CategoryBadge category={meta.category} size="sm" />
-                </div>
-              );
-            })}
-          </div>
-        </CollapsibleSection>
+          {round.exercises.map((ex) => {
+            const meta = exerciseMap[ex.exerciseId];
+            if (!meta) return null;
+            return (
+              <WorkoutPlanExerciseRow
+                key={`${round.roundNumber}-${ex.exerciseId}`}
+                name={meta.name}
+                detailText={roundTargetLabel(ex.exerciseId, ex.targetReps)}
+                readOnly
+              />
+            );
+          })}
+        </WorkoutSectionCard>
       ))}
 
-      {!isFullRestDay(plan) && (
-        <CollapsibleSection title="Cool-Down Stretches" defaultOpen={false}>
-          <div className="divide-y divide-border px-2 py-1">
-            {coolDown.map((stretch) => {
-              const ex = exerciseMap[stretch.exerciseId];
-              if (!ex) return null;
-              return (
-                <PreviewRow
-                  key={stretch.exerciseId}
-                  name={ex.name}
-                  target={stretch.targetReps}
-                />
-              );
-            })}
-          </div>
-        </CollapsibleSection>
+      {!isFullRestDay(plan) && coolDown.length > 0 && (
+        <WorkoutSectionCard
+          title="Cool-Down Stretches"
+          defaultOpen={false}
+          statusLabel={stretchCountLabel(coolDown.length)}
+        >
+          {coolDown.map((stretch) => {
+            const ex = exerciseMap[stretch.exerciseId];
+            if (!ex) return null;
+            return (
+              <WorkoutPlanExerciseRow
+                key={stretch.exerciseId}
+                name={ex.name}
+                detailText={stretch.targetReps}
+                readOnly
+              />
+            );
+          })}
+        </WorkoutSectionCard>
       )}
     </>
   );
@@ -202,14 +214,5 @@ export default function WorkoutPlanPreview({
     <AnimatedSection className="space-y-4" delay={0.05}>
       {body}
     </AnimatedSection>
-  );
-}
-
-function PreviewRow({ name, target }: { name: string; target: string }) {
-  return (
-    <div className="px-2 py-2.5">
-      <p className="text-sm font-medium text-foreground">{name}</p>
-      <p className="text-xs text-muted">{target}</p>
-    </div>
   );
 }

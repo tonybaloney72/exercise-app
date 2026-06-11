@@ -10,10 +10,18 @@ import {
   formatPlanTargetPrescription,
   resolveExerciseSettings,
 } from "@/utils/effectiveExerciseSettings";
+import {
+  structureRoundExercises,
+  type RoundCopyMode,
+  type RoundCopyPrefs,
+} from "@/lib/dayPlanRoundCopy";
+import { MAX_DAY_ROUNDS } from "@/lib/dayRoundLimits";
 import type {
   CardioActivityKind,
   ExerciseCategory,
   ExerciseLog,
+  RoundExercise,
+  RoundLog,
   WorkoutLog,
 } from "@/types";
 
@@ -89,7 +97,135 @@ function sectionAllAddressed(logs: ExerciseLog[]): boolean {
   return logs.length > 0 && logs.every((e) => e.completed || e.skipped);
 }
 
-export const MAX_WORKOUT_ROUNDS = 6;
+export const MAX_WORKOUT_ROUNDS = MAX_DAY_ROUNDS;
+
+function renumberRoundLogs(rounds: RoundLog[]): RoundLog[] {
+  return rounds.map((round, index) => ({
+    ...round,
+    roundNumber: index + 1,
+  }));
+}
+
+function roundExercisesFromLogs(logs: ExerciseLog[]): RoundExercise[] {
+  return logs.map((ex) => {
+    const meta = exerciseMap[ex.exerciseId];
+    return {
+      exerciseId: ex.exerciseId,
+      targetReps: ex.targetPrescription ?? meta?.defaultReps ?? "",
+      category: (meta?.category ?? "CB") as ExerciseCategory,
+    };
+  });
+}
+
+function freshExerciseLogsFromCopy(
+  sourceLogs: ExerciseLog[],
+  mode: RoundCopyMode,
+  usedInDay: ReadonlySet<string>,
+  prefs: RoundCopyPrefs,
+): ExerciseLog[] {
+  if (mode === "repeat") {
+    return sourceLogs.map((ex) => ({
+      exerciseId: ex.exerciseId,
+      completed: false,
+      skipped: false,
+      targetPrescription: ex.targetPrescription,
+      loggingMode: ex.loggingMode,
+      targetDurationSeconds: ex.targetDurationSeconds,
+    }));
+  }
+
+  const slots = roundExercisesFromLogs(sourceLogs);
+  const copied = structureRoundExercises(slots, usedInDay, prefs);
+  return copied.map((slot) => {
+    const log = buildStrengthExerciseLog(slot.exerciseId);
+    return {
+      ...log,
+      targetPrescription: slot.targetReps || log.targetPrescription,
+    };
+  });
+}
+
+function usedExerciseIdsInWorkout(
+  rounds: readonly RoundLog[],
+  skipRoundIndex?: number,
+): Set<string> {
+  const used = new Set<string>();
+  rounds.forEach((round, index) => {
+    if (index === skipRoundIndex) return;
+    for (const ex of round.exercises) {
+      used.add(ex.exerciseId);
+    }
+  });
+  return used;
+}
+
+/** Insert an empty round at `insertAt` (0-based index). */
+export function insertEmptyRoundAt(
+  log: WorkoutLog,
+  insertAt: number,
+): WorkoutLog {
+  if (log.rounds.length >= MAX_WORKOUT_ROUNDS) return log;
+  const at = Math.max(0, Math.min(insertAt, log.rounds.length));
+  const rounds = [...log.rounds];
+  rounds.splice(at, 0, { roundNumber: at + 1, exercises: [] });
+  return { ...log, rounds: renumberRoundLogs(rounds) };
+}
+
+/** Insert a round at `insertAt`, copying from `sourceRoundNumber` (1-based). */
+export function insertRoundCopyAt(
+  log: WorkoutLog,
+  insertAt: number,
+  sourceRoundNumber: number,
+  mode: RoundCopyMode,
+  prefs: RoundCopyPrefs,
+): WorkoutLog {
+  if (log.rounds.length >= MAX_WORKOUT_ROUNDS) return log;
+  const sourceIndex = log.rounds.findIndex(
+    (r) => r.roundNumber === sourceRoundNumber,
+  );
+  if (sourceIndex < 0) return log;
+
+  const source = log.rounds[sourceIndex]!;
+  const at = Math.max(0, Math.min(insertAt, log.rounds.length));
+  const usedInDay = usedExerciseIdsInWorkout(log.rounds);
+  const exercises = freshExerciseLogsFromCopy(
+    source.exercises,
+    mode,
+    usedInDay,
+    prefs,
+  );
+
+  const rounds = [...log.rounds];
+  rounds.splice(at, 0, { roundNumber: at + 1, exercises });
+  return { ...log, rounds: renumberRoundLogs(rounds) };
+}
+
+/** Replace target round with a copy from the prior round (`roundNumber` is 1-based). */
+export function applyRoundCopyFromPriorInWorkout(
+  log: WorkoutLog,
+  roundNumber: number,
+  mode: RoundCopyMode,
+  prefs: RoundCopyPrefs,
+): WorkoutLog {
+  const targetIndex = log.rounds.findIndex((r) => r.roundNumber === roundNumber);
+  if (targetIndex <= 0) return log;
+
+  const source = log.rounds[targetIndex - 1];
+  if (!source) return log;
+
+  const usedInDay = usedExerciseIdsInWorkout(log.rounds, targetIndex);
+  const exercises = freshExerciseLogsFromCopy(
+    source.exercises,
+    mode,
+    usedInDay,
+    prefs,
+  );
+
+  const rounds = log.rounds.map((round, index) =>
+    index === targetIndex ? { ...round, exercises } : round,
+  );
+  return { ...log, rounds };
+}
 
 export function addRoundAt(log: WorkoutLog): WorkoutLog {
   if (log.rounds.length >= MAX_WORKOUT_ROUNDS) return log;

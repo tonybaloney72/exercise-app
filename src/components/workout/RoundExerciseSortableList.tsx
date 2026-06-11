@@ -17,7 +17,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import CategoryBadge from "@/components/common/CategoryBadge";
+import WorkoutPlanExerciseRow from "@/components/workout/WorkoutPlanExerciseRow";
 import { exerciseMap } from "@/data/exercises";
 import { sortableSlotId } from "@/lib/reorderRoundExercises";
 import type { RoundExercise } from "@/types";
@@ -37,13 +37,13 @@ function DragHandle({
     <button
       type="button"
       title={disabled ? "Add another exercise to reorder" : "Drag to reorder"}
-      className="mt-0.5 flex h-9 w-9 shrink-0 touch-none items-center justify-center rounded-lg border border-border bg-surface text-foreground/70 hover:bg-surface-hover hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 cursor-grab active:cursor-grabbing"
+      className="flex h-7 w-7 shrink-0 touch-none items-center justify-center rounded-md border-2 border-border bg-transparent text-foreground/50 transition-colors hover:bg-surface-hover hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 cursor-grab active:cursor-grabbing"
       aria-label={label}
       disabled={disabled}
       {...attributes}
       {...listeners}
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
         <circle cx="9" cy="7" r="1.75" />
         <circle cx="15" cy="7" r="1.75" />
         <circle cx="9" cy="12" r="1.75" />
@@ -91,55 +91,42 @@ function SortableExerciseRow({
 
   if (!meta) return null;
 
+  const menuItems = [
+    { label: "Change exercise", onClick: onChange },
+    ...(canRemove
+      ? [{ label: "Remove from round", onClick: onRemove }]
+      : []),
+  ];
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`px-2 py-3 space-y-2 ${isDragging ? "relative z-10 rounded-lg bg-surface shadow-md ring-1 ring-border" : ""}`}
+      className={isDragging ? "relative z-10 rounded-lg bg-surface shadow-md ring-1 ring-border" : ""}
     >
-      <div className="flex items-start gap-2">
-        <DragHandle
-          label={`Reorder ${meta.name}`}
-          disabled={saving || !canReorder}
-          listeners={listeners}
-          attributes={attributes}
-        />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-foreground">{meta.name}</p>
-              <CategoryBadge category={meta.category} size="sm" />
-            </div>
-            <div className="flex shrink-0 gap-1">
-              <button
-                type="button"
-                onClick={onChange}
-                className="rounded-lg border border-border px-2 py-1 text-sm font-medium text-foreground hover:bg-surface-hover"
-              >
-                Change
-              </button>
-              <button
-                type="button"
-                disabled={!canRemove}
-                onClick={onRemove}
-                className="rounded-lg border border-border px-2 py-1 text-sm font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-40"
-                aria-label={`Remove ${meta.name}`}
-              >
-                Remove
-              </button>
-            </div>
-          </div>
-          <label className="mt-2 block">
-            <span className="text-sm text-muted">Target</span>
-            <input
-              type="text"
-              value={slot.targetReps}
-              onChange={(e) => onUpdateReps(e.target.value)}
-              className="mt-0.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-            />
-          </label>
-        </div>
-      </div>
+      <WorkoutPlanExerciseRow
+        name={meta.name}
+        leading={
+          <DragHandle
+            label={`Reorder ${meta.name}`}
+            disabled={saving || !canReorder}
+            listeners={listeners}
+            attributes={attributes}
+          />
+        }
+        menuItems={menuItems}
+        onNameClick={onChange}
+      >
+        <label className="block">
+          <span className="text-xs text-muted">Target</span>
+          <input
+            type="text"
+            value={slot.targetReps}
+            onChange={(e) => onUpdateReps(e.target.value)}
+            className="mt-0.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+          />
+        </label>
+      </WorkoutPlanExerciseRow>
     </div>
   );
 }
@@ -190,14 +177,6 @@ export default function RoundExerciseSortableList({
     onReorder(fromIndex, toIndex);
   };
 
-  if (exercises.length === 0) {
-    return (
-      <p className="px-2 py-4 text-center text-sm text-muted">
-        Add an exercise to build this round.
-      </p>
-    );
-  }
-
   return (
     <DndContext
       sensors={sensors}
@@ -205,21 +184,19 @@ export default function RoundExerciseSortableList({
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
-        <div className="divide-y divide-border px-2 py-1">
-          {exercises.map((slot, slotIndex) => (
-            <SortableExerciseRow
-              key={sortableIds[slotIndex]}
-              id={sortableIds[slotIndex]!}
-              slot={slot}
-              canRemove={exercises.length > 1}
-              canReorder={canReorder}
-              saving={saving}
-              onChange={() => onChangeSlot(slotIndex)}
-              onRemove={() => onRemoveSlot(slotIndex)}
-              onUpdateReps={(value) => onUpdateReps(slotIndex, value)}
-            />
-          ))}
-        </div>
+        {exercises.map((slot, slotIndex) => (
+          <SortableExerciseRow
+            key={sortableIds[slotIndex]}
+            id={sortableIds[slotIndex]!}
+            slot={slot}
+            canRemove={exercises.length > 1}
+            canReorder={canReorder}
+            saving={saving}
+            onChange={() => onChangeSlot(slotIndex)}
+            onRemove={() => onRemoveSlot(slotIndex)}
+            onUpdateReps={(value) => onUpdateReps(slotIndex, value)}
+          />
+        ))}
       </SortableContext>
     </DndContext>
   );

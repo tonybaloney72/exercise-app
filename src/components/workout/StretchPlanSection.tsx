@@ -1,8 +1,9 @@
 "use client";
 
-import CollapsibleSection from "@/components/common/CollapsibleSection";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
+import WorkoutPlanExerciseRow from "@/components/workout/WorkoutPlanExerciseRow";
+import WorkoutSectionCard from "@/components/workout/WorkoutSectionCard";
 import { exerciseMap } from "@/data/exercises";
 import type { StretchEntry } from "@/types";
 
@@ -35,52 +36,43 @@ function StretchListBody({
   StretchPlanSectionProps,
   "entries" | "minCount" | "onChange" | "onRemove" | "onUpdateTarget"
 >) {
+  if (entries.length === 0) {
+    return (
+      <EmptyState title="No stretches yet." className="px-2 py-3 text-xs" />
+    );
+  }
+
   return (
-    <div className="divide-y divide-border px-2 py-1">
-      {entries.length === 0 ? (
-        <EmptyState title="No stretches yet." className="px-2 py-4 text-xs" />
-      ) : (
-        entries.map((entry, index) => {
-          const meta = exerciseMap[entry.exerciseId];
-          if (!meta) return null;
-          return (
-            <div key={`${entry.exerciseId}-${index}`} className="px-2 py-3 space-y-2">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-foreground">{meta.name}</p>
-                </div>
-                <div className="flex shrink-0 gap-1">
-                  <button
-                    type="button"
-                    onClick={() => onChange(index)}
-                    className="rounded-lg border border-border px-2 py-1 text-sm font-medium text-foreground hover:bg-surface-hover"
-                  >
-                    Change
-                  </button>
-                  <button
-                    type="button"
-                    disabled={entries.length <= minCount}
-                    onClick={() => onRemove(index)}
-                    className="rounded-lg border border-border px-2 py-1 text-sm font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-40"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-              <label className="block">
-                <span className="text-sm text-muted">Target</span>
-                <input
-                  type="text"
-                  value={entry.targetReps}
-                  onChange={(e) => onUpdateTarget(index, e.target.value)}
-                  className="mt-0.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-                />
-              </label>
-            </div>
-          );
-        })
-      )}
-    </div>
+    <>
+      {entries.map((entry, index) => {
+        const meta = exerciseMap[entry.exerciseId];
+        if (!meta) return null;
+        const canRemove = entries.length > minCount;
+        return (
+          <WorkoutPlanExerciseRow
+            key={`${entry.exerciseId}-${index}`}
+            name={meta.name}
+            menuItems={[
+              { label: "Change stretch", onClick: () => onChange(index) },
+              ...(canRemove
+                ? [{ label: "Remove", onClick: () => onRemove(index) }]
+                : []),
+            ]}
+            onNameClick={() => onChange(index)}
+          >
+            <label className="block">
+              <span className="text-xs text-muted">Target</span>
+              <input
+                type="text"
+                value={entry.targetReps}
+                onChange={(e) => onUpdateTarget(index, e.target.value)}
+                className="mt-0.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+              />
+            </label>
+          </WorkoutPlanExerciseRow>
+        );
+      })}
+    </>
   );
 }
 
@@ -96,16 +88,6 @@ export default function StretchPlanSection({
   onRemove,
   onUpdateTarget,
 }: StretchPlanSectionProps) {
-  const addButton = (
-    <button
-      type="button"
-      onClick={onAdd}
-      className="rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-surface-hover"
-    >
-      + Add
-    </button>
-  );
-
   const body = (
     <StretchListBody
       entries={entries}
@@ -118,14 +100,14 @@ export default function StretchPlanSection({
 
   if (collapsible) {
     return (
-      <CollapsibleSection
+      <WorkoutSectionCard
         title={title}
-        hint={stretchCountLabel(entries.length)}
         defaultOpen={defaultOpen}
-        toolbar={addButton}
+        statusLabel={stretchCountLabel(entries.length)}
+        menuItems={[{ label: "Add stretch", onClick: onAdd }]}
       >
         {body}
-      </CollapsibleSection>
+      </WorkoutSectionCard>
     );
   }
 
@@ -138,9 +120,15 @@ export default function StretchPlanSection({
             <p className="text-sm text-muted mt-0.5">{hint}</p>
           ) : null}
         </div>
-        {addButton}
+        <button
+          type="button"
+          onClick={onAdd}
+          className="rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-surface-hover"
+        >
+          + Add
+        </button>
       </div>
-      {body}
+      <div className="px-2 py-1 space-y-0.5">{body}</div>
     </SurfaceCard>
   );
 }

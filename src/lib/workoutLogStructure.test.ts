@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   addRoundAt,
+  applyRoundCopyFromPriorInWorkout,
+  insertEmptyRoundAt,
+  insertRoundCopyAt,
   removeRoundAt,
   addWarmUpStretch,
   MAX_WORKOUT_ROUNDS,
@@ -76,5 +80,45 @@ describe("workoutLogStructure", () => {
     const next = removeWarmUpStretchAt(emptyLog(), "SW-1");
     expect(next.warmUpExercises).toHaveLength(0);
     expect(next.warmUpCompleted).toBe(false);
+  });
+
+  it("insertEmptyRoundAt inserts an empty round and renumbers", () => {
+    const next = insertEmptyRoundAt(emptyLog(), 1);
+    expect(next.rounds).toHaveLength(2);
+    expect(next.rounds[1]?.exercises).toEqual([]);
+    expect(next.rounds.map((r) => r.roundNumber)).toEqual([1, 2]);
+  });
+
+  it("insertRoundCopyAt inserts repeat copy and renumbers", () => {
+    const prefs = {
+      availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
+      dislikedExerciseIds: new Set<string>(),
+    };
+    const next = insertRoundCopyAt(emptyLog(), 1, 1, "repeat", prefs);
+    expect(next.rounds).toHaveLength(2);
+    expect(next.rounds[1]?.exercises.map((e) => e.exerciseId)).toEqual([
+      "CB-1",
+      "CB-2",
+    ]);
+    expect(next.rounds[1]?.exercises.every((e) => !e.completed)).toBe(true);
+    expect(next.rounds.map((r) => r.roundNumber)).toEqual([1, 2]);
+  });
+
+  it("applyRoundCopyFromPriorInWorkout replaces target round", () => {
+    let log = insertRoundCopyAt(emptyLog(), 1, 1, "repeat", {
+      availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
+      dislikedExerciseIds: new Set<string>(),
+    });
+    log = {
+      ...log,
+      rounds: log.rounds.map((r, i) =>
+        i === 1 ? { ...r, exercises: [] } : r,
+      ),
+    };
+    const next = applyRoundCopyFromPriorInWorkout(log, 2, "repeat", {
+      availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
+      dislikedExerciseIds: new Set<string>(),
+    });
+    expect(next.rounds[1]?.exercises).toHaveLength(2);
   });
 });
