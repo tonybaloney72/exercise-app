@@ -224,10 +224,10 @@ export default function WeeklyDayPage() {
   if (planLoading) {
     return (
       <div className="flex flex-col items-center gap-4 py-12 px-2">
+        <WeeklyOverviewBackLink />
         <p className="text-sm text-muted text-center">
           Loading this day&apos;s plan…
         </p>
-        <WeeklyOverviewBackLink />
       </div>
     );
   }

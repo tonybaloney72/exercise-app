@@ -8,11 +8,11 @@ import {
   LAYOUT_GROUP_ORDER,
 } from "@/lib/weeklyCategoryLayout";
 import {
-  addRoundInBlueprint,
   applyRoundCloneFromPrior,
   copyDayInBlueprint,
   DAY_BLUEPRINT_KIND_LABELS,
   describeDayBlueprint,
+  insertRoundInBlueprint,
   MAX_BLUEPRINT_ROUNDS,
   removeRoundInBlueprint,
   setDayCardioInBlueprint,
@@ -92,33 +92,7 @@ export default function GuidedDayBlueprintEditor({
       ) : null}
 
       <div className="space-y-1.5">
-        <p className="text-xs font-medium text-muted">Day type</p>
-        <div className="flex flex-wrap gap-1.5" role="radiogroup">
-          {DAY_KINDS.map((kind) => (
-            <button
-              key={kind}
-              type="button"
-              role="radio"
-              aria-checked={day.dayKind === kind}
-              onClick={() =>
-                onChange((prev) =>
-                  setDayKindInBlueprint(prev, dayOfWeek, kind),
-                )
-              }
-              className={uiChoicePillClass(day.dayKind === kind)}
-            >
-              {DAY_BLUEPRINT_KIND_LABELS[kind]}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-1.5">
         <p className="text-xs font-medium text-muted">Copy from another day</p>
-        <p className="text-[11px] text-muted leading-snug">
-          Replace this day&apos;s type, rounds, and cardio with another day in
-          this week.
-        </p>
         <div className="flex flex-wrap gap-1.5">
           {WEEK_DAY_ABBRS.map((label, sourceDow) => {
             if (sourceDow === dayOfWeek) return null;
@@ -157,11 +131,7 @@ export default function GuidedDayBlueprintEditor({
                 type="button"
                 onClick={() => {
                   onChange((prev) =>
-                    copyDayInBlueprint(
-                      prev,
-                      dayOfWeek,
-                      pendingCopySourceDow,
-                    ),
+                    copyDayInBlueprint(prev, dayOfWeek, pendingCopySourceDow),
                   );
                   setPendingCopySourceDow(null);
                 }}
@@ -179,6 +149,26 @@ export default function GuidedDayBlueprintEditor({
             </div>
           </SurfaceCard>
         ) : null}
+      </div>
+
+      <div className="space-y-1.5">
+        <p className="text-xs font-medium text-muted">Day type</p>
+        <div className="flex flex-wrap gap-1.5" role="radiogroup">
+          {DAY_KINDS.map((kind) => (
+            <button
+              key={kind}
+              type="button"
+              role="radio"
+              aria-checked={day.dayKind === kind}
+              onClick={() =>
+                onChange((prev) => setDayKindInBlueprint(prev, dayOfWeek, kind))
+              }
+              className={uiChoicePillClass(day.dayKind === kind)}
+            >
+              {DAY_BLUEPRINT_KIND_LABELS[kind]}
+            </button>
+          ))}
+        </div>
       </div>
 
       {hasRounds ? (
@@ -207,11 +197,7 @@ export default function GuidedDayBlueprintEditor({
                       type="button"
                       onClick={() =>
                         onChange((prev) =>
-                          removeRoundInBlueprint(
-                            prev,
-                            dayOfWeek,
-                            roundIndex,
-                          ),
+                          removeRoundInBlueprint(prev, dayOfWeek, roundIndex),
                         )
                       }
                       className="shrink-0 text-xs text-muted hover:text-foreground"
@@ -270,16 +256,15 @@ export default function GuidedDayBlueprintEditor({
                     value={round.exerciseCount ?? ""}
                     onChange={(e) => {
                       const raw = e.target.value.trim();
-                      onChange(
-                        (prev) =>
-                          setRoundExerciseCount(
-                            prev,
-                            dayOfWeek,
-                            roundIndex,
-                            raw === ""
-                              ? undefined
-                              : Number.parseInt(raw, 10) || undefined,
-                          ),
+                      onChange((prev) =>
+                        setRoundExerciseCount(
+                          prev,
+                          dayOfWeek,
+                          roundIndex,
+                          raw === ""
+                            ? undefined
+                            : Number.parseInt(raw, 10) || undefined,
+                        ),
                       );
                     }}
                     className={uiRoundCountInput}
@@ -323,24 +308,28 @@ export default function GuidedDayBlueprintEditor({
                     </button>
                   </div>
                 ) : null}
+
+                {canAddRound ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onChange((prev) =>
+                        insertRoundInBlueprint(prev, dayOfWeek, roundIndex + 1),
+                      )
+                    }
+                    className="w-full rounded-lg border border-dashed border-border px-2 py-1.5 text-xs font-medium text-muted hover:border-accent/40 hover:text-foreground"
+                  >
+                    + Add round below
+                  </button>
+                ) : null}
               </SurfaceCard>
             ))}
 
-            {canAddRound ? (
-              <button
-                type="button"
-                onClick={() =>
-                  onChange((prev) => addRoundInBlueprint(prev, dayOfWeek))
-                }
-                className="w-full rounded-lg border border-dashed border-border px-3 py-2.5 text-sm font-medium text-muted hover:border-accent/40 hover:text-foreground"
-              >
-                + Add round
-              </button>
-            ) : (
+            {!canAddRound ? (
               <p className="text-xs text-muted text-center">
                 Maximum {MAX_BLUEPRINT_ROUNDS} rounds per day.
               </p>
-            )}
+            ) : null}
           </div>
 
           <DayBlueprintCardioEditor
@@ -353,10 +342,6 @@ export default function GuidedDayBlueprintEditor({
           />
         </>
       ) : null}
-
-      <p className="text-xs text-muted border-t border-border/60 pt-2">
-        {describeDayBlueprint(day)}
-      </p>
     </div>
   );
 }

@@ -3,6 +3,8 @@ import {
   addRoundInBlueprint,
   applyRoundCloneFromPrior,
   copyDayInBlueprint,
+  insertRoundInBlueprint,
+  MAX_BLUEPRINT_ROUNDS,
   DEFAULT_ACTIVE_RECOVERY_ROUND_COUNT,
   DEFAULT_WORKOUT_ROUND_COUNT,
   setDayCardioInBlueprint,
@@ -29,6 +31,34 @@ describe("weekBlueprintDraft", () => {
     expect(next[0]?.rounds.at(-1)?.groups).toEqual(
       next[0]?.rounds.at(-2)?.groups,
     );
+  });
+
+  it("insertRoundInBlueprint inserts between existing rounds", () => {
+    const base = setDayKindInBlueprint({}, 0, "workout");
+    const inserted = insertRoundInBlueprint(base, 0, 1);
+    expect(inserted[0]?.rounds).toHaveLength(DEFAULT_WORKOUT_ROUND_COUNT + 1);
+    expect(inserted[0]?.rounds[1]?.groups).toEqual(
+      inserted[0]?.rounds[0]?.groups,
+    );
+  });
+
+  it("insertRoundInBlueprint remaps clone indices when inserting at start", () => {
+    let blueprint = setDayKindInBlueprint({}, 0, "workout");
+    blueprint = applyRoundCloneFromPrior(blueprint, 0, 1, "repeat");
+    const inserted = insertRoundInBlueprint(blueprint, 0, 0);
+    expect(inserted[0]?.rounds).toHaveLength(DEFAULT_WORKOUT_ROUND_COUNT + 1);
+    expect(inserted[0]?.rounds[2]?.cloneOfRoundIndex).toBe(1);
+    expect(inserted[0]?.rounds[2]?.cloneMode).toBe("repeat");
+  });
+
+  it("insertRoundInBlueprint is a no-op at max rounds", () => {
+    let blueprint = setDayKindInBlueprint({}, 0, "workout");
+    for (let i = 0; i < 3; i++) {
+      blueprint = addRoundInBlueprint(blueprint, 0);
+    }
+    expect(blueprint[0]?.rounds).toHaveLength(MAX_BLUEPRINT_ROUNDS);
+    const blocked = insertRoundInBlueprint(blueprint, 0, 1);
+    expect(blocked).toBe(blueprint);
   });
 
   it("copyDayInBlueprint deep-copies source onto target", () => {

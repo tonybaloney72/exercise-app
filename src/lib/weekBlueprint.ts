@@ -140,6 +140,12 @@ export function roundBlueprintGroupsEqual(
 }
 
 /** Drop repeat-clone specs when groups no longer match the source round. */
+export function sanitizeBlueprintRoundClones(
+  rounds: RoundBlueprint[],
+): RoundBlueprint[] {
+  return sanitizeRoundCloneMetadata(rounds);
+}
+
 function sanitizeRoundCloneMetadata(
   rounds: RoundBlueprint[],
 ): RoundBlueprint[] {

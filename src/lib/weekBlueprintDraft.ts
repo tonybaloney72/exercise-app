@@ -2,6 +2,7 @@ import { getCatalogPlanForDay } from "@/data/trainingWeekCatalog";
 import { groupsForCatalogDay } from "@/lib/weeklyCategoryLayout";
 import {
   sanitizeBlueprintExerciseCount,
+  sanitizeBlueprintRoundClones,
   type DayBlueprint,
   type DayBlueprintKind,
   type RoundBlueprint,
@@ -133,23 +134,75 @@ export function setDayKindInBlueprint(
   };
 }
 
+function seedRoundBlueprint(
+  day: DayBlueprint,
+  dow: number,
+  insertAt: number,
+): RoundBlueprint {
+  const catalogGroups = catalogGroupsForDay(dow);
+  const prev = insertAt > 0 ? day.rounds[insertAt - 1] : undefined;
+  const next = day.rounds[insertAt];
+  if (prev) {
+    return {
+      groups: [...prev.groups],
+      exerciseCount: prev.exerciseCount,
+    };
+  }
+  if (next) {
+    return {
+      groups: [...next.groups],
+      exerciseCount: next.exerciseCount,
+    };
+  }
+  return roundFromGroups(catalogGroups);
+}
+
+/** Shift clone source indices when a round is inserted at `insertAt`. */
+function remapCloneIndicesAfterRoundInsert(
+  rounds: RoundBlueprint[],
+  insertAt: number,
+): RoundBlueprint[] {
+  return rounds.map((round) => {
+    if (round.cloneOfRoundIndex == null) return round;
+    if (round.cloneOfRoundIndex >= insertAt) {
+      return { ...round, cloneOfRoundIndex: round.cloneOfRoundIndex + 1 };
+    }
+    return round;
+  });
+}
+
+/**
+ * Insert a round at `insertAt` (0 = before first, length = append).
+ * Seeds groups/count from the round above, or below when inserting at 0.
+ */
+export function insertRoundInBlueprint(
+  blueprint: WeekBlueprint,
+  dow: number,
+  insertAt: number,
+): WeekBlueprint {
+  const day = blueprint[dow] ?? defaultDayBlueprint(dow);
+  if (day.rounds.length >= MAX_BLUEPRINT_ROUNDS) return blueprint;
+
+  const at = Math.max(0, Math.min(insertAt, day.rounds.length));
+  const nextRound = seedRoundBlueprint(day, dow, at);
+  const rounds = [...day.rounds];
+  rounds.splice(at, 0, nextRound);
+  const sanitized = sanitizeBlueprintRoundClones(
+    remapCloneIndicesAfterRoundInsert(rounds, at),
+  );
+
+  return {
+    ...blueprint,
+    [dow]: { ...day, rounds: sanitized },
+  };
+}
+
 export function addRoundInBlueprint(
   blueprint: WeekBlueprint,
   dow: number,
 ): WeekBlueprint {
   const day = blueprint[dow] ?? defaultDayBlueprint(dow);
-  if (day.rounds.length >= MAX_BLUEPRINT_ROUNDS) return blueprint;
-
-  const catalogGroups = catalogGroupsForDay(dow);
-  const last = day.rounds[day.rounds.length - 1];
-  const next: RoundBlueprint = last
-    ? { groups: [...last.groups], exerciseCount: last.exerciseCount }
-    : roundFromGroups(catalogGroups);
-
-  return {
-    ...blueprint,
-    [dow]: { ...day, rounds: [...day.rounds, next] },
-  };
+  return insertRoundInBlueprint(blueprint, dow, day.rounds.length);
 }
 
 export function removeRoundInBlueprint(
