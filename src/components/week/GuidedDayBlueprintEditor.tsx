@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import DayBlueprintCardioEditor from "@/components/week/DayBlueprintCardioEditor";
 import {
@@ -9,6 +10,7 @@ import {
 import {
   addRoundInBlueprint,
   applyRoundCloneFromPrior,
+  copyDayInBlueprint,
   DAY_BLUEPRINT_KIND_LABELS,
   describeDayBlueprint,
   MAX_BLUEPRINT_ROUNDS,
@@ -28,6 +30,7 @@ import {
   type WeekBlueprintWarning,
 } from "@/lib/weekBlueprintWarnings";
 import { ROUND_DENSITY_TARGETS } from "@/lib/programProfile";
+import { WEEK_DAY_ABBRS } from "@/lib/weekWizardConstants";
 import { uiChoicePillClass } from "@/lib/uiClasses";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
@@ -65,6 +68,13 @@ export default function GuidedDayBlueprintEditor({
   const hasRounds =
     day.dayKind === "workout" || day.dayKind === "active_recovery";
   const canAddRound = day.rounds.length < MAX_BLUEPRINT_ROUNDS;
+  const [pendingCopySourceDow, setPendingCopySourceDow] = useState<
+    number | null
+  >(null);
+
+  useEffect(() => {
+    setPendingCopySourceDow(null);
+  }, [dayOfWeek]);
 
   return (
     <div className="space-y-4">
@@ -101,6 +111,74 @@ export default function GuidedDayBlueprintEditor({
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <p className="text-xs font-medium text-muted">Copy from another day</p>
+        <p className="text-[11px] text-muted leading-snug">
+          Replace this day&apos;s type, rounds, and cardio with another day in
+          this week.
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {WEEK_DAY_ABBRS.map((label, sourceDow) => {
+            if (sourceDow === dayOfWeek) return null;
+            const isPending = pendingCopySourceDow === sourceDow;
+            return (
+              <button
+                key={label}
+                type="button"
+                aria-pressed={isPending}
+                onClick={() => setPendingCopySourceDow(sourceDow)}
+                className={uiChoicePillClass(isPending)}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {pendingCopySourceDow != null ? (
+          <SurfaceCard className="border-amber-500/40 bg-amber-500/10 p-3 space-y-2.5">
+            <p className="text-sm text-foreground leading-snug">
+              Copy {WEEK_DAY_ABBRS[pendingCopySourceDow]}&apos;s plan onto{" "}
+              {WEEK_DAY_ABBRS[dayOfWeek]}? This replaces{" "}
+              {WEEK_DAY_ABBRS[dayOfWeek]}&apos;s current plan.
+            </p>
+            <p className="text-xs text-muted leading-snug">
+              {describeDayBlueprint(
+                blueprint[pendingCopySourceDow] ?? {
+                  dayKind: "full_rest",
+                  rounds: [],
+                },
+              )}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  onChange((prev) =>
+                    copyDayInBlueprint(
+                      prev,
+                      dayOfWeek,
+                      pendingCopySourceDow,
+                    ),
+                  );
+                  setPendingCopySourceDow(null);
+                }}
+                className="rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-white hover:bg-accent/90"
+              >
+                Copy plan
+              </button>
+              <button
+                type="button"
+                onClick={() => setPendingCopySourceDow(null)}
+                className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-foreground"
+              >
+                Cancel
+              </button>
+            </div>
+          </SurfaceCard>
+        ) : null}
       </div>
 
       {hasRounds ? (

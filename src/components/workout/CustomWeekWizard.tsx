@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
+import BackNavLink from "@/components/common/BackNavLink";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import WeekBlueprintPresetPicker from "@/components/week/WeekBlueprintPresetPicker";
 import WeekWizardShell, {
@@ -219,9 +220,7 @@ export default function CustomWeekWizard() {
     return (
       <div className="py-8 space-y-4">
         <p className="text-sm text-red-400">{error}</p>
-        <Link href="/weekly" className="text-sm font-medium text-accent">
-          Back to Weekly
-        </Link>
+        <BackNavLink label="Back" />
       </div>
     );
   }
@@ -232,8 +231,6 @@ export default function CustomWeekWizard() {
 
   return (
     <WeekWizardShell
-      backHref="/weekly"
-      backLabel="← Weekly overview"
       title="Build your week"
       subtitle={`Day ${activeDow + 1} of 7 · ${WEEK_DAY_ABBRS[activeDow]}${isToday ? " · Today" : ""} · ${plan.name}`}
       activeDow={activeDow}

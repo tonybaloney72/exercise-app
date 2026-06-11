@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
+import { useNavigateBack } from "@/components/common/BackNavLink";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
@@ -71,8 +72,13 @@ const WEEKLY_BACK_LINK_CLASS =
   "group block w-full max-w-md text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:mx-auto";
 
 function WeeklyOverviewBackLink() {
+  const navigateBack = useNavigateBack("/weekly");
   return (
-    <Link href="/weekly" className={WEEKLY_BACK_LINK_CLASS}>
+    <button
+      type="button"
+      onClick={navigateBack}
+      className={WEEKLY_BACK_LINK_CLASS}
+    >
       <SurfaceCard className="flex items-center gap-3 border-2 px-4 py-3.5 shadow-sm transition-colors hover:border-accent/50 hover:bg-accent/10">
         <span
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20 text-lg font-bold text-accent group-hover:bg-accent/30"
@@ -80,16 +86,16 @@ function WeeklyOverviewBackLink() {
         >
           ←
         </span>
-        <span className="min-w-0 flex-1">
+        <span className="min-w-0 flex-1 text-left">
           <span className="block text-sm font-semibold text-foreground">
-            Back to weekly overview
+            Back
           </span>
           <span className="mt-0.5 block text-xs leading-snug text-muted">
-            All days in this training week
+            Return to the previous page
           </span>
         </span>
       </SurfaceCard>
-    </Link>
+    </button>
   );
 }
 

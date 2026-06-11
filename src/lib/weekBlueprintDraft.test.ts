@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   addRoundInBlueprint,
+  applyRoundCloneFromPrior,
+  copyDayInBlueprint,
   DEFAULT_ACTIVE_RECOVERY_ROUND_COUNT,
   DEFAULT_WORKOUT_ROUND_COUNT,
+  setDayCardioInBlueprint,
   setDayKindInBlueprint,
+  setRoundExerciseCount,
   shortDayBlueprintLabel,
 } from "@/lib/weekBlueprintDraft";
 
@@ -25,6 +29,42 @@ describe("weekBlueprintDraft", () => {
     expect(next[0]?.rounds.at(-1)?.groups).toEqual(
       next[0]?.rounds.at(-2)?.groups,
     );
+  });
+
+  it("copyDayInBlueprint deep-copies source onto target", () => {
+    let blueprint = setDayKindInBlueprint({}, 1, "workout");
+    blueprint = setRoundExerciseCount(blueprint, 1, 0, 12);
+    blueprint = setDayCardioInBlueprint(blueprint, 1, ["jog"]);
+
+    const copied = copyDayInBlueprint(blueprint, 3, 1);
+    expect(copied[3]?.dayKind).toBe("workout");
+    expect(copied[3]?.rounds[0]?.exerciseCount).toBe(12);
+    expect(copied[3]?.cardio).toEqual(["jog"]);
+
+    const mutated = setRoundExerciseCount(copied, 3, 0, 5);
+    expect(mutated[3]?.rounds[0]?.exerciseCount).toBe(5);
+    expect(mutated[1]?.rounds[0]?.exerciseCount).toBe(12);
+  });
+
+  it("copyDayInBlueprint is a no-op when source and target are the same", () => {
+    const blueprint = setDayKindInBlueprint({}, 1, "full_rest");
+    expect(copyDayInBlueprint(blueprint, 1, 1)).toBe(blueprint);
+  });
+
+  it("copyDayInBlueprint preserves round clone metadata", () => {
+    let blueprint = setDayKindInBlueprint({}, 0, "workout");
+    blueprint = applyRoundCloneFromPrior(blueprint, 0, 1, "repeat");
+    const copied = copyDayInBlueprint(blueprint, 2, 0);
+    expect(copied[2]?.rounds[1]?.cloneOfRoundIndex).toBe(0);
+    expect(copied[2]?.rounds[1]?.cloneMode).toBe("repeat");
+  });
+
+  it("copyDayInBlueprint copies rest and stretch days", () => {
+    const blueprint = setDayKindInBlueprint({}, 4, "stretches");
+    const copied = copyDayInBlueprint(blueprint, 5, 4);
+    expect(copied[5]?.dayKind).toBe("stretches");
+    expect(copied[5]?.rounds).toEqual([]);
+    expect(copied[5]?.cardio).toEqual([]);
   });
 
   it("shortDayBlueprintLabel stays compact for the day strip", () => {

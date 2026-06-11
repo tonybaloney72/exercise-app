@@ -1,21 +1,14 @@
 import Link from "next/link";
-
-const LINK_CLASS =
-  "inline-flex items-center gap-1.5 text-sm font-medium text-accent transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+import BackNavLink from "@/components/common/BackNavLink";
 
 export function ProgressBackLink({
-  href = "/progress",
-  label = "Back to Progress",
+  label = "Back",
+  fallbackHref = "/progress",
 }: {
-  href?: string;
   label?: string;
-}) {
-  return (
-    <Link href={href} className={LINK_CLASS}>
-      <span aria-hidden>←</span>
-      {label}
-    </Link>
-  );
+  fallbackHref?: string;
+} = {}) {
+  return <BackNavLink label={label} fallbackHref={fallbackHref} />;
 }
 
 export function ProgressHistoryLink() {

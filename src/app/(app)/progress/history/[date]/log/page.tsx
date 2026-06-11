@@ -136,17 +136,15 @@ export default function WorkoutHistoryBackfillLogPage() {
     return (
       <div className="py-8 space-y-4 px-2 text-center">
         <p className="text-sm text-muted">Invalid date in URL.</p>
-        <ProgressBackLink href="/progress/history" label="Back to history" />
+        <ProgressBackLink />
       </div>
     );
   }
 
-  const backHref = `/progress/history/${dateKey}`;
-
   if (!canAccessLogPage) {
     return (
       <div className="py-8 space-y-4">
-        <ProgressBackLink href={backHref} label="Back to day" />
+        <ProgressBackLink />
         <SurfaceCard className="px-4 py-6 text-center">
           <p className="text-sm text-foreground">
             {resumeEligibility.ok === false
@@ -163,7 +161,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   if (planLoading || mode === "loading") {
     return (
       <div className="py-8 space-y-4">
-        <ProgressBackLink href={backHref} label="Back to day" />
+        <ProgressBackLink />
         <p className="text-sm text-muted text-center">Loading plan…</p>
       </div>
     );
@@ -172,7 +170,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   if (planError || !plan) {
     return (
       <div className="py-8 space-y-4">
-        <ProgressBackLink href={backHref} label="Back to day" />
+        <ProgressBackLink />
         <SurfaceCard className="px-4 py-6 text-center">
           <p className="text-sm text-red-400">
             {planError ?? "Could not load the plan for this day."}
@@ -189,7 +187,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   ) {
     return (
       <div className="py-8 space-y-4">
-        <ProgressBackLink href={backHref} label="Back to day" />
+        <ProgressBackLink />
         <SurfaceCard className="px-4 py-6 text-center">
           <p className="text-sm text-foreground">
             Finish or discard your current workout before logging another day.
@@ -208,7 +206,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   if (!sessionForThisDay) {
     return (
       <div className="py-8 space-y-5">
-        <ProgressBackLink href={backHref} label="Back to day" />
+        <ProgressBackLink />
         <h1 className="text-2xl font-bold text-foreground">
           Log workout · {formatPageTitle(dateKey)}
         </h1>
@@ -236,7 +234,7 @@ export default function WorkoutHistoryBackfillLogPage() {
 
   return (
     <div className="py-6 space-y-5">
-      <ProgressBackLink href={backHref} label="Back to day" />
+      <ProgressBackLink />
       <h1 className="text-2xl font-bold text-foreground">
         {formatPageTitle(dateKey)}
       </h1>

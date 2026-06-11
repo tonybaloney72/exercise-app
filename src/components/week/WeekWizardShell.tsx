@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import SurfaceCard from "@/components/common/SurfaceCard";
+import BackNavLink from "@/components/common/BackNavLink";
 import { WEEK_DAY_ABBRS } from "@/lib/weekWizardConstants";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 type Props = {
-  backHref: string;
-  backLabel: string;
+  backLabel?: string;
   title: string;
   subtitle: string;
   activeDow: number;
@@ -19,8 +18,7 @@ type Props = {
 };
 
 export default function WeekWizardShell({
-  backHref,
-  backLabel,
+  backLabel = "Back",
   title,
   subtitle,
   activeDow,
@@ -35,12 +33,7 @@ export default function WeekWizardShell({
   return (
     <div className="py-6 space-y-5 pb-24">
       <div>
-        <Link
-          href={backHref}
-          className="text-sm font-medium text-accent hover:text-accent/80"
-        >
-          {backLabel}
-        </Link>
+        <BackNavLink label={backLabel} />
         <h1 className="mt-2 text-2xl font-bold text-foreground">{title}</h1>
         <p className="mt-1 text-sm text-muted">{subtitle}</p>
       </div>

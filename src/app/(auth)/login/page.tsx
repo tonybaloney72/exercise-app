@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import BackNavLink from "@/components/common/BackNavLink";
 import AuthField from "@/components/auth/AuthField";
 import { humanizeAuthError } from "@/lib/auth/humanizeAuthError";
 import { createClient } from "@/lib/supabase/client";
@@ -106,9 +107,7 @@ function LoginForm() {
           </Link>
         </p>
         <p>
-          <Link href="/" className="hover:text-foreground">
-            ← Back to home
-          </Link>
+          <BackNavLink label="Back" fallbackHref="/" className="text-sm text-muted hover:text-foreground" />
         </p>
       </div>
     </div>

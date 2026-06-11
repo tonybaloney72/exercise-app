@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import BackNavLink from "@/components/common/BackNavLink";
 import AuthField from "@/components/auth/AuthField";
 import { humanizeAuthError } from "@/lib/auth/humanizeAuthError";
 import { createClient } from "@/lib/supabase/client";
@@ -42,12 +42,12 @@ export default function ForgotPasswordPage() {
           If an account exists for <span className="text-foreground">{email}</span>,
           we sent instructions to reset your password.
         </p>
-        <Link
-          href="/login"
+        <BackNavLink
+          label="Back to log in"
+          prefixArrow={false}
+          fallbackHref="/login"
           className="inline-block rounded-xl border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-surface-hover"
-        >
-          Back to log in
-        </Link>
+        />
       </div>
     );
   }
@@ -89,14 +89,15 @@ export default function ForgotPasswordPage() {
 
       <div className="space-y-1 text-center text-sm text-muted sm:space-y-2 sm:text-xs">
         <p>
-          <Link href="/login" className="text-accent hover:underline">
-            Back to log in
-          </Link>
+          <BackNavLink
+            label="Back to log in"
+            prefixArrow={false}
+            fallbackHref="/login"
+            className="text-accent hover:underline"
+          />
         </p>
         <p>
-          <Link href="/" className="hover:text-foreground">
-            ← Back to home
-          </Link>
+          <BackNavLink label="Back" fallbackHref="/" className="text-sm text-muted hover:text-foreground" />
         </p>
       </div>
     </div>

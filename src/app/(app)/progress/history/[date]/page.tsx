@@ -99,7 +99,7 @@ export default function WorkoutHistoryDayPage() {
     return (
       <div className="py-8 space-y-4 px-2 text-center">
         <p className="text-sm text-muted">Invalid date in URL.</p>
-        <ProgressBackLink href="/progress/history" label="Back to history" />
+        <ProgressBackLink />
       </div>
     );
   }
@@ -108,7 +108,7 @@ export default function WorkoutHistoryDayPage() {
     const logHref = `/progress/history/${dateKey}/log`;
     return (
       <div className="py-8 space-y-4">
-        <ProgressBackLink href="/progress/history" label="Back to history" />
+        <ProgressBackLink />
         <h1 className="text-2xl font-bold text-foreground">
           {formatPageTitle(dateKey)}
         </h1>
@@ -159,7 +159,7 @@ export default function WorkoutHistoryDayPage() {
   return (
     <div className="py-6 space-y-5">
       <div className="space-y-3">
-        <ProgressBackLink href="/progress/history" label="Back to history" />
+        <ProgressBackLink />
         <h1 className="text-2xl font-bold text-foreground">
           {formatPageTitle(dateKey)}
         </h1>

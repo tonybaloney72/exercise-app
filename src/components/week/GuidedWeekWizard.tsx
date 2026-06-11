@@ -170,8 +170,6 @@ export default function GuidedWeekWizard() {
 
   return (
     <WeekWizardShell
-      backHref="/settings"
-      backLabel="← Settings"
       title="Plan your week"
       subtitle={`Day ${activeDow + 1} of 7 · ${WEEK_DAY_ABBRS[activeDow]}${isToday ? " · Today" : ""}`}
       activeDow={activeDow}

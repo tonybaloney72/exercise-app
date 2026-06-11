@@ -67,6 +67,40 @@ function defaultDayBlueprint(dow: number): DayBlueprint {
   };
 }
 
+function cloneRoundBlueprint(round: RoundBlueprint): RoundBlueprint {
+  return {
+    groups: [...round.groups],
+    exerciseCount: round.exerciseCount,
+    cloneOfRoundIndex: round.cloneOfRoundIndex,
+    cloneMode: round.cloneMode,
+  };
+}
+
+function cloneDayBlueprint(day: DayBlueprint): DayBlueprint {
+  return {
+    dayKind: day.dayKind,
+    rounds: day.rounds.map(cloneRoundBlueprint),
+    cardio: day.cardio ? [...day.cardio] : [],
+  };
+}
+
+/** Replace one day's blueprint with a deep copy of another (same week). */
+export function copyDayInBlueprint(
+  blueprint: WeekBlueprint,
+  targetDow: number,
+  sourceDow: number,
+): WeekBlueprint {
+  if (targetDow === sourceDow) return blueprint;
+  if (targetDow < 0 || targetDow > 6 || sourceDow < 0 || sourceDow > 6) {
+    return blueprint;
+  }
+  const source = blueprint[sourceDow] ?? defaultDayBlueprint(sourceDow);
+  return {
+    ...blueprint,
+    [targetDow]: cloneDayBlueprint(source),
+  };
+}
+
 export function setDayKindInBlueprint(
   blueprint: WeekBlueprint,
   dow: number,
