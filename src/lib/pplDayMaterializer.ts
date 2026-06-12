@@ -113,7 +113,9 @@ function pickCoreBlockExercises(
   ctx: Parameters<typeof pickExercisesForCategory>[2],
 ): RoundExercise[] {
   const groups =
-    plan.coreGroups.length > 0 ? plan.coreGroups : (["CS"] as ExerciseCategory[]);
+    plan.coreGroups.length > 0
+      ? plan.coreGroups
+      : (["CS"] as ExerciseCategory[]);
   const out: RoundExercise[] = [];
   const used = new Set<string>();
   for (let i = 0; i < count; i++) {
@@ -180,10 +182,14 @@ function materializeLegsDay(
     ...ctx,
     seedPrefix: `${ctx.seedPrefix}-legs`,
   });
-  const coreBlock = pickCoreBlockExercises(plan, PPL_CORE_BLOCK_COUNT[density], {
-    ...ctx,
-    seedPrefix: `${ctx.seedPrefix}-core-block`,
-  });
+  const coreBlock = pickCoreBlockExercises(
+    plan,
+    PPL_CORE_BLOCK_COUNT[density],
+    {
+      ...ctx,
+      seedPrefix: `${ctx.seedPrefix}-core-block`,
+    },
+  );
   return [
     cloneExercises(working),
     cloneExercises(working),
@@ -204,7 +210,9 @@ function materializeActiveRecoveryShell(
   const out: RoundExercise[] = [];
   const used = new Set<string>();
   const groups =
-    plan.coreGroups.length > 0 ? plan.coreGroups : (["CR", "CS"] as ExerciseCategory[]);
+    plan.coreGroups.length > 0
+      ? plan.coreGroups
+      : (["CR", "CS"] as ExerciseCategory[]);
   for (let i = 0; i < count; i++) {
     const category = groups[i % groups.length]!;
     const filled = fillPplSlot(
@@ -244,7 +252,9 @@ export function buildPplRoundExerciseSets(
     dislikedIds: collectDislikedIds(prefs),
     favoriteIds: collectFavoriteIds(prefs),
     exerciseSettings,
-    expertiseFilter: userSettings ? resolveExpertiseFilter(userSettings) : undefined,
+    expertiseFilter: userSettings
+      ? resolveExpertiseFilter(userSettings)
+      : undefined,
     seedPrefix: `ppl-d${plan.dayOfWeek}-v:${varietySeed?.trim() || "static"}`,
   };
 
@@ -270,7 +280,7 @@ export function buildPplRoundExerciseSets(
 
 /**
  * Apply PPL set structure. Push/pull keep {@link DayPlan.cardioActivities} for
- * endurance logging (Cardio section) — not strength round slots.
+ * endurance logging (Cardio section) - not strength round slots.
  */
 export function materializePplDayPlan(
   plan: DayPlan,

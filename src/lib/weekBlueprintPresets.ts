@@ -2,10 +2,7 @@ import {
   DEFAULT_WEEKLY_PPL_SCHEDULE,
   suggestWeeklyCardioFromPplSchedule,
 } from "@/lib/pplWeekSchedule";
-import {
-  PPL_BALANCED_SHELLS,
-  type PplDayType,
-} from "@/lib/pplWeekTemplate";
+import { PPL_BALANCED_SHELLS, type PplDayType } from "@/lib/pplWeekTemplate";
 import type { LayoutGroup } from "@/lib/weeklyCategoryLayout";
 import {
   sanitizeWeekBlueprint,
@@ -26,7 +23,7 @@ export const WEEK_BLUEPRINT_PRESETS: WeekBlueprintPreset[] = [
     id: "upper_lower",
     label: "Upper / lower",
     description:
-      "Alternating strength themes from the default catalog — good general template.",
+      "Alternating strength themes from the default catalog - good general template.",
   },
   {
     id: "ppl_balanced",
@@ -71,9 +68,12 @@ export function buildPplBalancedWeekBlueprint(): WeekBlueprint {
   for (const shell of PPL_BALANCED_SHELLS) {
     const dayKind =
       shell.dayType === "active_recovery" ? "active_recovery" : "workout";
-    const rounds = Array.from({ length: shell.roundCount }, (_, roundIndex) => ({
-      groups: groupsForPplRound(shell.dayType, roundIndex, shell.roundCount),
-    }));
+    const rounds = Array.from(
+      { length: shell.roundCount },
+      (_, roundIndex) => ({
+        groups: groupsForPplRound(shell.dayType, roundIndex, shell.roundCount),
+      }),
+    );
 
     out[shell.dayOfWeek] = {
       dayKind,

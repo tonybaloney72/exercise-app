@@ -19,7 +19,7 @@ export async function refreshCurrentTrainingWeek(
   useTrainingWeekRefreshStore.getState().notifyRefreshed(reason);
 }
 
-/** Rest / cardio schedule only — preserves custom week exercise picks. */
+/** Rest / cardio schedule only - preserves custom week exercise picks. */
 export async function refreshCurrentCustomWeekSchedule(): Promise<void> {
   const { useAuthStore } = await import("@/stores/useAuthStore");
   if (useAuthStore.getState().mode !== "authenticated") return;

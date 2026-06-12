@@ -43,7 +43,7 @@ console.log("Wrote src/app/icon.png");
 await writeIcon(path.join(appDir, "apple-icon.png"), 180);
 console.log("Wrote src/app/apple-icon.png");
 
-// Simple splash (portrait phone) — brand mark centered on theme background
+// Simple splash (portrait phone) - brand mark centered on theme background
 const splashPath = path.join(publicDir, "apple-splash-1170x2532.png");
 await sharp({
   create: {

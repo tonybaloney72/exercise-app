@@ -36,6 +36,7 @@ fallow dead-code --format json --quiet
 ```
 
 Only create a config when you need to:
+
 - Change rule severity levels for incremental adoption
 - Add custom ignore patterns or ignore dependencies
 - Specify additional entry points not auto-detected
@@ -67,7 +68,7 @@ The `--changed-since` flag limits analysis to files modified since a git ref. It
 # This only shows issues in files changed since main
 fallow dead-code --format json --quiet --changed-since main
 
-# Same for duplication — only clone groups involving changed files
+# Same for duplication - only clone groups involving changed files
 fallow dupes --format json --quiet --changed-since main
 
 # This shows ALL issues in the project
@@ -109,7 +110,7 @@ Fallow uses Oxc for pure syntactic analysis. It does not run the TypeScript comp
 import(`./locales/${lang}.json`);
 
 // RESOLVED: import.meta.glob
-const modules = import.meta.glob('./modules/*.ts');
+const modules = import.meta.glob("./modules/*.ts");
 
 // NOT RESOLVED: fully dynamic
 const mod = import(someVariable);
@@ -130,13 +131,13 @@ Fallow fully resolves `export *` and named re-export chains through barrel files
 
 ```typescript
 // src/utils.ts
-export const helper = () => {};  // NOT flagged, used via barrel chain
+export const helper = () => {}; // NOT flagged, used via barrel chain
 
 // src/index.ts (barrel)
-export * from './utils';
+export * from "./utils";
 
 // src/app.ts
-import { helper } from './index';  // Resolves through the chain
+import { helper } from "./index"; // Resolves through the chain
 ```
 
 If an export IS flagged as unused despite being in a barrel file, it means no downstream consumer actually imports it. The barrel file re-exports it, but nobody uses it from there.
@@ -145,11 +146,11 @@ If an export IS flagged as unused despite being in a barrel file, it means no do
 
 ## Exit Code 1 vs 2
 
-| Code | Meaning | Action |
-|------|---------|--------|
-| 0 | No error-severity issues | Success |
-| 1 | Error-severity issues found | Review findings |
-| 2 | Runtime error (`fix` without `--yes` in non-TTY, invalid config) | Fix config or add `--yes` |
+| Code | Meaning                                                          | Action                    |
+| ---- | ---------------------------------------------------------------- | ------------------------- |
+| 0    | No error-severity issues                                         | Success                   |
+| 1    | Error-severity issues found                                      | Review findings           |
+| 2    | Runtime error (`fix` without `--yes` in non-TTY, invalid config) | Fix config or add `--yes` |
 
 Exit code 1 is triggered by issues with `"error"` severity in the rules config. Without a rules section, all issue types default to `"error"`. Use the rules system to control which issues fail CI:
 
@@ -160,8 +161,8 @@ Exit code 1 is triggered by issues with `"error"` severity in the rules config. 
     "unused-files": "error",
     "unused-dependencies": "error",
     "unused-exports": "warn",
-    "unused-types": "warn"
-  }
+    "unused-types": "warn",
+  },
 }
 ```
 
@@ -315,7 +316,7 @@ If you use utility decorators that DO NOT imply reflective use (Playwright's `@s
 ```jsonc
 // .fallowrc.json
 {
-  "ignoreDecorators": ["@step"]
+  "ignoreDecorators": ["@step"],
 }
 ```
 
@@ -385,7 +386,7 @@ Fallow detects `// fallow-ignore` comments and `@expected-unused` JSDoc tags tha
 ```typescript
 // STALE: the export below is actually used now
 // fallow-ignore-next-line unused-export
-export const helper = () => {};  // imported in app.ts
+export const helper = () => {}; // imported in app.ts
 ```
 
 Use `--stale-suppressions` to filter for only stale suppression findings. The `stale-suppressions` rule defaults to `warn`. Set to `error` in CI to enforce suppression hygiene:
@@ -393,8 +394,8 @@ Use `--stale-suppressions` to filter for only stale suppression findings. The `s
 ```jsonc
 {
   "rules": {
-    "stale-suppressions": "error"
-  }
+    "stale-suppressions": "error",
+  },
 }
 ```
 
@@ -433,7 +434,9 @@ export const Layout = () => (
       <link rel="stylesheet" href="/static/style.css" />
       <script src="/static/app.js"></script>
     </head>
-    <body><h1>Hello</h1></body>
+    <body>
+      <h1>Hello</h1>
+    </body>
   </html>
 );
 ```
@@ -468,7 +471,7 @@ In monorepos, shared library packages have exported APIs consumed by external co
 
 ```jsonc
 {
-  "publicPackages": ["@myorg/shared-lib", "@myorg/ui-kit"]
+  "publicPackages": ["@myorg/shared-lib", "@myorg/ui-kit"],
 }
 ```
 
@@ -482,7 +485,7 @@ Files loaded at runtime via plugin systems, locale directories, or lazy module p
 
 ```jsonc
 {
-  "dynamicallyLoaded": ["plugins/**/*.ts", "locales/**/*.json"]
+  "dynamicallyLoaded": ["plugins/**/*.ts", "locales/**/*.json"],
 }
 ```
 
@@ -504,8 +507,12 @@ Fallow tracks class member usage through instance variables. If you instantiate 
 
 ```typescript
 class MyService {
-  greet() { return 'hello'; }   // NOT flagged: used via instance
-  unused() { return 'bye'; }    // Flagged: never called
+  greet() {
+    return "hello";
+  } // NOT flagged: used via instance
+  unused() {
+    return "bye";
+  } // Flagged: never called
 }
 
 const svc = new MyService();
@@ -522,10 +529,10 @@ In `--production` mode, fallow detects production dependencies that are only imp
 
 ```typescript
 // If "zod" is in dependencies (not devDependencies):
-import type { ZodSchema } from 'zod';  // Flagged as type-only dependency
+import type { ZodSchema } from "zod"; // Flagged as type-only dependency
 
 // This is a real import, not type-only:
-import { z } from 'zod';  // NOT flagged
+import { z } from "zod"; // NOT flagged
 ```
 
 ```bash
@@ -547,9 +554,9 @@ Fallow detects production dependencies that are only imported from test files (`
 ```typescript
 // If "msw" is in dependencies (not devDependencies):
 // src/handlers.test.ts
-import { setupServer } from 'msw/node';  // Flagged as test-only dependency
+import { setupServer } from "msw/node"; // Flagged as test-only dependency
 
-// src/app.ts — no imports of "msw" here
+// src/app.ts - no imports of "msw" here
 ```
 
 ```bash
@@ -568,8 +575,8 @@ The `test-only-dependencies` rule defaults to `warn`. Suppress with `"test-only-
 
 These are separate features and can be used independently or together:
 
-- **`FALLOW_COMMENT: "true"`** — posts a single summary comment on the MR with issue counts and a findings table
-- **`FALLOW_REVIEW: "true"`** — posts inline code review comments on the exact MR diff lines where issues were found
+- **`FALLOW_COMMENT: "true"`** - posts a single summary comment on the MR with issue counts and a findings table
+- **`FALLOW_REVIEW: "true"`** - posts inline code review comments on the exact MR diff lines where issues were found
 
 ```yaml
 # WRONG: expecting inline review comments from FALLOW_COMMENT
@@ -601,12 +608,12 @@ fallow license refresh: your stored license is too stale to refresh. Reactivate 
 
 Stable codes the CLI surfaces today:
 
-| Code | Operation | Meaning |
-|------|-----------|---------|
-| `token_stale` | `refresh` | Stored JWT is more than 45 days past its `exp`. Reactivate. |
-| `invalid_token` | `refresh` | Stored JWT is missing required claims (e.g. `sub`). Reactivate. |
-| `unauthorized` | `refresh` or `trial` | Auth failed. Reactivate. |
-| `rate_limit_exceeded` | `trial` | Trial endpoint is capped at 5 per hour per IP. Wait or use a different network. |
+| Code                  | Operation            | Meaning                                                                         |
+| --------------------- | -------------------- | ------------------------------------------------------------------------------- |
+| `token_stale`         | `refresh`            | Stored JWT is more than 45 days past its `exp`. Reactivate.                     |
+| `invalid_token`       | `refresh`            | Stored JWT is missing required claims (e.g. `sub`). Reactivate.                 |
+| `unauthorized`        | `refresh` or `trial` | Auth failed. Reactivate.                                                        |
+| `rate_limit_exceeded` | `trial`              | Trial endpoint is capped at 5 per hour per IP. Wait or use a different network. |
 
 To detect a rate-limited trial signup in CI:
 
@@ -630,7 +637,7 @@ variables:
   FALLOW_CHANGED_SINCE: "origin/main"
 
 # CORRECT: let the template auto-detect
-# (no FALLOW_CHANGED_SINCE needed — it reads the MR target branch)
+# (no FALLOW_CHANGED_SINCE needed - it reads the MR target branch)
 ```
 
 Override `FALLOW_CHANGED_SINCE` only when you need a specific ref (e.g., a release branch) or want to disable auto-detection by setting it to an empty string.
@@ -641,4 +648,4 @@ Override `FALLOW_CHANGED_SINCE` only when you need a specific ref (e.g., a relea
 
 The GitLab CI template auto-detects the project's package manager from lockfiles (`package-lock.json` for npm, `pnpm-lock.yaml` for pnpm, `yarn.lock` for yarn). MR comments and review comments use the correct commands for the detected manager.
 
-This means review comments will show `pnpm remove lodash` instead of `npm uninstall lodash` in a pnpm project. No configuration is needed — detection is automatic.
+This means review comments will show `pnpm remove lodash` instead of `npm uninstall lodash` in a pnpm project. No configuration is needed - detection is automatic.

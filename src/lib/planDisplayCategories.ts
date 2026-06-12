@@ -3,7 +3,11 @@ import {
   isBalancedScores,
   resolveTrainingPriorityScores,
 } from "@/lib/trainingPriorities";
-import type { DayPlan, ExerciseCategory, TrainingPriorityPreset } from "@/types";
+import type {
+  DayPlan,
+  ExerciseCategory,
+  TrainingPriorityPreset,
+} from "@/types";
 
 const DISPLAY_ORDER: ExerciseCategory[] = [
   "UP",
@@ -18,7 +22,7 @@ const DISPLAY_ORDER: ExerciseCategory[] = [
 
 /**
  * Categories actually prescribed in the day's rounds (for Weekly pills / headers).
- * Jog days do not add PC here — use a separate jog badge when `plan.hasJog`.
+ * Jog days do not add PC here - use a separate jog badge when `plan.hasJog`.
  */
 export function categoriesPresentInPlan(plan: DayPlan): ExerciseCategory[] {
   const present = new Set<ExerciseCategory>();

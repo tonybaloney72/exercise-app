@@ -56,7 +56,10 @@ function loadHcProgressions() {
 
 function runHcScrape() {
   const script = join(__dirname, "scrape-hc-progressions.mjs");
-  const r = spawnSync(process.execPath, [script], { stdio: "inherit", cwd: ROOT });
+  const r = spawnSync(process.execPath, [script], {
+    stdio: "inherit",
+    cwd: ROOT,
+  });
   if (r.status !== 0) process.exit(r.status ?? 1);
 }
 
@@ -86,7 +89,8 @@ async function main() {
 
   const uniqueYoutubeUrls = new Set();
   for (const ex of exercises) {
-    if (ex.videoUrl && youtubeVideoId(ex.videoUrl)) uniqueYoutubeUrls.add(ex.videoUrl);
+    if (ex.videoUrl && youtubeVideoId(ex.videoUrl))
+      uniqueYoutubeUrls.add(ex.videoUrl);
   }
   const channelByVideoId = new Map();
   if (!skipOembed) {
@@ -188,7 +192,7 @@ async function main() {
       console.log(`Patched ${appliedByFile[file]} blocks in ${file}`);
     }
   } else {
-    console.log("Dry run — no files written.");
+    console.log("Dry run - no files written.");
   }
 
   const summary = {
@@ -198,7 +202,9 @@ async function main() {
     skipOembed,
     stats,
     appliedByFile,
-    samplePatches: enrichmentRows.filter((r) => Object.keys(r.patch).length > 0).slice(0, 30),
+    samplePatches: enrichmentRows
+      .filter((r) => Object.keys(r.patch).length > 0)
+      .slice(0, 30),
   };
 
   writeFileSync(SUMMARY_OUT, JSON.stringify(summary, null, 2));
@@ -210,7 +216,9 @@ async function main() {
 
   console.log("\nCatalog enrichment summary:");
   console.log(`  Source labels updated: ${stats.sourceUpdated}`);
-  console.log(`  Videos added (HC match): ${stats.videoAdded} (${stats.hcMatched} name matches)`);
+  console.log(
+    `  Videos added (HC match): ${stats.videoAdded} (${stats.hcMatched} name matches)`,
+  );
   console.log(`  Expertise levels set:  ${stats.expertiseAdded}`);
   console.log(`  Summary: ${SUMMARY_OUT}`);
   console.log("\nRe-run: npm run audit:catalog");

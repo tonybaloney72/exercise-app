@@ -193,7 +193,9 @@ export default function GuidedWeekWizard() {
           ) : null}
           <WeekWizardNavFooter
             activeDow={activeDow}
-            onPrev={activeDow > 0 ? () => setActiveDow(activeDow - 1) : undefined}
+            onPrev={
+              activeDow > 0 ? () => setActiveDow(activeDow - 1) : undefined
+            }
             onNext={
               activeDow < 6
                 ? () => setActiveDow(activeDow + 1)
@@ -222,7 +224,7 @@ export default function GuidedWeekWizard() {
         <Link href="/weekly/build" className="text-accent hover:underline">
           Switch to manual week
         </Link>{" "}
-        after saving — or change build style in Settings.
+        after saving - or change build style in Settings.
       </p>
     </WeekWizardShell>
   );

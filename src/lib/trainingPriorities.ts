@@ -20,7 +20,10 @@ export type TrainingPriorityWeights = Record<EmphasisGroup, number>;
 
 /** Per-group emphasis (0 = skip, 4 = peak). Drives generator and A2 customize UI. */
 export type TrainingPriorityScore = 0 | 1 | 2 | 3 | 4;
-export type TrainingPriorityScores = Record<EmphasisGroup, TrainingPriorityScore>;
+export type TrainingPriorityScores = Record<
+  EmphasisGroup,
+  TrainingPriorityScore
+>;
 
 export const EMPHASIS_GROUP_LABELS: Record<EmphasisGroup, string> = {
   core: "Core",
@@ -294,26 +297,36 @@ export function describeTrainingPriorityScores(
   scores: TrainingPriorityScores,
 ): string {
   const ranked = EMPHASIS_GROUP_ORDER.filter((g) => scores[g] > 0).sort(
-    (a, b) => scores[b] - scores[a] || EMPHASIS_GROUP_ORDER.indexOf(a) - EMPHASIS_GROUP_ORDER.indexOf(b),
+    (a, b) =>
+      scores[b] - scores[a] ||
+      EMPHASIS_GROUP_ORDER.indexOf(a) - EMPHASIS_GROUP_ORDER.indexOf(b),
   );
   if (ranked.length === 0) {
-    return "No emphasis groups selected — using balanced defaults.";
+    return "No emphasis groups selected - using balanced defaults.";
   }
-  const strong = ranked.filter((g) => scores[g] >= 3).map((g) => GROUP_PREVIEW_NAMES[g]);
-  const moderate = ranked.filter((g) => scores[g] === 2).map((g) => GROUP_PREVIEW_NAMES[g]);
+  const strong = ranked
+    .filter((g) => scores[g] >= 3)
+    .map((g) => GROUP_PREVIEW_NAMES[g]);
+  const moderate = ranked
+    .filter((g) => scores[g] === 2)
+    .map((g) => GROUP_PREVIEW_NAMES[g]);
   const parts: string[] = [];
   if (strong.length > 0) {
     parts.push(`Stronger ${formatNameList(strong)} on mixed days`);
   } else if (moderate.length > 0) {
     parts.push(`Moderate ${formatNameList(moderate)} across the week`);
   } else {
-    parts.push(`Light emphasis on ${formatNameList(ranked.map((g) => GROUP_PREVIEW_NAMES[g]))}`);
+    parts.push(
+      `Light emphasis on ${formatNameList(ranked.map((g) => GROUP_PREVIEW_NAMES[g]))}`,
+    );
   }
   const skipped = EMPHASIS_GROUP_ORDER.filter((g) => scores[g] === 0).map(
     (g) => GROUP_PREVIEW_NAMES[g],
   );
   if (skipped.length > 0 && skipped.length < EMPHASIS_GROUP_ORDER.length) {
-    parts.push(`less ${formatNameList(skipped)} unless the day theme includes it`);
+    parts.push(
+      `less ${formatNameList(skipped)} unless the day theme includes it`,
+    );
   }
   parts.push("themed days still follow the weekly template");
   return `${parts[0]}; ${parts.slice(1).join("; ")}.`;

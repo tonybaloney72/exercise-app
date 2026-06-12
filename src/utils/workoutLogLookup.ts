@@ -45,7 +45,7 @@ export function getPausedWorkoutDateForToday(
   return paused?.date ?? null;
 }
 
-/** Non-paused in-progress log for today — auto-resume on load (authenticated). */
+/** Non-paused in-progress log for today - auto-resume on load (authenticated). */
 export function shouldAutoRestoreInProgressFromHistory(
   workoutHistory: WorkoutLog[],
   todayKey: string,
@@ -68,9 +68,7 @@ function findWorkoutLogForDate(
   if (byStoredDate) return byStoredDate;
   return (
     workoutHistory.find(
-      (w) =>
-        w.endTime &&
-        formatLocalDateKey(new Date(w.endTime)) === dateKey,
+      (w) => w.endTime && formatLocalDateKey(new Date(w.endTime)) === dateKey,
     ) ?? null
   );
 }

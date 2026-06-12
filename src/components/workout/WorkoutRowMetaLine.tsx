@@ -11,7 +11,7 @@ interface WorkoutRowMetaLineProps {
   name: ReactNode;
   nameClassName?: string;
   subName?: ReactNode;
-  /** Static label (preview / plan edit) — no expand button on the title. */
+  /** Static label (preview / plan edit) - no expand button on the title. */
   readOnly?: boolean;
   /** Tighter row for plan editor / preview lists. */
   dense?: boolean;
@@ -108,7 +108,9 @@ export default function WorkoutRowMetaLine({
             <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
               <SetTimerPill seconds={timerSeconds} title={timerTitle} />
               {trimmedDetail ? (
-                <p className="min-w-0 text-xs leading-snug text-muted">{trimmedDetail}</p>
+                <p className="min-w-0 text-xs leading-snug text-muted">
+                  {trimmedDetail}
+                </p>
               ) : null}
             </div>
           ) : null}

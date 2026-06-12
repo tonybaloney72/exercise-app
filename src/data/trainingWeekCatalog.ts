@@ -1,5 +1,5 @@
 /**
- * Author **week themes** — seed for materialization only.
+ * Author **week themes** - seed for materialization only.
  * Rounds define count per day; exercise slots are always filled by `programProfile` + catalog picks.
  * Production reads go through `planResolver` (persisted or materialized week).
  */

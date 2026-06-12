@@ -18,9 +18,9 @@ export default function WeekBuilderMigrationBanner({ onDismiss }: Props) {
           Weekly layout mode is retired. Open{" "}
           <strong className="text-foreground">Your week</strong> below to choose{" "}
           <strong className="text-foreground">PPL</strong> or{" "}
-          <strong className="text-foreground">Custom</strong> (guided or manual).
-          If you used Weekly layout, your week was converted to a guided blueprint
-          — open the guided week planner to review and save.
+          <strong className="text-foreground">Custom</strong> (guided or
+          manual). If you used Weekly layout, your week was converted to a
+          guided blueprint - open the guided week planner to review and save.
         </p>
       </div>
       <div className="flex flex-wrap gap-2">

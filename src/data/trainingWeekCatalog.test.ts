@@ -12,7 +12,7 @@ const EQUIP = [...DEFAULT_AVAILABLE_EQUIPMENT];
 const EMPTY_PREFS: ExercisePreferenceMap = {};
 
 describe("trainingWeekCatalog", () => {
-  it("stores themes only — no exercise ids in seed rounds", () => {
+  it("stores themes only - no exercise ids in seed rounds", () => {
     for (const day of TRAINING_WEEK_CATALOG) {
       expect(isThemesOnlyCatalogPlan(day)).toBe(true);
     }

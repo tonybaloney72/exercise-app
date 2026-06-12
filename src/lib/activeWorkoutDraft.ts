@@ -10,7 +10,7 @@ const DRAFT_VERSION = 1;
 
 export type ActiveWorkoutDraftMeta = {
   savedAt: string;
-  /** User chose Save for later — do not auto-resume until Resume. */
+  /** User chose Save for later - do not auto-resume until Resume. */
   paused: boolean;
 };
 
@@ -46,7 +46,7 @@ function parsePayload(raw: string): ActiveWorkoutDraftPayload | null {
   }
 }
 
-/** Guests only — authenticated users persist in-progress rows via Supabase. */
+/** Guests only - authenticated users persist in-progress rows via Supabase. */
 function usesLocalWorkoutDraft(scope: DraftAuthScope): boolean {
   return scope.mode !== "authenticated";
 }

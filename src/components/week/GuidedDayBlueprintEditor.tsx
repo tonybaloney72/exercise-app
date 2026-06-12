@@ -245,7 +245,7 @@ export default function GuidedDayBlueprintEditor({
                     Exercises in this round
                   </label>
                   <p className="text-[11px] text-muted leading-snug">
-                    Optional — leave blank for ~{defaultExerciseCount}{" "}
+                    Optional - leave blank for ~{defaultExerciseCount}{" "}
                     exercises, or enter any count (minimum 1).
                   </p>
                   <input

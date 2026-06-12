@@ -48,7 +48,7 @@ function parseProgressionPage(html, pageMeta) {
   let m;
   while ((m = h3Re.exec(html)) !== null) {
     const raw = decodeHtml(m[1]);
-    const stepM = raw.match(/^#\d+\s*[-–—]?\s*(.+)$/i);
+    const stepM = raw.match(/^#\d+\s*[-–-]?\s*(.+)$/i);
     if (!stepM) continue;
     const name = stepM[1].trim();
     if (/^faq$/i.test(name)) continue;
@@ -83,7 +83,12 @@ async function main() {
     }
     const html = await res.text();
     const steps = parseProgressionPage(html, page);
-    pages.push({ ...page, url, stepCount: steps.length, videoUrl: steps[0]?.videoUrl ?? null });
+    pages.push({
+      ...page,
+      url,
+      stepCount: steps.length,
+      videoUrl: steps[0]?.videoUrl ?? null,
+    });
     for (const step of steps) {
       if (!byNormalized.has(step.normalized)) {
         byNormalized.set(step.normalized, step);

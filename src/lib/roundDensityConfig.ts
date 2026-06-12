@@ -16,17 +16,17 @@ export const ROUND_DENSITY_OPTIONS: RoundDensityOption[] = [
   {
     value: "compact",
     label: "Compact",
-    description: "About 3 exercises per round — shorter sessions.",
+    description: "About 3 exercises per round - shorter sessions.",
   },
   {
     value: "standard",
     label: "Standard",
-    description: "About 5 exercises per round — matches the default templates.",
+    description: "About 5 exercises per round - matches the default templates.",
   },
   {
     value: "full",
     label: "Full",
     description:
-      "About 7 exercises per round — longer rounds when equipment allows.",
+      "About 7 exercises per round - longer rounds when equipment allows.",
   },
 ];

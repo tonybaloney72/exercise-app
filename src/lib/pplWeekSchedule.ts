@@ -81,7 +81,10 @@ export function weeklyPplScheduleEqual(
   b: WeeklyPplSchedule,
 ): boolean {
   for (let dow = 0; dow < 7; dow++) {
-    if ((a[dow] ?? DEFAULT_WEEKLY_PPL_SCHEDULE[dow]) !== (b[dow] ?? DEFAULT_WEEKLY_PPL_SCHEDULE[dow])) {
+    if (
+      (a[dow] ?? DEFAULT_WEEKLY_PPL_SCHEDULE[dow]) !==
+      (b[dow] ?? DEFAULT_WEEKLY_PPL_SCHEDULE[dow])
+    ) {
       return false;
     }
   }
@@ -103,7 +106,9 @@ export function mergeRestDaysIntoPplSchedule(
   return out;
 }
 
-export function resolveWeeklyPplSchedule(settings: UserSettings): WeeklyPplSchedule {
+export function resolveWeeklyPplSchedule(
+  settings: UserSettings,
+): WeeklyPplSchedule {
   if (!settings.weeklyPplScheduleCustomized) {
     if (settings.weeklyRestDaysCustomized) {
       return mergeRestDaysIntoPplSchedule(settings.weeklyRestDays);
@@ -192,13 +197,13 @@ function roundCountForSchedule(entry: PplDaySchedule): number {
 function themeForSchedule(entry: PplDaySchedule): string {
   switch (entry) {
     case "push":
-      return "Push — upper push + cardio finisher";
+      return "Push - upper push + cardio finisher";
     case "pull":
-      return "Pull — upper pull + cardio finisher";
+      return "Pull - upper pull + cardio finisher";
     case "legs":
-      return "Legs — lower body + core block";
+      return "Legs - lower body + core block";
     case "active_recovery":
-      return "Active recovery — light core + cardio";
+      return "Active recovery - light core + cardio";
     case "stretches":
       return "Stretches only";
     case "full_rest":
@@ -230,7 +235,10 @@ export function buildPplDayPlanFromSchedule(
   dayOfWeek: number,
   schedule: WeeklyPplSchedule,
 ): DayPlan {
-  const entry = schedule[dayOfWeek] ?? DEFAULT_WEEKLY_PPL_SCHEDULE[dayOfWeek] ?? "full_rest";
+  const entry =
+    schedule[dayOfWeek] ??
+    DEFAULT_WEEKLY_PPL_SCHEDULE[dayOfWeek] ??
+    "full_rest";
   const shell = buildPplShellFromSchedule(dayOfWeek, entry);
   return {
     dayOfWeek: shell.dayOfWeek,
@@ -263,8 +271,7 @@ export function suggestWeeklyCardioFromPplSchedule(
   const out: Record<number, CardioActivityKind[]> = {};
   for (let dow = 0; dow < 7; dow++) {
     const entry = schedule[dow] ?? DEFAULT_WEEKLY_PPL_SCHEDULE[dow];
-    out[dow] =
-      entry && pplScheduleHasCardioFinisher(entry) ? ["jog"] : [];
+    out[dow] = entry && pplScheduleHasCardioFinisher(entry) ? ["jog"] : [];
   }
   return out;
 }
@@ -281,9 +288,7 @@ export function sanitizePplWeeklyCardioByDayForSchedule(
   return out;
 }
 
-function weeklyPplScheduleFingerprint(
-  schedule: WeeklyPplSchedule,
-): string {
+function weeklyPplScheduleFingerprint(schedule: WeeklyPplSchedule): string {
   const seg = [0, 1, 2, 3, 4, 5, 6]
     .map((d) => `${d}:${schedule[d] ?? DEFAULT_WEEKLY_PPL_SCHEDULE[d]}`)
     .join(",");

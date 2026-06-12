@@ -52,8 +52,11 @@ export async function searchYoutube(query, options = {}) {
     return searchCache[q].results;
   }
 
-  const { apiKey = process.env.YOUTUBE_API_KEY, maxResults = 5, fetchFn = fetch } =
-    options;
+  const {
+    apiKey = process.env.YOUTUBE_API_KEY,
+    maxResults = 5,
+    fetchFn = fetch,
+  } = options;
 
   const forceHtml = options.forceHtml === true;
   let via = "html";
@@ -66,7 +69,7 @@ export async function searchYoutube(query, options = {}) {
     } catch (err) {
       const msg = String(err);
       if (/403/.test(msg) && /quota/i.test(msg)) {
-        console.warn(`YouTube API quota hit for "${q}" — using HTML search.`);
+        console.warn(`YouTube API quota hit for "${q}" - using HTML search.`);
         results = await searchViaHtml(q, { maxResults, fetchFn });
         via = "html-quota-fallback";
       } else {

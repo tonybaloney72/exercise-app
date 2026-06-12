@@ -237,6 +237,6 @@ export function weeklyCategoryLayoutFingerprint(
 }
 
 function describeDayLayout(groups: LayoutGroup[]): string {
-  if (groups.length === 0) return "Rest — no generated exercises";
+  if (groups.length === 0) return "Rest - no generated exercises";
   return groups.map((g) => LAYOUT_GROUP_LABELS[g]).join(" · ");
 }

@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 /**
  * Supabase client for Server Components, Route Handlers, and Server Actions.
- * In Server Components, `cookieStore.set` will throw — we swallow the error
+ * In Server Components, `cookieStore.set` will throw - we swallow the error
  * because session refresh happens in the proxy.
  */
 export async function createClient() {

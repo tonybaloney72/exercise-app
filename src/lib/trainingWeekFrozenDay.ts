@@ -43,7 +43,7 @@ export function getFrozenPastDayPlanCopy(
 
   return {
     frozenPlanMessage:
-      "This is the plan saved for that day in your current training week. Changing settings updates today and upcoming days only — not past days.",
+      "This is the plan saved for that day in your current training week. Changing settings updates today and upcoming days only - not past days.",
     dislikedOnFrozenPlanMessage: hasDisliked
       ? "This saved plan still includes an exercise you’ve marked disliked. Past days aren’t auto-updated; use Customize on a future day or Reset week on Weekly if you want a fresh plan."
       : null,

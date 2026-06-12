@@ -3,7 +3,12 @@ import {
   pplScheduleToRestDayMode,
   resolveWeeklyPplSchedule,
 } from "@/lib/pplWeekSchedule";
-import type { DayPlan, RestDayMode, UserSettings, WeeklyRestDays } from "@/types";
+import type {
+  DayPlan,
+  RestDayMode,
+  UserSettings,
+  WeeklyRestDays,
+} from "@/types";
 
 export const REST_DAY_LABELS: Record<RestDayMode, string> = {
   workout: "Workout",
@@ -13,11 +18,12 @@ export const REST_DAY_LABELS: Record<RestDayMode, string> = {
 };
 
 export const REST_DAY_DESCRIPTIONS: Record<RestDayMode, string> = {
-  workout: "Normal plan for this weekday (strength rounds + stretches + any cardio you enabled).",
+  workout:
+    "Normal plan for this weekday (strength rounds + stretches + any cardio you enabled).",
   active_recovery:
     "One light core-focused round plus stretches; optional cardio. Not a full training day.",
-  stretches: "Warm-up and cool-down only — no exercise rounds.",
-  full_rest: "Nothing scheduled — no stretches, rounds, or cardio to log.",
+  stretches: "Warm-up and cool-down only - no exercise rounds.",
+  full_rest: "Nothing scheduled - no stretches, rounds, or cardio to log.",
 };
 
 /** Defaults: Sunday active recovery; other days follow the normal week. */
@@ -59,7 +65,10 @@ export function sanitizeWeeklyRestDays(raw: unknown): WeeklyRestDays {
   return out;
 }
 
-export function weeklyRestDaysEqual(a: WeeklyRestDays, b: WeeklyRestDays): boolean {
+export function weeklyRestDaysEqual(
+  a: WeeklyRestDays,
+  b: WeeklyRestDays,
+): boolean {
   for (let dow = 0; dow < 7; dow++) {
     if ((a[dow] ?? "workout") !== (b[dow] ?? "workout")) return false;
   }
@@ -146,7 +155,7 @@ export function isFullRestDay(plan: DayPlan): boolean {
   return plan.restDayMode === "full_rest";
 }
 
-/** Full rest or stretches-only — user may still add optional work via the editor. */
+/** Full rest or stretches-only - user may still add optional work via the editor. */
 export function isOptionalRestDay(plan: DayPlan): boolean {
   return plan.restDayMode === "full_rest" || plan.restDayMode === "stretches";
 }

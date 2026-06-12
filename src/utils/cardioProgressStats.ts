@@ -64,9 +64,15 @@ export function cardioExerciseTitle(exerciseId: string): string {
 }
 
 /** e.g. `10:33/mi` */
-export function formatPacePerMile(secondsPerMile: number | null | undefined): string {
-  if (secondsPerMile == null || !Number.isFinite(secondsPerMile) || secondsPerMile <= 0) {
-    return "—";
+export function formatPacePerMile(
+  secondsPerMile: number | null | undefined,
+): string {
+  if (
+    secondsPerMile == null ||
+    !Number.isFinite(secondsPerMile) ||
+    secondsPerMile <= 0
+  ) {
+    return "-";
   }
   const rounded = Math.round(secondsPerMile);
   const mins = Math.floor(rounded / 60);

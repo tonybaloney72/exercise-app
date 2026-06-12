@@ -19,9 +19,7 @@ import {
   saveCustomDayPlan,
   seedManualWeekFromBlueprint,
 } from "@/lib/trainingWeekCustomize";
-import {
-  resolveBlueprintForManualSeed,
-} from "@/lib/manualWeekSeed";
+import { resolveBlueprintForManualSeed } from "@/lib/manualWeekSeed";
 import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
 import { bumpTrainingWeekPlansAfterCustomSave } from "@/lib/trainingWeekCacheRefresh";
 import { bumpTrainingWeekPlansFromDb } from "@/lib/trainingWeekRefresh";
@@ -43,11 +41,11 @@ function weekDatesFromKeys(dateKeys: string[]): Date[] {
 }
 
 function manualDayStripLabel(plan: DayPlan | undefined): string {
-  if (!plan) return "—";
+  if (!plan) return "-";
   const count = countPlannedExercises(plan);
   if (count > 0) return `${count} ex`;
   if (plan.rounds.length > 0) return `${plan.rounds.length} rnd`;
-  return "—";
+  return "-";
 }
 
 export default function CustomWeekWizard() {
@@ -254,7 +252,9 @@ export default function CustomWeekWizard() {
             }
           }}
           nextLabel={
-            nextDow != null ? `${WEEK_DAY_ABBRS[nextDow]} →` : "Done — view week"
+            nextDow != null
+              ? `${WEEK_DAY_ABBRS[nextDow]} →`
+              : "Done - view week"
           }
           nextPrimary={nextDow != null}
         />
@@ -275,7 +275,10 @@ export default function CustomWeekWizard() {
 
       <p className="text-xs text-muted text-center">
         Prefer structure over picking exercises?{" "}
-        <Link href="/weekly/build-guided" className="text-accent hover:underline">
+        <Link
+          href="/weekly/build-guided"
+          className="text-accent hover:underline"
+        >
           Switch to guided week
         </Link>
       </p>
@@ -331,7 +334,9 @@ export default function CustomWeekWizard() {
         isCustomWeek
         saving={saving}
         embedded
-        saveLabel={nextLabel ? `Save & continue to ${nextLabel}` : "Save this day"}
+        saveLabel={
+          nextLabel ? `Save & continue to ${nextLabel}` : "Save this day"
+        }
         onDirtyChange={handleDraftChange}
         onSave={(edited) => {
           if (nextDow != null) {
@@ -349,7 +354,7 @@ export default function CustomWeekWizard() {
           href="/weekly"
           className="block w-full rounded-xl border border-border py-3 text-center text-sm font-semibold text-foreground hover:bg-surface-hover"
         >
-          Done — view week
+          Done - view week
         </Link>
       ) : null}
     </WeekWizardShell>

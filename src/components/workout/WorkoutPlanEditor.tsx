@@ -387,10 +387,10 @@ export default function WorkoutPlanEditor({
             Rounds
           </p>
           <p className="text-sm text-muted leading-snug">
-            New rounds start empty — choose Copy, different exercises, or
+            New rounds start empty - choose Copy, different exercises, or
             Customize.{" "}
-            <span className="font-medium text-foreground">Add round</span> appends
-            at the end.
+            <span className="font-medium text-foreground">Add round</span>{" "}
+            appends at the end.
           </p>
         </div>
         {draft.rounds.length < MAX_WORKOUT_ROUNDS ? (
@@ -573,7 +573,7 @@ export default function WorkoutPlanEditor({
       <CategoryPickModal
         open={categoryPickRound !== null}
         title="Choose category"
-        hint="Any training category — respects your equipment and dislikes."
+        hint="Any training category - respects your equipment and dislikes."
         categories={ROUND_ADD_CATEGORIES}
         onClose={() => setCategoryPickRound(null)}
         onPick={(category) => {

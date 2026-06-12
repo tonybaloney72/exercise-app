@@ -2,8 +2,8 @@
 -- Initial schema for Supabase Auth and Data phase.
 --
 -- Tables: profiles, user_settings, workout_logs, exercise_logs
--- Trigger: handle_new_user — auto-creates profile + settings on signup
--- RPC:     save_workout — atomic upsert of a workout + its exercise logs
+-- Trigger: handle_new_user - auto-creates profile + settings on signup
+-- RPC:     save_workout - atomic upsert of a workout + its exercise logs
 -- RLS:     owner-only access on every user-scoped table
 -- =====================================================================
 

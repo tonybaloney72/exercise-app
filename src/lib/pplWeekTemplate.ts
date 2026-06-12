@@ -1,7 +1,7 @@
 /**
  * 6-day push / pull / legs week shells for Preset mode (PPL epic).
  * Rounds are empty until `programProfile` + generator fill them (Phase 2+).
- * @see ROADMAP.md — 6-day PPL week engine
+ * @see ROADMAP.md - 6-day PPL week engine
  */
 import {
   DEFAULT_WEEKLY_PPL_SCHEDULE,
@@ -59,7 +59,7 @@ export const PPL_BALANCED_SHELLS: readonly PplDayShell[] = [
   {
     dayOfWeek: 0,
     name: DAY_NAMES[0],
-    theme: "Active recovery — light core + cardio",
+    theme: "Active recovery - light core + cardio",
     dayType: "active_recovery",
     roundCount: 1,
     hasCardioFinisher: true,
@@ -67,7 +67,7 @@ export const PPL_BALANCED_SHELLS: readonly PplDayShell[] = [
   {
     dayOfWeek: 1,
     name: DAY_NAMES[1],
-    theme: "Push — upper push + cardio finisher",
+    theme: "Push - upper push + cardio finisher",
     dayType: "push",
     roundCount: 3,
     hasCardioFinisher: true,
@@ -75,7 +75,7 @@ export const PPL_BALANCED_SHELLS: readonly PplDayShell[] = [
   {
     dayOfWeek: 2,
     name: DAY_NAMES[2],
-    theme: "Pull — upper pull + cardio finisher",
+    theme: "Pull - upper pull + cardio finisher",
     dayType: "pull",
     roundCount: 3,
     hasCardioFinisher: true,
@@ -83,7 +83,7 @@ export const PPL_BALANCED_SHELLS: readonly PplDayShell[] = [
   {
     dayOfWeek: 3,
     name: DAY_NAMES[3],
-    theme: "Legs — lower body + core block",
+    theme: "Legs - lower body + core block",
     dayType: "legs",
     roundCount: 4,
     hasCardioFinisher: false,
@@ -91,7 +91,7 @@ export const PPL_BALANCED_SHELLS: readonly PplDayShell[] = [
   {
     dayOfWeek: 4,
     name: DAY_NAMES[4],
-    theme: "Push — upper push + cardio finisher",
+    theme: "Push - upper push + cardio finisher",
     dayType: "push",
     roundCount: 3,
     hasCardioFinisher: true,
@@ -99,7 +99,7 @@ export const PPL_BALANCED_SHELLS: readonly PplDayShell[] = [
   {
     dayOfWeek: 5,
     name: DAY_NAMES[5],
-    theme: "Pull — upper pull + cardio finisher",
+    theme: "Pull - upper pull + cardio finisher",
     dayType: "pull",
     roundCount: 3,
     hasCardioFinisher: true,
@@ -107,7 +107,7 @@ export const PPL_BALANCED_SHELLS: readonly PplDayShell[] = [
   {
     dayOfWeek: 6,
     name: DAY_NAMES[6],
-    theme: "Legs — lower body + core block",
+    theme: "Legs - lower body + core block",
     dayType: "legs",
     roundCount: 4,
     hasCardioFinisher: false,
@@ -131,7 +131,9 @@ function getPplShellForDay(
   dayOfWeek: number,
   variant: PplWeekVariant = "balanced",
 ): PplDayShell {
-  const shell = shellsForPplVariant(variant).find((s) => s.dayOfWeek === dayOfWeek);
+  const shell = shellsForPplVariant(variant).find(
+    (s) => s.dayOfWeek === dayOfWeek,
+  );
   if (!shell) {
     throw new Error(`No PPL shell for dayOfWeek ${dayOfWeek} (${variant})`);
   }
@@ -182,7 +184,9 @@ export function getPplPlanForDay(
     const schedule = resolveWeeklyPplSchedule(variantOrSettings);
     return clonePplDay(buildPplDayPlanFromSchedule(dayOfWeek, schedule));
   }
-  return clonePplDay(buildPplDayPlan(getPplShellForDay(dayOfWeek, variantOrSettings)));
+  return clonePplDay(
+    buildPplDayPlan(getPplShellForDay(dayOfWeek, variantOrSettings)),
+  );
 }
 
 /** Full Sun–Sat PPL week for generator seeding (rounds empty until materialized). */
@@ -251,11 +255,11 @@ export function suggestWeeklyCardioFromPpl(
 }
 
 /** Fingerprint segment for prefs / week regen. */
-export function pplTemplateFingerprint(
-  settings?: UserSettings,
-): string {
+export function pplTemplateFingerprint(settings?: UserSettings): string {
   if (settings) {
-    return pplTemplateFingerprintWithSchedule(resolveWeeklyPplSchedule(settings));
+    return pplTemplateFingerprintWithSchedule(
+      resolveWeeklyPplSchedule(settings),
+    );
   }
   return pplTemplateFingerprintWithSchedule(DEFAULT_WEEKLY_PPL_SCHEDULE);
 }

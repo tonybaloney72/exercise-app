@@ -6,9 +6,12 @@ import { readFileSync } from "fs";
 import { pathToFileURL } from "url";
 import { createRequire } from "module";
 
-// Load compiled exercises via dynamic import of TS — use regex parse instead
+// Load compiled exercises via dynamic import of TS - use regex parse instead
 const catalogText = readFileSync("src/data/exercises.ts", "utf8");
-const hybridText = readFileSync("src/data/hybridCalisthenicsExercises.ts", "utf8");
+const hybridText = readFileSync(
+  "src/data/hybridCalisthenicsExercises.ts",
+  "utf8",
+);
 
 function parseExercises(text, source) {
   const entries = [];
@@ -77,7 +80,9 @@ const catalog = parseExercises(catalogText, "catalog");
 const hybrid = parseExercises(hybridText, "hybrid");
 const all = [...catalog, ...hybrid];
 
-console.log(`Catalog: ${catalog.length}, Hybrid: ${hybrid.length}, Total parsed: ${all.length}\n`);
+console.log(
+  `Catalog: ${catalog.length}, Hybrid: ${hybrid.length}, Total parsed: ${all.length}\n`,
+);
 
 // Exact normalized dupes
 const byNorm = new Map();
@@ -132,13 +137,17 @@ for (const [n, list] of exactDupes) {
   }
 }
 
-console.log("\n=== PLURAL / near-same (singularized match, different display name) ===");
+console.log(
+  "\n=== PLURAL / near-same (singularized match, different display name) ===",
+);
 const pluralSeen = new Set();
 for (const { a, b, na, nb } of near.filter((x) => x.kind === "plural")) {
   const key = [a.id, b.id].sort().join("|");
   if (pluralSeen.has(key)) continue;
   pluralSeen.add(key);
-  console.log(`  "${a.name}" (${a.id}, ${a.source}) <-> "${b.name}" (${b.id}, ${b.source})`);
+  console.log(
+    `  "${a.name}" (${a.id}, ${a.source}) <-> "${b.name}" (${b.id}, ${b.source})`,
+  );
   console.log(`    cats: ${a.category} / ${b.category}`);
 }
 
@@ -155,7 +164,9 @@ for (const { a, b, d, na, nb } of near
 }
 
 // Substring containment (one name contains other)
-console.log("\n=== SUBSTRING (likely variant, e.g. 'Push Up' vs 'Wide Push Up') ===");
+console.log(
+  "\n=== SUBSTRING (likely variant, e.g. 'Push Up' vs 'Wide Push Up') ===",
+);
 const sub = [];
 for (let i = 0; i < all.length; i++) {
   for (let j = i + 1; j < all.length; j++) {

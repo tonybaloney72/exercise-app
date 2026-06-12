@@ -5,7 +5,7 @@ export const PPL_TEMPLATE_VERSION = "ppl-2026-05-v4";
 
 export type PplDayType = "active_recovery" | "push" | "pull" | "legs";
 
-/** Core categories used on leg days (abs / core work — not on push or pull). */
+/** Core categories used on leg days (abs / core work - not on push or pull). */
 export const PPL_LEG_DAY_CORE_GROUPS: ExerciseCategory[] = [
   "CF",
   "CL",

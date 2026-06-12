@@ -77,10 +77,11 @@ export default function WorkoutSession({
     addCardioToWorkout,
   } = useWorkoutStore();
 
-  const [pickTarget, setPickTarget] = useState<SessionStructurePickTarget | null>(
+  const [pickTarget, setPickTarget] =
+    useState<SessionStructurePickTarget | null>(null);
+  const [categoryPickRound, setCategoryPickRound] = useState<number | null>(
     null,
   );
-  const [categoryPickRound, setCategoryPickRound] = useState<number | null>(null);
 
   const isEditing = isCompletedWorkoutLog(activeWorkout);
   const sessionPlan = useMemo(
@@ -136,7 +137,8 @@ export default function WorkoutSession({
     0,
   );
   const completedExercises = activeWorkout.rounds.reduce(
-    (acc, r) => acc + r.exercises.filter((e) => e.completed || e.skipped).length,
+    (acc, r) =>
+      acc + r.exercises.filter((e) => e.completed || e.skipped).length,
     0,
   );
   const overallProgress =
@@ -147,7 +149,7 @@ export default function WorkoutSession({
     if (!log) return;
     void celebrateWorkoutComplete();
     toast.success("Workout complete!", {
-      description: "Nice work — your session is saved.",
+      description: "Nice work - your session is saved.",
       duration: 4000,
     });
     onAfterComplete?.(log);
@@ -188,7 +190,7 @@ export default function WorkoutSession({
             Editing completed workout
           </p>
           <p className="text-xs text-muted mt-0.5">
-            Adjust exercises, sets, stretches, or cardio — then save. Cancel
+            Adjust exercises, sets, stretches, or cardio - then save. Cancel
             discards changes.
           </p>
         </div>
@@ -196,7 +198,9 @@ export default function WorkoutSession({
 
       <div className="rounded-xl border border-border bg-surface p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-muted">Workout Progress</span>
+          <span className="text-xs font-medium text-muted">
+            Workout Progress
+          </span>
           <span className="text-xs font-bold text-accent">
             {Math.round(overallProgress * 100)}%
           </span>
@@ -260,9 +264,7 @@ export default function WorkoutSession({
               roundIndex={roundIndex}
               roundCount={activeWorkout.rounds.length}
               isEmptyRound={roundLog.exercises.length === 0}
-              onAddRoundBelow={() =>
-                insertEmptyRoundAtWorkout(roundIndex + 1)
-              }
+              onAddRoundBelow={() => insertEmptyRoundAtWorkout(roundIndex + 1)}
               onCopyRepeat={() =>
                 applyRoundCopyFromPriorWorkout(round.roundNumber, "repeat")
               }
@@ -299,7 +301,9 @@ export default function WorkoutSession({
       )}
 
       <div className="rounded-xl border border-border bg-surface p-4">
-        <label className="text-xs font-medium text-muted">Notes (optional)</label>
+        <label className="text-xs font-medium text-muted">
+          Notes (optional)
+        </label>
         <textarea
           rows={2}
           value={activeWorkout.notes ?? ""}
@@ -308,17 +312,17 @@ export default function WorkoutSession({
           className="mt-2 w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted"
         />
         <p className="mt-2 text-sm text-muted">
-          {isEditing
-            ? "Notes are saved when you tap Save changes."
-            : (
-              <>
-                Progress saves automatically. Notes are saved when you tap{" "}
-                <span className="font-medium text-foreground">
-                  Complete Workout
-                </span>
-                .
-              </>
-            )}
+          {isEditing ? (
+            "Notes are saved when you tap Save changes."
+          ) : (
+            <>
+              Progress saves automatically. Notes are saved when you tap{" "}
+              <span className="font-medium text-foreground">
+                Complete Workout
+              </span>
+              .
+            </>
+          )}
         </p>
       </div>
 

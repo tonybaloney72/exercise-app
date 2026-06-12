@@ -6,7 +6,7 @@ import type { WorkoutRowMenuItem } from "@/components/workout/WorkoutRowOverflow
 
 const LEADING_SPACER = <div className="h-7 w-7 shrink-0" aria-hidden />;
 
-/** Leading column (7) + gap-2 — indent for fields below the title row. */
+/** Leading column (7) + gap-2 - indent for fields below the title row. */
 const CHILD_INDENT = "pl-9";
 
 type Props = {
@@ -46,7 +46,9 @@ export default function WorkoutPlanExerciseRow({
           />
         </div>
       </div>
-      {children ? <div className={`${CHILD_INDENT} mt-1.5`}>{children}</div> : null}
+      {children ? (
+        <div className={`${CHILD_INDENT} mt-1.5`}>{children}</div>
+      ) : null}
     </div>
   );
 }

@@ -1,4 +1,4 @@
--- Per-exercise favorites / exclusions for authenticated users (Slice 1 — dynamic plans foundation).
+-- Per-exercise favorites / exclusions for authenticated users (Slice 1 - dynamic plans foundation).
 -- Absence of a row means neutral (neither favorite nor disliked).
 
 create type public.exercise_preference_kind as enum ('favorite', 'disliked');

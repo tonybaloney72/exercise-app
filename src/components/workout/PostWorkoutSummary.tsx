@@ -92,9 +92,11 @@ export default function PostWorkoutSummary({
             className="space-y-1.5 pt-1 border-t border-border"
           >
             <div className="flex items-baseline justify-between gap-2">
-              <span className="text-sm font-medium text-foreground">{line.label}</span>
+              <span className="text-sm font-medium text-foreground">
+                {line.label}
+              </span>
               <span className="text-sm font-semibold text-foreground">
-                {line.skipped ? "Skipped" : line.completed ? "Done" : "—"}
+                {line.skipped ? "Skipped" : line.completed ? "Done" : "-"}
               </span>
             </div>
             {line.completed && !line.skipped && (

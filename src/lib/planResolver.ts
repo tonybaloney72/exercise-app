@@ -371,8 +371,8 @@ export async function resolveTrainingWeekBundleForAuth(
 
 /**
  * Regenerate days in the Sun–Sat week containing `dateKey`.
- * `prefs` — today (if no workout started) + future; past days and in-progress today are kept.
- * `full` — entire week from catalog (explicit reset).
+ * `prefs` - today (if no workout started) + future; past days and in-progress today are kept.
+ * `full` - entire week from catalog (explicit reset).
  */
 export async function refreshTrainingWeekContaining(
   dateKey: string,

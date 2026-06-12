@@ -19,16 +19,17 @@ import type { StretchEntry } from "@/types";
 
 type StretchListKey = "defaultWarmUp" | "defaultCoolDown";
 
-type PickTarget =
-  | { list: StretchListKey; index?: number }
-  | null;
+type PickTarget = { list: StretchListKey; index?: number } | null;
 
 interface DefaultStretchesModalProps {
   open: boolean;
   onClose: () => void;
 }
 
-export default function DefaultStretchesModal({ open, onClose }: DefaultStretchesModalProps) {
+export default function DefaultStretchesModal({
+  open,
+  onClose,
+}: DefaultStretchesModalProps) {
   const settings = useSettingsStore();
   const prefs = useExercisePreferencesStore((s) => s.byExerciseId);
   const dislikedIds = useMemo(() => collectDislikedIds(prefs), [prefs]);
@@ -59,7 +60,8 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
 
   const pickCandidates = useMemo(() => {
     if (!pickTarget) return [];
-    const list = pickTarget.list === "defaultWarmUp" ? draftWarmUp : draftCoolDown;
+    const list =
+      pickTarget.list === "defaultWarmUp" ? draftWarmUp : draftCoolDown;
     const used = buildStretchUsedExerciseIds(list, pickTarget.index);
     return getStretchCandidates({
       category: pickCategory(pickTarget.list),
@@ -98,7 +100,11 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
     setPickTarget(null);
   };
 
-  const updateTarget = (list: StretchListKey, index: number, targetReps: string) => {
+  const updateTarget = (
+    list: StretchListKey,
+    index: number,
+    targetReps: string,
+  ) => {
     const setter = list === "defaultWarmUp" ? setDraftWarmUp : setDraftCoolDown;
     setter((prev) => {
       const next = [...prev];
@@ -123,7 +129,9 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
       await settings.updateSettings({ defaultWarmUp, defaultCoolDown });
       onClose();
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Could not save stretch defaults");
+      setError(
+        e instanceof Error ? e.message : "Could not save stretch defaults",
+      );
     } finally {
       setSaving(false);
     }
@@ -131,11 +139,11 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
 
   const plannedName =
     pickTarget?.index != null
-      ? exerciseMap[
+      ? (exerciseMap[
           (pickTarget.list === "defaultWarmUp" ? draftWarmUp : draftCoolDown)[
             pickTarget.index
           ]?.exerciseId ?? ""
-        ]?.name ?? "Stretch"
+        ]?.name ?? "Stretch")
       : pickTarget?.list === "defaultCoolDown"
         ? "Cool-down stretch"
         : "Warm-up stretch";
@@ -172,7 +180,7 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
         }
       >
         <StretchPlanSection
-          title="Always include — warm-up"
+          title="Always include - warm-up"
           hint="Merged first into each day's warm-up (before focus-based additions)."
           entries={draftWarmUp}
           onAdd={() => setPickTarget({ list: "defaultWarmUp" })}
@@ -183,11 +191,13 @@ export default function DefaultStretchesModal({ open, onClose }: DefaultStretche
           }
         />
         <StretchPlanSection
-          title="Always include — cool-down"
+          title="Always include - cool-down"
           hint="Merged first into each day's cool-down."
           entries={draftCoolDown}
           onAdd={() => setPickTarget({ list: "defaultCoolDown" })}
-          onChange={(index) => setPickTarget({ list: "defaultCoolDown", index })}
+          onChange={(index) =>
+            setPickTarget({ list: "defaultCoolDown", index })
+          }
           onRemove={(index) => removeStretch("defaultCoolDown", index)}
           onUpdateTarget={(index, target) =>
             updateTarget("defaultCoolDown", index, target)

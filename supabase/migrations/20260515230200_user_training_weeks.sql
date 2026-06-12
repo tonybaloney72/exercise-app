@@ -1,4 +1,4 @@
--- Persisted training week template (Slice 2 — lazy materialized Sun–Sat from catalog until generator/prefs own it).
+-- Persisted training week template (Slice 2 - lazy materialized Sun–Sat from catalog until generator/prefs own it).
 -- week_start_sunday is the local-calendar Sunday beginning the ISO week row; days holds 7 × DayPlan as JSON (keys "0".."6").
 
 create table public.user_training_weeks (

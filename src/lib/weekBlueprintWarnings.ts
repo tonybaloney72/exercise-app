@@ -75,7 +75,7 @@ export function analyzeWeekBlueprint(
     warnings.push({
       id: "no-light-day",
       message:
-        "No rest or light day this week — consider active recovery, stretches only, or full rest on at least one day.",
+        "No rest or light day this week - consider active recovery, stretches only, or full rest on at least one day.",
     });
   }
 
@@ -94,7 +94,7 @@ export function analyzeWeekBlueprint(
       const heaviest = skewCounts.find((g) => g.count === skewMax)?.label;
       warnings.push({
         id: "skew-emphasis",
-        message: `Looks ${heaviest}-heavy this week — no ${missing} rounds scheduled. Fine if intentional.`,
+        message: `Looks ${heaviest}-heavy this week - no ${missing} rounds scheduled. Fine if intentional.`,
       });
     }
   }
@@ -113,7 +113,7 @@ export function analyzeWeekBlueprint(
     warnings.push({
       id: "no-core",
       message:
-        "No core groups on any round this week — add a core pill if you want midsection work.",
+        "No core groups on any round this week - add a core pill if you want midsection work.",
     });
   }
 

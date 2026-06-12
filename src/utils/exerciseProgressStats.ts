@@ -52,7 +52,9 @@ export function listExercisesWithNumericProgress(
   }
   return [...ids]
     .map((id) => ({ id, name: resolveExerciseDisplayName(id) }))
-    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+    .sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+    );
 }
 
 /**
@@ -130,7 +132,8 @@ export function buildExerciseProgressSeries(
 
   points.sort((a, b) => a.sortKey - b.sortKey);
 
-  const wantsDuration = preferDuration && points.some((p) => p.mode === "duration");
+  const wantsDuration =
+    preferDuration && points.some((p) => p.mode === "duration");
   let normalized = wantsDuration
     ? points.filter((p) => p.mode === "duration")
     : points.filter((p) => p.mode === "reps");
@@ -171,8 +174,7 @@ export function exerciseProgressTooltipLines(
   const breakdown = formatExerciseProgressSetBreakdown(point);
   if (point.mode === "duration") {
     const total =
-      formatDurationSeconds(chartValue) ||
-      `${Math.round(chartValue)}s total`;
+      formatDurationSeconds(chartValue) || `${Math.round(chartValue)}s total`;
     const primary = `${total} · ${breakdown}`;
     if (point.reps > 0) {
       return { primary, secondary: `${point.reps} reps also logged` };
@@ -193,7 +195,7 @@ export function exerciseProgressTooltipLines(
 export function formatExerciseProgressSetsCell(
   point: ExerciseProgressPoint,
 ): string {
-  if (point.setCount === 0) return "—";
+  if (point.setCount === 0) return "-";
   if (point.mode === "duration" && point.durationPerSet.length > 0) {
     const parts = point.durationPerSet.map(formatDurationSeconds);
     if (point.setCount === 1) return parts[0] ?? "1 set";

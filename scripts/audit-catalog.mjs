@@ -1,5 +1,5 @@
 /**
- * Phase 0 — Exercise catalog audit (inventory only; no auto-fix).
+ * Phase 0 - Exercise catalog audit (inventory only; no auto-fix).
  * Run: npm run audit:catalog
  * Optional: npm run audit:catalog -- --check-links  (HEAD requests; slow)
  *
@@ -53,9 +53,11 @@ function youtubeVideoKey(url) {
   if (!url) return null;
   try {
     const u = new URL(url);
-    if (u.hostname.includes("youtu.be")) return u.pathname.slice(1).split("/")[0] || null;
+    if (u.hostname.includes("youtu.be"))
+      return u.pathname.slice(1).split("/")[0] || null;
     if (u.hostname.includes("youtube.com")) {
-      if (u.pathname.startsWith("/embed/")) return u.pathname.split("/")[2] ?? null;
+      if (u.pathname.startsWith("/embed/"))
+        return u.pathname.split("/")[2] ?? null;
       return u.searchParams.get("v") ?? null;
     }
   } catch {
@@ -292,8 +294,9 @@ async function main() {
       missingVideoUrl: rows.filter((r) => !r.videoUrl).length,
       missingEquipment: rows.filter((r) => !r.equipment?.length).length,
       nonYoutubeVideo: rows.filter((r) => r.videoKind === "other").length,
-      vagueSource: rows.filter((r) => r.flags.includes("vague_or_missing_source"))
-        .length,
+      vagueSource: rows.filter((r) =>
+        r.flags.includes("vague_or_missing_source"),
+      ).length,
       equipmentHeuristicMismatch: rows.filter((r) =>
         r.flags.includes("equipment_heuristic_mismatch"),
       ).length,
@@ -328,19 +331,23 @@ async function main() {
   );
   console.log(`  Duplicate IDs:    ${report.totals.duplicateIds}`);
   console.log(
-    `  Shared YouTube IDs: ${report.totals.sharedYoutubeVideos} (same clip, many exercises — often OK)`,
+    `  Shared YouTube IDs: ${report.totals.sharedYoutubeVideos} (same clip, many exercises - often OK)`,
   );
   console.log(
     `  Stretches (SW/SC) missing video: ${stretchMissingVideo} / ${stretchRows.length}`,
   );
   console.log("\n  Flag counts:");
-  for (const [flag, count] of Object.entries(byFlag).sort((a, b) => b[1] - a[1])) {
+  for (const [flag, count] of Object.entries(byFlag).sort(
+    (a, b) => b[1] - a[1],
+  )) {
     console.log(`    ${flag}: ${count}`);
   }
   console.log(`\n  Wrote ${jsonPath}`);
   console.log(`  Wrote ${csvPath} (${flagged.length} flagged rows)`);
   if (!checkLinks) {
-    console.log("\n  Tip: run with --check-links to HEAD-check video URLs (slow).");
+    console.log(
+      "\n  Tip: run with --check-links to HEAD-check video URLs (slow).",
+    );
   }
 }
 

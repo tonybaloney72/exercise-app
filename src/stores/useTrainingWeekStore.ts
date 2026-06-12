@@ -35,7 +35,7 @@ type TrainingWeekState = {
     },
     options?: EnsureWeekOptions,
   ) => Promise<TrainingWeekDays>;
-  /** After a custom day save + plan revision bump — avoids a redundant DB resolve. */
+  /** After a custom day save + plan revision bump - avoids a redundant DB resolve. */
   applySavedWeek: (
     anchorKey: string,
     depsKey: string,

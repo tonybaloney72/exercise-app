@@ -1,4 +1,7 @@
-import { getReplacementCandidates, type ExpertiseFilter } from "@/lib/exerciseCandidates";
+import {
+  getReplacementCandidates,
+  type ExpertiseFilter,
+} from "@/lib/exerciseCandidates";
 import { buildRoundExcludeIds } from "@/lib/roundExclude";
 import type { Exercise, ExerciseCategory, ExerciseEquipment } from "@/types";
 
@@ -37,7 +40,7 @@ export function getPlanSlotCandidates(options: {
   }).sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** Any category — full pool for add-slot (equipment + dislikes; excludes ids already in round). */
+/** Any category - full pool for add-slot (equipment + dislikes; excludes ids already in round). */
 export function getPlanAddCandidates(options: {
   category: ExerciseCategory;
   roundExerciseIds: string[];

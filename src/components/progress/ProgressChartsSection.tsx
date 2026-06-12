@@ -1,13 +1,7 @@
 "use client";
 
 import { useMemo, useRef } from "react";
-import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-} from "recharts";
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import type { WorkoutLog } from "@/types";
 import { CATEGORIES } from "@/data/categories";
 import { trainingCategoryTotals } from "@/utils/progressStats";
@@ -124,7 +118,7 @@ export default function ProgressChartsSection({ history }: Props) {
       ) : (
         <SurfaceCard className="mt-3 border-dashed bg-surface/50 px-4 py-8">
           <EmptyState
-            title="No logged strength sets yet — finish round exercises to see this chart."
+            title="No logged strength sets yet - finish round exercises to see this chart."
             className="text-xs"
           />
         </SurfaceCard>

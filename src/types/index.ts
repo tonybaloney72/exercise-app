@@ -1,14 +1,14 @@
 export type ExerciseCategory =
-  | "CF"   // Core Front/Flexion
-  | "CL"   // Core Lower Abs
-  | "CR"   // Core Rotational/Obliques
-  | "CS"   // Core Stability
-  | "UP"   // Upper Push
-  | "UPL"  // Upper Pull
-  | "LB"   // Lower Body
-  | "PC"   // Plyometric Cardio
-  | "SW"   // Stretch – Warm-Up (Dynamic)
-  | "SC";  // Stretch – Cool-Down (Static)
+  | "CF" // Core Front/Flexion
+  | "CL" // Core Lower Abs
+  | "CR" // Core Rotational/Obliques
+  | "CS" // Core Stability
+  | "UP" // Upper Push
+  | "UPL" // Upper Pull
+  | "LB" // Lower Body
+  | "PC" // Plyometric Cardio
+  | "SW" // Stretch – Warm-Up (Dynamic)
+  | "SC"; // Stretch – Cool-Down (Static)
 
 /** How the user prefers to log a given exercise by default (timer mode is roadmap-backed). */
 export type ExerciseSetMode = "reps" | "timer";
@@ -39,9 +39,14 @@ export type ExerciseEquipment =
   | "bicycle";
 
 /** Planned: ExRx-style plyometric intensity (low → high). Not used in UI yet. */
-export type PlyometricIntensity = "low" | "low_medium" | "medium" | "medium_high" | "high";
+export type PlyometricIntensity =
+  | "low"
+  | "low_medium"
+  | "medium"
+  | "medium_high"
+  | "high";
 
-/** Curated difficulty for generator filtering (see ROADMAP — Expertise levels). */
+/** Curated difficulty for generator filtering (see ROADMAP - Expertise levels). */
 export type ExpertiseLevel =
   | "beginner"
   | "novice"
@@ -183,7 +188,7 @@ export interface ExerciseLog {
   actualReps?: number;
   /**
    * Logged time performed (timer mode), when different from the planned countdown.
-   * Optional override — if omitted when completing, we default from `targetDurationSeconds` / prescription.
+   * Optional override - if omitted when completing, we default from `targetDurationSeconds` / prescription.
    */
   actualDuration?: number;
   /**
@@ -235,7 +240,7 @@ export interface WorkoutLog {
   notes?: string;
   startTime?: string;
   endTime?: string;
-  /** Save for later — only meaningful when `endTime` is unset (authenticated cloud sync). */
+  /** Save for later - only meaningful when `endTime` is unset (authenticated cloud sync). */
   paused?: boolean;
 }
 
@@ -245,10 +250,7 @@ import type {
   WeeklyCategoryLayout,
 } from "@/lib/weeklyCategoryLayout";
 import type { WeeklyLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
-import type {
-  CustomBuildStyle,
-  WeekBlueprint,
-} from "@/lib/weekBlueprint";
+import type { CustomBuildStyle, WeekBlueprint } from "@/lib/weekBlueprint";
 
 /** Training priority preset (replaces legacy “program focus” naming in UI). */
 export type TrainingPriorityPreset =
@@ -304,7 +306,7 @@ export interface UserSettings {
   weekBlueprintCustomized: boolean;
   /** User dismissed the week-builder migration notice. */
   weekBuilderMigrationAcknowledged: boolean;
-  /** @deprecated Legacy layout mode — migrated to {@link weekBlueprint}. */
+  /** @deprecated Legacy layout mode - migrated to {@link weekBlueprint}. */
   weeklyCategoryLayout: WeeklyCategoryLayout;
   /** When false, layout is derived from catalog until user edits. */
   weeklyCategoryLayoutCustomized: boolean;
@@ -338,4 +340,3 @@ export interface WeightLogEntry {
   date: string;
   weightLb: number;
 }
-

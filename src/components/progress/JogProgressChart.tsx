@@ -49,10 +49,13 @@ function CardioTooltipBody({ point }: { point: CardioChartPoint }) {
       ? formatSecondsToMMSS(point.durationSec)
       : null;
   const pace = formatPacePerMile(point.paceSecondsPerMile);
-  const paceLine = pace !== "—" ? `Pace: ${pace}` : null;
+  const paceLine = pace !== "-" ? `Pace: ${pace}` : null;
 
   return (
-    <div className="rounded-lg border border-border px-3 py-2 text-xs shadow-lg" style={tooltipStyle}>
+    <div
+      className="rounded-lg border border-border px-3 py-2 text-xs shadow-lg"
+      style={tooltipStyle}
+    >
       <p className="font-semibold text-foreground">{point.date}</p>
       {dist && <p className="mt-1 text-muted">Distance: {dist}</p>}
       {time && <p className="text-muted">Time: {time}</p>}
@@ -107,7 +110,8 @@ export default function CardioProgressChart({
     () =>
       series.map((p) => ({
         ...p,
-        distancePlot: p.distanceMi != null && p.distanceMi > 0 ? p.distanceMi : 0,
+        distancePlot:
+          p.distanceMi != null && p.distanceMi > 0 ? p.distanceMi : 0,
         durationPlot: p.durationMin != null ? p.durationMin : undefined,
       })),
     [series],
@@ -136,9 +140,21 @@ export default function CardioProgressChart({
         subtitle="Distance (bars) and session time (line). Tooltip shows pace per mile when both are logged."
       >
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={composedData} margin={{ top: 28, right: 8, left: 0, bottom: 4 }}>
-            <CartesianGrid stroke="var(--border-color)" strokeDasharray="4 4" vertical={false} />
-            <XAxis dataKey="xLabel" tick={axisTick} tickLine={false} axisLine={false} />
+          <ComposedChart
+            data={composedData}
+            margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
+          >
+            <CartesianGrid
+              stroke="var(--border-color)"
+              strokeDasharray="4 4"
+              vertical={false}
+            />
+            <XAxis
+              dataKey="xLabel"
+              tick={axisTick}
+              tickLine={false}
+              axisLine={false}
+            />
             <YAxis
               yAxisId="mi"
               width={40}
@@ -178,7 +194,11 @@ export default function CardioProgressChart({
               height={28}
               formatter={(value) => (
                 <span className="text-xs text-muted">
-                  {value === "distancePlot" ? "Distance (mi)" : value === "durationPlot" ? "Time (min)" : value}
+                  {value === "distancePlot"
+                    ? "Distance (mi)"
+                    : value === "durationPlot"
+                      ? "Time (min)"
+                      : value}
                 </span>
               )}
             />
@@ -194,7 +214,9 @@ export default function CardioProgressChart({
                 <Cell
                   key={`d-${index}`}
                   fill="var(--accent)"
-                  fillOpacity={entry.distanceMi != null && entry.distanceMi > 0 ? 0.45 : 0}
+                  fillOpacity={
+                    entry.distanceMi != null && entry.distanceMi > 0 ? 0.45 : 0
+                  }
                 />
               ))}
             </Bar>
@@ -226,9 +248,21 @@ export default function CardioProgressChart({
         subtitle={`Distance per completed session (log time as well to see pace).`}
       >
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={series} margin={{ top: 28, right: 8, left: 0, bottom: 4 }}>
-            <CartesianGrid stroke="var(--border-color)" strokeDasharray="4 4" vertical={false} />
-            <XAxis dataKey="xLabel" tick={axisTick} tickLine={false} axisLine={false} />
+          <BarChart
+            data={series}
+            margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
+          >
+            <CartesianGrid
+              stroke="var(--border-color)"
+              strokeDasharray="4 4"
+              vertical={false}
+            />
+            <XAxis
+              dataKey="xLabel"
+              tick={axisTick}
+              tickLine={false}
+              axisLine={false}
+            />
             <YAxis
               width={40}
               tick={axisTick}
@@ -248,7 +282,9 @@ export default function CardioProgressChart({
             <Legend
               verticalAlign="top"
               height={28}
-              formatter={() => <span className="text-xs text-muted">Distance (mi)</span>}
+              formatter={() => (
+                <span className="text-xs text-muted">Distance (mi)</span>
+              )}
             />
             <Bar
               dataKey="distanceMi"
@@ -270,9 +306,21 @@ export default function CardioProgressChart({
       subtitle="Session time per completed session (add distance to see pace per mile)."
     >
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={series} margin={{ top: 28, right: 8, left: 0, bottom: 4 }}>
-          <CartesianGrid stroke="var(--border-color)" strokeDasharray="4 4" vertical={false} />
-          <XAxis dataKey="xLabel" tick={axisTick} tickLine={false} axisLine={false} />
+        <LineChart
+          data={series}
+          margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
+        >
+          <CartesianGrid
+            stroke="var(--border-color)"
+            strokeDasharray="4 4"
+            vertical={false}
+          />
+          <XAxis
+            dataKey="xLabel"
+            tick={axisTick}
+            tickLine={false}
+            axisLine={false}
+          />
           <YAxis
             width={44}
             tick={axisTick}
@@ -292,7 +340,9 @@ export default function CardioProgressChart({
           <Legend
             verticalAlign="top"
             height={28}
-            formatter={() => <span className="text-xs text-muted">Time (min)</span>}
+            formatter={() => (
+              <span className="text-xs text-muted">Time (min)</span>
+            )}
           />
           <Line
             type="monotone"

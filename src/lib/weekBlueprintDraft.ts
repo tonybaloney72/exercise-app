@@ -27,7 +27,9 @@ function catalogGroupsForDay(dow: number) {
   return groupsForCatalogDay(getCatalogPlanForDay(dow));
 }
 
-function roundFromGroups(groups: import("@/lib/weeklyCategoryLayout").LayoutGroup[]): RoundBlueprint {
+function roundFromGroups(
+  groups: import("@/lib/weeklyCategoryLayout").LayoutGroup[],
+): RoundBlueprint {
   return { groups: [...groups] };
 }
 
@@ -36,10 +38,9 @@ function buildDefaultRounds(
   dow: number,
   prevRounds: RoundBlueprint[],
 ): RoundBlueprint[] {
-  const baseGroups =
-    prevRounds[0]?.groups.length
-      ? prevRounds[0].groups
-      : catalogGroupsForDay(dow);
+  const baseGroups = prevRounds[0]?.groups.length
+    ? prevRounds[0].groups
+    : catalogGroupsForDay(dow);
 
   if (dayKind === "active_recovery") {
     const first = prevRounds[0];
@@ -233,7 +234,7 @@ function setRoundCountInBlueprint(
     rounds.push(
       existing ?? {
         groups: day.rounds[day.rounds.length - 1]?.groups.length
-          ? [...(day.rounds[day.rounds.length - 1]!.groups)]
+          ? [...day.rounds[day.rounds.length - 1]!.groups]
           : [...catalogGroups],
       },
     );
@@ -346,7 +347,7 @@ export function describeDayBlueprint(day: DayBlueprint): string {
         ? r.groups
             .map((g) => g.replace("upper_", "").replace("core_", ""))
             .join("+")
-        : "—";
+        : "-";
     const clone =
       r.cloneOfRoundIndex != null && r.cloneMode
         ? r.cloneMode === "repeat"
@@ -357,9 +358,7 @@ export function describeDayBlueprint(day: DayBlueprint): string {
   });
 
   const cardio =
-    (day.cardio?.length ?? 0) > 0
-      ? ` · C&E: ${day.cardio!.join(", ")}`
-      : "";
+    (day.cardio?.length ?? 0) > 0 ? ` · C&E: ${day.cardio!.join(", ")}` : "";
 
   return `${kind} · ${roundParts.join(" · ")}${cardio}`;
 }

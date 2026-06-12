@@ -2,7 +2,7 @@
  * Suggest YouTube URLs for catalog exercises missing videoUrl.
  *
  * Run: npm run catalog:suggest-videos
- * Requires: YOUTUBE_API_KEY recommended (else HTML search fallback — may break)
+ * Requires: YOUTUBE_API_KEY recommended (else HTML search fallback - may break)
  *
  * Options:
  *   --dry-run              Default; write CSV/JSON only
@@ -73,15 +73,20 @@ function parseArgs(argv) {
   for (const arg of argv) {
     if (arg === "--apply") opts.dryRun = false;
     else if (arg === "--dry-run") opts.dryRun = true;
-    else if (arg.startsWith("--approve=")) opts.approve = arg.slice("--approve=".length);
-    else if (arg.startsWith("--from-csv=")) opts.fromCsv = arg.slice("--from-csv=".length);
+    else if (arg.startsWith("--approve="))
+      opts.approve = arg.slice("--approve=".length);
+    else if (arg.startsWith("--from-csv="))
+      opts.fromCsv = arg.slice("--from-csv=".length);
     else if (arg === "--from-json") opts.fromJson = OUT_JSON;
     else if (arg.startsWith("--from-json=")) {
       opts.fromJson = arg.slice("--from-json=".length);
     } else if (arg === "--sync-csv") opts.syncCsv = true;
-    else if (arg.startsWith("--limit=")) opts.limit = Number(arg.slice("--limit=".length));
-    else if (arg.startsWith("--ids=")) opts.ids = arg.slice("--ids=".length).split(",");
-    else if (arg.startsWith("--delay-ms=")) opts.delayMs = Number(arg.slice("--delay-ms=".length));
+    else if (arg.startsWith("--limit="))
+      opts.limit = Number(arg.slice("--limit=".length));
+    else if (arg.startsWith("--ids="))
+      opts.ids = arg.slice("--ids=".length).split(",");
+    else if (arg.startsWith("--delay-ms="))
+      opts.delayMs = Number(arg.slice("--delay-ms=".length));
     else if (arg === "--skip-search") opts.skipSearch = true;
     else if (arg === "--resume") opts.resume = true;
     else if (arg === "--html") opts.forceHtml = true;
@@ -95,7 +100,8 @@ function parseArgs(argv) {
 }
 
 function loadRowsFromJson(path = OUT_JSON) {
-  const jsonPath = path.startsWith("/") || /^[A-Za-z]:/.test(path) ? path : join(ROOT, path);
+  const jsonPath =
+    path.startsWith("/") || /^[A-Za-z]:/.test(path) ? path : join(ROOT, path);
   const data = JSON.parse(readFileSync(jsonPath, "utf8"));
   return data.rows ?? [];
 }
@@ -199,7 +205,7 @@ async function buildSuggestions(exercises, opts) {
   const apiKey = opts.forceHtml ? null : process.env.YOUTUBE_API_KEY;
   if (!apiKey && !opts.skipSearch && !opts.forceHtml) {
     console.warn(
-      "YOUTUBE_API_KEY not set — using HTML search fallback (less reliable).",
+      "YOUTUBE_API_KEY not set - using HTML search fallback (less reliable).",
     );
   }
   if (opts.forceHtml) {
@@ -253,8 +259,9 @@ async function buildSuggestions(exercises, opts) {
     targets: targets.length,
     rows,
     missingTotal: missing.length,
-    skippedResume: Object.keys(previous).filter((id) => previous[id]?.suggestedVideoUrl)
-      .length,
+    skippedResume: Object.keys(previous).filter(
+      (id) => previous[id]?.suggestedVideoUrl,
+    ).length,
   };
 }
 
@@ -262,12 +269,23 @@ function markApprovedOnly() {
   const previous = loadPreviousRows();
   const rows = Object.values(previous).map((r) => applyAutoMarkToRow(r, true));
   const marked = rows.filter((r) => r.reviewStatus === "approved").length;
-  writeOutput({ rows, missingTotal: rows.length, processed: 0, apiKeyPresent: false });
+  writeOutput({
+    rows,
+    missingTotal: rows.length,
+    processed: 0,
+    apiKeyPresent: false,
+  });
   console.log(`Auto-marked ${marked} / ${rows.length} rows as approved.`);
   return rows;
 }
 
-function writeOutput({ rows, missingTotal, processed, apiKeyPresent, skippedResume = 0 }) {
+function writeOutput({
+  rows,
+  missingTotal,
+  processed,
+  apiKeyPresent,
+  skippedResume = 0,
+}) {
   const payload = {
     generatedAt: new Date().toISOString(),
     missingTotal,
@@ -404,9 +422,7 @@ async function main() {
   if (opts.markApprovedOnly) {
     markApprovedOnly();
     console.log("\nApply approved rows:");
-    console.log(
-      "  npm run catalog:suggest-videos -- --apply --from-json",
-    );
+    console.log("  npm run catalog:suggest-videos -- --apply --from-json");
     return;
   }
 
@@ -472,7 +488,9 @@ async function main() {
   console.log("  npm run catalog:video-review");
   console.log("Auto-mark safe rows then apply:");
   console.log("  npm run catalog:suggest-videos -- --mark-approved");
-  console.log("  npm run catalog:suggest-videos -- --apply --from-csv=reports/video-suggestions.csv");
+  console.log(
+    "  npm run catalog:suggest-videos -- --apply --from-csv=reports/video-suggestions.csv",
+  );
   console.log("Continue after quota (HTML search, keeps your 52):");
   console.log("  npm run catalog:suggest-videos -- --resume --html");
 

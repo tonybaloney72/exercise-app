@@ -13,7 +13,8 @@ export function isAbBicycleExerciseName(name) {
   if (/\breverse\s+bicycle\b/i.test(n)) return true;
   if (/\bbicycle\s+(kick|twist|pulses?)\b/i.test(n)) return true;
   if (/\b(crunch|oblique|abs|core)\b.*\bbicycle\b/i.test(n)) return true;
-  if (/\bbicycle\b.*\b(straight\s+leg|crunch|kick|twist|oblique)\b/i.test(n)) return true;
+  if (/\bbicycle\b.*\b(straight\s+leg|crunch|kick|twist|oblique)\b/i.test(n))
+    return true;
   return false;
 }
 
@@ -29,7 +30,10 @@ export function isCyclingEquipmentName(name) {
     return true;
   }
   if (/\b(^bike$|^cycling$|^cycle$)\b/i.test(n)) return true;
-  if (/\bbike\b/i.test(n) && /\b(cardio|ride|indoor|stationary|spin)\b/i.test(n)) {
+  if (
+    /\bbike\b/i.test(n) &&
+    /\b(cardio|ride|indoor|stationary|spin)\b/i.test(n)
+  ) {
     return true;
   }
   return false;
@@ -57,7 +61,9 @@ function equipmentFromNamedMove(name) {
   if (/\bface\s+pull\b/i.test(n)) return ["cable", "resistance_band"];
   if (/\b(jefferson|zercher)\s+squat\b/i.test(n)) return ["barbell"];
   if (
-    /\b(roman\s+chair|hyperextension|glute\s+ham|ghd|back\s+extension)\b/i.test(n) &&
+    /\b(roman\s+chair|hyperextension|glute\s+ham|ghd|back\s+extension)\b/i.test(
+      n,
+    ) &&
     !/\b(lying|floor|prone)\b/i.test(n)
   ) {
     return ["machine"];
@@ -171,7 +177,7 @@ function setsOverlapViaInterchangeable(aSet, eSet) {
  * True when catalog tags and heuristic disagree materially.
  * Equipment arrays are OR-style (user needs any one listed implement).
  *
- * Curated catalog wins over a name-only bodyweight default — avoids flagging
+ * Curated catalog wins over a name-only bodyweight default - avoids flagging
  * exercises you already fixed (Turkish sit-up + DB/KB, roman chair + machine, etc.).
  */
 export function equipmentAuditMismatch(actual, expected) {

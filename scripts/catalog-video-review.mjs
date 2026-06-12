@@ -23,7 +23,7 @@ function escapeHtml(s) {
 
 function main() {
   if (!existsSync(IN_JSON)) {
-    console.error(`Missing ${IN_JSON} — run catalog:suggest-videos first.`);
+    console.error(`Missing ${IN_JSON} - run catalog:suggest-videos first.`);
     process.exit(1);
   }
 
@@ -38,9 +38,9 @@ function main() {
       return `
       <article class="card" data-id="${escapeHtml(r.id)}" data-auto="${auto ? "1" : "0"}">
         <header>
-          <h2>${escapeHtml(r.id)} — ${escapeHtml(r.name)}</h2>
+          <h2>${escapeHtml(r.id)} - ${escapeHtml(r.name)}</h2>
           <p class="meta">${escapeHtml(r.category)} · ${escapeHtml(r.confidence)} · score ${escapeHtml(r.titleMatchScore)} · ${escapeHtml(r.strategy)}</p>
-          <p class="meta">${escapeHtml(r.channelTitle)} — ${escapeHtml(r.videoTitle)}</p>
+          <p class="meta">${escapeHtml(r.channelTitle)} - ${escapeHtml(r.videoTitle)}</p>
         </header>
         <iframe src="https://www.youtube.com/embed/${escapeHtml(id)}" loading="lazy" allowfullscreen></iframe>
         <div class="actions">
@@ -123,7 +123,9 @@ function main() {
   writeFileSync(OUT_HTML, html);
   console.log(`Wrote ${OUT_HTML} (${rows.length} embeds)`);
   console.log("Open in browser → approve → Download CSV →");
-  console.log("  npm run catalog:suggest-videos -- --apply --from-csv=path/to/export.csv");
+  console.log(
+    "  npm run catalog:suggest-videos -- --apply --from-csv=path/to/export.csv",
+  );
 }
 
 main();

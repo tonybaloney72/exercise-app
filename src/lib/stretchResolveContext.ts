@@ -23,7 +23,7 @@ export type StretchResolveContext = {
   trainingPriorityPreset: TrainingPriorityPreset;
   trainingPriorityScores: TrainingPriorityScores;
   trainingPriorityCustomized: boolean;
-  /** Sunday date key for the active week — rotates catalog picks across weeks. */
+  /** Sunday date key for the active week - rotates catalog picks across weeks. */
   weekRotationKey: string;
   /** Stretch ids already assigned earlier in the same Sun–Sat week (generator variety). */
   weekUsedStretchIds?: ReadonlySet<string>;
@@ -53,8 +53,7 @@ export function buildStretchResolveContextFromInputs(inputs: {
       useCatalogIfEmpty,
     ),
     dislikedExerciseIds,
-    trainingPriorityPreset:
-      inputs.trainingPriorityPreset ?? "balanced",
+    trainingPriorityPreset: inputs.trainingPriorityPreset ?? "balanced",
     trainingPriorityScores:
       inputs.trainingPriorityScores ??
       scoresFromPreset(inputs.trainingPriorityPreset ?? "balanced"),
@@ -74,8 +73,7 @@ export function stretchesForPlanInWeek(
     resolved[plan.dayOfWeek] ?? resolveStretchesForDay(plan, ctx);
   const dayOnly = resolveStretchesForDay(plan, ctx);
   return {
-    warmUp:
-      weekAware.warmUp.length > 0 ? weekAware.warmUp : dayOnly.warmUp,
+    warmUp: weekAware.warmUp.length > 0 ? weekAware.warmUp : dayOnly.warmUp,
     coolDown:
       weekAware.coolDown.length > 0 ? weekAware.coolDown : dayOnly.coolDown,
   };

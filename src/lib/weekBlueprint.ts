@@ -68,7 +68,7 @@ export const CUSTOM_BUILD_STYLE_LABELS: Record<
   guided: {
     label: "Guided week",
     description:
-      "Describe each day and round — we generate exercises for you. Best while you are still exploring movements.",
+      "Describe each day and round - we generate exercises for you. Best while you are still exploring movements.",
   },
   manual: {
     label: "Manual week",
@@ -125,7 +125,8 @@ function sanitizeRoundBlueprint(
       : undefined;
 
   const cloneMode =
-    typeof o.cloneMode === "string" && CLONE_MODES.includes(o.cloneMode as RoundCloneMode)
+    typeof o.cloneMode === "string" &&
+    CLONE_MODES.includes(o.cloneMode as RoundCloneMode)
       ? (o.cloneMode as RoundCloneMode)
       : undefined;
 
@@ -133,8 +134,7 @@ function sanitizeRoundBlueprint(
     groups,
     exerciseCount,
     cloneOfRoundIndex,
-    cloneMode:
-      cloneOfRoundIndex != null && cloneMode ? cloneMode : undefined,
+    cloneMode: cloneOfRoundIndex != null && cloneMode ? cloneMode : undefined,
   };
 }
 
@@ -191,9 +191,7 @@ function sanitizeDayBlueprint(
   const defaultGroups = groupsForCatalogDay(catalog);
   const fb: DayBlueprint = fallback ?? {
     dayKind: "workout",
-    rounds: defaultGroups.length
-      ? [{ groups: [...defaultGroups] }]
-      : [],
+    rounds: defaultGroups.length ? [{ groups: [...defaultGroups] }] : [],
     cardio: [],
   };
 
@@ -288,11 +286,7 @@ export function migrateLayoutToBlueprint(
         rounds.push({ groups: [...groups] });
       }
     } else {
-      const specs = buildLayoutRoundSpecs(
-        enabled,
-        resolved,
-        catalogRoundCount,
-      );
+      const specs = buildLayoutRoundSpecs(enabled, resolved, catalogRoundCount);
       for (const spec of specs) {
         if (spec.group !== "mixed") {
           rounds.push({ groups: [spec.group] });
@@ -335,7 +329,10 @@ export function resolveDayBlueprintForSettings(
   );
 }
 
-export function weekBlueprintEqual(a: WeekBlueprint, b: WeekBlueprint): boolean {
+export function weekBlueprintEqual(
+  a: WeekBlueprint,
+  b: WeekBlueprint,
+): boolean {
   return weeklyBlueprintFingerprint(a) === weeklyBlueprintFingerprint(b);
 }
 
@@ -385,11 +382,7 @@ export function applyDayBlueprintMetadata(
 ): DayPlan {
   let next = { ...plan };
   if (day.dayKind === "workout" || day.dayKind === "active_recovery") {
-    next = applyWeeklyCardioToDay(
-      next,
-      day.cardio ?? [],
-      availableEquipment,
-    );
+    next = applyWeeklyCardioToDay(next, day.cardio ?? [], availableEquipment);
   }
   next = applyRestDayToPlan(next, dayBlueprintKindToRestMode(day.dayKind));
   return next;

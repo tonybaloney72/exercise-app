@@ -334,7 +334,7 @@ const catalogExercises: Exercise[] = [
     secondaryCategory: "LB",
   },
 
-  // ── Core – Front/Flexion (CF) — Rehab Hero & Healthline ──
+  // ── Core – Front/Flexion (CF) - Rehab Hero & Healthline ──
   {
     id: "CF-8",
     name: "Isometric Abdominal Crunch",
@@ -443,7 +443,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Abs"],
     defaultReps: "12",
     notes:
-      "Arms overhead, legs extended — crunch up without pulling on neck; short range at top.",
+      "Arms overhead, legs extended - crunch up without pulling on neck; short range at top.",
     videoUrl: "https://www.youtube.com/watch?v=NhAWZShoSEI",
     source: "Lauren Aikins Personal Training",
     isTimeBased: false,
@@ -463,7 +463,7 @@ const catalogExercises: Exercise[] = [
     isTimeBased: false,
   },
 
-  // ── Core – Lower Abs (CL) — Rehab Hero & Healthline ──
+  // ── Core – Lower Abs (CL) - Rehab Hero & Healthline ──
   {
     id: "CL-7",
     name: "Scissor Kick",
@@ -487,7 +487,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors"],
     defaultReps: "12",
     notes:
-      "Supine, knees bent — lift both heels off floor using lower abs; slow and controlled. Rehab Hero.",
+      "Supine, knees bent - lift both heels off floor using lower abs; slow and controlled. Rehab Hero.",
     source: "Rehab Hero",
     videoUrl: "https://www.rehabhero.ca/exercise/heel-lifts",
     isTimeBased: false,
@@ -517,7 +517,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Obliques"],
     defaultReps: "8 each side",
     notes:
-      "Arms out, knees bent or straight — lower legs to each side with control; stop before back lifts. Healthline.",
+      "Arms out, knees bent or straight - lower legs to each side with control; stop before back lifts. Healthline.",
     source: "Healthline",
     videoUrl:
       "https://www.healthline.com/health/fitness-exercise/oblique-workout",
@@ -582,7 +582,7 @@ const catalogExercises: Exercise[] = [
     secondaryCategory: "UPL",
   },
 
-  // ── Core – Rotational/Obliques (CR) — Rehab Hero & Healthline ──
+  // ── Core – Rotational/Obliques (CR) - Rehab Hero & Healthline ──
   {
     id: "CR-7",
     name: "Heel Tap",
@@ -682,7 +682,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Obliques"],
     defaultReps: "12 each side",
     notes:
-      "Wide stance, hands behind head — bring elbow and same-side knee together in a side crunch. Healthline.",
+      "Wide stance, hands behind head - bring elbow and same-side knee together in a side crunch. Healthline.",
     source: "Healthline",
     videoUrl:
       "https://www.healthline.com/health/fitness-exercise/oblique-workout",
@@ -937,7 +937,7 @@ const catalogExercises: Exercise[] = [
     isTimeBased: false,
   },
 
-  // ── Core – Stability (CS) — Rehab Hero & Healthline ──
+  // ── Core – Stability (CS) - Rehab Hero & Healthline ──
   {
     id: "CS-6",
     name: "Abdominal Breathing Dead Bug",
@@ -990,7 +990,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "8 each side",
     notes:
-      "Bird dog with longer holds or small weight — progress from standard bird dog. Rehab Hero.",
+      "Bird dog with longer holds or small weight - progress from standard bird dog. Rehab Hero.",
     source: "Rehab Hero",
     videoUrl: "https://www.rehabhero.ca/exercise/advanced-bird-dog",
     isTimeBased: false,
@@ -1004,7 +1004,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Transverse Abdominis"],
     defaultReps: "20–30 sec",
     notes:
-      "Hands on Bosu dome (or stability ball), tall plank — unstable surface. Rehab Hero.",
+      "Hands on Bosu dome (or stability ball), tall plank - unstable surface. Rehab Hero.",
     source: "Rehab Hero",
     videoUrl: "https://www.rehabhero.ca/exercise/bosu-ball-tall-plank",
     isTimeBased: true,
@@ -1032,7 +1032,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
-      "Half-kneel beside ball for support, band at chest — press out against rotation. Rehab Hero.",
+      "Half-kneel beside ball for support, band at chest - press out against rotation. Rehab Hero.",
     source: "Rehab Hero",
     videoUrl: "https://www.rehabhero.ca/exercise/swiss-ball-pallof-press",
     isTimeBased: false,
@@ -1251,7 +1251,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Spinal Erectors", "Glutes"],
     defaultReps: "12",
     notes:
-      "Prone over bench, thighs blocked — extend spine without hyperextending lumbar. Rehab Hero.",
+      "Prone over bench, thighs blocked - extend spine without hyperextending lumbar. Rehab Hero.",
     source: "Rehab Hero",
     videoUrl: "https://www.rehabhero.ca/exercise/thigh-block-back-extension",
     isTimeBased: false,
@@ -1376,7 +1376,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
     defaultReps: "15",
     notes:
-      "Hands on elevated surface (table/counter). Easier than floor — good for volume",
+      "Hands on elevated surface (table/counter). Easier than floor - good for volume",
     source: "National Academy of Sports Medicine (NASM)",
     videoUrl: "https://www.youtube.com/watch?v=0JUrOH--Kdk",
     isTimeBased: false,
@@ -1390,7 +1390,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
     defaultReps: "8–10",
     notes:
-      "Feet elevated on chair, knees on ground. Upper chest emphasis — harder than standard knee push-ups",
+      "Feet elevated on chair, knees on ground. Upper chest emphasis - harder than standard knee push-ups",
     source: "ScottHermanFitness",
     videoUrl: "https://www.youtube.com/watch?v=SKPab2YC8BE",
     isTimeBased: false,
@@ -1404,7 +1404,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Chest", "Front Deltoids", "Triceps"],
     defaultReps: "4–6",
     notes:
-      "Explosive push-up with enough height to clap before landing; advanced — progress from incline.",
+      "Explosive push-up with enough height to clap before landing; advanced - progress from incline.",
     source: "ExRx.net",
     videoUrl: "https://exrx.net/Plyometrics/ClapPushUp",
     isTimeBased: false,
@@ -1791,7 +1791,7 @@ const catalogExercises: Exercise[] = [
     expertiseLevel: "advanced",
     muscleGroups: ["Calves", "Glutes", "Hamstrings", "Quadriceps"],
     defaultReps: "8 each",
-    notes: "Rear foot elevated on chair. ADVANCED — add when squats feel easy",
+    notes: "Rear foot elevated on chair. ADVANCED - add when squats feel easy",
     source: "Vicky Justiz",
     videoUrl: "https://www.youtube.com/watch?v=yewlXtRs3K4",
     isTimeBased: false,
@@ -1886,7 +1886,7 @@ const catalogExercises: Exercise[] = [
     expertiseLevel: "beginner",
     muscleGroups: ["Glutes", "Quadriceps"],
     defaultReps: "20 each",
-    notes: "Standing cross-body — elbow to opposite knee",
+    notes: "Standing cross-body - elbow to opposite knee",
     source: "Joanna Soh",
     videoUrl: "https://www.youtube.com/watch?v=z1fwSujYhX8",
     isTimeBased: false,
@@ -1945,7 +1945,7 @@ const catalogExercises: Exercise[] = [
     isTimeBased: false,
   },
 
-  // ── Cardio/Plyometric — Rehab Hero (Plyometrics) ──
+  // ── Cardio/Plyometric - Rehab Hero (Plyometrics) ──
   {
     id: "PC-8",
     name: "Single Leg Drop Landing",
@@ -2091,7 +2091,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Calves", "Glutes", "Quadriceps"],
     defaultReps: "4–6",
     notes:
-      "Step off box, land briefly, immediately jump vertically or forward. Advanced — build up slowly.",
+      "Step off box, land briefly, immediately jump vertically or forward. Advanced - build up slowly.",
     source: "Rehab Hero",
     videoUrl: "https://www.rehabhero.ca/exercise/depth-jump",
     isTimeBased: false,
@@ -2128,7 +2128,7 @@ const catalogExercises: Exercise[] = [
     secondaryCategory: "LB",
   },
 
-  // ── Cardio/Plyometric — ExRx.net (bodyweight / minimal gear) ──
+  // ── Cardio/Plyometric - ExRx.net (bodyweight / minimal gear) ──
   {
     id: "PC-20",
     name: "90° Jump Turns",
@@ -2302,7 +2302,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Calves", "Glutes", "Hamstrings", "Quadriceps"],
     defaultReps: "3–4",
     notes:
-      "Hop-step-jump sequence for max distance; technical — start at submax intensity.",
+      "Hop-step-jump sequence for max distance; technical - start at submax intensity.",
     source: "ExRx.net",
     videoUrl: "https://exrx.net/Plyometrics/StandingTripleJump",
     isTimeBased: false,
@@ -2427,7 +2427,7 @@ const catalogExercises: Exercise[] = [
     plyometricIntensity: "high",
   },
 
-  // ── Cardio/Plyometric — medicine ball (ExRx.net) ──
+  // ── Cardio/Plyometric - medicine ball (ExRx.net) ──
   {
     id: "PC-43",
     name: "Medicine Ball Slam",
@@ -2746,7 +2746,7 @@ const catalogExercises: Exercise[] = [
     plyometricIntensity: "medium",
   },
 
-  // ── Cardio/Plyometric — plyo box (ExRx.net) ──
+  // ── Cardio/Plyometric - plyo box (ExRx.net) ──
   {
     id: "PC-63",
     name: "Box Depth Jump",
@@ -2756,7 +2756,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Calves", "Glutes", "Quadriceps"],
     defaultReps: "4–6",
     notes:
-      "Step off box, land on both feet, immediately jump vertically. Advanced — progress from drop landings.",
+      "Step off box, land on both feet, immediately jump vertically. Advanced - progress from drop landings.",
     source: "ExRx.net",
     videoUrl: "https://exrx.net/Plyometrics/PlatformDepthJump",
     isTimeBased: false,
@@ -2912,7 +2912,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Mobility", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "On all fours — inhale: arch spine and look up (cow); exhale: round spine and tuck chin (cat)",
+      "On all fours - inhale: arch spine and look up (cow); exhale: round spine and tuck chin (cat)",
     source: "Timothy Lee, MS, OTRL, CPT",
     videoUrl: "https://www.youtube.com/watch?v=zWtLlhFp8HY",
     isTimeBased: false,
@@ -2964,7 +2964,7 @@ const catalogExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Warm-up scapular control in plank — retract shoulder blades together, then protract apart (serratus activation)",
+      "Warm-up scapular control in plank - retract shoulder blades together, then protract apart (serratus activation)",
     source: "Live Lean TV Daily Exercises",
     videoUrl: "https://www.youtube.com/watch?v=iQP1BBmwAgg",
     isTimeBased: false,
@@ -3143,7 +3143,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "6",
     notes:
       "Slowly tilt chin toward chest, then lift chin gently toward ceiling. Keep shoulders relaxed. From DAREBEE Universal Warmup.",
-    source: "DAREBEE — Universal Warmup",
+    source: "DAREBEE - Universal Warmup",
     videoUrl: "https://darebee.com/workouts/universal-warmup-workout.html",
     isTimeBased: false,
     secondaryCategory: "CS",
@@ -3158,7 +3158,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "6 each side",
     notes:
       "Drop ear toward shoulder without shrugging; alternate sides. Dynamic warm-up (not a static hold). DAREBEE Universal / Classic.",
-    source: "DAREBEE — Universal Warmup",
+    source: "DAREBEE - Universal Warmup",
     videoUrl: "https://darebee.com/workouts/universal-warmup-workout.html",
     isTimeBased: false,
     secondaryCategory: "CS",
@@ -3173,7 +3173,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "4 each direction",
     notes:
       "Slow controlled circles with the head; reverse direction halfway. DAREBEE Universal / Quick / Classic.",
-    source: "DAREBEE — Universal Warmup",
+    source: "DAREBEE - Universal Warmup",
     videoUrl: "https://darebee.com/workouts/universal-warmup-workout.html",
     isTimeBased: false,
     secondaryCategory: "CS",
@@ -3203,7 +3203,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "10 each side",
     notes:
       "One arm reaches up and back while the other reaches down; switch in a controlled rhythm. DAREBEE Quick / 4-Min.",
-    source: "DAREBEE — Quick Warmup",
+    source: "DAREBEE - Quick Warmup",
     videoUrl: "https://darebee.com/workouts/quick-warmup-workout.html",
     isTimeBased: false,
     secondaryCategory: "UP",
@@ -3218,7 +3218,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "10 each side",
     notes:
       "Alternate reaching one arm up and slightly back while the other stays down. Opens chest and shoulders. DAREBEE 2-Minute Warmup.",
-    source: "DAREBEE — 2-Minute Warmup",
+    source: "DAREBEE - 2-Minute Warmup",
     videoUrl: "https://darebee.com/workouts/2-minute-warmup-workout.html",
     isTimeBased: false,
     secondaryCategory: "UPL",
@@ -3233,7 +3233,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "10",
     notes:
       "Raise both arms out to the sides and overhead in a wide arc, lower with control. DAREBEE Classic Warmup.",
-    source: "DAREBEE — Classic Warmup",
+    source: "DAREBEE - Classic Warmup",
     videoUrl: "https://darebee.com/workouts/classic-warmup-workout.html",
     isTimeBased: false,
     secondaryCategory: "UP",
@@ -3278,7 +3278,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "10",
     notes:
       "Hop left and right with feet together; stay light on the toes. DAREBEE 2-Minute Warmup.",
-    source: "DAREBEE — 2-Minute Warmup",
+    source: "DAREBEE - 2-Minute Warmup",
     videoUrl:
       "https://darebee.com/exercises/hops-side-to-side-feet-together.html",
     isTimeBased: false,
@@ -3294,7 +3294,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "10 each leg",
     notes:
       "Small hops on one foot, then switch; use a wall for balance if needed. DAREBEE Quick / 4-Min.",
-    source: "DAREBEE — Quick Warmup",
+    source: "DAREBEE - Quick Warmup",
     videoUrl: "https://darebee.com/workouts/quick-warmup-workout.html",
     isTimeBased: false,
     secondaryCategory: "PC",
@@ -3309,7 +3309,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "10 each leg",
     notes:
       "Stand on one leg, lift the other knee and rotate the hip outward in a circle, then switch legs. DAREBEE Quick / 2-Min / 4-Min.",
-    source: "DAREBEE — Quick Warmup",
+    source: "DAREBEE - Quick Warmup",
     videoUrl: "https://darebee.com/workouts/quick-warmup-workout.html",
     isTimeBased: false,
     secondaryCategory: "LB",
@@ -3339,7 +3339,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "6 each leg",
     notes:
       "Drive one knee up while reaching both arms overhead, alternate legs. DAREBEE Universal Warmup.",
-    source: "DAREBEE — Universal Warmup",
+    source: "DAREBEE - Universal Warmup",
     videoUrl: "https://darebee.com/workouts/universal-warmup-workout.html",
     isTimeBased: false,
     secondaryCategory: "PC",
@@ -3354,7 +3354,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "30 sec",
     notes:
       "Loose jabs and crosses at easy speed, stay on the balls of the feet. DAREBEE Fighter's Warmup.",
-    source: "DAREBEE — Fighter's Warmup",
+    source: "DAREBEE - Fighter's Warmup",
     videoUrl: "https://darebee.com/workouts/fighters-warmup-workout.html",
     isTimeBased: true,
     secondaryCategory: "UP",
@@ -3369,7 +3369,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "30 sec (alternate legs)",
     notes:
       "Low snap kicks straight ahead, light contact, alternate legs. DAREBEE Fighter's Warmup.",
-    source: "DAREBEE — Fighter's Warmup",
+    source: "DAREBEE - Fighter's Warmup",
     videoUrl: "https://darebee.com/exercises/front-kicks.html",
     isTimeBased: true,
     secondaryCategory: "LB",
@@ -3384,7 +3384,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "30 sec",
     notes:
       "Low roundhouse-style kick with controlled hip turn; stay light and mobile. DAREBEE Fighter's Warmup.",
-    source: "DAREBEE — Fighter's Warmup",
+    source: "DAREBEE - Fighter's Warmup",
     videoUrl: "https://darebee.com/exercises/turning-kicks.html",
     isTimeBased: true,
     secondaryCategory: "LB",
@@ -3414,7 +3414,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "20 each leg",
     notes:
       "Lift knees to a comfortable height, opposite arm swing, easy pace. DAREBEE Universal Warmup.",
-    source: "DAREBEE — Universal Warmup",
+    source: "DAREBEE - Universal Warmup",
     videoUrl: "https://darebee.com/workouts/universal-warmup-workout.html",
     isTimeBased: false,
     secondaryCategory: "PC",
@@ -3429,7 +3429,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "20 sec",
     notes:
       "Small skip hops on the balls of the feet, soft landings, stay tall. DAREBEE Quick / 4-Min warmups.",
-    source: "DAREBEE — Quick Warmup",
+    source: "DAREBEE - Quick Warmup",
     videoUrl: "https://darebee.com/workouts/quick-warmup-workout.html",
     isTimeBased: true,
     secondaryCategory: "PC",
@@ -3518,7 +3518,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Mobility", "Obliques", "Spinal Erectors"],
     defaultReps: "6 each side",
     notes:
-      "Side-lying, knees bent — open top arm to ceiling and behind, follow with eyes; hips stay stacked.",
+      "Side-lying, knees bent - open top arm to ceiling and behind, follow with eyes; hips stay stacked.",
     source: "Momentum Physical Therapy of New Paltz",
     videoUrl: "https://www.youtube.com/watch?v=e71IP2SLrRc",
     isTimeBased: false,
@@ -3533,7 +3533,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Mobility", "Rhomboids", "Rear Deltoids"],
     defaultReps: "10",
     notes:
-      "Back to wall, forearms and wrists on wall — slide arms up overhead without ribs flaring.",
+      "Back to wall, forearms and wrists on wall - slide arms up overhead without ribs flaring.",
     source: "YouTube",
     videoUrl: "https://www.youtube.com/watch?v=52Z-6SB4d0s",
     isTimeBased: false,
@@ -3563,7 +3563,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Mobility", "Rear Deltoids", "Rhomboids"],
     defaultReps: "10",
     notes:
-      "Lie face down, thumbs up — lift arms to a Y overhead with shoulder blades set down and back.",
+      "Lie face down, thumbs up - lift arms to a Y overhead with shoulder blades set down and back.",
     source: "YouTube",
     videoUrl: "https://www.youtube.com/watch?v=MKDAXQ19U6Q",
     isTimeBased: false,
@@ -3578,7 +3578,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Glutes", "Hip Flexors", "Mobility", "Obliques"],
     defaultReps: "20 m each direction",
     notes:
-      "Lateral grapevine at easy pace, knees up, torso tall — prep for change-of-direction days.",
+      "Lateral grapevine at easy pace, knees up, torso tall - prep for change-of-direction days.",
     source: "Twin Cities Orthopedics",
     videoUrl: "https://www.youtube.com/watch?v=ViOHs1b6jGc",
     isTimeBased: false,
@@ -3609,7 +3609,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "3–5 each side",
     notes:
       "On all fours, lift knee to hip height (foot to ceiling), draw the biggest circle out to the side, forward toward the shoulder, down beside the opposite knee, then reverse. Controlled articular rotation for hips before squats, runs, or rows. Peloton / FRC-style mobility.",
-    source: "Peloton — Warm-Up Exercises",
+    source: "Peloton - Warm-Up Exercises",
     videoUrl: "https://www.onepeloton.com/blog/warm-up-exercises",
     isTimeBased: false,
     secondaryCategory: "LB",
@@ -3624,7 +3624,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "3–5 each arm",
     notes:
       "Stand tall, slow maximal arm circle: palm in, reach forward and up (bicep by ear), rotate palm back, arc down behind you, finish at the side palm out, then reverse. Lubricates the shoulder joint before pressing or pulling. Peloton warm-up.",
-    source: "Peloton — Warm-Up Exercises",
+    source: "Peloton - Warm-Up Exercises",
     videoUrl: "https://www.onepeloton.com/blog/warm-up-exercises",
     isTimeBased: false,
     secondaryCategory: "UP",
@@ -3644,8 +3644,8 @@ const catalogExercises: Exercise[] = [
     ],
     defaultReps: "5–8",
     notes:
-      "Face down, arms long: lift into I (arms/head/chest off floor), sweep to Y, bend elbows to W (scapular retraction), extend to T, sweep forward to I — one rep. Wakes postural muscles before rows, runs, or deadlifts. Peloton warm-up.",
-    source: "Peloton — Warm-Up Exercises",
+      "Face down, arms long: lift into I (arms/head/chest off floor), sweep to Y, bend elbows to W (scapular retraction), extend to T, sweep forward to I - one rep. Wakes postural muscles before rows, runs, or deadlifts. Peloton warm-up.",
+    source: "Peloton - Warm-Up Exercises",
     videoUrl: "https://www.onepeloton.com/blog/warm-up-exercises",
     isTimeBased: false,
     secondaryCategory: "UPL",

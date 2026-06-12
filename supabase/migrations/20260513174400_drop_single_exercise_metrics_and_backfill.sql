@@ -4,7 +4,7 @@
 -- so it no longer makes sense to special-case push-ups and jogging here.
 --
 -- Also backfill profiles + user_settings rows for any auth.users that
--- predate the handle_new_user trigger. Idempotent — safe on a fresh DB
+-- predate the handle_new_user trigger. Idempotent - safe on a fresh DB
 -- (the WHERE NOT EXISTS clauses make the inserts no-ops).
 -- =====================================================================
 

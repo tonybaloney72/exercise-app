@@ -1,4 +1,4 @@
-/** Cardio-block activities (jog, walk, etc.) — not strength round slots. */
+/** Cardio-block activities (jog, walk, etc.) - not strength round slots. */
 const ENDURANCE_BLOCK_EXERCISE_IDS = [
   "END-JOG",
   "END-WALK",

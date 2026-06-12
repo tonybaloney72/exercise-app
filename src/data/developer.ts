@@ -3,10 +3,10 @@
 export const DEVELOPER_NAME = "Anthony Bologna";
 
 export const DEVELOPER_TAGLINE =
-  "I'm investing in ME — get it? My Exercise is ME.";
+  "I'm investing in ME - get it? My Exercise is ME.";
 
 export const DEVELOPER_BIO =
-  "I am a software developer passionate about both user and developer experience who works tirelessly to create friendly, polished websites. With an eye for detail, a desire to grow, and a passion for building products that help people in their day-to-day life, I believe I can contribute at a high level to any team — no matter the challenge.";
+  "I am a software developer passionate about both user and developer experience who works tirelessly to create friendly, polished websites. With an eye for detail, a desire to grow, and a passion for building products that help people in their day-to-day life, I believe I can contribute at a high level to any team - no matter the challenge.";
 
 export type DeveloperLink = {
   label: string;

@@ -7,9 +7,9 @@ const FOCUSABLE_SELECTOR =
 
 export function getFocusableElements(root: HTMLElement | null): HTMLElement[] {
   if (!root) return [];
-  return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-    (el) => el.offsetParent !== null || el.getClientRects().length > 0,
-  );
+  return Array.from(
+    root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter((el) => el.offsetParent !== null || el.getClientRects().length > 0);
 }
 
 function preferredFocusTarget(nodes: HTMLElement[]): HTMLElement | undefined {
@@ -30,9 +30,9 @@ type Options = {
   onClose?: () => void;
   closeOnEscape?: boolean;
   /**
-   * `prefer-input` — first input/textarea if present (default).
-   * `first` — first focusable in DOM order (often the close button).
-   * `none` — do not move focus on open (avoids mobile keyboard popping up).
+   * `prefer-input` - first input/textarea if present (default).
+   * `first` - first focusable in DOM order (often the close button).
+   * `none` - do not move focus on open (avoids mobile keyboard popping up).
    */
   initialFocus?: FocusTrapInitialFocus;
 };

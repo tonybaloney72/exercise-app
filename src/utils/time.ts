@@ -18,7 +18,7 @@ export function parseTimeInput(value: string): number | undefined {
     return mins * 60 + Math.min(secs, 59);
   }
 
-  // Mobile-friendly numeric keypad without ":" — e.g. 1735 → 17:35
+  // Mobile-friendly numeric keypad without ":" - e.g. 1735 → 17:35
   if (/^\d{4}$/.test(trimmed)) {
     const mins = parseInt(trimmed.slice(0, 2), 10);
     const secs = parseInt(trimmed.slice(2, 4), 10);
@@ -26,7 +26,7 @@ export function parseTimeInput(value: string): number | undefined {
     return mins * 60 + secs;
   }
 
-  // Shorter durations without ":" — e.g. 930 → 9:30
+  // Shorter durations without ":" - e.g. 930 → 9:30
   if (/^\d{3}$/.test(trimmed)) {
     const mins = parseInt(trimmed.slice(0, 1), 10);
     const secs = parseInt(trimmed.slice(1, 3), 10);
@@ -85,7 +85,9 @@ export function countdownRingProgress(
 }
 
 /** Logged duration for display (MM:SS, or raw seconds if formatting fails). */
-export function formatLoggedDuration(seconds: number | undefined | null): string {
+export function formatLoggedDuration(
+  seconds: number | undefined | null,
+): string {
   if (seconds == null) return "";
   return formatSecondsToMMSS(seconds) || `${seconds}s`;
 }

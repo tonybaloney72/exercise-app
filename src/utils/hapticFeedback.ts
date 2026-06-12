@@ -1,9 +1,9 @@
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
-/** Timer finished — long triple pulse (duration is the main lever on mobile). */
+/** Timer finished - long triple pulse (duration is the main lever on mobile). */
 const TIMER_DONE_PATTERN_MS = [400, 120, 400, 120, 400] as const;
 
-/** Exercise / stretch marked complete — shorter but stronger than before. */
+/** Exercise / stretch marked complete - shorter but stronger than before. */
 const EXERCISE_COMPLETE_PATTERN_MS = [120, 80, 200] as const;
 
 function vibratePattern(pattern: readonly number[]): void {

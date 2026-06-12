@@ -56,7 +56,7 @@ export default function WeeklyCardioEditor({
             <strong className="text-foreground">
               push, pull, and Sunday recovery
             </strong>{" "}
-            only — leg days use a core block instead. Enable{" "}
+            only - leg days use a core block instead. Enable{" "}
             <strong className="text-foreground">Bicycle / indoor bike</strong>{" "}
             under Your equipment for cycle.
           </>

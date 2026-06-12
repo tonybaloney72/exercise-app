@@ -54,7 +54,7 @@ export default function PplWeekScheduleEditor({ value, onChange }: Props) {
       </div>
       {activePreset === "custom" ? (
         <p className="text-caption text-muted leading-snug">
-          Custom schedule — weekdays don&apos;t match a preset.
+          Custom schedule - weekdays don&apos;t match a preset.
         </p>
       ) : null}
       <ul className="space-y-2">

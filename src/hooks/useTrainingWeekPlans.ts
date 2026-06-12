@@ -17,7 +17,7 @@ import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /**
  * Current calendar week`s day plans via `planResolver` (materialized for guests;
- * persisted lazy-seeded week when signed in) — same source as Today and weekly day routes.
+ * persisted lazy-seeded week when signed in) - same source as Today and weekly day routes.
  */
 export function useTrainingWeekPlans(weekDates: Date[]): {
   weekByDow: TrainingWeekDays | null;
@@ -93,6 +93,7 @@ export function useTrainingWeekPlans(weekDates: Date[]): {
   return {
     weekByDow,
     loading: waitingForWeek && storeError == null,
-    error: !!anchorKey && !waitingForWeek && weekByDow == null ? storeError : null,
+    error:
+      !!anchorKey && !waitingForWeek && weekByDow == null ? storeError : null,
   };
 }

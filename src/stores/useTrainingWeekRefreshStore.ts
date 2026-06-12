@@ -10,7 +10,7 @@ export type TrainingWeekRefreshReason =
   | "program"
   | "reset";
 
-/** One line each — full policy lives in docs; toast is a quick confirmation only. */
+/** One line each - full policy lives in docs; toast is a quick confirmation only. */
 const TOAST_MESSAGE: Record<TrainingWeekRefreshReason, string> = {
   dislike: "Dislikes applied to today and the rest of this week.",
   favorite: "Favorites applied to today and the rest of this week.",

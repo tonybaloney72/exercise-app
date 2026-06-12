@@ -14,10 +14,10 @@ npm run audit:catalog -- --check-links
 
 ## Outputs
 
-| File | Purpose |
-|------|---------|
-| `catalog-audit.json` | Full inventory, per-exercise flags, category totals |
-| `catalog-audit.csv` | Flagged rows only — open in a spreadsheet for Phase 1 burn-down |
+| File                 | Purpose                                                         |
+| -------------------- | --------------------------------------------------------------- |
+| `catalog-audit.json` | Full inventory, per-exercise flags, category totals             |
+| `catalog-audit.csv`  | Flagged rows only - open in a spreadsheet for Phase 1 burn-down |
 
 Re-run after catalog edits to track progress. JSON/CSV are gitignored; this README is committed.
 
@@ -51,21 +51,21 @@ npm run catalog:suggest-videos
 2. Tries **duplicate name** in catalog first, then **YouTube search** using the **exercise name only** (catalog `source` is not added to the query).
 3. Picks the best verified result by **title match** (prefers “how to” / tutorial titles over vague or progression-style names).
 4. **Verifies** each pick with YouTube oEmbed (skips dead/unembeddable IDs).
-5. Writes `video-suggestions.csv` / `.json` for review — **does not patch** by default.
+5. Writes `video-suggestions.csv` / `.json` for review - **does not patch** by default.
 
 Options:
 
-| Flag | Purpose |
-|------|---------|
-| `--limit=20` | Smoke-test first N missing |
-| `--ids=CF-13,UPL-7` | Only these ids |
-| `--delay-ms=1500` | Throttle search (default 1200) |
-| `--resume` | Keep prior suggestions; only search rows still without a URL |
-| `--html` | HTML search only (no Data API quota; use after quota exceeded) |
-| `--auto-mark` | Set `reviewStatus=approved` on auto-safe rows while suggesting |
-| `--mark-approved` | Re-scan existing JSON and auto-mark safe rows (no API calls) |
-| `--from-json` | Apply from `video-suggestions.json` (after manual JSON edits) |
-| `--sync-csv` | Regenerate CSV from JSON (optional; apply can use JSON directly) |
+| Flag                | Purpose                                                          |
+| ------------------- | ---------------------------------------------------------------- |
+| `--limit=20`        | Smoke-test first N missing                                       |
+| `--ids=CF-13,UPL-7` | Only these ids                                                   |
+| `--delay-ms=1500`   | Throttle search (default 1200)                                   |
+| `--resume`          | Keep prior suggestions; only search rows still without a URL     |
+| `--html`            | HTML search only (no Data API quota; use after quota exceeded)   |
+| `--auto-mark`       | Set `reviewStatus=approved` on auto-safe rows while suggesting   |
+| `--mark-approved`   | Re-scan existing JSON and auto-mark safe rows (no API calls)     |
+| `--from-json`       | Apply from `video-suggestions.json` (after manual JSON edits)    |
+| `--sync-csv`        | Regenerate CSV from JSON (optional; apply can use JSON directly) |
 
 Visual bulk review (embedded players):
 
@@ -83,4 +83,4 @@ Without `YOUTUBE_API_KEY`, the script falls back to parsing YouTube search HTML 
 
 Caches: `youtube-search-cache.json`, `youtube-oembed-cache.json`.
 
-**END-\*** cardio rows (Jog, Walk, etc.) are audit-exempt — no `videoUrl` or `source` required.
+**END-\*** cardio rows (Jog, Walk, etc.) are audit-exempt - no `videoUrl` or `source` required.

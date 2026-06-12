@@ -9,7 +9,7 @@ export function pplWorkingExerciseCount(density: RoundDensity): number {
   return ROUND_DENSITY_TARGETS[density];
 }
 
-/** Leg day round 4 — dense core circuits (e.g. 15 moves in ~13 min). */
+/** Leg day round 4 - dense core circuits (e.g. 15 moves in ~13 min). */
 export const PPL_CORE_BLOCK_COUNT: Record<RoundDensity, number> = {
   compact: 5,
   standard: 10,

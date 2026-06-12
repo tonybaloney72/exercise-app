@@ -70,9 +70,7 @@ export default function ExerciseRow({
   const stored = useExerciseSettingsStore((s) => s.byExerciseId[effectiveId]);
 
   const roundExercises = useMemo(() => {
-    const r = activeWorkout?.rounds.find(
-      (x) => x.roundNumber === roundNumber,
-    );
+    const r = activeWorkout?.rounds.find((x) => x.roundNumber === roundNumber);
     return r?.exercises ?? [];
   }, [activeWorkout?.rounds, roundNumber]);
 
@@ -127,12 +125,7 @@ export default function ExerciseRow({
       log.loggingMode ??
       resolveExerciseSettings(effectiveExercise, stored).defaultSetMode
     );
-  }, [
-    log.loggingMode,
-    plannedExercise,
-    effectiveExercise,
-    stored,
-  ]);
+  }, [log.loggingMode, plannedExercise, effectiveExercise, stored]);
 
   const effectiveTargetSec = useMemo(() => {
     if (!effectiveExercise) return DEFAULT_TIMER_SECONDS_FALLBACK;
@@ -170,20 +163,14 @@ export default function ExerciseRow({
   ]);
 
   const actualRepsPlaceholder = useMemo(() => {
-    if (!effectiveExercise || mode !== "reps") return "—";
+    if (!effectiveExercise || mode !== "reps") return "-";
     const r = resolveExerciseSettings(effectiveExercise, stored);
     if (r.defaultTargetReps != null) return String(r.defaultTargetReps);
     const hint = parseRepTargetHint(
       resolvePrescriptionText(log) || roundExercise.targetReps,
     );
-    return hint != null ? String(hint) : "—";
-  }, [
-    effectiveExercise,
-    mode,
-    stored,
-    log,
-    roundExercise.targetReps,
-  ]);
+    return hint != null ? String(hint) : "-";
+  }, [effectiveExercise, mode, stored, log, roundExercise.targetReps]);
 
   if (!plannedExercise || !effectiveExercise) return null;
 
@@ -245,8 +232,7 @@ export default function ExerciseRow({
     });
   }
 
-  const showTimerPill =
-    mode === "timer" && !log.completed && !log.skipped;
+  const showTimerPill = mode === "timer" && !log.completed && !log.skipped;
   const detailText = showTimerPill
     ? didLine.replace(/^\s*→\s*/, "").trim() || null
     : `${prescriptionLine}${didLine}`.trim() || null;
@@ -262,7 +248,9 @@ export default function ExerciseRow({
           }}
           className="mt-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
           style={{
-            borderColor: log.completed ? "var(--accent)" : "var(--border-color)",
+            borderColor: log.completed
+              ? "var(--accent)"
+              : "var(--border-color)",
             backgroundColor: log.completed ? "var(--accent)" : "transparent",
           }}
         >

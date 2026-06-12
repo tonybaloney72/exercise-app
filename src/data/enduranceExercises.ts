@@ -2,7 +2,7 @@ import type { Exercise } from "@/types";
 
 /**
  * Endurance / cardio block activities (logged in exercise_logs with section cardio).
- * No videoUrl or source — catalog audit skips END-* (see scripts/lib/catalog-parse.mjs).
+ * No videoUrl or source - catalog audit skips END-* (see scripts/lib/catalog-parse.mjs).
  */
 export const enduranceExercises: Exercise[] = [
   {
@@ -32,7 +32,8 @@ export const enduranceExercises: Exercise[] = [
     equipment: ["bicycle"],
     muscleGroups: ["Mobility"],
     defaultReps: "30 min",
-    notes: "Road, stationary, or indoor bike; log time and optional distance (miles).",
+    notes:
+      "Road, stationary, or indoor bike; log time and optional distance (miles).",
     isTimeBased: true,
   },
   {
@@ -52,7 +53,8 @@ export const enduranceExercises: Exercise[] = [
     equipment: ["bodyweight"],
     muscleGroups: ["Mobility"],
     defaultReps: "20 min",
-    notes: "Pool or open water; log time and optional distance (miles) if known.",
+    notes:
+      "Pool or open water; log time and optional distance (miles) if known.",
     isTimeBased: true,
   },
 ];

@@ -22,7 +22,10 @@ function countCategories(plan: DayPlan): Map<ExerciseCategory, number> {
   return counts;
 }
 
-function sumCategories(counts: Map<ExerciseCategory, number>, cats: ExerciseCategory[]): number {
+function sumCategories(
+  counts: Map<ExerciseCategory, number>,
+  cats: ExerciseCategory[],
+): number {
   return cats.reduce((n, c) => n + (counts.get(c) ?? 0), 0);
 }
 
@@ -44,13 +47,13 @@ export function analyzeDayPlanBalance(plan: DayPlan): BalanceAlert[] {
     alerts.push({
       id: "push-no-pull",
       severity: "warning",
-      message: `${push} push exercises and no pull — consider adding upper pull (UPL).`,
+      message: `${push} push exercises and no pull - consider adding upper pull (UPL).`,
     });
   } else if (pull >= 4 && push === 0) {
     alerts.push({
       id: "pull-no-push",
       severity: "warning",
-      message: `${pull} pull exercises and no push — consider adding upper push (UP).`,
+      message: `${pull} pull exercises and no push - consider adding upper push (UP).`,
     });
   } else if (push >= 3 && pull === 0) {
     alerts.push({
@@ -70,7 +73,8 @@ export function analyzeDayPlanBalance(plan: DayPlan): BalanceAlert[] {
     alerts.push({
       id: "core-heavy",
       severity: "info",
-      message: "Mostly core work — check that upper/lower strength is covered elsewhere this week.",
+      message:
+        "Mostly core work - check that upper/lower strength is covered elsewhere this week.",
     });
   }
 
@@ -78,7 +82,8 @@ export function analyzeDayPlanBalance(plan: DayPlan): BalanceAlert[] {
     alerts.push({
       id: "no-lower",
       severity: "info",
-      message: "No lower-body (LB) exercises — fine for an upper day if legs are trained on other days.",
+      message:
+        "No lower-body (LB) exercises - fine for an upper day if legs are trained on other days.",
     });
   }
 

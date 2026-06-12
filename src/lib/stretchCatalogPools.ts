@@ -2,11 +2,7 @@ import { exercises } from "@/data/exercises";
 import type { Exercise, ExerciseCategory } from "@/types";
 import type { StretchEntry } from "@/types";
 
-export type StretchThemePoolId =
-  | "upper"
-  | "lower"
-  | "core"
-  | "conditioning";
+export type StretchThemePoolId = "upper" | "lower" | "core" | "conditioning";
 
 const UPPER_TAGS = new Set<ExerciseCategory>(["UP", "UPL"]);
 const LOWER_TAGS = new Set<ExerciseCategory>(["LB"]);
@@ -24,9 +20,7 @@ export function themePoolForStretch(ex: Exercise): StretchThemePoolId {
   if (LOWER_TAGS.has(sec)) return "lower";
   if (CORE_TAGS.has(sec)) return "core";
   if (PC_TAGS.has(sec)) return "conditioning";
-  throw new Error(
-    `Stretch ${ex.id}: unsupported secondaryCategory "${sec}"`,
-  );
+  throw new Error(`Stretch ${ex.id}: unsupported secondaryCategory "${sec}"`);
 }
 
 function toStretchEntry(ex: Exercise): StretchEntry {
@@ -36,7 +30,9 @@ function toStretchEntry(ex: Exercise): StretchEntry {
 /** Workout ids that also appear in warm-up themed pools (no duplicate SW row). */
 const WORKOUT_WARM_CROSSOVER_IDS = ["CS-3", "PC-1"] as const;
 
-function buildThemedPools(category: "SW" | "SC"): Record<StretchThemePoolId, StretchEntry[]> {
+function buildThemedPools(
+  category: "SW" | "SC",
+): Record<StretchThemePoolId, StretchEntry[]> {
   const pools: Record<StretchThemePoolId, StretchEntry[]> = {
     upper: [],
     lower: [],
@@ -112,7 +108,7 @@ function mergeThemedPools(
   return merged;
 }
 
-/** SW + SC + workout crossovers per theme — session warm-up picks. */
+/** SW + SC + workout crossovers per theme - session warm-up picks. */
 export const WARM_SESSION_CATALOG_POOLS = mergeThemedPools(
   mergeThemedPools(WARM_UP_CATALOG_POOLS, COOL_DOWN_CATALOG_POOLS),
   buildWorkoutWarmCrossoverPools(),

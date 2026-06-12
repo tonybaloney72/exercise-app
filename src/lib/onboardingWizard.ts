@@ -1,5 +1,6 @@
 /** sessionStorage: hide onboarding until the tab/session is closed. */
-export const ONBOARDING_DEFERRED_SESSION_KEY = "exercise-app-onboarding-deferred";
+export const ONBOARDING_DEFERRED_SESSION_KEY =
+  "exercise-app-onboarding-deferred";
 
 export const ONBOARDING_STEP_COUNT = 5;
 
@@ -48,7 +49,7 @@ export const ONBOARDING_TAB_TOUR = [
   {
     label: "Today",
     description:
-      "Your workout for the day—start a session, log quick cardio, or track body weight.",
+      "Your workout for the day-start a session, log quick cardio, or track body weight.",
   },
   {
     label: "Week",

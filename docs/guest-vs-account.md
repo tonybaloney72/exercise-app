@@ -6,12 +6,12 @@ MyExercise uses two access modes. **Guest** is for trying the app on one device;
 
 **Can do**
 
-- **Today** — follow an auto-generated plan for the current calendar week; start, pause, and complete workouts
-- **Weekly** — browse Sun–Sat; open each day (preview or completed log review)
-- **Progress** — charts and stats from workouts stored in **localStorage** on this device
-- **Library** — search and filter exercises; set per-exercise timer defaults (local)
-- **Settings** — dark mode, rest/set timers, equipment (regenerates the in-memory week when prefs change), equipment onboarding
-- **Workout session** — log sets, timers, swap/skip, add/remove exercises or rounds during a session (saved in the **workout log** only)
+- **Today** - follow an auto-generated plan for the current calendar week; start, pause, and complete workouts
+- **Weekly** - browse Sun–Sat; open each day (preview or completed log review)
+- **Progress** - charts and stats from workouts stored in **localStorage** on this device
+- **Library** - search and filter exercises; set per-exercise timer defaults (local)
+- **Settings** - dark mode, rest/set timers, equipment (regenerates the in-memory week when prefs change), equipment onboarding
+- **Workout session** - log sets, timers, swap/skip, add/remove exercises or rounds during a session (saved in the **workout log** only)
 
 **Cannot do (requires account)**
 
@@ -36,12 +36,12 @@ Everything above, plus:
 
 ## Week infrastructure (by design)
 
-| Topic | Decision |
-|-------|----------|
-| Guest week persistence | **Not planned** — gate with copy, not localStorage parity |
-| Guest custom week | **Not planned** — account-only |
-| Week boundary cron | **Not needed** — lazy `weekKey` (Sunday local) on each visit |
-| `week_start_date` setting | **Unused** — app uses Sun–Sat only; column may be removed later |
+| Topic                     | Decision                                                        |
+| ------------------------- | --------------------------------------------------------------- |
+| Guest week persistence    | **Not planned** - gate with copy, not localStorage parity       |
+| Guest custom week         | **Not planned** - account-only                                  |
+| Week boundary cron        | **Not needed** - lazy `weekKey` (Sunday local) on each visit    |
+| `week_start_date` setting | **Unused** - app uses Sun–Sat only; column may be removed later |
 
 ## UI pattern
 

@@ -31,7 +31,7 @@ describe("pplWeekTemplate", () => {
     ]);
   });
 
-  it("stores themes only — no exercise ids in seed rounds", () => {
+  it("stores themes only - no exercise ids in seed rounds", () => {
     const week = buildPplWeek();
     for (let dow = 0; dow < 7; dow++) {
       expect(isThemesOnlyPplPlan(week[dow]!)).toBe(true);

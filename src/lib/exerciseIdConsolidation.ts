@@ -5,7 +5,7 @@
 
 /** @deprecated id → canonical id */
 export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
-  // A — catalog wins over Hybrid Calisthenics
+  // A - catalog wins over Hybrid Calisthenics
   "HC-131": "CS-3",
   "HC-178": "CS-5",
   "HC-192": "CF-13",
@@ -19,7 +19,7 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "HC-299": "CL-10",
   "HC-263": "LB-7",
   "HC-264": "LB-7",
-  // B — duplicate HC rows (keep first of pair)
+  // B - duplicate HC rows (keep first of pair)
   "HC-062": "HC-061",
   "HC-077": "HC-076",
   "HC-175": "HC-174",
@@ -33,29 +33,29 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "HC-288": "HC-287",
   "HC-292": "HC-291",
   "HC-295": "HC-294",
-  // C — workout entry wins over stretch duplicate
+  // C - workout entry wins over stretch duplicate
   "SW-20": "LB-1",
   "SW-25": "PC-1",
   "SW-17": "PC-5",
-  // D — glute bridge: keep CS-5
+  // D - glute bridge: keep CS-5
   "SW-15": "CS-5",
-  // F — duplicate in-place bounce (keep Hops on the Spot)
+  // F - duplicate in-place bounce (keep Hops on the Spot)
   "SW-40": "SW-33",
-  // G — duplicate bird dog (keep Bird-Dog)
+  // G - duplicate bird dog (keep Bird-Dog)
   "SW-51": "SW-8",
-  // H — strict duplicates of workout entries (keep CS-3 / PC-1)
+  // H - strict duplicates of workout entries (keep CS-3 / PC-1)
   "SW-52": "CS-3",
   "SW-44": "PC-1",
-  // E — duplicate mountain climber variants
+  // E - duplicate mountain climber variants
   "PC-3": "CR-10",
-  // P3 — catalog hygiene (May 2026)
+  // P3 - catalog hygiene (May 2026)
   "SC-20": "SC-15",
   "SC-28": "SC-8",
   "HC-243": "SW-10",
-  // P3 — dedupe / consolidate (May 2026)
+  // P3 - dedupe / consolidate (May 2026)
   "PC-25": "PC-22",
   "HC-137": "SC-23",
-  // P3 — stretch/workout duplicates (May 2026)
+  // P3 - stretch/workout duplicates (May 2026)
   "HC-216": "SW-23",
   "HC-186": "SW-48",
   "PC-12": "PC-31",
@@ -126,7 +126,6 @@ export function migrateConsolidatedExerciseId(id: string): string {
 
 function isRemovedFromLibrary(id: string): boolean {
   return (
-    REMOVED_HYBRID_EXERCISE_IDS.has(id) ||
-    REMOVED_CATALOG_STRETCH_IDS.has(id)
+    REMOVED_HYBRID_EXERCISE_IDS.has(id) || REMOVED_CATALOG_STRETCH_IDS.has(id)
   );
 }

@@ -22,10 +22,15 @@ import {
 import type { DayPlan } from "@/types";
 
 function blueprintMaterializeProfile(blueprint: WeekBlueprint) {
-  return buildProgramProfileInput("balanced", scoresFromPreset("balanced"), false, {
-    blueprintMode: true,
-    weekBlueprint: blueprint,
-  });
+  return buildProgramProfileInput(
+    "balanced",
+    scoresFromPreset("balanced"),
+    false,
+    {
+      blueprintMode: true,
+      weekBlueprint: blueprint,
+    },
+  );
 }
 
 /** Materialize a full Sun–Sat week from a blueprint (filled exercises). */
@@ -86,7 +91,7 @@ export async function buildDayPlanFromBlueprint(
   return day;
 }
 
-/** Saved guided blueprint, preset, or catalog default — for manual week seed. */
+/** Saved guided blueprint, preset, or catalog default - for manual week seed. */
 export function resolveBlueprintForManualSeed(
   settings: {
     weekBlueprint?: WeekBlueprint;
