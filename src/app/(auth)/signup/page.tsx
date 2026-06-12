@@ -1,16 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import BackNavLink from "@/components/common/BackNavLink";
 import AuthField from "@/components/auth/AuthField";
+import AuthOrDivider from "@/components/auth/AuthOrDivider";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { humanizeAuthError } from "@/lib/auth/humanizeAuthError";
 import { createClient } from "@/lib/supabase/client";
-import { APP_HOME } from "@/lib/auth/constants";
+import { APP_HOME, safeReturnTo } from "@/lib/auth/constants";
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const params = useSearchParams();
+  const returnTo = safeReturnTo(params.get("returnTo"));
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -56,8 +61,13 @@ export default function SignupPage() {
     }
 
     router.refresh();
-    router.push(APP_HOME);
+    router.push(returnTo || APP_HOME);
   }
+
+  const loginHref =
+    returnTo !== APP_HOME
+      ? `/login?returnTo=${encodeURIComponent(returnTo)}`
+      : "/login";
 
   return (
     <div className="space-y-3 sm:space-y-5">
@@ -67,6 +77,21 @@ export default function SignupPage() {
           Sync your workouts across devices.
         </p>
       </div>
+
+      <GoogleSignInButton
+        returnTo={returnTo}
+        disabled={busy}
+        onStart={() => {
+          setBusy(true);
+          setError(null);
+        }}
+        onError={(message) => {
+          setError(humanizeAuthError(message, "signup"));
+          setBusy(false);
+        }}
+      />
+
+      <AuthOrDivider />
 
       <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
         <AuthField
@@ -116,7 +141,7 @@ export default function SignupPage() {
       <div className="space-y-1 text-center text-sm text-muted sm:space-y-2 sm:text-xs">
         <p>
           Already have an account?{" "}
-          <Link href="/login" className="text-accent hover:underline">
+          <Link href={loginHref} className="text-accent hover:underline">
             Log in
           </Link>
         </p>
@@ -125,5 +150,13 @@ export default function SignupPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignupForm />
+    </Suspense>
   );
 }

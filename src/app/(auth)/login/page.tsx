@@ -1,11 +1,13 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import BackNavLink from "@/components/common/BackNavLink";
 import AuthField from "@/components/auth/AuthField";
+import AuthOrDivider from "@/components/auth/AuthOrDivider";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { humanizeAuthError } from "@/lib/auth/humanizeAuthError";
 import { createClient } from "@/lib/supabase/client";
 import { APP_HOME, safeReturnTo } from "@/lib/auth/constants";
@@ -19,6 +21,13 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const urlError = params.get("error");
+    if (urlError) {
+      setError(humanizeAuthError(decodeURIComponent(urlError), "login"));
+    }
+  }, [params]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -57,6 +66,21 @@ function LoginForm() {
         <h1 className="text-xl font-bold text-foreground sm:text-2xl">Welcome back</h1>
         <p className="text-xs text-muted sm:text-sm">Log in to sync your progress.</p>
       </div>
+
+      <GoogleSignInButton
+        returnTo={returnTo}
+        disabled={busy}
+        onStart={() => {
+          setBusy(true);
+          setError(null);
+        }}
+        onError={(message) => {
+          setError(humanizeAuthError(message, "login"));
+          setBusy(false);
+        }}
+      />
+
+      <AuthOrDivider />
 
       <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
         <AuthField
@@ -103,7 +127,14 @@ function LoginForm() {
         </p>
         <p>
           No account?{" "}
-          <Link href="/signup" className="text-accent hover:underline">
+          <Link
+            href={
+              returnTo !== APP_HOME
+                ? `/signup?returnTo=${encodeURIComponent(returnTo)}`
+                : "/signup"
+            }
+            className="text-accent hover:underline"
+          >
             Create one
           </Link>
         </p>
