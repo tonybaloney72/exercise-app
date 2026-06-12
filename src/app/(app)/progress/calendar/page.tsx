@@ -20,7 +20,7 @@ function CalendarRedirectInner() {
   );
 }
 
-/** Legacy URL — history lives at `/progress/history`. */
+/** Legacy URL - history lives at `/progress/history`. */
 export default function WorkoutHistoryCalendarRedirect() {
   return (
     <Suspense fallback={null}>

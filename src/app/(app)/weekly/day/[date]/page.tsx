@@ -405,7 +405,7 @@ export default function WeeklyDayPage() {
           ) : continueWorkoutHere ? (
             <SurfaceCard className="border-accent/30 bg-accent/10 px-4 py-3">
               <p className="text-sm text-foreground">
-                Workout in progress — continue on{" "}
+                Workout in progress - continue on{" "}
                 <Link
                   href="/today"
                   className="font-medium text-accent hover:underline"
@@ -418,7 +418,7 @@ export default function WeeklyDayPage() {
           ) : (
             <SurfaceCard className="px-4 py-3">
               <p className="text-sm text-foreground">
-                You haven&apos;t completed today&apos;s workout yet — preview
+                You haven&apos;t completed today&apos;s workout yet - preview
                 below or use{" "}
                 <Link
                   href="/today"

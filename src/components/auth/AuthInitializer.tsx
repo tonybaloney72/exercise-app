@@ -44,7 +44,7 @@ export default function AuthInitializer({ initialUser, initialGuest }: Props) {
       // Re-read the cookie in case it changed (e.g. exit guest in another tab).
       setGuest(readGuestCookie());
 
-      // Fresh login on this device — migrate any local data.
+      // Fresh login on this device - migrate any local data.
       if (event === "SIGNED_IN" && u) {
         void migrateLocalDataIfNeeded(u.id);
       }

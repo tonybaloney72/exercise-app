@@ -50,7 +50,7 @@ export default function LandingPage() {
             Train every day, build the habit.
           </h1>
           <p className="text-xs leading-snug text-muted sm:text-sm">
-            A pocket coach for daily strength, cardio, and recovery — built for
+            A pocket coach for daily strength, cardio, and recovery - built for
             consistency over intensity.
           </p>
         </motion.div>
@@ -69,7 +69,7 @@ export default function LandingPage() {
             {busy ? "Loading…" : "Continue as guest"}
           </button>
           <p className="text-center text-caption leading-snug text-muted sm:text-sm">
-            Guest mode keeps everything on this device — no account, no sync.
+            Guest mode keeps everything on this device - no account, no sync.
           </p>
 
           <div className="my-2 flex items-center gap-3 sm:my-4">

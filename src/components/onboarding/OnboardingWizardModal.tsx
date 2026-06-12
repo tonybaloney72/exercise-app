@@ -36,11 +36,15 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
 
   const [step, setStep] = useState<OnboardingStepId>("welcome");
   const [equipment, setEquipment] = useState<ExerciseEquipment[]>(() =>
-    savedEquipment.length > 0 ? [...savedEquipment] : [...DEFAULT_AVAILABLE_EQUIPMENT],
+    savedEquipment.length > 0
+      ? [...savedEquipment]
+      : [...DEFAULT_AVAILABLE_EQUIPMENT],
   );
-  const [expertiseByGroup, setExpertiseByGroup] = useState<ExpertiseByGroup>(() => ({
-    ...savedExpertise,
-  }));
+  const [expertiseByGroup, setExpertiseByGroup] = useState<ExpertiseByGroup>(
+    () => ({
+      ...savedExpertise,
+    }),
+  );
   const [saving, setSaving] = useState(false);
 
   const stepNumber = onboardingStepIndex(step) + 1;
@@ -144,7 +148,7 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
               <p>
                 You&apos;ll pick your skill level by muscle group, the equipment
                 you have, and see how the main tabs work. The default week is a
-                6-day push / pull / legs split—you can change that anytime.
+                6-day push / pull / legs split-you can change that anytime.
               </p>
             </div>
           ),
@@ -165,7 +169,9 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
         return {
           title: "Your equipment",
           hint: "We use this for the exercise library and when building your week.",
-          body: <EquipmentPicker selected={equipment} onChange={setEquipment} />,
+          body: (
+            <EquipmentPicker selected={equipment} onChange={setEquipment} />
+          ),
         };
       case "tour":
         return {
@@ -178,7 +184,9 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
                   key={tab.label}
                   className="rounded-xl border border-border bg-surface-hover px-3 py-2.5"
                 >
-                  <p className="text-sm font-semibold text-foreground">{tab.label}</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {tab.label}
+                  </p>
                   <p className="mt-0.5 text-xs text-muted leading-relaxed">
                     {tab.description}
                   </p>
@@ -194,23 +202,31 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
           body: (
             <div className="space-y-4 text-sm leading-relaxed">
               <div className="rounded-xl border border-accent/30 bg-accent/10 px-3 py-3">
-                <p className="font-semibold text-foreground">6-day P/P/L (recommended)</p>
+                <p className="font-semibold text-foreground">
+                  6-day P/P/L (recommended)
+                </p>
                 <p className="mt-1 text-xs text-muted">
-                  Balanced push, pull, and leg days with configurable rest and cardio.
-                  Great if you want a proven split without building from scratch.
+                  Balanced push, pull, and leg days with configurable rest and
+                  cardio. Great if you want a proven split without building from
+                  scratch.
                 </p>
               </div>
               <div className="rounded-xl border border-border bg-surface-hover px-3 py-3">
-                <p className="font-semibold text-foreground">Custom week — guided</p>
+                <p className="font-semibold text-foreground">
+                  Custom week - guided
+                </p>
                 <p className="mt-1 text-xs text-muted">
-                  Step through a blueprint wizard: day themes, rounds, and cardio per
-                  day. The app fills exercises from your settings.
+                  Step through a blueprint wizard: day themes, rounds, and
+                  cardio per day. The app fills exercises from your settings.
                 </p>
               </div>
               <div className="rounded-xl border border-border bg-surface-hover px-3 py-3">
-                <p className="font-semibold text-foreground">Custom week — manual</p>
+                <p className="font-semibold text-foreground">
+                  Custom week - manual
+                </p>
                 <p className="mt-1 text-xs text-muted">
-                  Pick exercises yourself for each day—full control, more setup time.
+                  Pick exercises yourself for each day—full control, more setup
+                  time.
                 </p>
               </div>
             </div>

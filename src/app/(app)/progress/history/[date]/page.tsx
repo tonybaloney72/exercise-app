@@ -61,7 +61,10 @@ export default function WorkoutHistoryDayPage() {
     [workoutHistory, dateKey],
   );
 
-  const reviewPlan = useMemo(() => (log ? planFromWorkoutLog(log) : null), [log]);
+  const reviewPlan = useMemo(
+    () => (log ? planFromWorkoutLog(log) : null),
+    [log],
+  );
   const sessionPlan = useMemo(() => {
     if (!log) return null;
     if (prescribedPlan) return sessionPlanForWorkoutEdit(log, prescribedPlan);
@@ -143,12 +146,14 @@ export default function WorkoutHistoryDayPage() {
                   Log workout for this day
                 </Link>
               ) : (
-                <p className="text-xs text-muted">{backfillEligibility.reason}</p>
+                <p className="text-xs text-muted">
+                  {backfillEligibility.reason}
+                </p>
               )}
             </>
           ) : (
             <p className="text-xs text-muted">
-              This day is in the future — no log yet.
+              This day is in the future - no log yet.
             </p>
           )}
         </SurfaceCard>
@@ -168,7 +173,10 @@ export default function WorkoutHistoryDayPage() {
       {inCurrentWeek ? (
         <p className="text-xs text-muted px-1">
           To change this week&apos;s prescribed plan (not the saved log), open{" "}
-          <Link href={`/weekly/day/${dateKey}`} className="font-medium text-accent hover:underline">
+          <Link
+            href={`/weekly/day/${dateKey}`}
+            className="font-medium text-accent hover:underline"
+          >
             Weekly
           </Link>
           .

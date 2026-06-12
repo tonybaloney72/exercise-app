@@ -7,7 +7,14 @@ import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 
 function CloseIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <line x1="18" y1="6" x2="6" y2="18" />
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
@@ -36,14 +43,17 @@ export type BottomSheetModalProps = {
   titleClassName?: string;
   hintClassName?: string;
   /**
-   * `sheet` — slides up from the bottom on small screens (default).
-   * `center` — centered dialog on all breakpoints.
+   * `sheet` - slides up from the bottom on small screens (default).
+   * `center` - centered dialog on all breakpoints.
    */
   placement?: "sheet" | "center";
   initialFocus?: FocusTrapInitialFocus;
 };
 
-const maxWidthClass: Record<NonNullable<BottomSheetModalProps["maxWidth"]>, string> = {
+const maxWidthClass: Record<
+  NonNullable<BottomSheetModalProps["maxWidth"]>,
+  string
+> = {
   md: "max-w-md",
   lg: "max-w-lg",
 };
@@ -106,9 +116,13 @@ export default function BottomSheetModal({
         >
           <motion.div
             ref={panelRef}
-            initial={centered ? { scale: 0.96, opacity: 0 } : { y: 40, opacity: 0 }}
+            initial={
+              centered ? { scale: 0.96, opacity: 0 } : { y: 40, opacity: 0 }
+            }
             animate={centered ? { scale: 1, opacity: 1 } : { y: 0, opacity: 1 }}
-            exit={centered ? { scale: 0.96, opacity: 0 } : { y: 40, opacity: 0 }}
+            exit={
+              centered ? { scale: 0.96, opacity: 0 } : { y: 40, opacity: 0 }
+            }
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
             className={`flex max-h-[90vh] w-full ${maxWidthClass[maxWidth]} flex-col overflow-hidden border border-border bg-surface shadow-xl ${
               centered

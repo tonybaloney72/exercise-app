@@ -105,7 +105,7 @@ export default function SettingsPage() {
               <div>
                 <p className="text-xs text-muted">Mode</p>
                 <p className="text-sm text-foreground">
-                  Guest — data is stored on this device only.
+                  Guest - data is stored on this device only.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -352,8 +352,8 @@ export default function SettingsPage() {
                   Open week builder
                 </Link>
                 <p className="text-xs text-muted leading-snug">
-                  Pick every exercise yourself, or start from a template (upper/lower
-                  or PPL) and tweak in the editor.
+                  Pick every exercise yourself, or start from a template
+                  (upper/lower or PPL) and tweak in the editor.
                 </p>
               </div>
             ) : null}
@@ -402,7 +402,7 @@ export default function SettingsPage() {
                 hint={
                   settings.programMode === "preset"
                     ? "Push and pull days: pick jog, walk, cycle, etc."
-                    : "Jog, walk, cycle, hike, or swim per day — log time and distance in the workout."
+                    : "Jog, walk, cycle, hike, or swim per day - log time and distance in the workout."
                 }
                 defaultOpen={false}
               >
@@ -500,7 +500,7 @@ export default function SettingsPage() {
               <p className="text-xs text-foreground">
                 {effectiveStretchDefaults.warm === 0 &&
                 effectiveStretchDefaults.cool === 0
-                  ? "None selected — focus-based stretches still apply per day."
+                  ? "None selected - focus-based stretches still apply per day."
                   : `${effectiveStretchDefaults.warm} warm-up · ${effectiveStretchDefaults.cool} cool-down`}
               </p>
               <button

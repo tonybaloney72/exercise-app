@@ -136,9 +136,9 @@ export default function ExerciseProgressChart({ history }: Props) {
         headerExtra={
           <p className="shrink-0 border-b border-border px-4 py-2 text-sm leading-snug text-muted">
             One row per workout. <span className="text-foreground">Sets</span>{" "}
-            lists each logged set; reps and time columns are day totals. The line
-            chart uses total time for time-based exercises when duration was
-            logged; otherwise total reps.
+            lists each logged set; reps and time columns are day totals. The
+            line chart uses total time for time-based exercises when duration
+            was logged; otherwise total reps.
           </p>
         }
       >
@@ -170,13 +170,13 @@ export default function ExerciseProgressChart({ history }: Props) {
                     {formatExerciseProgressSetsCell(row)}
                   </td>
                   <td className="px-2 py-2 tabular-nums text-foreground">
-                    {row.reps > 0 ? row.reps : "—"}
+                    {row.reps > 0 ? row.reps : "-"}
                   </td>
                   <td className="px-2 py-2 tabular-nums text-foreground">
                     {row.durationSec > 0
                       ? formatSecondsToMMSS(row.durationSec) ||
                         `${row.durationSec}s`
-                      : "—"}
+                      : "-"}
                   </td>
                 </tr>
               ))}

@@ -412,7 +412,7 @@ function TodayPageInner() {
           </AnimatedSection>
         )}
 
-      {/* Completed today — summary card unchanged */}
+      {/* Completed today - summary card unchanged */}
       {isTodaySession && showTodaysCompletedReview && !showWorkoutDetails && (
         <PostWorkoutSummary
           plan={plan}

@@ -41,7 +41,7 @@ export function FavoriteIconOutline({ size = 20, className }: IconProps) {
   );
 }
 
-/** Circle with diagonal strike — “exclude from generated plans”. */
+/** Circle with diagonal strike - "exclude from generated plans". */
 export function DislikeIcon({ size = 20, className }: IconProps) {
   return (
     <svg

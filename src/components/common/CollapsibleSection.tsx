@@ -12,13 +12,13 @@ interface CollapsibleSectionProps {
   defaultOpen?: boolean;
   /** Nested panel inside another card (no outer SurfaceCard). */
   embedded?: boolean;
-  /** Page-background headers (e.g. Library) — no card chrome, compact title row. */
+  /** Page-background headers (e.g. Library) - no card chrome, compact title row. */
   flat?: boolean;
   /** With `flat`, show hint in parentheses beside the title instead of below. */
   hintInline?: boolean;
   /** Classes on the expanded content wrapper. */
   contentClassName?: string;
-  /** @deprecated Use `toolbar` — actions in the header crowd mobile layouts. */
+  /** @deprecated Use `toolbar` - actions in the header crowd mobile layouts. */
   headerActions?: ReactNode;
   /** Actions in a row at the top of the expanded panel (e.g. Add exercise). */
   toolbar?: ReactNode;

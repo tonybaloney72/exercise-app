@@ -68,11 +68,13 @@ function WorkoutHistoryPageInner() {
       <div className="space-y-3">
         <ProgressBackLink />
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Workout history</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            Workout history
+          </h1>
           <p className="text-sm text-muted mt-1">
             {totalCount === 0
               ? "Completed workouts appear on the calendar below."
-              : `${totalCount} completed workout${totalCount === 1 ? "" : "s"} — tap a day for details.`}
+              : `${totalCount} completed workout${totalCount === 1 ? "" : "s"} - tap a day for details.`}
           </p>
         </div>
       </div>
@@ -108,7 +110,9 @@ export default function WorkoutHistoryPage() {
   return (
     <Suspense
       fallback={
-        <div className="py-12 text-center text-sm text-muted">Loading history…</div>
+        <div className="py-12 text-center text-sm text-muted">
+          Loading history…
+        </div>
       }
     >
       <WorkoutHistoryPageInner />

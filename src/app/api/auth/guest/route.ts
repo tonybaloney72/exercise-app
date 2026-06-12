@@ -8,7 +8,7 @@ const COOKIE_OPTIONS = {
   name: GUEST_COOKIE_NAME,
   path: "/",
   sameSite: "lax" as const,
-  // Not httpOnly — client-side store also reads this to render guest UI.
+  // Not httpOnly - client-side store also reads this to render guest UI.
   httpOnly: false,
   secure: process.env.NODE_ENV === "production",
 };

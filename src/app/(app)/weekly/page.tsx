@@ -195,7 +195,7 @@ export default function WeeklyPage() {
           </h2>
           <p className="mt-1 text-xs text-muted leading-snug">
             {programMode === "custom" && customBuildStyle === "guided"
-              ? "Describe your week structure and we generate exercises — or switch to manual in Settings."
+              ? "Describe your week structure and we generate exercises - or switch to manual in Settings."
               : "Walk through Sun–Sat, start from a template, and tweak exercises each day."}
           </p>
           <Link

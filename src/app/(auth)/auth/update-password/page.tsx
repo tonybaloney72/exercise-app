@@ -38,7 +38,7 @@ export default function UpdatePasswordPage() {
       return;
     }
 
-    // Recovery session is already active — drop straight into the app.
+    // Recovery session is already active - drop straight into the app.
     router.refresh();
     router.push(APP_HOME);
   }
@@ -46,7 +46,9 @@ export default function UpdatePasswordPage() {
   return (
     <div className="space-y-3 sm:space-y-5">
       <div className="space-y-0.5 sm:space-y-1">
-        <h1 className="text-xl font-bold text-foreground sm:text-2xl">Set a new password</h1>
+        <h1 className="text-xl font-bold text-foreground sm:text-2xl">
+          Set a new password
+        </h1>
         <p className="text-xs text-muted sm:text-sm">
           Choose something you&apos;ll remember.
         </p>
