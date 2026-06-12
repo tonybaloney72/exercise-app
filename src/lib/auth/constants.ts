@@ -15,7 +15,12 @@ const AUTH_ONLY_PATHS = ["/login", "/signup", "/forgot-password"] as const;
  * `/auth/callback` (code exchange) and `/auth/update-password`
  * (recovery flow) must remain reachable even with an active session.
  */
-const PUBLIC_NEUTRAL_PATHS = ["/auth/callback", "/auth/update-password"] as const;
+const PUBLIC_NEUTRAL_PATHS = [
+  "/auth/callback",
+  "/auth/update-password",
+  "/privacy",
+  "/terms",
+] as const;
 
 export function isAuthOnlyPath(pathname: string): boolean {
   return (AUTH_ONLY_PATHS as readonly string[]).includes(pathname);

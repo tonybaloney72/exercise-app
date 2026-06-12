@@ -1,6 +1,6 @@
 # MyExercise App
 
-https://my-exercise-tracking-app.vercel.app/
+https://myexercise.dev/
 
 A Progressive Web App (PWA) for planning and logging workouts. Use it in the browser or add it to your home screen on iOS and Android for an app-like experience. MyExercise builds a weekly training plan from your equipment, priorities, and preferences, then guides you through each session with timers, stretch blocks, cardio logging, and progress charts. Sign in with Supabase to sync across devices, or use **Continue as guest** to try it locally without an account.
 
@@ -73,18 +73,18 @@ Open [http://localhost:3000](http://localhost:3000). Use **Sign up** / **Log in*
 
 ### Useful scripts
 
-| Command              | Purpose                                           |
-| -------------------- | ------------------------------------------------- |
-| `npm run dev`        | Development server                                |
-| `npm run build`      | Production build                                  |
-| `npm run start`      | Run production build locally                      |
-| `npm run lint`       | ESLint                                            |
-| `npm run test`       | Vitest (single run)                               |
-| `npm run test:watch` | Vitest watch mode                                 |
-| `npm run fallow:audit` | Optional Fallow audit vs `main`; prunes Fallow temp worktrees after |
+| Command                          | Purpose                                                                       |
+| -------------------------------- | ----------------------------------------------------------------------------- |
+| `npm run dev`                    | Development server                                                            |
+| `npm run build`                  | Production build                                                              |
+| `npm run start`                  | Run production build locally                                                  |
+| `npm run lint`                   | ESLint                                                                        |
+| `npm run test`                   | Vitest (single run)                                                           |
+| `npm run test:watch`             | Vitest watch mode                                                             |
+| `npm run fallow:audit`           | Optional Fallow audit vs `main`; prunes Fallow temp worktrees after           |
 | `npm run fallow:prune-worktrees` | Drop stale `fallow-audit-base-cache-*` worktrees if Source Control lists them |
-| `npm run db:push`    | Apply Supabase migrations (requires Supabase CLI) |
-| `npm run icons`      | Regenerate PWA icons from brand assets            |
+| `npm run db:push`                | Apply Supabase migrations (requires Supabase CLI)                             |
+| `npm run icons`                  | Regenerate PWA icons from brand assets                                        |
 
 ### Fallow and git worktrees
 

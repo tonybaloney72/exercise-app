@@ -99,6 +99,18 @@ export default function LandingPage() {
             </p>
           )}
         </motion.div>
+
+        <p className="mt-6 text-center text-caption text-muted">
+          <Link href="/privacy" className="hover:text-foreground">
+            Privacy
+          </Link>
+          <span aria-hidden className="mx-2">
+            ·
+          </span>
+          <Link href="/terms" className="hover:text-foreground">
+            Terms
+          </Link>
+        </p>
       </div>
     </main>
   );

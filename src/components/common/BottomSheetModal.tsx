@@ -103,9 +103,9 @@ export default function BottomSheetModal({
           className={
             centered
               ? keyboardInset > 0
-                ? "fixed inset-0 z-[60] flex items-end justify-center bg-black/70 px-4 pt-4"
-                : "fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
-              : "fixed inset-0 z-[60] flex items-end justify-center bg-black/70 p-0 sm:items-center sm:p-4"
+                ? "fixed inset-0 z-60 flex items-end justify-center bg-black/70 px-4 pt-4"
+                : "fixed inset-0 z-60 flex items-center justify-center bg-black/70 p-4"
+              : "fixed inset-0 z-60 flex items-end justify-center bg-black/70 p-0 sm:items-center sm:p-4"
           }
           style={
             centered && keyboardInset > 0

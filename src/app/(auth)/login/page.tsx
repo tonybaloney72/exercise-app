@@ -108,6 +108,15 @@ function LoginForm() {
           </Link>
         </p>
         <p>
+          <Link href="/privacy" className="text-accent hover:underline">
+            Privacy
+          </Link>
+          {" · "}
+          <Link href="/terms" className="text-accent hover:underline">
+            Terms
+          </Link>
+        </p>
+        <p>
           <BackNavLink label="Back" fallbackHref="/" className="text-sm text-muted hover:text-foreground" />
         </p>
       </div>
