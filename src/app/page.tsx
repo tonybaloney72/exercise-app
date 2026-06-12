@@ -36,23 +36,24 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-1.5 sm:space-y-2"
         >
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex justify-center">
             <Image
               src="/branding/ME_Logo_Simple.png"
-              alt="MyExercise"
+              alt=""
               width={240}
               height={96}
               className="h-auto w-[min(200px,70vw)] object-contain sm:w-[min(280px,85vw)]"
               priority
+              aria-hidden
             />
-            <p className="text-center text-muted mt-[-60px] sm:mt-[-80px]">
-              MyExercise
-            </p>
           </div>
-          <h1 className="text-2xl font-bold leading-tight text-foreground sm:text-3xl">
-            Train every day, build the habit.
+          <h1 className="text-center text-2xl font-bold leading-tight text-foreground sm:text-3xl">
+            MyExercise
           </h1>
-          <p className="text-xs leading-snug text-muted sm:text-sm">
+          <p className="text-center text-lg font-semibold leading-snug text-foreground sm:text-xl">
+            Train every day, build the habit.
+          </p>
+          <p className="text-center text-xs leading-snug text-muted sm:text-sm">
             A pocket coach for daily strength, cardio, and recovery - built for
             consistency over intensity.
           </p>

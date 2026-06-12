@@ -15,6 +15,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MyExercise",
   description: "Daily workout tracker & fitness companion",
+  applicationName: "MyExercise",
+  openGraph: {
+    title: "MyExercise",
+    siteName: "MyExercise",
+    type: "website",
+  },
   manifest: "/manifest.json",
   icons: {
     icon: [
