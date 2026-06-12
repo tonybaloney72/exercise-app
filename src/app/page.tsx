@@ -36,7 +36,7 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-1.5 sm:space-y-2"
         >
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center justify-center">
             <Image
               src="/branding/ME_Logo_Simple.png"
               alt="MyExercise"
@@ -45,6 +45,9 @@ export default function LandingPage() {
               className="h-auto w-[min(200px,70vw)] object-contain sm:w-[min(280px,85vw)]"
               priority
             />
+            <p className="text-center text-muted mt-[-60px] sm:mt-[-80px]">
+              My Exercise
+            </p>
           </div>
           <h1 className="text-2xl font-bold leading-tight text-foreground sm:text-3xl">
             Train every day, build the habit.
@@ -61,16 +64,19 @@ export default function LandingPage() {
           transition={{ delay: 0.05 }}
           className="mt-4 space-y-2 sm:mt-8 sm:space-y-3"
         >
-          <button
-            onClick={continueAsGuest}
-            disabled={busy}
-            className="w-full rounded-xl bg-accent py-3 text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] disabled:opacity-60 sm:py-4"
+          <Link
+            href="/login"
+            className="block w-full rounded-xl bg-accent py-3 text-center text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] disabled:opacity-60 sm:py-4"
           >
-            {busy ? "Loading…" : "Continue as guest"}
-          </button>
-          <p className="text-center text-caption leading-snug text-muted sm:text-sm">
-            Guest mode keeps everything on this device - no account, no sync.
-          </p>
+            Log in
+          </Link>
+
+          <Link
+            href="/signup"
+            className="block w-full rounded-xl border border-transparent py-3 text-center text-sm font-semibold text-accent transition-colors hover:bg-accent/10 sm:py-3.5"
+          >
+            Create account
+          </Link>
 
           <div className="my-2 flex items-center gap-3 sm:my-4">
             <div className="h-px flex-1 bg-border" />
@@ -79,20 +85,16 @@ export default function LandingPage() {
             </span>
             <div className="h-px flex-1 bg-border" />
           </div>
-
-          <Link
-            href="/login"
+          <button
+            onClick={continueAsGuest}
+            disabled={busy}
             className="block w-full rounded-xl border border-border bg-surface py-3 text-center text-sm font-semibold text-foreground transition-colors hover:bg-surface-hover sm:py-3.5"
           >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className="block w-full rounded-xl border border-transparent py-3 text-center text-sm font-semibold text-accent transition-colors hover:bg-accent/10 sm:py-3.5"
-          >
-            Create account
-          </Link>
-
+            {busy ? "Loading…" : "Continue as guest"}
+          </button>
+          <p className="text-center text-caption leading-snug text-muted sm:text-sm">
+            Guest mode keeps everything on this device - no account, no sync.
+          </p>
           {error && (
             <p className="text-center text-xs text-red-400" role="alert">
               {error}

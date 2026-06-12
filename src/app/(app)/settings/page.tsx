@@ -7,6 +7,8 @@ import AnimatedSection from "@/components/common/AnimatedSection";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import AboutDeveloperSection from "@/components/settings/AboutDeveloperSection";
+import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
+import SettingsLegalLinks from "@/components/settings/SettingsLegalLinks";
 import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
 import { buildStretchResolveContext } from "@/lib/stretchResolveContextStores";
@@ -97,6 +99,8 @@ export default function SettingsPage() {
               >
                 Sign out
               </button>
+              <DeleteAccountSection />
+              <SettingsLegalLinks />
             </>
           )}
 
@@ -128,6 +132,7 @@ export default function SettingsPage() {
               >
                 Exit guest mode
               </button>
+              <SettingsLegalLinks />
             </>
           )}
 

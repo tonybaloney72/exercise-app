@@ -142,8 +142,10 @@ export default function PrivacyPage() {
         </h2>
         <p>
           Account and workout data is kept while your account is active so the
-          app can function. You may request account or data deletion by
-          contacting us. Guest data on your device can be cleared by removing
+          app can function. You can delete your account anytime from{" "}
+          <strong className="text-foreground">Settings → Account</strong>, which
+          removes your synced data from our servers. You may also email us to
+          request deletion. Guest data on your device can be cleared by removing
           the app or site data from your browser.
         </p>
       </section>
