@@ -54,6 +54,21 @@ export interface ExercisePreferenceRepo {
   ): Promise<void>;
 }
 
+export type SubmitExerciseFeedbackInput = {
+  source: "exercise_row" | "library";
+  category: "wrong_description" | "bad_link" | "other";
+  details?: string | null;
+  exerciseId: string;
+  snapshotName: string;
+  snapshotDescription: string | null;
+  snapshotLink: string | null;
+  context?: Record<string, unknown> | null;
+};
+
+export interface UserFeedbackRepo {
+  submitExerciseReport(input: SubmitExerciseFeedbackInput): Promise<void>;
+}
+
 /** dayOfWeek 0 (Sun) … 6 (Sat) → persisted template for that day. */
 export type TrainingWeekDays = Record<number, DayPlan>;
 

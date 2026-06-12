@@ -9,6 +9,23 @@ Set in the Vercel project (Production + Preview):
 
 Match your Supabase project. See [supabase-migrations.md](./supabase-migrations.md) before relying on new DB features.
 
+### User feedback digest (Supabase Edge Function)
+
+Set on the **Supabase project** (not Vercel) for `feedback-digest`:
+
+| Secret | Purpose |
+| ------ | ------- |
+| `RESEND_API_KEY` | Resend API key for digest emails |
+| `ADMIN_REPORT_EMAIL` | Inbox that receives batched exercise reports |
+| `FEEDBACK_FROM_EMAIL` | Verified Resend sender (defaults to `feedback@resend.dev` in dev) |
+| `CRON_SECRET` | Optional bearer token for scheduled invocations |
+
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided automatically to Edge Functions.
+
+**Schedule:** In Supabase Dashboard → Edge Functions → `feedback-digest` → add a daily cron (or use `pg_cron` + `net.http_post`). The function POSTs to itself with `Authorization: Bearer <CRON_SECRET>` when configured.
+
+Apply migration `20260529120000_user_feedback.sql` before enabling the digest.
+
 ## Custom domain (optional)
 
 1. Vercel project → **Settings** → **Domains**

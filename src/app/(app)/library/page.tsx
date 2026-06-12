@@ -13,7 +13,9 @@ import {
   DislikeIcon,
   FavoriteIcon,
   FavoriteIconOutline,
+  ReportIcon,
 } from "@/components/common/ExercisePreferenceIcons";
+import ExerciseReportSheet from "@/components/feedback/ExerciseReportSheet";
 import {
   EXPERTISE_LEVEL_LABELS,
   EXPERTISE_LEVEL_ORDER,
@@ -361,12 +363,13 @@ export default function LibraryPage() {
   );
 }
 
-function ExercisePreferenceToggles({ exerciseId }: { exerciseId: string }) {
+function ExercisePreferenceToggles({ exercise }: { exercise: Exercise }) {
   const mode = useAuthStore((s) => s.mode);
   const preference = useExercisePreferencesStore(
-    (s) => s.byExerciseId[exerciseId],
+    (s) => s.byExerciseId[exercise.id],
   );
   const setPreference = useExercisePreferencesStore((s) => s.setPreference);
+  const [reportOpen, setReportOpen] = useState(false);
 
   if (mode !== "authenticated") return null;
 
@@ -374,57 +377,74 @@ function ExercisePreferenceToggles({ exerciseId }: { exerciseId: string }) {
   const isDisliked = preference === "disliked";
 
   return (
-    <div
-      className="flex shrink-0 items-center gap-0.5"
-      role="group"
-      aria-label="Exercise preferences"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <button
-        type="button"
-        onClick={() =>
-          void setPreference(exerciseId, isFavorite ? null : "favorite")
-        }
-        className={`rounded-lg p-1.5 transition-colors ${
-          isFavorite
-            ? "text-amber-400 bg-amber-400/15"
-            : "text-muted hover:bg-surface-hover hover:text-foreground"
-        }`}
-        title={isFavorite ? "Remove from favorites" : "Favorite"}
-        aria-pressed={isFavorite}
-        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+    <>
+      <div
+        className="flex shrink-0 items-center gap-0.5"
+        role="group"
+        aria-label="Exercise preferences"
+        onClick={(e) => e.stopPropagation()}
       >
-        {isFavorite ? (
-          <FavoriteIcon size={20} />
-        ) : (
-          <FavoriteIconOutline size={20} />
-        )}
-      </button>
-      <button
-        type="button"
-        onClick={() =>
-          void setPreference(exerciseId, isDisliked ? null : "disliked")
-        }
-        className={`rounded-lg p-1.5 transition-colors ${
-          isDisliked
-            ? "text-rose-400 bg-rose-400/15"
-            : "text-muted hover:bg-surface-hover hover:text-foreground"
-        }`}
-        title={
-          isDisliked
-            ? "Remove exclusion (neutral)"
-            : "Exclude from generated plans"
-        }
-        aria-pressed={isDisliked}
-        aria-label={
-          isDisliked
-            ? "Allow in personalized plans"
-            : "Exclude from personalized plans"
-        }
-      >
-        <DislikeIcon size={20} />
-      </button>
-    </div>
+        <button
+          type="button"
+          onClick={() =>
+            void setPreference(exercise.id, isFavorite ? null : "favorite")
+          }
+          className={`rounded-lg p-1.5 transition-colors ${
+            isFavorite
+              ? "text-amber-400 bg-amber-400/15"
+              : "text-muted hover:bg-surface-hover hover:text-foreground"
+          }`}
+          title={isFavorite ? "Remove from favorites" : "Favorite"}
+          aria-pressed={isFavorite}
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+        >
+          {isFavorite ? (
+            <FavoriteIcon size={20} />
+          ) : (
+            <FavoriteIconOutline size={20} />
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            void setPreference(exercise.id, isDisliked ? null : "disliked")
+          }
+          className={`rounded-lg p-1.5 transition-colors ${
+            isDisliked
+              ? "text-rose-400 bg-rose-400/15"
+              : "text-muted hover:bg-surface-hover hover:text-foreground"
+          }`}
+          title={
+            isDisliked
+              ? "Remove exclusion (neutral)"
+              : "Exclude from generated plans"
+          }
+          aria-pressed={isDisliked}
+          aria-label={
+            isDisliked
+              ? "Allow in personalized plans"
+              : "Exclude from personalized plans"
+          }
+        >
+          <DislikeIcon size={20} />
+        </button>
+        <button
+          type="button"
+          onClick={() => setReportOpen(true)}
+          className="rounded-lg p-1.5 text-muted transition-colors hover:bg-surface-hover hover:text-foreground"
+          title="Report an issue"
+          aria-label="Report an issue with this exercise"
+        >
+          <ReportIcon size={20} />
+        </button>
+      </div>
+      <ExerciseReportSheet
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        exercise={exercise}
+        source="library"
+      />
+    </>
   );
 }
 
@@ -563,7 +583,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
             <span className="text-xs text-muted">Bodyweight</span>
           )}
         </button>
-        <ExercisePreferenceToggles exerciseId={exercise.id} />
+        <ExercisePreferenceToggles exercise={exercise} />
         <svg
           width="16"
           height="16"

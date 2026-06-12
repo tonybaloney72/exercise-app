@@ -2,6 +2,7 @@ import {
   DislikeIcon,
   FavoriteIcon,
   FavoriteIconOutline,
+  ReportIcon,
 } from "@/components/common/ExercisePreferenceIcons";
 
 export function MenuIconStar({ filled }: { filled?: boolean }) {
@@ -16,4 +17,8 @@ export function MenuIconDislike({ active }: { active?: boolean }) {
   return (
     <DislikeIcon size={18} className={active ? "text-rose-400" : undefined} />
   );
+}
+
+export function MenuIconReport() {
+  return <ReportIcon size={18} />;
 }

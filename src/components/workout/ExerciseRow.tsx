@@ -30,7 +30,8 @@ import SwapExerciseModal from "./SwapExerciseModal";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
 import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
-import { MenuIconDislike, MenuIconStar } from "./WorkoutRowMenuIcons";
+import { MenuIconDislike, MenuIconReport, MenuIconStar } from "./WorkoutRowMenuIcons";
+import ExerciseReportSheet from "@/components/feedback/ExerciseReportSheet";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 
 interface ExerciseRowProps {
@@ -51,6 +52,7 @@ export default function ExerciseRow({
   const [expanded, setExpanded] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
   const [swapModalKey, setSwapModalKey] = useState(0);
+  const [reportOpen, setReportOpen] = useState(false);
   const activeWorkout = useWorkoutStore((s) => s.activeWorkout);
   const {
     toggleExercise,
@@ -204,6 +206,11 @@ export default function ExerciseRow({
         }),
     });
   }
+  overflowItems.push({
+    label: "Report an issue",
+    icon: <MenuIconReport />,
+    onClick: () => setReportOpen(true),
+  });
   if (!log.skipped) {
     overflowItems.push({
       label: "Swap exercise",
@@ -278,6 +285,19 @@ export default function ExerciseRow({
           timerSeconds={effectiveTargetSec}
         />
       </div>
+
+      <ExerciseReportSheet
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        exercise={effectiveExercise}
+        source="exercise_row"
+        contextExtra={{
+          roundNumber,
+          plannedExerciseId: plannedId,
+          effectiveExerciseId: effectiveId,
+          swapped: Boolean(log.swappedWith),
+        }}
+      />
 
       <SwapExerciseModal
         key={swapModalKey}

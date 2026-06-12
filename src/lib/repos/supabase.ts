@@ -37,6 +37,8 @@ import type {
   SaveTrainingWeekOptions,
   WorkoutDayTemplateRepo,
   SaveWorkoutDayTemplateInput,
+  UserFeedbackRepo,
+  SubmitExerciseFeedbackInput,
 } from "./types";
 import type { WorkoutDayTemplate } from "@/types";
 import {
@@ -874,6 +876,32 @@ export const supabaseWorkoutDayTemplateRepo: WorkoutDayTemplateRepo = {
 
     if (error) {
       console.error("[supabaseWorkoutDayTemplateRepo.delete]", error);
+      throw error;
+    }
+  },
+};
+
+export const supabaseUserFeedbackRepo: UserFeedbackRepo = {
+  async submitExerciseReport(input: SubmitExerciseFeedbackInput): Promise<void> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { error } = await supabase.from("user_feedback").insert({
+      source: input.source,
+      category: input.category,
+      details: input.details ?? null,
+      exercise_id: input.exerciseId,
+      reporter_user_id: user?.id ?? null,
+      snapshot_name: input.snapshotName,
+      snapshot_description: input.snapshotDescription,
+      snapshot_link: input.snapshotLink,
+      context: input.context ?? null,
+    });
+
+    if (error) {
+      console.error("[supabaseUserFeedbackRepo.submitExerciseReport]", error);
       throw error;
     }
   },

@@ -15,6 +15,7 @@ import {
   supabaseWorkoutRepo,
   supabaseTrainingWeekRepo,
   supabaseWorkoutDayTemplateRepo,
+  supabaseUserFeedbackRepo,
 } from "./supabase";
 import type {
   ExercisePreferenceRepo,
@@ -23,6 +24,7 @@ import type {
   WorkoutRepo,
   TrainingWeekRepo,
   WorkoutDayTemplateRepo,
+  UserFeedbackRepo,
 } from "./types";
 
 export type {
@@ -74,4 +76,9 @@ export function getWorkoutDayTemplateRepo(
   return m === "authenticated"
     ? supabaseWorkoutDayTemplateRepo
     : localWorkoutDayTemplateRepo;
+}
+
+/** Always Supabase — guests may submit exercise reports (anon insert). */
+export function getUserFeedbackRepo(): UserFeedbackRepo {
+  return supabaseUserFeedbackRepo;
 }

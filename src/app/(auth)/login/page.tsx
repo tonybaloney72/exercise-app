@@ -77,6 +77,7 @@ function LoginForm() {
           required
           value={password}
           onChange={setPassword}
+          showPasswordToggle
         />
 
         {error && (
