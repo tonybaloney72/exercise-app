@@ -63,8 +63,12 @@ function LoginForm() {
         />
       </div>
       <div className="space-y-0.5 sm:space-y-1">
-        <h1 className="text-xl font-bold text-foreground sm:text-2xl">Welcome back</h1>
-        <p className="text-xs text-muted sm:text-sm">Log in to sync your progress.</p>
+        <h1 className="text-xl font-bold text-foreground sm:text-2xl">
+          Welcome back
+        </h1>
+        <p className="text-xs text-muted sm:text-sm">
+          Log in to sync your progress.
+        </p>
       </div>
 
       <GoogleSignInButton
@@ -88,7 +92,6 @@ function LoginForm() {
           label="Email"
           type="email"
           autoComplete="email"
-          autoFocus
           required
           value={email}
           onChange={setEmail}
@@ -148,7 +151,11 @@ function LoginForm() {
           </Link>
         </p>
         <p>
-          <BackNavLink label="Back" fallbackHref="/" className="text-sm text-muted hover:text-foreground" />
+          <BackNavLink
+            label="Back"
+            fallbackHref="/"
+            className="text-sm text-muted hover:text-foreground"
+          />
         </p>
       </div>
     </div>
