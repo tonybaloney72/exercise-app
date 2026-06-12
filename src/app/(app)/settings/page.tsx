@@ -8,6 +8,7 @@ import CollapsibleSection from "@/components/common/CollapsibleSection";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import AboutDeveloperSection from "@/components/settings/AboutDeveloperSection";
 import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
+import SettingsFeedbackSection from "@/components/settings/SettingsFeedbackSection";
 import SettingsLegalLinks from "@/components/settings/SettingsLegalLinks";
 import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
@@ -521,6 +522,20 @@ export default function SettingsPage() {
       )}
 
       <AnimatedSection delay={0.05}>
+        <CollapsibleSection
+          title="Feedback"
+          hint="Bugs, ideas, and confusing UX"
+          defaultOpen={false}
+          contentClassName="space-y-3 p-4"
+        >
+          <p className="text-xs text-muted">
+            Send a message to the developer and help us improve MyExercise.
+          </p>
+          <SettingsFeedbackSection />
+        </CollapsibleSection>
+      </AnimatedSection>
+
+      <AnimatedSection delay={0.055}>
         <AboutDeveloperSection />
       </AnimatedSection>
 

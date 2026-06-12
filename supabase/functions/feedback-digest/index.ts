@@ -9,12 +9,19 @@ type FeedbackRow = {
   snapshot_name: string | null;
   snapshot_description: string | null;
   snapshot_link: string | null;
+  context: Record<string, unknown> | null;
   created_at: string;
 };
 
-const CATEGORY_LABELS: Record<string, string> = {
+const EXERCISE_CATEGORY_LABELS: Record<string, string> = {
   wrong_description: "Wrong description",
   bad_link: "Broken or incorrect link",
+  other: "Other",
+};
+
+const GENERAL_CATEGORY_LABELS: Record<string, string> = {
+  bug: "Bug",
+  suggestion: "Suggestion",
   other: "Other",
 };
 
@@ -26,7 +33,7 @@ function escapeHtml(text: string): string {
     .replaceAll('"', "&quot;");
 }
 
-function buildDigestHtml(rows: FeedbackRow[]): string {
+function buildExerciseSections(rows: FeedbackRow[]): string {
   const byExercise = new Map<string, FeedbackRow[]>();
   for (const row of rows) {
     const key = row.exercise_id ?? "_unknown";
@@ -38,10 +45,11 @@ function buildDigestHtml(rows: FeedbackRow[]): string {
   const sections: string[] = [];
   for (const [, group] of byExercise) {
     const first = group[0];
-    const title = first.snapshot_name ?? first.exercise_id ?? "Unknown exercise";
+    const title =
+      first.snapshot_name ?? first.exercise_id ?? "Unknown exercise";
     const items = group
       .map((row) => {
-        const cat = CATEGORY_LABELS[row.category] ?? row.category;
+        const cat = EXERCISE_CATEGORY_LABELS[row.category] ?? row.category;
         const detail = row.details?.trim()
           ? `<p style="margin:4px 0 0;color:#555">${escapeHtml(row.details.trim())}</p>`
           : "";
@@ -55,8 +63,39 @@ function buildDigestHtml(rows: FeedbackRow[]): string {
       `<h3 style="margin:16px 0 8px">${escapeHtml(title)}</h3><ul style="padding-left:20px">${items}</ul>`,
     );
   }
+  return sections.join("");
+}
 
-  return `<!DOCTYPE html><html><body style="font-family:system-ui,sans-serif;line-height:1.5;color:#111"><h2>Exercise feedback digest</h2><p>${rows.length} new report(s).</p>${sections.join("")}</body></html>`;
+function buildGeneralSection(rows: FeedbackRow[]): string {
+  if (rows.length === 0) return "";
+  const items = rows
+    .map((row) => {
+      const cat = GENERAL_CATEGORY_LABELS[row.category] ?? row.category;
+      const detail = row.details?.trim()
+        ? `<p style="margin:4px 0 0;color:#333">${escapeHtml(row.details.trim())}</p>`
+        : "";
+      const route =
+        typeof row.context?.route === "string"
+          ? `<p style="margin:4px 0 0;color:#888">Route: ${escapeHtml(row.context.route)}</p>`
+          : "";
+      return `<li style="margin-bottom:12px"><strong>${escapeHtml(cat)}</strong> <span style="color:#888">(${escapeHtml(row.created_at)})</span>${detail}${route}</li>`;
+    })
+    .join("");
+  return `<h2 style="margin:24px 0 12px">General feedback</h2><ul style="padding-left:20px">${items}</ul>`;
+}
+
+function buildDigestHtml(
+  exerciseRows: FeedbackRow[],
+  generalRows: FeedbackRow[],
+): string {
+  const total = exerciseRows.length + generalRows.length;
+  const exerciseBlock =
+    exerciseRows.length > 0
+      ? `<h2 style="margin:0 0 12px">Exercise reports</h2>${buildExerciseSections(exerciseRows)}`
+      : "";
+  const generalBlock = buildGeneralSection(generalRows);
+
+  return `<!DOCTYPE html><html><body style="font-family:system-ui,sans-serif;line-height:1.5;color:#111"><h2>MyExercise feedback digest</h2><p>${total} new item(s) - ${exerciseRows.length} exercise, ${generalRows.length} general.</p>${exerciseBlock}${generalBlock}</body></html>`;
 }
 
 Deno.serve(async (req) => {
@@ -74,7 +113,8 @@ Deno.serve(async (req) => {
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const resendKey = Deno.env.get("RESEND_API_KEY");
   const adminEmail = Deno.env.get("ADMIN_REPORT_EMAIL");
-  const fromEmail = Deno.env.get("FEEDBACK_FROM_EMAIL") ?? "feedback@resend.dev";
+  const fromEmail =
+    Deno.env.get("FEEDBACK_FROM_EMAIL") ?? "feedback@resend.dev";
 
   if (!supabaseUrl || !serviceRoleKey || !resendKey || !adminEmail) {
     return new Response("Missing configuration", { status: 500 });
@@ -85,10 +125,9 @@ Deno.serve(async (req) => {
   const { data: rows, error } = await supabase
     .from("user_feedback")
     .select(
-      "id, source, category, details, exercise_id, snapshot_name, snapshot_description, snapshot_link, created_at",
+      "id, source, category, details, exercise_id, snapshot_name, snapshot_description, snapshot_link, context, created_at",
     )
     .is("emailed_at", null)
-    .in("source", ["exercise_row", "library"])
     .order("created_at", { ascending: true })
     .limit(200);
 
@@ -107,7 +146,12 @@ Deno.serve(async (req) => {
     });
   }
 
-  const html = buildDigestHtml(pending);
+  const exerciseRows = pending.filter(
+    (r) => r.source === "exercise_row" || r.source === "library",
+  );
+  const generalRows = pending.filter((r) => r.source === "settings");
+
+  const html = buildDigestHtml(exerciseRows, generalRows);
   const resendRes = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -117,7 +161,7 @@ Deno.serve(async (req) => {
     body: JSON.stringify({
       from: fromEmail,
       to: [adminEmail],
-      subject: `Exercise feedback digest (${pending.length})`,
+      subject: `MyExercise feedback digest (${pending.length})`,
       html,
     }),
   });
@@ -146,7 +190,13 @@ Deno.serve(async (req) => {
     });
   }
 
-  return new Response(JSON.stringify({ sent: true, count: pending.length }), {
-    headers: { "Content-Type": "application/json" },
-  });
+  return new Response(
+    JSON.stringify({
+      sent: true,
+      count: pending.length,
+      exercise: exerciseRows.length,
+      general: generalRows.length,
+    }),
+    { headers: { "Content-Type": "application/json" } },
+  );
 });

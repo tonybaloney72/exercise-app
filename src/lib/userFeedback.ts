@@ -17,6 +17,17 @@ export const EXERCISE_FEEDBACK_CATEGORY_LABELS: Record<
   other: "Other",
 };
 
+export type GeneralFeedbackCategory = "bug" | "suggestion" | "other";
+
+export const GENERAL_FEEDBACK_CATEGORY_LABELS: Record<
+  GeneralFeedbackCategory,
+  string
+> = {
+  bug: "Bug",
+  suggestion: "Suggestion",
+  other: "Other",
+};
+
 const SNAPSHOT_DESCRIPTION_MAX = 500;
 const RATE_LIMIT_KEY = "user_feedback_submit_times";
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
@@ -110,5 +121,14 @@ export function validateExerciseFeedbackSubmit(input: {
   if (input.category === "other" && !input.details.trim()) {
     return "Please describe the issue.";
   }
+  return null;
+}
+
+export function validateGeneralFeedbackSubmit(input: {
+  category: GeneralFeedbackCategory | "";
+  message: string;
+}): string | null {
+  if (!input.category) return "Choose a category.";
+  if (!input.message.trim()) return "Please enter your feedback.";
   return null;
 }

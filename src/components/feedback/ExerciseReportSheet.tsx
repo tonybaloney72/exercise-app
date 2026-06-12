@@ -53,7 +53,10 @@ export default function ExerciseReportSheet({
   }, [open, exercise.id]);
 
   async function handleSubmit() {
-    const validationError = validateExerciseFeedbackSubmit({ category, details });
+    const validationError = validateExerciseFeedbackSubmit({
+      category,
+      details,
+    });
     if (validationError) {
       toast.error(validationError);
       return;
@@ -76,7 +79,7 @@ export default function ExerciseReportSheet({
         context: buildFeedbackContext(contextExtra),
       });
       recordFeedbackSubmit();
-      toast.success("Thanks — we'll review this.");
+      toast.success("Thanks - we'll review this.");
       onClose();
     } catch (err) {
       console.error("[ExerciseReportSheet.submit]", err);
@@ -117,7 +120,9 @@ export default function ExerciseReportSheet({
       }
     >
       <div className="space-y-1 rounded-lg border border-border bg-surface-hover/50 px-3 py-2.5">
-        <p className="text-sm font-medium text-foreground">{snapshots.snapshotName}</p>
+        <p className="text-sm font-medium text-foreground">
+          {snapshots.snapshotName}
+        </p>
         {snapshots.snapshotDescription ? (
           <p className="text-xs text-muted line-clamp-4">
             {snapshots.snapshotDescription}
@@ -172,7 +177,9 @@ export default function ExerciseReportSheet({
           htmlFor="feedback-details"
           className="text-xs font-medium uppercase tracking-wide text-muted"
         >
-          {category === "other" ? "Details (required)" : "Additional details (optional)"}
+          {category === "other"
+            ? "Details (required)"
+            : "Additional details (optional)"}
         </label>
         <textarea
           id="feedback-details"

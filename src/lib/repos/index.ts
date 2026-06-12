@@ -57,7 +57,9 @@ export function getExerciseSettingsRepo(mode?: AuthMode): ExerciseSettingsRepo {
     : localExerciseSettingsRepo;
 }
 
-export function getExercisePreferenceRepo(mode?: AuthMode): ExercisePreferenceRepo {
+export function getExercisePreferenceRepo(
+  mode?: AuthMode,
+): ExercisePreferenceRepo {
   const m = mode ?? useAuthStore.getState().mode;
   return m === "authenticated"
     ? supabaseExercisePreferenceRepo
@@ -66,7 +68,9 @@ export function getExercisePreferenceRepo(mode?: AuthMode): ExercisePreferenceRe
 
 export function getTrainingWeekRepo(mode?: AuthMode): TrainingWeekRepo {
   const m = mode ?? useAuthStore.getState().mode;
-  return m === "authenticated" ? supabaseTrainingWeekRepo : localTrainingWeekRepo;
+  return m === "authenticated"
+    ? supabaseTrainingWeekRepo
+    : localTrainingWeekRepo;
 }
 
 export function getWorkoutDayTemplateRepo(
@@ -78,7 +82,7 @@ export function getWorkoutDayTemplateRepo(
     : localWorkoutDayTemplateRepo;
 }
 
-/** Always Supabase — guests may submit exercise reports (anon insert). */
+/** Always Supabase - guests may submit exercise reports (anon insert). */
 export function getUserFeedbackRepo(): UserFeedbackRepo {
   return supabaseUserFeedbackRepo;
 }

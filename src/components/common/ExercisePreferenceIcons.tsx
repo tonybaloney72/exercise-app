@@ -41,7 +41,7 @@ export function FavoriteIconOutline({ size = 20, className }: IconProps) {
   );
 }
 
-/** Exclamation in circle — report catalog issue. */
+/** Exclamation in circle - report catalog issue. */
 export function ReportIcon({ size = 20, className }: IconProps) {
   return (
     <svg

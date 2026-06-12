@@ -67,7 +67,14 @@ export type SubmitExerciseFeedbackInput = {
 
 export interface UserFeedbackRepo {
   submitExerciseReport(input: SubmitExerciseFeedbackInput): Promise<void>;
+  submitGeneralFeedback(input: SubmitGeneralFeedbackInput): Promise<void>;
 }
+
+export type SubmitGeneralFeedbackInput = {
+  category: "bug" | "suggestion" | "other";
+  details: string;
+  context?: Record<string, unknown> | null;
+};
 
 /** dayOfWeek 0 (Sun) … 6 (Sat) → persisted template for that day. */
 export type TrainingWeekDays = Record<number, DayPlan>;

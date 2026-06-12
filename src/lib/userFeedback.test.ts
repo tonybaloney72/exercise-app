@@ -4,6 +4,7 @@ import {
   feedbackRateLimitBlocked,
   recordFeedbackSubmit,
   validateExerciseFeedbackSubmit,
+  validateGeneralFeedbackSubmit,
 } from "@/lib/userFeedback";
 
 function createLocalStorageMock() {
@@ -65,6 +66,21 @@ describe("userFeedback", () => {
       validateExerciseFeedbackSubmit({
         category: "bad_link",
         details: "",
+      }),
+    ).toBeNull();
+  });
+
+  it("validates general feedback category and message", () => {
+    expect(validateGeneralFeedbackSubmit({ category: "", message: "" })).toMatch(
+      /category/i,
+    );
+    expect(
+      validateGeneralFeedbackSubmit({ category: "bug", message: "   " }),
+    ).toMatch(/feedback/i);
+    expect(
+      validateGeneralFeedbackSubmit({
+        category: "suggestion",
+        message: "Love the weekly view!",
       }),
     ).toBeNull();
   });

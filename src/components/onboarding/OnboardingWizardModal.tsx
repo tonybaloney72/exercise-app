@@ -176,7 +176,7 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
       case "tour":
         return {
           title: "Around the app",
-          hint: "Five tabs at the bottom—here’s what each one is for.",
+          hint: "Five tabs at the bottom-here’s what each one is for.",
           body: (
             <ul className="space-y-3">
               {ONBOARDING_TAB_TOUR.map((tab) => (
@@ -225,7 +225,7 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
                   Custom week - manual
                 </p>
                 <p className="mt-1 text-xs text-muted">
-                  Pick exercises yourself for each day—full control, more setup
+                  Pick exercises yourself for each day-full control, more setup
                   time.
                 </p>
               </div>

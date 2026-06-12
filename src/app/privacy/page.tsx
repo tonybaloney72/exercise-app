@@ -29,29 +29,34 @@ export default function PrivacyPage() {
         </h2>
         <p>
           We keep data collection to a minimum. We do <strong>not</strong> sell
-          your information, run advertising trackers, or build marketing profiles.
+          your information, run advertising trackers, or build marketing
+          profiles.
         </p>
         <ul className="list-disc space-y-2 pl-5 text-muted">
           <li>
-            <strong className="text-foreground">Account email</strong> — used
+            <strong className="text-foreground">Account email</strong> - used
             only to sign you in and identify your account. If you use Google
             sign-in, Google may share your email (and basic profile details such
             as your name or avatar) with us solely for authentication.
           </li>
           <li>
-            <strong className="text-foreground">Workout and settings you save</strong>{" "}
-            — if you create an account, exercises, logs, and preferences you enter
-            in the app are stored so the service can sync across your devices.
-            This is app data you choose to save, not data we harvest for resale
-            or advertising.
+            <strong className="text-foreground">
+              Workout and settings you save
+            </strong>{" "}
+            - if you create an account, exercises, logs, and preferences you
+            enter in the app are stored so the service can sync across your
+            devices. This is app data you choose to save, not data we harvest
+            for resale or advertising.
           </li>
           <li>
-            <strong className="text-foreground">Optional exercise reports</strong>{" "}
-            — if you submit a catalog issue report, we store what you send
+            <strong className="text-foreground">
+              Optional exercise reports
+            </strong>{" "}
+            - if you submit a catalog issue report, we store what you send
             (issue type and any note) so it can be reviewed and fixed.
           </li>
           <li>
-            <strong className="text-foreground">Guest mode</strong> — if you
+            <strong className="text-foreground">Guest mode</strong> - if you
             continue without an account, your data stays on your device in local
             storage. We do not receive it unless you later sign up and migrate
             it.

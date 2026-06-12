@@ -39,6 +39,7 @@ import type {
   SaveWorkoutDayTemplateInput,
   UserFeedbackRepo,
   SubmitExerciseFeedbackInput,
+  SubmitGeneralFeedbackInput,
 } from "./types";
 import type { WorkoutDayTemplate } from "@/types";
 import {
@@ -902,6 +903,32 @@ export const supabaseUserFeedbackRepo: UserFeedbackRepo = {
 
     if (error) {
       console.error("[supabaseUserFeedbackRepo.submitExerciseReport]", error);
+      throw error;
+    }
+  },
+
+  async submitGeneralFeedback(
+    input: SubmitGeneralFeedbackInput,
+  ): Promise<void> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { error } = await supabase.from("user_feedback").insert({
+      source: "settings",
+      category: input.category,
+      details: input.details,
+      exercise_id: null,
+      reporter_user_id: user?.id ?? null,
+      snapshot_name: null,
+      snapshot_description: null,
+      snapshot_link: null,
+      context: input.context ?? null,
+    });
+
+    if (error) {
+      console.error("[supabaseUserFeedbackRepo.submitGeneralFeedback]", error);
       throw error;
     }
   },
