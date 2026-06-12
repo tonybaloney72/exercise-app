@@ -43,7 +43,9 @@ export default function AboutDeveloperSection() {
       contentClassName="space-y-4 p-4"
     >
       <div className="space-y-1">
-        <p className="text-base font-semibold text-foreground">{DEVELOPER_NAME}</p>
+        <p className="text-base font-semibold text-foreground">
+          {DEVELOPER_NAME}
+        </p>
         <p className="text-sm text-accent">{DEVELOPER_TAGLINE}</p>
       </div>
       <p className="text-sm leading-relaxed text-muted">{DEVELOPER_BIO}</p>
@@ -63,7 +65,7 @@ export default function AboutDeveloperSection() {
         ))}
       </ul>
       <p className="text-caption text-muted">
-        My Exercise · v{packageJson.version}
+        MyExercise · v{packageJson.version}
       </p>
     </CollapsibleSection>
   );

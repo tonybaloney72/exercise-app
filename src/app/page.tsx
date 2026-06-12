@@ -46,7 +46,7 @@ export default function LandingPage() {
               priority
             />
             <p className="text-center text-muted mt-[-60px] sm:mt-[-80px]">
-              My Exercise
+              MyExercise
             </p>
           </div>
           <h1 className="text-2xl font-bold leading-tight text-foreground sm:text-3xl">
