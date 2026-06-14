@@ -9,6 +9,21 @@ Set in the Vercel project (Production + Preview):
 
 Match your Supabase project. See [supabase-migrations.md](./supabase-migrations.md) before relying on new DB features.
 
+### App version checks (Phase 1)
+
+Production builds automatically set `NEXT_PUBLIC_BUILD_ID` from `VERCEL_GIT_COMMIT_SHA` (via `next.config.ts`). The client compares that id to `GET /api/version` on load, tab focus, and hourly while active.
+
+| Variable | Required | Purpose |
+| -------- | -------- | ------- |
+| `VERCEL_GIT_COMMIT_SHA` | Auto on Vercel | Current deploy build id (server + client) |
+| `NEXT_PUBLIC_BUILD_ID` | Optional override | Manual build id when not on Vercel |
+| `APP_FORCE_UPDATE` | Optional | Set to `true` for a breaking release → blocking refresh modal |
+| `APP_UPDATE_MESSAGE` | Optional | Custom copy for the update banner/modal |
+
+**Breaking release:** deploy the new build, then set `APP_FORCE_UPDATE=true` on Vercel until stale tabs refresh. Clear the flag on the next routine deploy if only a soft banner is needed.
+
+**Local dev:** build id defaults to `development`; client and `/api/version` match, so no banner appears.
+
 ### User feedback digest (Supabase Edge Function)
 
 Set on the **Supabase project** (not Vercel) for `feedback-digest`:
