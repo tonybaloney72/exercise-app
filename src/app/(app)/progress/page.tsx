@@ -1,17 +1,15 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import TabEnterMotion from "@/components/common/TabEnterMotion";
 import ProgressPageSkeleton from "@/components/common/ProgressPageSkeleton";
+import ProgressChartsSkeleton from "@/components/progress/ProgressChartsSkeleton";
 import { useHistoryReady } from "@/hooks/useHistoryReady";
 import { formatLocalDateKey } from "@/utils/localDateKey";
-import ProgressChartsSection from "@/components/progress/ProgressChartsSection";
-import WeightProgressChart from "@/components/progress/WeightProgressChart";
-import ExerciseProgressChart from "@/components/progress/ExerciseProgressChart";
-import CardioProgressSection from "@/components/progress/CardioProgressSection";
 import {
   buildCardioMilesTotals,
   formatCardioRecentLine,
@@ -48,6 +46,11 @@ import {
 } from "@/lib/workoutHistoryGroups";
 import { weekToDatePlanAdherence } from "@/utils/progressStats";
 import { filterCompletedWorkouts } from "@/utils/workoutLogLookup";
+
+const ProgressChartsBlock = dynamic(
+  () => import("@/components/progress/ProgressChartsBlock"),
+  { ssr: false, loading: () => <ProgressChartsSkeleton /> },
+);
 
 export default function ProgressPage() {
   const mode = useAuthStore((s) => s.mode);
@@ -185,13 +188,7 @@ export default function ProgressPage() {
 
       {completedHistory.length > 0 && <ProgressHistoryLink />}
 
-      <WeightProgressChart />
-
-      <ProgressChartsSection history={completedHistory} />
-
-      <ExerciseProgressChart history={completedHistory} />
-
-      <CardioProgressSection history={completedHistory} />
+      <ProgressChartsBlock history={completedHistory} />
 
       {completedHistory.length > 0 && (
         <div className="space-y-3">

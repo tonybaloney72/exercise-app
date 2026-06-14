@@ -4089,6 +4089,7 @@ const catalogExercises: Exercise[] = [
   },
 ];
 
+/** Full merged catalog. After id/category edits, run `npm run generate:category-index` (see docs/catalog-maintenance.md). */
 export const exercises: Exercise[] = [
   ...catalogExercises,
   ...enduranceExercises,

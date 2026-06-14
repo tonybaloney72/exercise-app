@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -67,20 +67,6 @@ export default function ExerciseProgressChart({ history }: Props) {
 
   const [sessionsOpen, setSessionsOpen] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!sessionsOpen) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setSessionsOpen(false);
-    }
-    window.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [sessionsOpen]);
 
   if (options.length === 0) {
     return null;

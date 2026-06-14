@@ -1,6 +1,6 @@
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan, ExerciseCategory, ExerciseLog, WorkoutLog } from "@/types";
-import { exercises } from "@/data/exercises";
+import { exerciseCategoryById } from "@/data/exerciseCategoryIndex";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import {
   getSundayOfWeekContaining,
@@ -10,10 +10,6 @@ import {
   countCompletedRoundExercises,
   countRoundExerciseSlots,
 } from "@/utils/workoutLogCounts";
-
-const exerciseCategoryById = new Map(
-  exercises.map((e) => [e.id, e.category] as const),
-);
 
 /** Strength / conditioning categories only (stretches excluded from balance). */
 const TRAINING_CATEGORIES = new Set<ExerciseCategory>([
@@ -82,7 +78,7 @@ function countCompletedTraining(
   counts: Record<ExerciseCategory, number>,
 ): void {
   if (!ex.completed || ex.skipped) return;
-  const cat = exerciseCategoryById.get(ex.exerciseId);
+  const cat = exerciseCategoryById[ex.exerciseId];
   if (!cat || !TRAINING_CATEGORIES.has(cat)) return;
   counts[cat] = (counts[cat] ?? 0) + 1;
 }

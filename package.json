@@ -18,6 +18,8 @@
     "fallow:audit": "fallow audit --base main --quiet; git worktree prune",
     "fallow:prune-worktrees": "git worktree prune",
     "audit:catalog": "node scripts/audit-catalog.mjs",
+    "generate:category-index": "node scripts/generate-exercise-category-index.mjs",
+    "analyze": "ANALYZE=true npm run build",
     "catalog:enrich": "node scripts/catalog-enrich.mjs",
     "catalog:scrape-hc": "node scripts/scrape-hc-progressions.mjs",
     "catalog:suggest-videos": "node scripts/catalog-suggest-videos.mjs",
@@ -40,6 +42,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.9",
     "@tailwindcss/postcss": "^4",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
@@ -47,8 +50,8 @@
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
     "eslint": "^9",
-    "fallow": "2.88.3",
     "eslint-config-next": "16.2.6",
+    "fallow": "2.88.3",
     "prettier": "^3.8.3",
     "sharp": "^0.34.5",
     "supabase": "2.98.2",

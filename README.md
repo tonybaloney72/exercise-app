@@ -82,8 +82,9 @@ Open [http://localhost:3000](http://localhost:3000). Use **Sign up** / **Log in*
 | `npm run test`                   | Vitest (single run)                                                           |
 | `npm run test:watch`             | Vitest watch mode                                                             |
 | `npm run fallow:audit`           | Optional Fallow audit vs `main`; prunes Fallow temp worktrees after           |
-| `npm run fallow:prune-worktrees` | Drop stale `fallow-audit-base-cache-*` worktrees if Source Control lists them |
-| `npm run db:push`                | Apply Supabase migrations (requires Supabase CLI)                             |
+| `npm run audit:catalog`          | Inventory / QA pass on the exercise catalog                                   |
+| `npm run generate:category-index`| **After catalog id/category edits** — regenerates `exerciseCategoryIndex.ts` (see [docs/catalog-maintenance.md](docs/catalog-maintenance.md)) |
+| `npm run catalog:enrich`         | Automated catalog metadata enrichment                                         |
 | `npm run icons`                  | Regenerate PWA icons from brand assets                                        |
 
 ### Fallow and git worktrees
@@ -101,7 +102,7 @@ src/
   lib/              # Plan generator, repos, stretch logic, cardio, history
   stores/           # Zustand (workout session, settings, auth, preferences)
 supabase/           # SQL migrations
-docs/               # Deployment, migrations, guest vs account
+docs/               # Deployment, migrations, guest vs account, catalog maintenance
 ```
 
 ## Deploy

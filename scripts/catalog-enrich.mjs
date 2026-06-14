@@ -9,6 +9,10 @@
  *
  * Writes: reports/catalog-enrichment-summary.json
  * Patches: src/data/exercises.ts, hybridCalisthenicsExercises.ts, enduranceExercises.ts
+ *
+ * After a run that changes ids or categories, also run:
+ *   npm run generate:category-index
+ * See docs/catalog-maintenance.md
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from "fs";

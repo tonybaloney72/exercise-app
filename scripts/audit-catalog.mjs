@@ -5,6 +5,10 @@
  *
  * Reads: src/data/exercises.ts, enduranceExercises.ts, hybridCalisthenicsExercises.ts
  * Writes: reports/catalog-audit.json, reports/catalog-audit.csv
+ *
+ * After changing exercise ids or categories in those files, also run:
+ *   npm run generate:category-index
+ * See docs/catalog-maintenance.md
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
