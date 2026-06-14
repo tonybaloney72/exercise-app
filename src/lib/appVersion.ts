@@ -12,13 +12,8 @@ export function getClientBuildId(): string {
   return process.env.NEXT_PUBLIC_BUILD_ID ?? "development";
 }
 
-/** Package version baked into the client bundle at compile time. */
-export function getClientAppVersion(): string {
-  return process.env.NEXT_PUBLIC_APP_VERSION ?? "0.0.0";
-}
-
 /** Resolve the running deployment's build id on the server. */
-export function resolveServerBuildId(): string {
+function resolveServerBuildId(): string {
   return (
     process.env.VERCEL_GIT_COMMIT_SHA ??
     process.env.NEXT_PUBLIC_BUILD_ID ??
@@ -26,20 +21,20 @@ export function resolveServerBuildId(): string {
   );
 }
 
-export function resolveServerAppVersion(): string {
+function resolveServerAppVersion(): string {
   return process.env.NEXT_PUBLIC_APP_VERSION ?? "0.0.0";
 }
 
-export function defaultUpdateMessage(): string {
+function defaultUpdateMessage(): string {
   return "A new version of MyExercise is available.";
 }
 
-export function resolveUpdateMessage(): string {
+function resolveUpdateMessage(): string {
   const custom = process.env.APP_UPDATE_MESSAGE?.trim();
   return custom && custom.length > 0 ? custom : defaultUpdateMessage();
 }
 
-export function isForceUpdateEnabled(): boolean {
+function isForceUpdateEnabled(): boolean {
   return process.env.APP_FORCE_UPDATE === "true";
 }
 
@@ -67,23 +62,8 @@ export function shouldForceUpdate(
   return forceUpdate && shouldPromptSoftUpdate(clientBuildId, serverBuildId);
 }
 
-export function dismissStorageKey(serverBuildId: string): string {
+function dismissStorageKey(serverBuildId: string): string {
   return `${DISMISS_KEY_PREFIX}${serverBuildId}`;
-}
-
-export function readDismissedBuildId(): string | null {
-  if (typeof sessionStorage === "undefined") return null;
-  try {
-    for (let i = 0; i < sessionStorage.length; i += 1) {
-      const key = sessionStorage.key(i);
-      if (key?.startsWith(DISMISS_KEY_PREFIX)) {
-        return key.slice(DISMISS_KEY_PREFIX.length);
-      }
-    }
-  } catch {
-    return null;
-  }
-  return null;
 }
 
 export function isSoftUpdateDismissed(serverBuildId: string): boolean {
