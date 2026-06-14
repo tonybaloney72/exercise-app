@@ -38,6 +38,8 @@ export default function FloatingTimer() {
     (s) => s.lastStopwatchSeconds,
   );
   const dismissLast = useFloatingTimerStore((s) => s.dismissLast);
+  const resetRest = useFloatingTimerStore((s) => s.resetRest);
+  const hasStarted = useFloatingTimerStore((s) => s.hasStarted);
   const restBetweenRounds = useSettingsStore((s) => s.restBetweenRounds);
 
   const [open, setOpen] = useState(false);
@@ -48,7 +50,7 @@ export default function FloatingTimer() {
   const fullscreen = !idle && presentation === "fullscreen";
   const isCountdown = mode === "rest" || mode === "setTimer";
   const countdownComplete = isCountdown && !running && seconds === 0;
-  const resetRest = useFloatingTimerStore((s) => s.resetRest);
+  const playLabel = hasStarted ? "Resume" : "Start";
 
   useEffect(() => {
     if (idle || !running) return;
@@ -245,6 +247,27 @@ export default function FloatingTimer() {
               </button>
               <button
                 type="button"
+                onClick={stop}
+                aria-label={countdownComplete ? "Close timer" : "Stop timer"}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/80 hover:text-white hover:bg-white/15 transition-colors"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+              <button
+                type="button"
                 onClick={() => {
                   if (countdownComplete) {
                     primeTimerAudio();
@@ -262,7 +285,7 @@ export default function FloatingTimer() {
                     ? "Restart timer"
                     : running
                       ? "Pause timer"
-                      : "Resume timer"
+                      : `${playLabel} timer`
                 }
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/90 hover:bg-white/15 transition-colors"
               >
@@ -291,27 +314,6 @@ export default function FloatingTimer() {
                     <polygon points="6 4 20 12 6 20 6 4" />
                   </svg>
                 )}
-              </button>
-              <button
-                type="button"
-                onClick={stop}
-                aria-label={countdownComplete ? "Close timer" : "Stop timer"}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/80 hover:text-white hover:bg-white/15 transition-colors"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
               </button>
             </div>
           </motion.div>

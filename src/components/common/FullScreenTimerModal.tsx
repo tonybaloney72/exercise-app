@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import CountdownRing from "@/components/common/CountdownRing";
@@ -10,6 +10,125 @@ import {
   countdownRingProgress,
   formatTimerDisplay,
 } from "@/utils/time";
+
+type TimerControlVariant = "primary" | "solid" | "ghost";
+
+const TIMER_CONTROL_VARIANTS: Record<TimerControlVariant, string> = {
+  primary:
+    "bg-accent text-white shadow-lg shadow-accent/30 hover:bg-accent/90",
+  solid: "bg-white text-black hover:bg-white/90",
+  ghost: "border border-white/30 text-white hover:bg-white/10",
+};
+
+function TimerControlButton({
+  onClick,
+  label,
+  variant,
+  icon,
+}: {
+  onClick: () => void;
+  label: string;
+  variant: TimerControlVariant;
+  icon: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex h-12 items-center gap-2 rounded-full px-5 text-sm font-bold transition-colors active:scale-[0.98] ${TIMER_CONTROL_VARIANTS[variant]}`}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+function TimerIcon({
+  children,
+  className = "shrink-0",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <span className={`inline-flex h-5 w-5 items-center justify-center ${className}`}>
+      {children}
+    </span>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <TimerIcon>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <polygon points="6 4 20 12 6 20 6 4" />
+      </svg>
+    </TimerIcon>
+  );
+}
+
+function PauseIcon() {
+  return (
+    <TimerIcon>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <rect x="6" y="5" width="4" height="14" rx="1" />
+        <rect x="14" y="5" width="4" height="14" rx="1" />
+      </svg>
+    </TimerIcon>
+  );
+}
+
+function StopIcon() {
+  return (
+    <TimerIcon>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <rect x="7" y="7" width="10" height="10" rx="1.5" />
+      </svg>
+    </TimerIcon>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <TimerIcon>
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </TimerIcon>
+  );
+}
+
+function ResetIcon() {
+  return (
+    <TimerIcon>
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+        <path d="M3 3v5h5" />
+      </svg>
+    </TimerIcon>
+  );
+}
 
 export default function FullScreenTimerModal() {
   const mode = useFloatingTimerStore((s) => s.mode);
@@ -26,6 +145,7 @@ export default function FullScreenTimerModal() {
   const resetStopwatch = useFloatingTimerStore((s) => s.resetStopwatch);
   const stop = useFloatingTimerStore((s) => s.stop);
   const minimizeTimer = useFloatingTimerStore((s) => s.minimizeTimer);
+  const hasStarted = useFloatingTimerStore((s) => s.hasStarted);
 
   const open = mode !== "idle";
   const panelRef = useRef<HTMLDivElement>(null);
@@ -33,6 +153,7 @@ export default function FullScreenTimerModal() {
   const isSetTimer = mode === "setTimer";
   const isCountdown = isRest || isSetTimer;
   const countdownComplete = isCountdown && !running && seconds === 0;
+  const playLabel = hasStarted ? "Resume" : "Start";
 
   useFocusTrap({
     open,
@@ -155,95 +276,80 @@ export default function FullScreenTimerModal() {
       {isRest && (
         <div className="mb-6 flex items-center gap-3">
           <AdjustButton onClick={() => adjustRest(-15)} label="-15s" />
-          <button
-            type="button"
+          <TimerControlButton
             onClick={resetRest}
-            className="rounded-full border border-white/20 px-4 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10"
-          >
-            Reset
-          </button>
+            label="Reset"
+            variant="ghost"
+            icon={<ResetIcon />}
+          />
           <AdjustButton onClick={() => adjustRest(15)} label="+15s" />
         </div>
       )}
 
       {isSetTimer && (
         <div className="mb-6 flex justify-center">
-          <button
-            type="button"
+          <TimerControlButton
             onClick={resetRest}
-            className="rounded-full border border-white/20 px-5 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10"
-          >
-            Reset
-          </button>
+            label="Reset"
+            variant="ghost"
+            icon={<ResetIcon />}
+          />
         </div>
       )}
 
       <div className="flex items-center gap-3">
         {countdownComplete ? (
           <>
-            <button
-              type="button"
+            <TimerControlButton
+              onClick={stop}
+              label="Close"
+              variant="solid"
+              icon={<CloseIcon />}
+            />
+            <TimerControlButton
               onClick={() => {
                 primeTimerAudio();
                 resetRest();
               }}
-              className="rounded-full border border-white/30 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10"
-            >
-              Restart
-            </button>
-            <button
-              type="button"
-              onClick={stop}
-              className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
-            >
-              Close
-            </button>
+              label="Restart"
+              variant="ghost"
+              icon={<ResetIcon />}
+            />
           </>
         ) : (
           <>
-            {running ? (
-              <button
-                type="button"
-                onClick={pause}
-                className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 text-white transition-colors hover:bg-white/10"
-                aria-label="Pause"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="5" width="4" height="14" rx="1" />
-                  <rect x="14" y="5" width="4" height="14" rx="1" />
-                </svg>
-              </button>
+            {isCountdown ? (
+              <TimerControlButton
+                onClick={stop}
+                label="Stop"
+                variant="solid"
+                icon={<StopIcon />}
+              />
             ) : (
-              <button
-                type="button"
+              <TimerControlButton
+                onClick={resetStopwatch}
+                label="Reset"
+                variant="solid"
+                icon={<ResetIcon />}
+              />
+            )}
+            {running ? (
+              <TimerControlButton
+                onClick={pause}
+                label="Pause"
+                variant="ghost"
+                icon={<PauseIcon />}
+              />
+            ) : (
+              <TimerControlButton
                 onClick={() => {
                   primeTimerAudio();
                   resume();
                 }}
-                className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30 transition-transform active:scale-95"
-                aria-label="Resume"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="6 4 20 12 6 20 6 4" />
-                </svg>
-              </button>
-            )}
-            {isCountdown ? (
-              <button
-                type="button"
-                onClick={stop}
-                className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
-              >
-                Stop
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={resetStopwatch}
-                className="rounded-full bg-white text-black px-6 py-3 text-sm font-bold transition-colors hover:bg-white/90"
-              >
-                Reset
-              </button>
+                label={playLabel}
+                variant="primary"
+                icon={<PlayIcon />}
+              />
             )}
           </>
         )}

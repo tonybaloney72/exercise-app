@@ -20,6 +20,7 @@ describe("useFloatingTimerStore syncTimerClock", () => {
       countdownRemainingMs: 0,
       stopwatchStartedAtMs: null,
       stopwatchBaseSeconds: 0,
+      hasStarted: false,
     });
   });
 
@@ -83,5 +84,25 @@ describe("useFloatingTimerStore syncTimerClock", () => {
     expect(s.seconds).toBe(90);
     expect(s.running).toBe(true);
     expect(s.countdownEndsAtMs).not.toBeNull();
+  });
+
+  it("tracks hasStarted for manual rest and stopwatch launch", () => {
+    useFloatingTimerStore.getState().startRest(60, false);
+    expect(useFloatingTimerStore.getState().hasStarted).toBe(false);
+
+    useFloatingTimerStore.getState().resume();
+    expect(useFloatingTimerStore.getState().hasStarted).toBe(true);
+
+    useFloatingTimerStore.getState().pause();
+    expect(useFloatingTimerStore.getState().hasStarted).toBe(true);
+
+    useFloatingTimerStore.getState().startStopwatch(false);
+    expect(useFloatingTimerStore.getState().hasStarted).toBe(false);
+
+    useFloatingTimerStore.getState().resume();
+    expect(useFloatingTimerStore.getState().hasStarted).toBe(true);
+
+    useFloatingTimerStore.getState().resetStopwatch();
+    expect(useFloatingTimerStore.getState().hasStarted).toBe(false);
   });
 });

@@ -29,6 +29,8 @@ interface FloatingTimerState {
   stopwatchStartedAtMs: number | null;
   /** Elapsed seconds accumulated before the current stopwatch segment. */
   stopwatchBaseSeconds: number;
+  /** True once the user has started the current timer session (running or paused). */
+  hasStarted: boolean;
 
   startRest: (totalSeconds: number, autoStart?: boolean) => void;
   startSetCountdown: (totalSeconds: number) => void;
@@ -70,6 +72,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   countdownRemainingMs: 0,
   stopwatchStartedAtMs: null,
   stopwatchBaseSeconds: 0,
+  hasStarted: false,
 
   startRest: (totalSeconds, autoStart = true) => {
     primeTimerAudio();
@@ -85,6 +88,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       countdownRemainingMs: seconds * 1000,
       stopwatchStartedAtMs: null,
       stopwatchBaseSeconds: 0,
+      hasStarted: autoStart,
     });
   },
 
@@ -102,6 +106,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       countdownRemainingMs: seconds * 1000,
       stopwatchStartedAtMs: null,
       stopwatchBaseSeconds: 0,
+      hasStarted: true,
     });
   },
 
@@ -118,6 +123,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
         countdownEndsAtMs: null,
         stopwatchBaseSeconds: base,
         stopwatchStartedAtMs: autoStart ? Date.now() : null,
+        hasStarted: autoStart,
       };
     }),
 
@@ -163,15 +169,17 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
           seconds,
           countdownEndsAtMs: countdownEndsAtFromSeconds(seconds),
           countdownRemainingMs: seconds * 1000,
+          hasStarted: true,
         };
       }
       if (s.mode === "stopwatch") {
         return {
           running: true,
           stopwatchStartedAtMs: Date.now(),
+          hasStarted: true,
         };
       }
-      return { running: true };
+      return { running: true, hasStarted: true };
     }),
 
   adjustRest: (deltaSeconds) =>
@@ -204,6 +212,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
         running: true,
         countdownEndsAtMs: countdownEndsAtFromSeconds(s.restTotalSeconds),
         countdownRemainingMs: s.restTotalSeconds * 1000,
+        hasStarted: true,
       };
     }),
 
@@ -215,6 +224,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
         running: false,
         stopwatchBaseSeconds: 0,
         stopwatchStartedAtMs: null,
+        hasStarted: false,
       };
     }),
 
@@ -228,6 +238,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       restTotalSeconds: 0,
       lastStopwatchSeconds:
         mode === "stopwatch" && seconds > 0 ? seconds : null,
+      hasStarted: false,
       ...clearClockFields(),
     });
   },
