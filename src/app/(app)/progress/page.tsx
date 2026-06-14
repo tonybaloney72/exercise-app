@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
-import { useAuthStore } from "@/stores/useAuthStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import TabEnterMotion from "@/components/common/TabEnterMotion";
 import ProgressPageSkeleton from "@/components/common/ProgressPageSkeleton";
@@ -53,9 +52,8 @@ const ProgressChartsBlock = dynamic(
 );
 
 export default function ProgressPage() {
-  const mode = useAuthStore((s) => s.mode);
   const historyReady = useHistoryReady();
-  const { workoutHistory, loadHistory } = useWorkoutStore();
+  const { workoutHistory } = useWorkoutStore();
   const weekDates = useMemo(() => {
     const now = new Date();
     const dayOfWeek = now.getDay();
@@ -66,11 +64,6 @@ export default function ProgressPage() {
     });
   }, []);
   const { weekByDow } = useTrainingWeekPlans(weekDates);
-
-  useEffect(() => {
-    if (mode === "loading") return;
-    loadHistory();
-  }, [mode, loadHistory]);
 
   const completedHistory = useMemo(
     () => filterCompletedWorkouts(workoutHistory),

@@ -54,7 +54,6 @@ function TodayPageInner() {
     startWorkout,
     resumeWorkout,
     discardWorkout,
-    loadHistory,
     reconcileDayBoundary,
     updateCompletedWorkoutNotes,
     startEditingCompletedWorkout,
@@ -87,11 +86,6 @@ function TodayPageInner() {
   const devForcePreWorkout =
     process.env.NODE_ENV === "development" &&
     searchParams.get("dev") === "start";
-
-  useEffect(() => {
-    if (mode === "loading") return;
-    void loadHistory();
-  }, [mode, loadHistory]);
 
   useEffect(() => {
     if (mode === "loading") return;

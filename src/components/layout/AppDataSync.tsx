@@ -16,7 +16,8 @@ import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /**
  * Preloads workout history and the current training week once per auth session
- * after settings hydrate. Page-level hooks reuse the same Zustand caches.
+ * after settings hydrate. Tab pages read from these caches; avoid calling
+ * `loadHistory()` / `ensureWeek()` on every remount unless data is stale.
  */
 export default function AppDataSync() {
   const mode = useAuthStore((s) => s.mode);

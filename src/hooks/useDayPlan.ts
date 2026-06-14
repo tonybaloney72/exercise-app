@@ -70,7 +70,13 @@ export function useDayPlan(dateKey: string): {
   const storeError = useTrainingWeekStore((s) => s.error);
 
   useEffect(() => {
-    if (!validDate || !anchorKey || mode === "loading" || !settingsHydrated) {
+    if (
+      !validDate ||
+      !anchorKey ||
+      mode === "loading" ||
+      !settingsHydrated ||
+      cacheMatches
+    ) {
       return;
     }
 
@@ -90,6 +96,7 @@ export function useDayPlan(dateKey: string): {
     programProfileKey,
     stretchDefaultsKey,
     depsKey,
+    cacheMatches,
   ]);
 
   const waitingForPlan =

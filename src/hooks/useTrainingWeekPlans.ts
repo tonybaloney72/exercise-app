@@ -68,7 +68,10 @@ export function useTrainingWeekPlans(weekDates: Date[]): {
   const storeError = useTrainingWeekStore((s) => s.error);
 
   useEffect(() => {
-    if (!anchorKey || mode === "loading" || !settingsHydrated) return;
+    if (!anchorKey || mode === "loading" || !settingsHydrated || cacheMatches) {
+      return;
+    }
+
     void useTrainingWeekStore.getState().ensureWeek(anchorKey, mode, {
       planRevision,
       equipmentKey,
@@ -84,6 +87,7 @@ export function useTrainingWeekPlans(weekDates: Date[]): {
     programProfileKey,
     stretchDefaultsKey,
     depsKey,
+    cacheMatches,
   ]);
 
   const waitingForWeek =

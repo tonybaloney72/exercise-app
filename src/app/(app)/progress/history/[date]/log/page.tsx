@@ -11,6 +11,7 @@ import {
   canResumeInProgressForDate,
   getBackfillEligibility,
 } from "@/lib/backfillWorkout";
+import { useEnsureHistoryLoaded } from "@/hooks/useEnsureHistoryLoaded";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
@@ -39,17 +40,13 @@ export default function WorkoutHistoryBackfillLogPage() {
   const {
     activeWorkout,
     workoutHistory,
-    loadHistory,
     startWorkoutForDate,
     continueInProgressWorkout,
   } = useWorkoutStore();
   const { plan, loading: planLoading, error: planError } = useDayPlan(dateKey);
   const [startError, setStartError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (mode === "loading") return;
-    void loadHistory();
-  }, [mode, loadHistory]);
+  useEnsureHistoryLoaded();
 
   const todayKey = formatLocalDateKey();
   const eligibility = useMemo(

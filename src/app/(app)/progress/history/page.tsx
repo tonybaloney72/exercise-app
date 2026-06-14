@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo } from "react";
+import { Suspense, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
@@ -13,32 +13,27 @@ import {
   parseMonthKey,
   shiftMonthKey,
 } from "@/lib/workoutHistoryCalendar";
+import { useEnsureHistoryLoaded } from "@/hooks/useEnsureHistoryLoaded";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
-import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 function WorkoutHistoryPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { workoutHistory, loadHistory } = useWorkoutStore();
-  const mode = useAuthStore((s) => s.mode);
+  const { workoutHistory } = useWorkoutStore();
 
-  const todayKey = formatLocalDateKey();
+  useEnsureHistoryLoaded();
   const defaultMonthKey = monthKeyFromParts(
     new Date().getFullYear(),
     new Date().getMonth(),
   );
 
   const monthParam = searchParams.get("month");
+  const todayKey = formatLocalDateKey();
   const monthKey = useMemo(() => {
     if (monthParam && parseMonthKey(monthParam)) return monthParam;
     return defaultMonthKey;
   }, [monthParam, defaultMonthKey]);
-
-  useEffect(() => {
-    if (mode === "loading") return;
-    void loadHistory();
-  }, [mode, loadHistory]);
 
   const completedKeys = useMemo(
     () => completedDateKeysFromHistory(workoutHistory),

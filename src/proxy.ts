@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createProxyClient } from "@/lib/supabase/proxy";
+import { shouldUseSessionOnlyAuth } from "@/lib/auth/proxySession";
 import {
   APP_HOME,
   GUEST_COOKIE_NAME,
@@ -10,14 +11,24 @@ import {
 
 export async function proxy(request: NextRequest) {
   const { supabase, getResponse } = createProxyClient(request);
-
-  // IMPORTANT: this must run before any logic that branches on the user,
-  // so the session cookie is refreshed and re-set onto the response.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const pathname = request.nextUrl.pathname;
+
+  // Full `getUser()` refreshes the session (document loads, auth routes).
+  // Soft tab navigation uses `getSession()` — local JWT read, no Auth round-trip.
+  const useSessionOnly = shouldUseSessionOnlyAuth(request, pathname);
+  let user: { id: string } | null = null;
+  if (useSessionOnly) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    user = session?.user ?? null;
+  } else {
+    const {
+      data: { user: validated },
+    } = await supabase.auth.getUser();
+    user = validated;
+  }
+
   const isGuest = request.cookies.get(GUEST_COOKIE_NAME)?.value === "1";
 
   // Signed-in users have no business on the landing or auth-only screens.

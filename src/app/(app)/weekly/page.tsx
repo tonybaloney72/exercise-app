@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import AnimatedSection from "@/components/common/AnimatedSection";
 import TabEnterMotion from "@/components/common/TabEnterMotion";
 import WeeklyPageSkeleton from "@/components/common/WeeklyPageSkeleton";
@@ -29,17 +29,12 @@ const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const OVERVIEW_DOW_ORDER = [0, 1, 2, 3, 4, 5, 6] as const;
 
 export default function WeeklyPage() {
-  const { workoutHistory, loadHistory } = useWorkoutStore();
+  const { workoutHistory } = useWorkoutStore();
   const mode = useAuthStore((s) => s.mode);
   const todayKey = formatLocalDateKey();
   const [resettingWeek, setResettingWeek] = useState(false);
   const [resetWeekConfirm, setResetWeekConfirm] = useState(false);
   const [resetWeekError, setResetWeekError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (mode === "loading") return;
-    loadHistory();
-  }, [mode, loadHistory]);
 
   const weekSource = useWeekSourceForDate(
     mode === "authenticated" ? todayKey : "",

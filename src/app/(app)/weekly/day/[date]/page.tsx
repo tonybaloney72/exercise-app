@@ -23,6 +23,7 @@ import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import { bumpTrainingWeekPlansAfterCustomSave } from "@/lib/trainingWeekCacheRefresh";
 import { resetTrainingDayToGenerated } from "@/lib/trainingWeekRefresh";
 import { saveCustomDayPlan } from "@/lib/trainingWeekCustomize";
+import { useEnsureHistoryLoaded } from "@/hooks/useEnsureHistoryLoaded";
 import { useWeekSourceForDate } from "@/hooks/useWeekSourceForDate";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -101,7 +102,6 @@ export default function WeeklyDayPage() {
   const dateKey = typeof params.date === "string" ? params.date : "";
   const {
     workoutHistory,
-    loadHistory,
     startWorkout,
     updateCompletedWorkoutNotes,
     startEditingCompletedWorkout,
@@ -114,10 +114,7 @@ export default function WeeklyDayPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (mode === "loading") return;
-    void loadHistory();
-  }, [mode, loadHistory]);
+  useEnsureHistoryLoaded();
 
   const parsed = parseLocalDateKey(dateKey);
   const inWeek = isDateKeyInCurrentCalendarWeek(dateKey);

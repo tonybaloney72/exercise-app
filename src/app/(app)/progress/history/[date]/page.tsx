@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import WorkoutSession from "@/components/workout/WorkoutSession";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import { ProgressBackLink } from "@/components/progress/ProgressSubnavLink";
+import { useEnsureHistoryLoaded } from "@/hooks/useEnsureHistoryLoaded";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import {
   planFromWorkoutLog,
@@ -15,7 +16,6 @@ import {
 } from "@/lib/workoutEditSession";
 import { formatCompletedBannerTitle } from "@/lib/workoutHistoryGroups";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
-import { useAuthStore } from "@/stores/useAuthStore";
 import { getBackfillEligibility } from "@/lib/backfillWorkout";
 import { compareDateKeyToRef } from "@/lib/workoutHistoryCalendar";
 import { formatLocalDateKey } from "@/utils/localDateKey";
@@ -43,18 +43,13 @@ export default function WorkoutHistoryDayPage() {
   const dateKey = typeof params.date === "string" ? params.date : "";
   const {
     workoutHistory,
-    loadHistory,
     updateCompletedWorkoutNotes,
     activeWorkout,
     startEditingCompletedWorkout,
   } = useWorkoutStore();
-  const mode = useAuthStore((s) => s.mode);
   const { plan: prescribedPlan } = useDayPlan(dateKey);
 
-  useEffect(() => {
-    if (mode === "loading") return;
-    void loadHistory();
-  }, [mode, loadHistory]);
+  useEnsureHistoryLoaded();
 
   const log = useMemo(
     () => findCompletedWorkoutForDate(workoutHistory, dateKey),
