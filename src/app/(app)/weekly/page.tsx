@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import AnimatedSection from "@/components/common/AnimatedSection";
+import TabEnterMotion from "@/components/common/TabEnterMotion";
+import WeeklyPageSkeleton from "@/components/common/WeeklyPageSkeleton";
 import EmptyState from "@/components/common/EmptyState";
 import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
@@ -103,6 +104,10 @@ export default function WeeklyPage() {
     return set;
   }, [workoutHistory, weekDateKeys]);
 
+  if (mode === "loading") {
+    return <WeeklyPageSkeleton />;
+  }
+
   return (
     <div className="py-6 space-y-5">
       <div>
@@ -163,9 +168,8 @@ export default function WeeklyPage() {
                 {date.getDate()}
               </span>
               {isCompleted && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
+                <TabEnterMotion
+                  initialScale={0}
                   className="h-1.5 w-1.5 rounded-full bg-green-400"
                 />
               )}

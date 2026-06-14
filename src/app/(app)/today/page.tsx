@@ -2,9 +2,9 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
 import AnimatedSection from "@/components/common/AnimatedSection";
-import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
+import TabEnterMotion from "@/components/common/TabEnterMotion";
+import TodayPageSkeleton from "@/components/common/TodayPageSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
@@ -156,24 +156,7 @@ function TodayPageInner() {
   }, [customizing]);
 
   if (planLoading) {
-    return (
-      <div className="py-6 space-y-5" aria-busy="true">
-        <div className="space-y-2 animate-pulse">
-          <div className="h-3 w-24 rounded bg-border" />
-          <div className="h-8 w-52 max-w-[80%] rounded bg-border" />
-          <div className="h-4 w-full max-w-sm rounded bg-border/80" />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-7 w-16 rounded-full bg-border animate-pulse"
-            />
-          ))}
-        </div>
-        <PlanCardSkeleton />
-      </div>
-    );
+    return <TodayPageSkeleton />;
   }
 
   if (planError || !plan) {
@@ -292,22 +275,13 @@ function TodayPageInner() {
       )}
 
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-1"
-      >
+      <TabEnterMotion y={-10} className="space-y-1">
         <h1 className="text-2xl font-bold text-foreground">{plan.name}</h1>
-      </motion.div>
+      </TabEnterMotion>
 
       {/* Category chips on today's plan (collapsed or expanded) */}
       {!completedLogForUi && !activeWorkout && !customizing && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="flex flex-wrap gap-2"
-        >
+        <TabEnterMotion delay={0.1} y={0} className="flex flex-wrap gap-2">
           {allCategories.map((cat) => (
             <CategoryBadge key={cat} category={cat} size="md" />
           ))}
@@ -316,7 +290,7 @@ function TodayPageInner() {
               🏃 Jog
             </span>
           )}
-        </motion.div>
+        </TabEnterMotion>
       )}
 
       {showGuestCustomizeGate && (
@@ -457,7 +431,7 @@ function TodayPageInner() {
 
 export default function TodayPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<TodayPageSkeleton />}>
       <TodayPageInner />
     </Suspense>
   );

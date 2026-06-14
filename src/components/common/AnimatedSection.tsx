@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { motion } from "framer-motion";
+import { useSuppressTabEnterAnimation } from "@/hooks/useSuppressTabEnterAnimation";
 
 type AnimatedSectionProps = {
   children: ReactNode;
@@ -14,6 +15,12 @@ export default function AnimatedSection({
   className = "",
   delay = 0.05,
 }: AnimatedSectionProps) {
+  const suppress = useSuppressTabEnterAnimation();
+
+  if (suppress) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}

@@ -4,7 +4,9 @@ import { useEffect, useMemo } from "react";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
-import { motion } from "framer-motion";
+import TabEnterMotion from "@/components/common/TabEnterMotion";
+import ProgressPageSkeleton from "@/components/common/ProgressPageSkeleton";
+import { useHistoryReady } from "@/hooks/useHistoryReady";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import ProgressChartsSection from "@/components/progress/ProgressChartsSection";
 import WeightProgressChart from "@/components/progress/WeightProgressChart";
@@ -49,6 +51,7 @@ import { filterCompletedWorkouts } from "@/utils/workoutLogLookup";
 
 export default function ProgressPage() {
   const mode = useAuthStore((s) => s.mode);
+  const historyReady = useHistoryReady();
   const { workoutHistory, loadHistory } = useWorkoutStore();
   const weekDates = useMemo(() => {
     const now = new Date();
@@ -144,6 +147,10 @@ export default function ProgressPage() {
     return [...base, { kind: "cardio-rotate", cardioStats }];
   }, [statCards]);
 
+  if (!historyReady) {
+    return <ProgressPageSkeleton />;
+  }
+
   return (
     <div className="py-6 space-y-5">
       <div>
@@ -155,20 +162,13 @@ export default function ProgressPage() {
       <div className="grid grid-cols-2 gap-3">
         {gridCards.map((card, i) =>
           isRotatingCardioSlot(card) ? (
-            <motion.div
-              key="cardio-stats-rotate"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-            >
+            <TabEnterMotion key="cardio-stats-rotate" delay={i * 0.05}>
               <RotatingCardioStatCard cards={card.cardioStats} />
-            </motion.div>
+            </TabEnterMotion>
           ) : (
-            <motion.div
+            <TabEnterMotion
               key={card.label}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
+              delay={i * 0.05}
               className={`${surfaceCardClassName} p-4`}
             >
               <span className="text-lg">{card.icon}</span>
@@ -178,7 +178,7 @@ export default function ProgressPage() {
               <p className="text-sm leading-snug text-muted">
                 {card.label}
               </p>
-            </motion.div>
+            </TabEnterMotion>
           ),
         )}
       </div>
