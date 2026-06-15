@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ExpertiseLevel } from "@/types";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 
 const LEVEL_RANK: Record<ExpertiseLevel, number> = {
   beginner: 0,

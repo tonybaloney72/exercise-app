@@ -18,7 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import WorkoutPlanExerciseRow from "@/components/workout/WorkoutPlanExerciseRow";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { sortableSlotId } from "@/lib/reorderRoundExercises";
 import type { RoundExercise } from "@/types";
 

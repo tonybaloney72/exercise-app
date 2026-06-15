@@ -1,3 +1,4 @@
+import type { TrainingWeekStoreDeps } from "@/lib/trainingWeekStoreDeps";
 import { buildTrainingWeekDepsKey } from "@/lib/trainingWeekCacheKey";
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { AuthMode } from "@/core";
@@ -10,13 +11,6 @@ export type WeekCacheEntry = {
   planRevision: number;
   weekByDow: TrainingWeekDays;
   weekSource: string | null;
-};
-
-export type TrainingWeekStoreDeps = {
-  planRevision: number;
-  equipmentKey: string;
-  programProfileKey: string;
-  stretchDefaultsKey: string;
 };
 
 /** Sun `YYYY-MM-DD` for the week containing `dateKey`, or null if invalid. */

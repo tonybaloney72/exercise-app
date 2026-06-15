@@ -1,4 +1,4 @@
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import type { WorkoutLog } from "@/types";
 

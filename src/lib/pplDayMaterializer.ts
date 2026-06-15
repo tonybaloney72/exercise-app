@@ -3,7 +3,7 @@
  * push/pull cardio stays in {@link DayPlan.cardioActivities} (endurance logging);
  * legs round 4 = core block.
  */
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import {
   collectDislikedIds,
   collectFavoriteIds,

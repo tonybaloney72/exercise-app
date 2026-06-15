@@ -9,7 +9,7 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const EXERCISES = join(__dirname, "../src/data/exercises.ts");
+const EXERCISES = join(__dirname, "../src/core/catalog/data/exercises.ts");
 
 /** Aligns with Hybrid Calisthenics muscle tags where applicable. */
 const CATEGORY_MUSCLE_GROUPS = {

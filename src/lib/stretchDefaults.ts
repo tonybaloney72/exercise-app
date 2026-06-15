@@ -1,4 +1,4 @@
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import {
   GUEST_FALLBACK_COOL_DOWN,
   GUEST_FALLBACK_WARM_UP,

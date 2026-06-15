@@ -55,8 +55,8 @@ describe("catalog-parse", () => {
   });
 
   it("reads CF-11 from exercises.ts with a real videoUrl", () => {
-    const text = readFileSync(join(ROOT, "src/data/exercises.ts"), "utf8");
-    const ex = parseExercisesFromText(text, "src/data/exercises.ts").find(
+    const text = readFileSync(join(ROOT, "src/core/catalog/data/exercises.ts"), "utf8");
+    const ex = parseExercisesFromText(text, "src/core/catalog/data/exercises.ts").find(
       (e) => e.id === "CF-11",
     );
     expect(ex?.videoUrl).toBe(

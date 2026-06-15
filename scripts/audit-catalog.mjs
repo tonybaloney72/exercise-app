@@ -3,7 +3,7 @@
  * Run: npm run audit:catalog
  * Optional: npm run audit:catalog -- --check-links  (HEAD requests; slow)
  *
- * Reads: src/data/exercises.ts, enduranceExercises.ts, hybridCalisthenicsExercises.ts
+ * Reads: src/core/catalog/data/exercises.ts, enduranceExercises.ts, hybridCalisthenicsExercises.ts
  * Writes: reports/catalog-audit.json, reports/catalog-audit.csv
  *
  * After changing exercise ids or categories in those files, also run:

@@ -1,4 +1,4 @@
-import { CATEGORIES } from "@/data/categories";
+import { CATEGORIES } from "@/core/catalog";
 import {
   isBalancedScores,
   resolveTrainingPriorityScores,

@@ -1,4 +1,4 @@
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { cardioLabelForRow, cardioRowKey } from "@/lib/cardioInstances";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";

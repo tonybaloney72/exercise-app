@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CompletionCheckmark from "@/components/common/CompletionCheckmark";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getStretchSwapCandidates } from "@/lib/stretchSwap";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";

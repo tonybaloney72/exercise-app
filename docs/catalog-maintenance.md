@@ -1,10 +1,13 @@
 # Exercise catalog maintenance
 
-The live catalog lives in:
+The live catalog lives under **`src/core/catalog/`**:
 
-- `src/data/exercises.ts`
-- `src/data/enduranceExercises.ts`
-- `src/data/hybridCalisthenicsExercises.ts`
+- `src/core/catalog/data/exercises.ts`
+- `src/core/catalog/data/enduranceExercises.ts`
+- `src/core/catalog/data/hybridCalisthenicsExercises.ts`
+- `src/core/catalog/categories.ts` (display metadata)
+
+App code should import via **`@/core/catalog`** (or `@/core`) — not the data files directly.
 
 ## After changing exercise ids or categories
 
@@ -16,7 +19,7 @@ Progress charts (`trainingCategoryTotals` in `src/utils/progressStats.ts`) use a
 npm run generate:category-index
 ```
 
-That refreshes `src/data/exerciseCategoryIndex.ts` (~600 id → category entries, including legacy `CP-*` aliases for `PC-*` ids).
+That refreshes `src/core/catalog/data/exerciseCategoryIndex.ts` (~600 id → category entries, including legacy `CP-*` aliases for `PC-*` ids).
 
 If you skip this step, new or renamed exercises may show up with wrong/missing category totals on Progress.
 

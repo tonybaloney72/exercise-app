@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { exercises } from "@/data/exercises";
+import { exercises } from "@/core/catalog";
 import {
   COOL_DOWN_CATALOG_POOLS,
   themePoolForStretch,

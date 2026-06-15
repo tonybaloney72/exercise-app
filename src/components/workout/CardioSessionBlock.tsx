@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
 import WorkoutRowOverflowMenu, {
   type WorkoutRowMenuItem,

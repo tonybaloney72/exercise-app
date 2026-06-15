@@ -1,4 +1,4 @@
-import { exercises } from "@/data/exercises";
+import { exercises } from "@/core/catalog";
 import type { Exercise, ExerciseCategory } from "@/types";
 import type { StretchEntry } from "@/types";
 

@@ -9,9 +9,9 @@ import type { TrainingWeekDays } from "@/lib/repos";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
   normalizeWeekAnchorKey,
-  useTrainingWeekStore,
   weekCacheEntryMatches,
-} from "@/stores/useTrainingWeekStore";
+} from "@/use-cases/trainingWeek/weekCache";
+import { useTrainingWeekStore } from "@/stores/useTrainingWeekStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 

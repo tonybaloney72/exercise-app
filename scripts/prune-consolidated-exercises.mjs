@@ -19,13 +19,13 @@ function removeExerciseBlocks(text, removedIds) {
   return text.replace(blockRe, (match, id) => (removedIds.has(id) ? "" : match));
 }
 
-const hybridPath = "src/data/hybridCalisthenicsExercises.ts";
+const hybridPath = "src/core/catalog/data/hybridCalisthenicsExercises.ts";
 let hybrid = readFileSync(hybridPath, "utf8");
 const beforeH = (hybrid.match(/^\s*id:/gm) || []).length;
 hybrid = removeExerciseBlocks(hybrid, REMOVED_HC);
 const afterH = (hybrid.match(/^\s*id:/gm) || []).length;
 
-const catalogPath = "src/data/exercises.ts";
+const catalogPath = "src/core/catalog/data/exercises.ts";
 let catalog = readFileSync(catalogPath, "utf8");
 const hybridImport = catalog.indexOf("import { hybridCalisthenicsExercises }");
 const catalogOnly = catalog.slice(0, hybridImport);

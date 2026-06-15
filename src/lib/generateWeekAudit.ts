@@ -1,7 +1,7 @@
 import { buildProgramProfileInput } from "@/lib/programProfile";
 import { buildPplWeek } from "@/lib/pplWeekTemplate";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { resolveStretchesForWeekSequential } from "@/lib/dayStretchPlan";
 import { isEnduranceBlockExerciseId } from "@/lib/enduranceBlockExercises";
 import { materializeTrainingWeek } from "@/lib/planGenerator";

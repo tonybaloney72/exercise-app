@@ -4,24 +4,14 @@ import { create } from "zustand";
 import { TRAINING_WEEK_SOURCE_CUSTOM_V1 } from "@/lib/planGenerator";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { buildTrainingWeekDepsKey } from "@/lib/trainingWeekCacheKey";
+import type { TrainingWeekStoreDeps } from "@/lib/trainingWeekStoreDeps";
 import type { AuthMode } from "@/core";
+import { fetchTrainingWeekBundle } from "@/use-cases/trainingWeek/fetchTrainingWeekBundle";
 import {
-  fetchTrainingWeekBundle,
   normalizeWeekAnchorKey,
   readWeekFromCache,
-  type TrainingWeekStoreDeps,
   type WeekCacheEntry,
-} from "@/use-cases";
-
-export type {
-  TrainingWeekStoreDeps,
-  WeekCacheEntry,
-} from "@/use-cases";
-export {
-  dayPlanFromWeekCache,
-  normalizeWeekAnchorKey,
-  weekCacheEntryMatches,
-} from "@/use-cases";
+} from "@/use-cases/trainingWeek/weekCache";
 
 type EnsureWeekOptions = {
   force?: boolean;

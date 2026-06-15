@@ -1,4 +1,4 @@
-import { exercises } from "@/data/exercises";
+import { exercises } from "@/core/catalog";
 import {
   ALL_EXERCISE_EQUIPMENT,
   exerciseMatchesEquipment,

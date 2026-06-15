@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
 import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { getReplacementCandidates } from "@/lib/exerciseCandidates";
 import { applyProgramProfileToDayPlan } from "@/lib/programProfile";
 import { resolveExpertiseFilter } from "@/lib/expertiseLevels";

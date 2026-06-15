@@ -14,7 +14,7 @@ import { applyProgramProfileToWeek } from "@/lib/programProfile";
 import { dayPlanContainsDislikedExercise } from "@/lib/trainingWeekFrozenDay";
 import type { ExercisePreferenceMap, ExerciseSettingsMap } from "@/lib/repos";
 import type { TrainingWeekDays } from "@/lib/repos";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 import {
   buildProgramProfileInput,

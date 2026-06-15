@@ -8,7 +8,7 @@
  *   --skip-oembed      Do not call YouTube oEmbed (keep hostname / HC labels only)
  *
  * Writes: reports/catalog-enrichment-summary.json
- * Patches: src/data/exercises.ts, hybridCalisthenicsExercises.ts, enduranceExercises.ts
+ * Patches: src/core/catalog/data/exercises.ts, hybridCalisthenicsExercises.ts, enduranceExercises.ts
  *
  * After a run that changes ids or categories, also run:
  *   npm run generate:category-index

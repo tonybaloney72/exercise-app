@@ -4,7 +4,7 @@ import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import WorkoutPlanExerciseRow from "@/components/workout/WorkoutPlanExerciseRow";
 import WorkoutSectionCard from "@/components/workout/WorkoutSectionCard";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import type { StretchEntry } from "@/types";
 
 interface StretchPlanSectionProps {

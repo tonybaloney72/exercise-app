@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import StretchPlanSection from "@/components/workout/StretchPlanSection";
 import StretchPickModal from "@/components/workout/StretchPickModal";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
 import {

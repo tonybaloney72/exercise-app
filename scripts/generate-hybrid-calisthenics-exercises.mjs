@@ -1,5 +1,5 @@
 /**
- * Generates src/data/hybridCalisthenicsExercises.ts from Hybrid Calisthenics
+ * Generates src/core/catalog/data/hybridCalisthenicsExercises.ts from Hybrid Calisthenics
  * exercise library pages (https://www.hybridcalisthenics.com/exercise-library).
  *
  * Run: node scripts/generate-hybrid-calisthenics-exercises.mjs
@@ -12,7 +12,7 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT = join(__dirname, "../src/data/hybridCalisthenicsExercises.ts");
+const OUT = join(__dirname, "../src/core/catalog/data/hybridCalisthenicsExercises.ts");
 
 /** @type {Record<string, import('../src/types/index.ts').ExerciseCategory>} */
 const MUSCLE_TO_CATEGORY = {

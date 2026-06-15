@@ -2,8 +2,8 @@
 
 import { useState, useMemo, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { exercises } from "@/data/exercises";
-import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
+import { exercises } from "@/core/catalog";
+import { CATEGORIES, CATEGORY_ORDER } from "@/core/catalog";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { EQUIPMENT_LABELS, exerciseMatchesEquipment } from "@/data/equipment";

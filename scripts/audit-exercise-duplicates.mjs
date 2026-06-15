@@ -7,9 +7,9 @@ import { pathToFileURL } from "url";
 import { createRequire } from "module";
 
 // Load compiled exercises via dynamic import of TS - use regex parse instead
-const catalogText = readFileSync("src/data/exercises.ts", "utf8");
+const catalogText = readFileSync("src/core/catalog/data/exercises.ts", "utf8");
 const hybridText = readFileSync(
-  "src/data/hybridCalisthenicsExercises.ts",
+  "src/core/catalog/data/hybridCalisthenicsExercises.ts",
   "utf8",
 );
 

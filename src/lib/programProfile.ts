@@ -1,4 +1,4 @@
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import {
   collectDislikedIds,
   collectFavoriteIds,

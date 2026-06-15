@@ -1,5 +1,5 @@
 import type { ExerciseLog, WorkoutLog, ExerciseSetMode } from "@/types";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { ensureCardioInstanceIds } from "@/lib/cardioInstances";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import {

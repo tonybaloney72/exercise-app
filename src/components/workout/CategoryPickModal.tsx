@@ -2,7 +2,7 @@
 
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import CategoryBadge from "@/components/common/CategoryBadge";
-import { CATEGORIES } from "@/data/categories";
+import { CATEGORIES } from "@/core/catalog";
 import type { ExerciseCategory } from "@/types";
 
 interface CategoryPickModalProps {

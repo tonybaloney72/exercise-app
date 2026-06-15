@@ -6,7 +6,7 @@ import AnimatedSection from "@/components/common/AnimatedSection";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import { cardioLabelForRow } from "@/lib/cardioInstances";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";

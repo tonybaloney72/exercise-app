@@ -1,5 +1,5 @@
 import type { WorkoutLog } from "@/types";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { resolveExerciseDisplayName } from "@/lib/exerciseDisplayName";
 import { effectiveExerciseId } from "@/utils/exerciseLogDefaults";
 

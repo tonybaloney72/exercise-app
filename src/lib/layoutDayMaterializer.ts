@@ -6,7 +6,7 @@ import {
   pickReplacementCandidate,
   type ExpertiseFilter,
 } from "@/lib/exerciseCandidates";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 import type {
   DayPlan,

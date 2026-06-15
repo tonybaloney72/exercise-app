@@ -48,7 +48,7 @@ import {
 } from "@/lib/exerciseSwap";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import {
   applyClampedTargetDuration,
   mapRoundExercises,

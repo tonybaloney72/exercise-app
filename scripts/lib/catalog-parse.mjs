@@ -18,9 +18,9 @@ export function isCatalogAuditExempt(exercise) {
 }
 
 export const CATALOG_SOURCES = [
-  { file: "src/data/exercises.ts", label: "catalog", blockPrefix: "\t{" },
-  { file: "src/data/enduranceExercises.ts", label: "endurance", blockPrefix: "  {" },
-  { file: "src/data/hybridCalisthenicsExercises.ts", label: "hybrid", blockPrefix: "\t{" },
+  { file: "src/core/catalog/data/exercises.ts", label: "catalog", blockPrefix: "\t{" },
+  { file: "src/core/catalog/data/enduranceExercises.ts", label: "endurance", blockPrefix: "  {" },
+  { file: "src/core/catalog/data/hybridCalisthenicsExercises.ts", label: "hybrid", blockPrefix: "\t{" },
 ];
 
 function parseEquipmentLine(line) {

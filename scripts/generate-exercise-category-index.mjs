@@ -1,5 +1,5 @@
 /**
- * Writes src/data/exerciseCategoryIndex.ts from catalog sources.
+ * Writes src/core/catalog/data/exerciseCategoryIndex.ts from catalog sources.
  * Run: npm run generate:category-index
  *
  * Required after any exercise id or category change in catalog TS files.
@@ -47,5 +47,5 @@ ${lines.join("\n")}
 };
 `;
 
-writeFileSync(join(ROOT, "src/data/exerciseCategoryIndex.ts"), out, "utf8");
+writeFileSync(join(ROOT, "src/core/catalog/data/exerciseCategoryIndex.ts"), out, "utf8");
 console.log(`Wrote exerciseCategoryIndex.ts (${sorted.length} ids)`);

@@ -9,9 +9,9 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import {
   dayPlanFromWeekCache,
   normalizeWeekAnchorKey,
-  useTrainingWeekStore,
   weekCacheEntryMatches,
-} from "@/stores/useTrainingWeekStore";
+} from "@/use-cases/trainingWeek/weekCache";
+import { useTrainingWeekStore } from "@/stores/useTrainingWeekStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { DayPlan } from "@/types";
 import { parseLocalDateKey } from "@/utils/weekCalendar";

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import {
   exerciseMeetsExpertiseCap,
   expertiseRank,

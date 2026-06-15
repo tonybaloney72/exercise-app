@@ -79,7 +79,17 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       partial.expertiseByGroup != null &&
       !expertiseByGroupEqual(partial.expertiseByGroup, current.expertiseByGroup);
 
-    set((s) => ({ ...s, ...updated }));
+    const authKey = settingsHydrationKey(
+      useAuthStore.getState().mode,
+      useAuthStore.getState().user?.id,
+    );
+
+    set((s) => ({
+      ...s,
+      ...updated,
+      hydrated: true,
+      hydratedForAuthKey: s.hydratedForAuthKey ?? authKey,
+    }));
     try {
       await getSettingsRepo(useAuthStore.getState().mode).save(updated);
     } catch (err) {
@@ -124,6 +134,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const authKey = settingsHydrationKey(mode, auth.user?.id);
     if (!authKey) return;
 
+    if (get().hydratedForAuthKey === authKey) return;
+
     const loaded = await getSettingsRepo(mode).load();
     const disliked = collectDislikedIds(
       useExercisePreferencesStore.getState().byExerciseId,
@@ -148,6 +160,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       useAuthStore.getState().user?.id,
     );
     if (currentKey !== authKey) return;
+
+    if (get().hydratedForAuthKey === authKey) return;
 
     set({ ...merged, hydrated: true, hydratedForAuthKey: authKey });
 

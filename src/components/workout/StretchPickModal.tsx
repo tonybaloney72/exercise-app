@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import CategoryBadge from "@/components/common/CategoryBadge";
-import { CATEGORIES } from "@/data/categories";
+import { CATEGORIES } from "@/core/catalog";
 import { pickRandomSwap } from "@/lib/exerciseSwap";
 import type { Exercise } from "@/types";
 

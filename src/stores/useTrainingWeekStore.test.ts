@@ -1,10 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { buildTrainingWeekDepsKey } from "@/lib/trainingWeekCacheKey";
 import type { TrainingWeekDays } from "@/lib/repos";
-import {
-  normalizeWeekAnchorKey,
-  useTrainingWeekStore,
-} from "@/stores/useTrainingWeekStore";
+import { normalizeWeekAnchorKey } from "@/use-cases/trainingWeek/weekCache";
+import { useTrainingWeekStore } from "@/stores/useTrainingWeekStore";
 
 const fetchTrainingWeekBundle = vi.fn();
 

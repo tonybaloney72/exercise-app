@@ -3,7 +3,7 @@
 import { useMemo, useRef } from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import type { WorkoutLog } from "@/types";
-import { CATEGORIES } from "@/data/categories";
+import { CATEGORIES } from "@/core/catalog";
 import { trainingCategoryTotals } from "@/utils/progressStats";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";

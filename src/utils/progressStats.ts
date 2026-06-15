@@ -1,6 +1,6 @@
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan, ExerciseCategory, ExerciseLog, WorkoutLog } from "@/types";
-import { exerciseCategoryById } from "@/data/exerciseCategoryIndex";
+import { exerciseCategoryById } from "@/core/catalog";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import {
   getSundayOfWeekContaining,

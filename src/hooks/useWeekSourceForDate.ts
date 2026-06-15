@@ -7,9 +7,9 @@ import { buildTrainingWeekDepsKey } from "@/lib/trainingWeekCacheKey";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import {
   normalizeWeekAnchorKey,
-  useTrainingWeekStore,
   weekCacheEntryMatches,
-} from "@/stores/useTrainingWeekStore";
+} from "@/use-cases/trainingWeek/weekCache";
+import { useTrainingWeekStore } from "@/stores/useTrainingWeekStore";
 import { parseLocalDateKey } from "@/utils/weekCalendar";
 
 /** Week `source` from the session cache (null until the week row is loaded). */

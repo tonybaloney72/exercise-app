@@ -1,4 +1,4 @@
-import { CATEGORIES } from "@/data/categories";
+import { CATEGORIES } from "@/core/catalog";
 import { planHasJog } from "@/lib/cardioActivities";
 import { TRAINING_WEEK_CATALOG } from "@/data/trainingWeekCatalog";
 import type { DayPlan, ExerciseCategory } from "@/types";

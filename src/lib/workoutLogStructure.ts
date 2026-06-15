@@ -1,4 +1,4 @@
-import { exerciseMap } from "@/data/exercises";
+import { exerciseMap } from "@/core/catalog";
 import { CARDIO_KIND_TO_EXERCISE_ID } from "@/lib/cardioActivities";
 import {
   appendCardioKind as appendCardioKindInstance,
