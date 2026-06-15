@@ -81,7 +81,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
     set((s) => ({ ...s, ...updated }));
     try {
-      await getSettingsRepo().save(updated);
+      await getSettingsRepo(useAuthStore.getState().mode).save(updated);
     } catch (err) {
       set((s) => ({ ...s, ...snapshot }));
       toastSaveError("settings", err);

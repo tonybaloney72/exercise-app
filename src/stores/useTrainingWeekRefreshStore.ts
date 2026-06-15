@@ -1,14 +1,8 @@
 "use client";
 
 import { create } from "zustand";
+import type { TrainingWeekRefreshReason } from "@/core";
 import { toast } from "sonner";
-
-export type TrainingWeekRefreshReason =
-  | "dislike"
-  | "favorite"
-  | "equipment"
-  | "program"
-  | "reset";
 
 /** One line each - full policy lives in docs; toast is a quick confirmation only. */
 const TOAST_MESSAGE: Record<TrainingWeekRefreshReason, string> = {

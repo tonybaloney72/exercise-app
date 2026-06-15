@@ -1,13 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-
-export type AuthMode = "loading" | "authenticated" | "guest" | "anonymous";
-
-export interface AuthUser {
-  id: string;
-  email: string | null;
-}
+import type { AuthMode, AuthUser } from "@/core";
 
 interface AuthState {
   mode: AuthMode;

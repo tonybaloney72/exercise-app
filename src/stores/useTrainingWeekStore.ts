@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { TRAINING_WEEK_SOURCE_CUSTOM_V1 } from "@/lib/planGenerator";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { buildTrainingWeekDepsKey } from "@/lib/trainingWeekCacheKey";
-import type { AuthMode } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
 import type { DayPlan } from "@/types";
 import { parseLocalDateKey, weekAnchorFromDateKey } from "@/utils/weekCalendar";
 

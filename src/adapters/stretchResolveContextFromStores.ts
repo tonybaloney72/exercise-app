@@ -8,15 +8,17 @@ import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStor
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { getWeekDateKeys } from "@/utils/weekCalendar";
 
-/** Sync context for stores / workout start (non-React). */
-export function buildStretchResolveContext(): StretchResolveContext {
+/** Sync stretch context from hydrated Zustand stores (non-React call sites). */
+export function buildStretchResolveContextFromStores(): StretchResolveContext {
   return buildStretchResolveContextFromInputs({
     defaultWarmUp: useSettingsStore.getState().defaultWarmUp,
     defaultCoolDown: useSettingsStore.getState().defaultCoolDown,
     authMode: useAuthStore.getState().mode,
     exercisePreferences: useExercisePreferencesStore.getState().byExerciseId,
     trainingPriorityPreset: useSettingsStore.getState().trainingPriorityPreset,
-    trainingPriorityScores: resolveTrainingPriorityScores(useSettingsStore.getState()),
+    trainingPriorityScores: resolveTrainingPriorityScores(
+      useSettingsStore.getState(),
+    ),
     trainingPriorityCustomized:
       useSettingsStore.getState().trainingPriorityCustomized,
     weekRotationKey: getWeekDateKeys()[0],

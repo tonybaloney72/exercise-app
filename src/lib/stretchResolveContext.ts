@@ -11,7 +11,7 @@ import {
   resolveDefaultCoolDownFromSettings,
   resolveDefaultWarmUpFromSettings,
 } from "@/lib/stretchDefaults";
-import type { AuthMode } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
 import { getWeekDateKeys } from "@/utils/weekCalendar";
 import type { TrainingPriorityScores } from "@/lib/trainingPriorities";
 import type { DayPlan, StretchEntry, TrainingPriorityPreset } from "@/types";

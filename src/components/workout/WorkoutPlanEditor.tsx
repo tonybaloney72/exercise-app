@@ -16,7 +16,7 @@ import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
 import { CATEGORIES, CATEGORY_ORDER } from "@/data/categories";
 import { exerciseMap } from "@/data/exercises";
 import { rebuildDerivedStretches } from "@/lib/dayStretchPlan";
-import { buildStretchResolveContext } from "@/lib/stretchResolveContextStores";
+import { buildStretchResolveContextFromStores } from "@/adapters/stretchResolveContextFromStores";
 import { buildStretchUsedExerciseIds } from "@/lib/stretchDefaults";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
@@ -98,7 +98,7 @@ export default function WorkoutPlanEditor({
   onDirtyChange,
 }: WorkoutPlanEditorProps) {
   const [draft, setDraft] = useState(() =>
-    prepareDayPlanForEditor(initialPlan, buildStretchResolveContext()),
+    prepareDayPlanForEditor(initialPlan, buildStretchResolveContextFromStores()),
   );
   const [pickTarget, setPickTarget] = useState<PickTarget | null>(null);
   const [categoryPickRound, setCategoryPickRound] = useState<number | null>(
@@ -342,7 +342,7 @@ export default function WorkoutPlanEditor({
     setDraft((prev) => {
       const { warmUp, coolDown } = rebuildDerivedStretches(
         prev,
-        buildStretchResolveContext(),
+        buildStretchResolveContextFromStores(),
       );
       return {
         ...prev,
@@ -506,7 +506,7 @@ export default function WorkoutPlanEditor({
         draft={draft}
         disabled={saving}
         onApply={(next) =>
-          setDraft(prepareDayPlanForEditor(next, buildStretchResolveContext()))
+          setDraft(prepareDayPlanForEditor(next, buildStretchResolveContextFromStores()))
         }
       />
 

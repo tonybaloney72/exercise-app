@@ -2,11 +2,11 @@ import { computePrefsFingerprintFromSettings } from "@/lib/planGenerator";
 import { settingsHydrationMatchesAuth } from "@/lib/settingsHydration";
 import type { PlanGeneratorInputs } from "@/lib/planGeneratorInputs";
 import { settingsSliceFromUserSettings } from "@/lib/planGeneratorInputsSlice";
+import type { AuthMode } from "@/core";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import type { AuthMode } from "@/stores/useAuthStore";
 
 /** Read generator inputs from hydrated Zustand stores when available (client only). */
 export function tryLoadGeneratorInputsFromStores(

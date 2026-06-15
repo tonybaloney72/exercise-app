@@ -11,6 +11,7 @@ import {
   sortTemplatesByName,
 } from "@/lib/workoutDayTemplates";
 import { toastSaveError } from "@/utils/saveErrorToast";
+import { useAuthStore } from "@/stores/useAuthStore";
 import type { DayPlan, WorkoutDayTemplate } from "@/types";
 import { toast } from "sonner";
 
@@ -25,6 +26,7 @@ export default function WorkoutDayTemplateToolbar({
   disabled = false,
   onApply,
 }: Props) {
+  const authMode = useAuthStore((s) => s.mode);
   const [saveOpen, setSaveOpen] = useState(false);
   const [pickOpen, setPickOpen] = useState(false);
   const [name, setName] = useState("");
@@ -36,7 +38,7 @@ export default function WorkoutDayTemplateToolbar({
   const refreshTemplates = useCallback(async () => {
     setLoadingList(true);
     try {
-      const list = await getWorkoutDayTemplateRepo().listAll();
+      const list = await getWorkoutDayTemplateRepo(authMode).listAll();
       setTemplates(sortTemplatesByName(list));
     } catch (e) {
       toastSaveError("workout templates", e);
@@ -44,7 +46,7 @@ export default function WorkoutDayTemplateToolbar({
     } finally {
       setLoadingList(false);
     }
-  }, []);
+  }, [authMode]);
 
   useEffect(() => {
     if (!pickOpen) return;
@@ -59,7 +61,7 @@ export default function WorkoutDayTemplateToolbar({
     }
     setSavingTemplate(true);
     try {
-      await getWorkoutDayTemplateRepo().save({
+      await getWorkoutDayTemplateRepo(authMode).save({
         name: label,
         plan: dayPlanToTemplateSnapshot(draft),
       });
@@ -92,7 +94,7 @@ export default function WorkoutDayTemplateToolbar({
   async function handleDelete(id: string) {
     setDeletingId(id);
     try {
-      await getWorkoutDayTemplateRepo().delete(id);
+      await getWorkoutDayTemplateRepo(authMode).delete(id);
       setTemplates((prev) => prev.filter((t) => t.id !== id));
       toast.success("Template deleted");
     } catch (e) {

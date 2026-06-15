@@ -6,7 +6,7 @@ import {
   stretchesForPlanInWeek,
   type StretchResolveContext,
 } from "@/lib/stretchResolveContext";
-import type { AuthMode } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
 import type { DayPlan } from "@/types";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { getWeekDateKeys, weekKeyFromDateKey } from "@/utils/weekCalendar";

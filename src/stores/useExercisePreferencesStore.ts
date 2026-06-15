@@ -5,7 +5,7 @@ import type { ExercisePreferenceKind } from "@/types";
 import { getExercisePreferenceRepo } from "@/lib/repos";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import { useAuthStore } from "@/stores/useAuthStore";
-import type { TrainingWeekRefreshReason } from "@/stores/useTrainingWeekRefreshStore";
+import type { TrainingWeekRefreshReason } from "@/core";
 import { toastSaveError, toastSavePartialWarning } from "@/utils/saveErrorToast";
 
 type SetExercisePreferenceOptions = {

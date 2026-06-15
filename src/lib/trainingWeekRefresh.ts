@@ -1,5 +1,5 @@
 import type { RefreshTrainingWeekScope } from "@/lib/trainingWeekRefreshScope";
-import type { TrainingWeekRefreshReason } from "@/stores/useTrainingWeekRefreshStore";
+import type { TrainingWeekRefreshReason } from "@/core";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /** Regenerate current Sun–Sat week (authenticated) and toast + refetch plans. */

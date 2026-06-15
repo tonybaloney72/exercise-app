@@ -3,7 +3,7 @@ import {
   selectStretchDefaultsKey,
   selectTrainingWeekCacheKey,
 } from "@/lib/planResolverDeps";
-import type { AuthMode } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
 import type { UserSettings } from "@/types";
 
 export type TrainingWeekStoreDeps = {

@@ -3,7 +3,7 @@ import { migrateWorkoutLog } from "@/lib/cpToPcMigration";
 import { isStaleSessionDate } from "@/lib/workoutSessionStale";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
-import type { AuthMode } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
 
 const DRAFT_KEY_PREFIX = "exercise-app-active-workout-draft";
 const DRAFT_VERSION = 1;

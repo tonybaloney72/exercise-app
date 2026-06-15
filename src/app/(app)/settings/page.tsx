@@ -12,7 +12,7 @@ import SettingsFeedbackSection from "@/components/settings/SettingsFeedbackSecti
 import SettingsLegalLinks from "@/components/settings/SettingsLegalLinks";
 import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
-import { buildStretchResolveContext } from "@/lib/stretchResolveContextStores";
+import { buildStretchResolveContextFromStores } from "@/adapters/stretchResolveContextFromStores";
 import { ROUND_DENSITY_OPTIONS } from "@/lib/programProfile";
 import { PPL_ROUND_DENSITY_OPTIONS } from "@/lib/pplRoundDensity";
 import {
@@ -44,7 +44,7 @@ export default function SettingsPage() {
 
   const effectiveStretchDefaults = useMemo(() => {
     if (!settings.hydrated) return { warm: 0, cool: 0 };
-    const ctx = buildStretchResolveContext();
+    const ctx = buildStretchResolveContextFromStores();
     return {
       warm: ctx.defaultWarmUp.length,
       cool: ctx.defaultCoolDown.length,

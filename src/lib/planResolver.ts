@@ -29,7 +29,7 @@ import {
   type ExerciseSettingsMap,
   type TrainingWeekDays,
 } from "@/lib/repos";
-import type { AuthMode } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
 import type {
   DayPlan,
   ExerciseEquipment,

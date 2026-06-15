@@ -1,4 +1,4 @@
-import type { AuthMode } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
 
 /** Stable id for which auth context `loadSettings` last applied. */
 export function settingsHydrationKey(

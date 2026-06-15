@@ -19,14 +19,14 @@ import {
 import { buildStretchResolveContextFromInputs } from "@/lib/stretchResolveContext";
 import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
 import { registerPrescribedPlanFreezeStateReader } from "@/lib/planResolverFreezeState";
-import type { AuthMode } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
 import {
   canResumeInProgressForDate,
   getBackfillEligibility,
   localNoonIsoForDateKey,
 } from "@/lib/backfillWorkout";
 import { parseLocalDateKey, weekKeyFromDateKey } from "@/utils/weekCalendar";
-import { getWorkoutRepo } from "@/lib/repos";
+import { getWorkoutRepo as resolveWorkoutRepo } from "@/lib/repos";
 import {
   buildEmptyCardioLogs,
   CARDIO_KIND_TO_EXERCISE_ID,
@@ -141,6 +141,10 @@ function stretchContextForWorkoutStart(weekAnchorDateKey?: string) {
 function draftScope(): DraftAuthScope {
   const auth = useAuthStore.getState();
   return { mode: auth.mode, userId: auth.user?.id ?? null };
+}
+
+function workoutRepo() {
+  return resolveWorkoutRepo(useAuthStore.getState().mode);
 }
 
 function seedTimerTargetSecondsFromResolved(
@@ -1226,7 +1230,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         workoutHistory: upsertWorkoutInHistory(historyBefore, saved),
       });
       try {
-        await getWorkoutRepo().saveWorkout(saved);
+        await workoutRepo().saveWorkout(saved);
         return true;
       } catch (err) {
         toastSaveError("activity log", err);
@@ -1521,7 +1525,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     });
 
     try {
-      await getWorkoutRepo().saveWorkout(completed);
+      await workoutRepo().saveWorkout(completed);
       return completed;
     } catch (err) {
       toastSaveError("workout", err);
@@ -1569,7 +1573,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       set({ workoutHistory: historyBefore.filter((w) => w.id !== id) });
       void (async () => {
         try {
-          await getWorkoutRepo().deleteWorkout(id);
+          await workoutRepo().deleteWorkout(id);
         } catch (err) {
           toastSaveError("workout", err);
           set({ workoutHistory: historyBefore });
@@ -1602,7 +1606,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       });
       void (async () => {
         try {
-          await getWorkoutRepo().saveWorkout(pausedLog);
+          await workoutRepo().saveWorkout(pausedLog);
         } catch (err) {
           toastSaveError("workout", err);
         }
@@ -1656,7 +1660,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       ),
     });
     try {
-      await getWorkoutRepo().saveWorkout(updated);
+      await workoutRepo().saveWorkout(updated);
     } catch (err) {
       toastSaveError("workout notes", err);
       set({ workoutHistory: historyBefore });
@@ -1700,7 +1704,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     });
 
     try {
-      await getWorkoutRepo().saveWorkout(saved);
+      await workoutRepo().saveWorkout(saved);
       return saved;
     } catch (err) {
       toastSaveError("workout", err);
@@ -1752,7 +1756,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         const row = workoutHistory.find((w) => w.id === id);
         if (!row) continue;
         try {
-          await getWorkoutRepo().saveWorkout(
+          await workoutRepo().saveWorkout(
             hydrateWorkoutLog(workoutLogForPersistence({ ...row, paused: true })),
           );
         } catch (err) {
@@ -1779,7 +1783,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       cancelScheduledPersistInProgressWorkout();
       if (mode === "authenticated") {
         try {
-          await getWorkoutRepo().saveWorkout(pausedLog);
+          await workoutRepo().saveWorkout(pausedLog);
         } catch (err) {
           toastSaveError("workout draft", err);
         }
@@ -1830,7 +1834,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     if (mode === "authenticated") {
       void (async () => {
         try {
-          await getWorkoutRepo().deleteWorkout(workoutId);
+          await workoutRepo().deleteWorkout(workoutId);
         } catch (err) {
           toastSaveError("workout", err);
           set({ workoutHistory: historyBefore, pausedWorkoutDate: state.pausedWorkoutDate });
@@ -1872,7 +1876,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     const run = async () => {
     const scope = draftScope();
     const todayKey = formatLocalDateKey();
-    let workoutHistory = (await getWorkoutRepo(mode).loadHistory()).map(
+    let workoutHistory = (await resolveWorkoutRepo(mode).loadHistory()).map(
       hydrateWorkoutLog,
     );
 
@@ -1895,7 +1899,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
             }),
           );
           try {
-            await getWorkoutRepo().saveWorkout(migrated);
+            await workoutRepo().saveWorkout(migrated);
             workoutHistory = upsertWorkoutInHistory(workoutHistory, migrated);
           } catch (err) {
             toastSaveError("workout draft", err);
@@ -1912,7 +1916,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         const row = workoutHistory.find((w) => w.id === id);
         if (!row) continue;
         try {
-          await getWorkoutRepo().saveWorkout(
+          await workoutRepo().saveWorkout(
             hydrateWorkoutLog(workoutLogForPersistence({ ...row, paused: true })),
           );
         } catch (err) {
@@ -1938,7 +1942,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       workoutHistory = upsertWorkoutInHistory(workoutHistory, pausedLog);
       if (mode === "authenticated") {
         try {
-          await getWorkoutRepo().saveWorkout(pausedLog);
+          await workoutRepo().saveWorkout(pausedLog);
         } catch (err) {
           toastSaveError("workout draft", err);
         }

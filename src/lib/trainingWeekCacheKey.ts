@@ -1,4 +1,4 @@
-import type { AuthMode } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
 
 /** Settings inputs that change resolved week content (excludes plan revision bumps). */
 export function buildTrainingWeekDepsKey(input: {

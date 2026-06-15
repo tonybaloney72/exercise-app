@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { registerPlanGeneratorInputsStoreReader } from "@/lib/planGeneratorInputs";
-import { tryLoadGeneratorInputsFromStores } from "@/lib/planGeneratorInputsFromStores";
+import { tryLoadGeneratorInputsFromStores } from "@/adapters/planGeneratorInputsFromStores";
 
 /** Wires hydrated Zustand settings into `loadGeneratorInputs` without import cycles. */
 export default function PlanGeneratorInputsSync() {

@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useAuthStore, type AuthUser } from "@/stores/useAuthStore";
+import { useAuthStore } from "@/stores/useAuthStore";
+import type { AuthUser } from "@/core";
 import { GUEST_COOKIE_NAME } from "@/lib/auth/constants";
 import { migrateLocalDataIfNeeded } from "@/lib/auth/migration";
 

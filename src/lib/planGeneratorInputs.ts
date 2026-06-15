@@ -7,7 +7,8 @@ import {
   type ExercisePreferenceMap,
   type ExerciseSettingsMap,
 } from "@/lib/repos";
-import type { AuthMode } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
+import { repoAuthMode } from "@/core";
 import type {
   ExerciseEquipment,
   RoundDensity,
@@ -36,10 +37,6 @@ export function registerPlanGeneratorInputsStoreReader(
   readGeneratorInputsFromStores = reader;
 }
 
-function repoModeForPlans(mode: AuthMode): AuthMode {
-  return mode === "authenticated" ? "authenticated" : "guest";
-}
-
 /** Generator inputs from Zustand when hydrated, otherwise from repos. */
 export async function loadGeneratorInputs(
   mode: AuthMode,
@@ -49,7 +46,7 @@ export async function loadGeneratorInputs(
     if (fromStores) return fromStores;
   }
 
-  const repoMode = repoModeForPlans(mode);
+  const repoMode = repoAuthMode(mode);
   const [prefs, settings, exerciseSettings] = await Promise.all([
     getExercisePreferenceRepo(repoMode).loadAll(),
     getSettingsRepo(repoMode).load(),

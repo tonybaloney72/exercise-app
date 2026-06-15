@@ -1,5 +1,5 @@
-import type { AuthMode } from "@/stores/useAuthStore";
-import { useAuthStore } from "@/stores/useAuthStore";
+import type { AuthMode } from "@/core";
+import { repoAuthMode } from "@/core";
 import {
   localExercisePreferenceRepo,
   localExerciseSettingsRepo,
@@ -40,44 +40,42 @@ export type {
 } from "./types";
 export { DEFAULT_SETTINGS } from "./types";
 
-export function getWorkoutRepo(mode?: AuthMode): WorkoutRepo {
-  const m = mode ?? useAuthStore.getState().mode;
-  return m === "authenticated" ? supabaseWorkoutRepo : localWorkoutRepo;
+function isSupabaseMode(mode: AuthMode): boolean {
+  return repoAuthMode(mode) === "authenticated";
 }
 
-export function getSettingsRepo(mode?: AuthMode): SettingsRepo {
-  const m = mode ?? useAuthStore.getState().mode;
-  return m === "authenticated" ? supabaseSettingsRepo : localSettingsRepo;
+export function getWorkoutRepo(mode: AuthMode): WorkoutRepo {
+  return isSupabaseMode(mode) ? supabaseWorkoutRepo : localWorkoutRepo;
 }
 
-export function getExerciseSettingsRepo(mode?: AuthMode): ExerciseSettingsRepo {
-  const m = mode ?? useAuthStore.getState().mode;
-  return m === "authenticated"
+export function getSettingsRepo(mode: AuthMode): SettingsRepo {
+  return isSupabaseMode(mode) ? supabaseSettingsRepo : localSettingsRepo;
+}
+
+export function getExerciseSettingsRepo(mode: AuthMode): ExerciseSettingsRepo {
+  return isSupabaseMode(mode)
     ? supabaseExerciseSettingsRepo
     : localExerciseSettingsRepo;
 }
 
 export function getExercisePreferenceRepo(
-  mode?: AuthMode,
+  mode: AuthMode,
 ): ExercisePreferenceRepo {
-  const m = mode ?? useAuthStore.getState().mode;
-  return m === "authenticated"
+  return isSupabaseMode(mode)
     ? supabaseExercisePreferenceRepo
     : localExercisePreferenceRepo;
 }
 
-export function getTrainingWeekRepo(mode?: AuthMode): TrainingWeekRepo {
-  const m = mode ?? useAuthStore.getState().mode;
-  return m === "authenticated"
+export function getTrainingWeekRepo(mode: AuthMode): TrainingWeekRepo {
+  return isSupabaseMode(mode)
     ? supabaseTrainingWeekRepo
     : localTrainingWeekRepo;
 }
 
 export function getWorkoutDayTemplateRepo(
-  mode?: AuthMode,
+  mode: AuthMode,
 ): WorkoutDayTemplateRepo {
-  const m = mode ?? useAuthStore.getState().mode;
-  return m === "authenticated"
+  return isSupabaseMode(mode)
     ? supabaseWorkoutDayTemplateRepo
     : localWorkoutDayTemplateRepo;
 }
