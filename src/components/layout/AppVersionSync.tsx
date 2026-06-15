@@ -11,12 +11,13 @@ import {
   shouldForceUpdate,
   shouldPromptSoftUpdate,
 } from "@/lib/appVersion";
+import { resolveApiUrl } from "@/lib/apiBaseUrl";
 
 const CHECK_INTERVAL_MS = 60 * 60 * 1000;
 
 async function fetchAppVersion(): Promise<AppVersionPayload | null> {
   try {
-    const res = await fetch("/api/version", { cache: "no-store" });
+    const res = await fetch(resolveApiUrl("/api/version"), { cache: "no-store" });
     if (!res.ok) return null;
     return (await res.json()) as AppVersionPayload;
   } catch {

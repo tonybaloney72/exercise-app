@@ -4,8 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { resolveApiUrl } from "@/lib/apiBaseUrl";
+import { isCapacitorBundledBuild, isNativePlatform } from "@/lib/capacitorRuntime";
+import { setGuestCookieActive } from "@/lib/auth/guestCookieClient";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -17,7 +19,13 @@ export default function LandingPage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch("/api/auth/guest", { method: "POST" });
+      if (isCapacitorBundledBuild() || isNativePlatform()) {
+        setGuestCookieActive();
+        setGuest(true);
+        router.push("/today");
+        return;
+      }
+      const res = await fetch(resolveApiUrl("/api/auth/guest"), { method: "POST" });
       if (!res.ok) throw new Error("Failed to start guest session.");
       setGuest(true);
       router.refresh();
@@ -31,11 +39,7 @@ export default function LandingPage() {
   return (
     <main className="flex-1">
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-start px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:justify-center sm:py-10 sm:pb-10">
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-1.5 sm:space-y-2"
-        >
+        <div className="space-y-1.5 sm:space-y-2">
           <div className="flex justify-center">
             <Image
               src="/branding/ME_Logo_Simple.png"
@@ -57,14 +61,9 @@ export default function LandingPage() {
             A pocket coach for daily strength, cardio, and recovery - built for
             consistency over intensity.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="mt-4 space-y-2 sm:mt-8 sm:space-y-3"
-        >
+        <div className="mt-4 space-y-2 sm:mt-8 sm:space-y-3">
           <Link
             href="/login"
             className="block w-full rounded-xl bg-accent py-3 text-center text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] disabled:opacity-60 sm:py-4"
@@ -101,7 +100,7 @@ export default function LandingPage() {
               {error}
             </p>
           )}
-        </motion.div>
+        </div>
 
         <p className="mt-6 text-center text-caption text-muted">
           <Link href="/privacy" className="hover:text-foreground">

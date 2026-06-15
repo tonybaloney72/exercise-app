@@ -23,6 +23,7 @@ import { formatSecondsToMMSS } from "@/utils/time";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
+import { PROGRESS_LINE_CHART_HEIGHT } from "@/components/progress/chartLayout";
 const tooltipStyle = {
   backgroundColor: "var(--surface)",
   border: "1px solid var(--border-color)",
@@ -171,16 +172,23 @@ export default function ExerciseProgressChart({ history }: Props) {
         )}
       </BottomSheetModal>
 
-      <SurfaceCard ref={chartRef} className="h-56 w-full p-2 pt-3">
+      <SurfaceCard ref={chartRef} className="w-full p-2 pt-3">
         {series.length === 0 ? (
-          <div className="flex h-full items-center justify-center px-4">
+          <div
+            className="flex items-center justify-center px-4"
+            style={{ height: PROGRESS_LINE_CHART_HEIGHT }}
+          >
             <EmptyState
               title="No chartable sessions for this exercise yet (log reps or duration when you complete sets)."
               className="text-xs"
             />
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer
+            width="100%"
+            height={PROGRESS_LINE_CHART_HEIGHT}
+            minWidth={0}
+          >
             <LineChart
               data={series}
               margin={{ top: 8, right: 8, left: 4, bottom: 4 }}

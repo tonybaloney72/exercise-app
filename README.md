@@ -86,6 +86,9 @@ Open [http://localhost:3000](http://localhost:3000). Use **Sign up** / **Log in*
 | `npm run generate:category-index`| **After catalog id/category edits** — regenerates `exerciseCategoryIndex.ts` (see [docs/catalog-maintenance.md](docs/catalog-maintenance.md)) |
 | `npm run catalog:enrich`         | Automated catalog metadata enrichment                                         |
 | `npm run icons`                  | Regenerate PWA icons from brand assets                                        |
+| `npm run android:remote`         | Sync Android project for production WebView (no launch) |
+| `npm run android:remote:run`     | Sync + run emulator against **https://myexercise.dev** |
+| `npm run android:dev`            | Run emulator against **local** `npm run dev` (needs dev server) |
 
 ### Fallow and git worktrees
 

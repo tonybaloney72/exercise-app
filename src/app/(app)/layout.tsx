@@ -5,6 +5,7 @@ import PlanGeneratorInputsSync from "@/components/layout/PlanGeneratorInputsSync
 import AppSettingsSync from "@/components/layout/AppSettingsSync";
 import WakeLockSync from "@/components/layout/WakeLockSync";
 import AppToaster from "@/components/layout/AppToaster";
+import PullToRefresh from "@/components/layout/PullToRefresh";
 import AuthInitializer from "@/components/auth/AuthInitializer";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
@@ -34,6 +35,7 @@ export default async function AppLayout({
       <OnboardingGate />
       <WakeLockSync />
       <AppToaster />
+      <PullToRefresh />
       <main className="flex-1 pb-20">
         <div className="mx-auto max-w-lg px-4">{children}</div>
       </main>

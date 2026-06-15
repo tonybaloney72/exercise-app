@@ -104,7 +104,7 @@ export default function AuthField({
           <button
             type="button"
             onClick={() => setPasswordVisible((v) => !v)}
-            className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted transition-colors hover:text-foreground sm:w-12"
+            className="absolute inset-y-0 right-0 flex w-11 min-w-[44px] items-center justify-center text-muted transition-colors hover:text-foreground sm:w-12"
             aria-label={passwordVisible ? "Hide password" : "Show password"}
             aria-pressed={passwordVisible}
             aria-controls={id}

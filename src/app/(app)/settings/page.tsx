@@ -7,6 +7,7 @@ import AnimatedSection from "@/components/common/AnimatedSection";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import AboutDeveloperSection from "@/components/settings/AboutDeveloperSection";
+import AndroidAppDownloadSection from "@/components/settings/AndroidAppDownloadSection";
 import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
 import SettingsFeedbackSection from "@/components/settings/SettingsFeedbackSection";
 import SettingsLegalLinks from "@/components/settings/SettingsLegalLinks";
@@ -32,6 +33,9 @@ import type { UserSettings } from "@/types";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { createClient } from "@/lib/supabase/client";
+import { resolveApiUrl } from "@/lib/apiBaseUrl";
+import { isCapacitorBundledBuild, isNativePlatform } from "@/lib/capacitorRuntime";
+import { clearGuestCookie } from "@/lib/auth/guestCookieClient";
 export default function SettingsPage() {
   const router = useRouter();
   const settings = useSettingsStore();
@@ -57,7 +61,7 @@ export default function SettingsPage() {
     exercisePrefs,
   ]);
   async function handleSignOut() {
-    await fetch("/api/auth/signout", { method: "POST" });
+    await fetch(resolveApiUrl("/api/auth/signout"), { method: "POST" });
     const supabase = createClient();
     await supabase.auth.signOut();
     router.refresh();
@@ -65,7 +69,11 @@ export default function SettingsPage() {
   }
 
   async function handleExitGuest() {
-    await fetch("/api/auth/guest", { method: "DELETE" });
+    if (isCapacitorBundledBuild() || isNativePlatform()) {
+      clearGuestCookie();
+    } else {
+      await fetch(resolveApiUrl("/api/auth/guest"), { method: "DELETE" });
+    }
     setGuest(false);
     router.refresh();
     router.push("/");
@@ -520,6 +528,10 @@ export default function SettingsPage() {
           </CollapsibleSection>
         </AnimatedSection>
       )}
+
+      <AnimatedSection delay={0.05}>
+        <AndroidAppDownloadSection />
+      </AnimatedSection>
 
       <AnimatedSection delay={0.05}>
         <CollapsibleSection

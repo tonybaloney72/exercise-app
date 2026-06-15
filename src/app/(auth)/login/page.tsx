@@ -86,7 +86,7 @@ function LoginForm() {
 
       <AuthOrDivider />
 
-      <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
+      <form method="post" onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
         <AuthField
           id="email"
           label="Email"

@@ -29,7 +29,7 @@ interface SettingsState extends UserSettings {
   /** Auth context the in-memory settings were loaded for (`user:<id>`, `guest`, `anonymous`). */
   hydratedForAuthKey: string | null;
   updateSettings: (partial: Partial<UserSettings>) => Promise<void>;
-  loadSettings: () => Promise<void>;
+  loadSettings: (options?: { force?: boolean }) => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -127,14 +127,14 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     }
   },
 
-  loadSettings: async () => {
+  loadSettings: async (options?: { force?: boolean }) => {
     const auth = useAuthStore.getState();
     const mode = auth.mode;
     if (mode === "loading") return;
     const authKey = settingsHydrationKey(mode, auth.user?.id);
     if (!authKey) return;
 
-    if (get().hydratedForAuthKey === authKey) return;
+    if (!options?.force && get().hydratedForAuthKey === authKey) return;
 
     const loaded = await getSettingsRepo(mode).load();
     const disliked = collectDislikedIds(
@@ -161,7 +161,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     );
     if (currentKey !== authKey) return;
 
-    if (get().hydratedForAuthKey === authKey) return;
+    if (!options?.force && get().hydratedForAuthKey === authKey) return;
 
     set({ ...merged, hydrated: true, hydratedForAuthKey: authKey });
 

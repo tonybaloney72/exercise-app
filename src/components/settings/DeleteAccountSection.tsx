@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import { createClient } from "@/lib/supabase/client";
+import { resolveApiUrl } from "@/lib/apiBaseUrl";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function DeleteAccountSection() {
@@ -16,7 +17,9 @@ export default function DeleteAccountSection() {
   async function handleDelete() {
     setBusy(true);
     try {
-      const res = await fetch("/api/auth/delete-account", { method: "POST" });
+      const res = await fetch(resolveApiUrl("/api/auth/delete-account"), {
+        method: "POST",
+      });
       const body = (await res.json().catch(() => ({}))) as {
         error?: string;
       };

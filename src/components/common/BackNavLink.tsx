@@ -41,7 +41,14 @@ export default function BackNavLink({
   const navigateBack = useNavigateBack(fallbackHref);
 
   return (
-    <button type="button" onClick={navigateBack} className={className}>
+    <a
+      href={fallbackHref ?? "/"}
+      onClick={(event) => {
+        event.preventDefault();
+        navigateBack();
+      }}
+      className={className}
+    >
       {prefixArrow && !label.startsWith("←") ? (
         <>
           <span aria-hidden>←</span>
@@ -50,6 +57,6 @@ export default function BackNavLink({
       ) : (
         label
       )}
-    </button>
+    </a>
   );
 }

@@ -14,6 +14,7 @@ import { buildWeightChartSeries, formatWeightLb } from "@/lib/weightLog";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
+import { PROGRESS_LINE_CHART_HEIGHT } from "@/components/progress/chartLayout";
 
 const tooltipStyle = {
   backgroundColor: "var(--surface)",
@@ -58,8 +59,12 @@ export default function WeightProgressChart() {
           Small steps add up. Keep logging and trust the trend.
         </p>
       </div>
-      <SurfaceCard className="h-56 w-full p-2 pt-3">
-        <ResponsiveContainer width="100%" height="100%">
+      <SurfaceCard className="w-full p-2 pt-3">
+        <ResponsiveContainer
+          width="100%"
+          height={PROGRESS_LINE_CHART_HEIGHT}
+          minWidth={0}
+        >
           <LineChart
             data={series}
             margin={{ top: 8, right: 8, left: 4, bottom: 4 }}

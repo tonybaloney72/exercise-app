@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import AppVersionSync from "@/components/layout/AppVersionSync";
+import CapacitorShellSync from "@/components/layout/CapacitorShellSync";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -57,6 +58,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
@@ -66,7 +68,8 @@ export default function RootLayout({
           media="(orientation: portrait)"
         />
       </head>
-      <body className="min-h-full flex flex-col">
+      <body suppressHydrationWarning className="min-h-full flex flex-col">
+        <CapacitorShellSync />
         <AppVersionSync />
         {children}
       </body>

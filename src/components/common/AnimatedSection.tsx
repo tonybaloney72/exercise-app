@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useSuppressTabEnterAnimation } from "@/hooks/useSuppressTabEnterAnimation";
 
@@ -16,16 +16,18 @@ export default function AnimatedSection({
   delay = 0.05,
 }: AnimatedSectionProps) {
   const suppress = useSuppressTabEnterAnimation();
-
+  const skipEnterAnimationRef = useRef(false);
   if (suppress) {
-    return <div className={className}>{children}</div>;
+    skipEnterAnimationRef.current = true;
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={
+        skipEnterAnimationRef.current ? false : { opacity: 0, y: 10 }
+      }
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
+      transition={{ delay: skipEnterAnimationRef.current ? 0 : delay }}
       className={className}
     >
       {children}

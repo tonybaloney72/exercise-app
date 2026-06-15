@@ -23,6 +23,7 @@ import {
   type CardioChartPoint,
 } from "@/utils/cardioProgressStats";
 import { formatSecondsToMMSS } from "@/utils/time";
+import { PROGRESS_LINE_CHART_HEIGHT } from "@/components/progress/chartLayout";
 const tooltipStyle: CSSProperties = {
   backgroundColor: "var(--surface)",
   border: "1px solid var(--border-color)",
@@ -80,7 +81,7 @@ function ChartShell({
         <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         <p className="text-xs text-muted mt-0.5">{subtitle}</p>
       </div>
-      <div className="h-56 w-full rounded-xl border border-border bg-surface p-2 pt-3">
+      <div className="w-full rounded-xl border border-border bg-surface p-2 pt-3">
         {children}
       </div>
     </div>
@@ -139,7 +140,11 @@ export default function CardioProgressChart({
         title={activityTitle}
         subtitle="Distance (bars) and session time (line). Tooltip shows pace per mile when both are logged."
       >
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer
+          width="100%"
+          height={PROGRESS_LINE_CHART_HEIGHT}
+          minWidth={0}
+        >
           <ComposedChart
             data={composedData}
             margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
@@ -247,7 +252,11 @@ export default function CardioProgressChart({
         title={activityTitle}
         subtitle={`Distance per completed session (log time as well to see pace).`}
       >
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer
+          width="100%"
+          height={PROGRESS_LINE_CHART_HEIGHT}
+          minWidth={0}
+        >
           <BarChart
             data={series}
             margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
@@ -305,7 +314,11 @@ export default function CardioProgressChart({
       title={activityTitle}
       subtitle="Session time per completed session (add distance to see pace per mile)."
     >
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer
+        width="100%"
+        height={PROGRESS_LINE_CHART_HEIGHT}
+        minWidth={0}
+      >
         <LineChart
           data={series}
           margin={{ top: 28, right: 8, left: 0, bottom: 4 }}

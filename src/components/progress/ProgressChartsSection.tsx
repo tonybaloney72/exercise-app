@@ -7,6 +7,7 @@ import { CATEGORIES } from "@/core/catalog";
 import { trainingCategoryTotals } from "@/utils/progressStats";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
+import { PROGRESS_PIE_CHART_HEIGHT } from "@/components/progress/chartLayout";
 
 const tooltipStyle = {
   backgroundColor: "var(--surface)",
@@ -55,8 +56,12 @@ export default function ProgressChartsSection({ history }: Props) {
           ref={categoryChartRef}
           className="mt-3 w-full overflow-hidden p-0"
         >
-          <div className="h-[220px] w-full px-4 pt-4">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="w-full px-4 pt-4">
+            <ResponsiveContainer
+              width="100%"
+              height={PROGRESS_PIE_CHART_HEIGHT}
+              minWidth={0}
+            >
               <PieChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
                 <Pie
                   data={categoryData}
