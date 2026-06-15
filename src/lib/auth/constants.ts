@@ -20,6 +20,7 @@ const PUBLIC_NEUTRAL_PATHS = [
   "/auth/update-password",
   "/privacy",
   "/terms",
+  "/download/android",
 ] as const;
 
 export function isAuthOnlyPath(pathname: string): boolean {

@@ -16,7 +16,9 @@ function getSnapshot() {
 }
 
 function getServerSnapshot() {
-  return false;
+  return shouldShowAndroidAppDownload(undefined, {
+    isDevelopment: process.env.NODE_ENV === "development",
+  });
 }
 
 function DownloadIcon() {
@@ -55,22 +57,23 @@ export default function AndroidAppDownloadSection() {
       contentClassName="space-y-3 p-4"
     >
       <p className="text-xs leading-snug text-muted">
-        You&apos;re using the installed web app. Download the native Android app
-        for the launcher icon, splash screen, and pull-to-refresh without a
-        browser tab.
+        {process.env.NODE_ENV === "development"
+          ? "Dev preview: this section is visible in desktop browsers for testing. In production it only appears in the installed Android PWA."
+          : "You\u2019re using the installed web app. Download the native Android app for the launcher icon, splash screen, and pull-to-refresh without a browser tab."}
       </p>
       <a
         href={downloadUrl}
-        target="_blank"
-        rel="noopener noreferrer"
+        target={downloadUrl.startsWith("/") ? undefined : "_blank"}
+        rel={downloadUrl.startsWith("/") ? undefined : "noopener noreferrer"}
         className="flex items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
       >
         <DownloadIcon />
         Download Android app
       </a>
       <p className="text-caption leading-snug text-muted">
-        Opens the APK download. You may need to allow installs from your browser
-        once, then open the file to install.
+        {downloadUrl.startsWith("/")
+          ? "Opens the Android download page in this app."
+          : "Opens the APK download. You may need to allow installs from your browser once, then open the file to install."}
       </p>
     </CollapsibleSection>
   );

@@ -166,7 +166,7 @@ Dynamic App Router segments (`/weekly/day/[date]`, `/progress/history/[date]`, â
 | `CAPACITOR_BUILD=1` | Set by export script; enables `output: 'export'` in `next.config.ts` |
 | `NEXT_PUBLIC_API_ORIGIN` | Production origin for `/api/*` in bundled builds (default `https://myexercise.dev`) |
 | `NATIVE_BUILD` / `NEXT_PUBLIC_NATIVE_BUILD` | APK build id for future update channel |
-| `NEXT_PUBLIC_ANDROID_APP_DOWNLOAD_URL` | APK URL linked from Settings (installed Android PWA only; default `https://myexercise.dev/downloads/myexercise.apk`) |
+| `NEXT_PUBLIC_ANDROID_APP_DOWNLOAD_URL` | Direct APK URL when hosted; Settings links to `/download/android` until this is set |
 
 ## App id
 

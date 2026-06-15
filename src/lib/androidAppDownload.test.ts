@@ -18,11 +18,26 @@ function env(
   };
 }
 
+const production = { isDevelopment: false };
+
 describe("shouldShowAndroidAppDownload", () => {
   it("shows in installed Android PWA", () => {
     expect(
       shouldShowAndroidAppDownload(
         env({ displayModeStandalone: true }),
+        production,
+      ),
+    ).toBe(true);
+  });
+
+  it("shows in desktop browser during local dev", () => {
+    expect(
+      shouldShowAndroidAppDownload(
+        env({
+          userAgent:
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        }),
+        { isDevelopment: true },
       ),
     ).toBe(true);
   });
@@ -34,12 +49,13 @@ describe("shouldShowAndroidAppDownload", () => {
           isNativePlatform: () => true,
           displayModeStandalone: true,
         }),
+        production,
       ),
     ).toBe(false);
   });
 
-  it("hides in normal browser tab", () => {
-    expect(shouldShowAndroidAppDownload(env())).toBe(false);
+  it("hides in normal browser tab in production", () => {
+    expect(shouldShowAndroidAppDownload(env(), production)).toBe(false);
   });
 
   it("hides on iOS home-screen PWA", () => {
@@ -50,11 +66,12 @@ describe("shouldShowAndroidAppDownload", () => {
           userAgent:
             "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
         }),
+        production,
       ),
     ).toBe(false);
   });
 
-  it("hides on desktop installed PWA", () => {
+  it("hides on desktop installed PWA in production", () => {
     expect(
       shouldShowAndroidAppDownload(
         env({
@@ -62,6 +79,7 @@ describe("shouldShowAndroidAppDownload", () => {
           userAgent:
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         }),
+        production,
       ),
     ).toBe(false);
   });
@@ -74,9 +92,7 @@ describe("isAndroidUserAgent", () => {
 });
 
 describe("resolveAndroidAppDownloadUrl", () => {
-  it("defaults to production download path", () => {
-    expect(resolveAndroidAppDownloadUrl()).toBe(
-      "https://myexercise.dev/downloads/myexercise.apk",
-    );
+  it("defaults to the in-app download page", () => {
+    expect(resolveAndroidAppDownloadUrl()).toBe("/download/android");
   });
 });
