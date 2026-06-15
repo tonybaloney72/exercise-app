@@ -6,7 +6,7 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
-    files: ["src/core/**/*.{ts,tsx}"],
+    files: ["src/core/**/*.{ts,tsx}", "src/use-cases/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -15,7 +15,7 @@ const eslintConfig = defineConfig([
             {
               group: ["@/stores/*", "@/stores", "@/components/*", "@/components"],
               message:
-                "src/core must not import presentation stores or components.",
+                "src/core and src/use-cases must not import presentation stores or components.",
             },
             {
               group: ["next", "next/*"],

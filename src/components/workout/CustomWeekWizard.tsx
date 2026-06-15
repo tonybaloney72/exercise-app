@@ -21,7 +21,7 @@ import {
 } from "@/lib/trainingWeekCustomize";
 import { resolveBlueprintForManualSeed } from "@/lib/manualWeekSeed";
 import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
-import { bumpTrainingWeekPlansAfterCustomSave } from "@/lib/trainingWeekCacheRefresh";
+import { bumpTrainingWeekPlansAfterCustomSave } from "@/adapters/bumpTrainingWeekPlansAfterCustomSave";
 import { bumpTrainingWeekPlansFromDb } from "@/lib/trainingWeekRefresh";
 import { WEEK_DAY_ABBRS } from "@/lib/weekWizardConstants";
 import { toastSaveError } from "@/utils/saveErrorToast";

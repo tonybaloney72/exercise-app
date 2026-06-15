@@ -6,11 +6,10 @@ import {
   useTrainingWeekStore,
 } from "@/stores/useTrainingWeekStore";
 
-const resolveTrainingWeekBundleForAuth = vi.fn();
+const fetchTrainingWeekBundle = vi.fn();
 
-vi.mock("@/lib/planResolver", () => ({
-  resolveTrainingWeekBundleForAuth: (...args: unknown[]) =>
-    resolveTrainingWeekBundleForAuth(...args),
+vi.mock("@/use-cases/trainingWeek/fetchTrainingWeekBundle", () => ({
+  fetchTrainingWeekBundle: (...args: unknown[]) => fetchTrainingWeekBundle(...args),
 }));
 
 const weekA = { 0: { dayOfWeek: 0, name: "Sun-A" } } as unknown as TrainingWeekDays;
@@ -26,8 +25,8 @@ const deps = {
 describe("useTrainingWeekStore", () => {
   beforeEach(() => {
     useTrainingWeekStore.getState().invalidate();
-    resolveTrainingWeekBundleForAuth.mockReset();
-    resolveTrainingWeekBundleForAuth.mockResolvedValue({
+    fetchTrainingWeekBundle.mockReset();
+    fetchTrainingWeekBundle.mockResolvedValue({
       days: weekA,
       source: "generated_v1",
     });
@@ -38,7 +37,7 @@ describe("useTrainingWeekStore", () => {
     await store.ensureWeek("2026-05-18", "guest", deps);
     expect(normalizeWeekAnchorKey("2026-05-18")).toBe("2026-05-17");
     expect(useTrainingWeekStore.getState().entry?.anchorKey).toBe("2026-05-17");
-    expect(resolveTrainingWeekBundleForAuth).toHaveBeenCalledWith(
+    expect(fetchTrainingWeekBundle).toHaveBeenCalledWith(
       "2026-05-17",
       "guest",
     );
@@ -50,19 +49,19 @@ describe("useTrainingWeekStore", () => {
     const p2 = store.ensureWeek("2026-05-17", "guest", deps);
     const [a, b] = await Promise.all([p1, p2]);
     expect(a).toBe(b);
-    expect(resolveTrainingWeekBundleForAuth).toHaveBeenCalledTimes(1);
+    expect(fetchTrainingWeekBundle).toHaveBeenCalledTimes(1);
   });
 
   it("returns cached week without a second resolve when revision matches", async () => {
     const store = useTrainingWeekStore.getState();
     await store.ensureWeek("2026-05-17", "guest", deps);
-    resolveTrainingWeekBundleForAuth.mockResolvedValue({
+    fetchTrainingWeekBundle.mockResolvedValue({
       days: weekB,
       source: "generated_v1",
     });
     const cached = await store.ensureWeek("2026-05-17", "guest", deps);
     expect(cached).toEqual(weekA);
-    expect(resolveTrainingWeekBundleForAuth).toHaveBeenCalledTimes(1);
+    expect(fetchTrainingWeekBundle).toHaveBeenCalledTimes(1);
   });
 
   it("applySavedWeek serves the next revision without refetching", async () => {
@@ -80,7 +79,7 @@ describe("useTrainingWeekStore", () => {
       planRevision: 2,
     });
     expect(cached).toEqual(weekB);
-    expect(resolveTrainingWeekBundleForAuth).toHaveBeenCalledTimes(1);
+    expect(fetchTrainingWeekBundle).toHaveBeenCalledTimes(1);
   });
 
   it("stores week source from the resolver bundle", async () => {

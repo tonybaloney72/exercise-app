@@ -28,6 +28,10 @@ import {
 import { parseLocalDateKey, weekKeyFromDateKey } from "@/utils/weekCalendar";
 import { getWorkoutRepo as resolveWorkoutRepo } from "@/lib/repos";
 import {
+  persistCompletedWorkout,
+  prepareCompleteWorkout,
+} from "@/use-cases/workout/completeWorkout";
+import {
   buildEmptyCardioLogs,
   CARDIO_KIND_TO_EXERCISE_ID,
   resolveCardioActivities,
@@ -1500,49 +1504,51 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     if (!state.activeWorkout) return null;
 
     const inProgress = state.activeWorkout;
-    const finished: WorkoutLog = {
-      ...inProgress,
-      endTime: new Date().toISOString(),
-      paused: false,
-    };
-    const completed = hydrateWorkoutLog(workoutLogForPersistence(finished));
+    const mode = useAuthStore.getState().mode;
+    const auth = mode === "authenticated";
     const historyBefore = state.workoutHistory;
-    const auth = useAuthStore.getState().mode === "authenticated";
-    const historyAfter = upsertWorkoutInHistory(historyBefore, completed);
-    const pausedWorkoutDate = auth
-      ? getPausedWorkoutDateForToday(historyAfter, formatLocalDateKey())
-      : null;
+    const todayKey = formatLocalDateKey();
+    const prepared = prepareCompleteWorkout({
+      activeWorkout: inProgress,
+      workoutHistory: historyBefore,
+      todayKey,
+      mode,
+    });
 
     markWorkoutCompleting(inProgress.id);
     cancelScheduledPersistActiveWorkoutDraft();
     clearActiveWorkoutDraft(draftScope());
 
-    // Optimistic UI: update store first so the user gets immediate feedback.
     set({
       activeWorkout: null,
-      pausedWorkoutDate,
-      workoutHistory: historyAfter,
+      pausedWorkoutDate: prepared.pausedWorkoutDate,
+      workoutHistory: prepared.workoutHistory,
     });
 
-    try {
-      await workoutRepo().saveWorkout(completed);
-      return completed;
-    } catch (err) {
-      toastSaveError("workout", err);
-      set({
-        activeWorkout: inProgress,
-        pausedWorkoutDate: state.pausedWorkoutDate,
-        workoutHistory: historyBefore,
-      });
-      if (auth) {
-        schedulePersistInProgressWorkout(inProgress, { paused: false });
-      } else {
-        schedulePersistActiveWorkoutDraft(draftScope(), inProgress);
-      }
-      return null;
-    } finally {
+    const result = await persistCompletedWorkout({
+      ...prepared,
+      mode,
+      workoutRepo: resolveWorkoutRepo(mode),
+    });
+
+    if (result.ok) {
       clearWorkoutCompleting(inProgress.id);
+      return result.completed;
     }
+
+    toastSaveError("workout", result.error);
+    set({
+      activeWorkout: inProgress,
+      pausedWorkoutDate: state.pausedWorkoutDate,
+      workoutHistory: historyBefore,
+    });
+    if (auth) {
+      schedulePersistInProgressWorkout(inProgress, { paused: false });
+    } else {
+      schedulePersistActiveWorkoutDraft(draftScope(), inProgress);
+    }
+    clearWorkoutCompleting(inProgress.id);
+    return null;
   },
 
   discardWorkout: () => {
