@@ -166,7 +166,21 @@ Dynamic App Router segments (`/weekly/day/[date]`, `/progress/history/[date]`, â
 | `CAPACITOR_BUILD=1` | Set by export script; enables `output: 'export'` in `next.config.ts` |
 | `NEXT_PUBLIC_API_ORIGIN` | Production origin for `/api/*` in bundled builds (default `https://myexercise.dev`) |
 | `NATIVE_BUILD` / `NEXT_PUBLIC_NATIVE_BUILD` | APK build id for future update channel |
-| `NEXT_PUBLIC_ANDROID_APP_DOWNLOAD_URL` | Direct APK URL when hosted; Settings links to `/download/android` until this is set |
+| `NEXT_PUBLIC_ANDROID_APP_DOWNLOAD_URL` | Optional override for APK URL (default `/downloads/myexercise.apk` in `public/`) |
+
+## Publish a downloadable APK
+
+Build the remote shell APK and copy it into `public/` so Vercel serves it at `/downloads/myexercise.apk`:
+
+```bash
+npm run android:apk
+```
+
+Then commit `public/downloads/myexercise.apk` and deploy. Settings (installed Android PWA) and `/download/android` link to that file.
+
+Override the URL with `NEXT_PUBLIC_ANDROID_APP_DOWNLOAD_URL` if you host the APK elsewhere (e.g. GitHub Releases).
+
+**Note:** `android:apk` produces a **debug** build for sideloading. For wider distribution, sign a release APK (`assembleRelease` + keystore) and replace the file before publishing.
 
 ## App id
 

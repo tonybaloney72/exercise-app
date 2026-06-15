@@ -32,7 +32,8 @@
     "android:remote": "node scripts/cap-android.mjs remote",
     "android:remote:run": "node scripts/cap-android.mjs remote --run",
     "android:dev": "node scripts/cap-android.mjs dev --run",
-    "android:bundle:sync": "node scripts/cap-android.mjs bundle"
+    "android:bundle:sync": "node scripts/cap-android.mjs bundle",
+    "android:apk": "node scripts/android-apk-publish.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.0",

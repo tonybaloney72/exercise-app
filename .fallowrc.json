@@ -2,13 +2,21 @@
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "entry": [
     "src/index.{ts,tsx,js,jsx}",
-    "src/main.{ts,tsx,js,jsx}"
+    "src/main.{ts,tsx,js,jsx}",
+    "src/app/(app)/layout.client.tsx"
   ],
   "ignorePatterns": [
     "scripts/audit-exercise-duplicates.mjs",
     "scripts/enrich-catalog-exercises.mjs",
     "scripts/generate-hybrid-calisthenics-exercises.mjs",
-    "scripts/prune-consolidated-exercises.mjs"
+    "scripts/prune-consolidated-exercises.mjs",
+    "scripts/capacitor-restore.mjs",
+    "scripts/android-apk-publish.mjs"
+  ],
+  "ignoreDependencies": [
+    "@capacitor/android",
+    "@capacitor/app",
+    "@capacitor/status-bar"
   ],
   "duplicates": {
     // Hide pair-only clones; focus on widespread copy-paste

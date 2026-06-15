@@ -63,17 +63,15 @@ export default function AndroidAppDownloadSection() {
       </p>
       <a
         href={downloadUrl}
-        target={downloadUrl.startsWith("/") ? undefined : "_blank"}
-        rel={downloadUrl.startsWith("/") ? undefined : "noopener noreferrer"}
+        download="myexercise.apk"
         className="flex items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
       >
         <DownloadIcon />
         Download Android app
       </a>
       <p className="text-caption leading-snug text-muted">
-        {downloadUrl.startsWith("/")
-          ? "Opens the Android download page in this app."
-          : "Opens the APK download. You may need to allow installs from your browser once, then open the file to install."}
+        Downloads the APK file. You may need to allow installs from your browser
+        once, then open the file to install.
       </p>
     </CollapsibleSection>
   );

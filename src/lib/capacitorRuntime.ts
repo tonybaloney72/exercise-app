@@ -9,8 +9,3 @@ export function isNativePlatform(): boolean {
 export function isCapacitorBundledBuild(): boolean {
   return process.env.NEXT_PUBLIC_CAPACITOR === "1";
 }
-
-/** Monotonic native shell build (APK); separate from web `NEXT_PUBLIC_BUILD_ID`. */
-export function getNativeBuildId(): string {
-  return process.env.NEXT_PUBLIC_NATIVE_BUILD ?? "0";
-}

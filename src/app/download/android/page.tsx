@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LEGAL_APP_NAME } from "@/data/legal";
+import {
+  resolveAndroidAppDownloadAbsoluteUrl,
+  resolveAndroidAppDownloadUrl,
+} from "@/lib/androidAppDownload";
 
 export const metadata: Metadata = {
   title: "Android app | MyExercise",
@@ -8,8 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default function AndroidDownloadPage() {
-  const configuredApkUrl =
-    process.env.NEXT_PUBLIC_ANDROID_APP_DOWNLOAD_URL?.trim() ?? null;
+  const downloadPath = resolveAndroidAppDownloadUrl();
+  const downloadUrl = resolveAndroidAppDownloadAbsoluteUrl();
 
   return (
     <main className="flex-1">
@@ -33,63 +37,49 @@ export default function AndroidDownloadPage() {
         </header>
 
         <div className="space-y-6 text-sm leading-relaxed text-muted">
-          {configuredApkUrl ? (
-            <section className="space-y-3">
-              <p className="text-foreground">
-                A release APK is available for download.
-              </p>
+          <section className="space-y-3">
+            <p className="text-foreground">
+              Download the MyExercise Android app (APK) and install it on your
+              device.
+            </p>
+            <a
+              href={downloadPath}
+              download="myexercise.apk"
+              className="inline-flex rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+            >
+              Download APK
+            </a>
+            <p>
+              Direct link:{" "}
               <a
-                href={configuredApkUrl}
-                className="inline-flex rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+                href={downloadUrl}
+                className="text-accent hover:underline"
               >
-                Download APK
+                {downloadUrl}
               </a>
-              <p>
-                After downloading, open the file on your Android device. You may
-                need to allow installs from your browser once.
-              </p>
-            </section>
-          ) : (
-            <section className="space-y-3">
-              <p className="text-foreground">
-                A public APK download is not hosted yet.
-              </p>
-              <p>
-                The Settings link points here so you can verify the flow before
-                a release file is published. When ready, set{" "}
-                <code className="rounded bg-surface-hover px-1.5 py-0.5 text-xs text-foreground">
-                  NEXT_PUBLIC_ANDROID_APP_DOWNLOAD_URL
-                </code>{" "}
-                to the APK URL (or place a file and point the env var at it).
-              </p>
-            </section>
-          )}
+            </p>
+            <p>
+              After downloading, open the file on your Android device. You may
+              need to allow installs from your browser once. The app loads{" "}
+              <strong className="text-foreground">myexercise.dev</strong> in a
+              native shell and needs internet.
+            </p>
+          </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-semibold text-foreground">
-              Build locally (developers)
+              Build a new APK (developers)
             </h2>
-            <p>
-              To run the native shell against production while developing
-              Capacitor:
-            </p>
+            <p>From the repo root:</p>
             <pre className="overflow-x-auto rounded-xl border border-border bg-surface-hover p-4 text-xs text-foreground">
-              {`npm run android:remote:run`}
+              {`npm run android:apk`}
             </pre>
             <p>
-              For local UI changes, keep{" "}
+              That syncs remote mode, runs Gradle, and copies the APK to{" "}
               <code className="rounded bg-surface-hover px-1.5 py-0.5 text-xs text-foreground">
-                npm run dev
-              </code>{" "}
-              running and use{" "}
-              <code className="rounded bg-surface-hover px-1.5 py-0.5 text-xs text-foreground">
-                npm run android:dev
+                public/downloads/myexercise.apk
               </code>
-              . See{" "}
-              <code className="rounded bg-surface-hover px-1.5 py-0.5 text-xs text-foreground">
-                docs/capacitor-android.md
-              </code>{" "}
-              in the repo.
+              . Commit and deploy so production serves the new file.
             </p>
           </section>
         </div>

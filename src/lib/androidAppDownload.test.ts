@@ -92,7 +92,7 @@ describe("isAndroidUserAgent", () => {
 });
 
 describe("resolveAndroidAppDownloadUrl", () => {
-  it("defaults to the in-app download page", () => {
-    expect(resolveAndroidAppDownloadUrl()).toBe("/download/android");
+  it("defaults to the hosted APK path", () => {
+    expect(resolveAndroidAppDownloadUrl()).toBe("/downloads/myexercise.apk");
   });
 });
