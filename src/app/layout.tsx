@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import AppVersionSync from "@/components/layout/AppVersionSync";
 import CapacitorShellSync from "@/components/layout/CapacitorShellSync";
+import NativeOAuthSync from "@/components/auth/NativeOAuthSync";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -70,6 +71,7 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col">
         <CapacitorShellSync />
+        <NativeOAuthSync />
         <AppVersionSync />
         {children}
       </body>

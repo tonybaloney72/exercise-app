@@ -17,6 +17,13 @@ export function humanizeAuthError(
     if (lower.includes("email not confirmed")) {
       return "Please confirm your email address before logging in.";
     }
+    if (
+      lower.includes("flow_state") ||
+      lower.includes("code verifier") ||
+      lower.includes("pkce")
+    ) {
+      return "Google sign-in could not be completed. Close the app and try again.";
+    }
   }
 
   if (context === "signup") {

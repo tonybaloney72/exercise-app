@@ -126,6 +126,24 @@ You can also watch the **`npm run dev` terminal** — blocked dev origins log a 
 
 Android APK and **installed PWA** (standalone) do not get the browser’s native pull-to-refresh. In the app shell, pull down at the top of any tab to reload settings, workout history, and the current training week. Regular mobile browser tabs are unchanged (they keep the browser gesture).
 
+### Google OAuth in the APK
+
+Web Google sign-in uses `/auth/callback` on the server. In the native shell, OAuth opens the system browser and returns via a deep link so the PKCE exchange runs in the WebView.
+
+**Supabase Dashboard** → Authentication → URL Configuration → **Redirect URLs**, add:
+
+```text
+dev.myexercise.app://auth/callback
+```
+
+Flow: `signInWithOAuth` (`skipBrowserRedirect`) → Capacitor Browser → Google → deep link → `NativeOAuthSync` → `exchangeCodeForSession` → app route.
+
+After changing `AndroidManifest.xml` or adding `@capacitor/browser`, rebuild the APK:
+
+```bash
+npm run android:apk
+```
+
 Physical device on same Wi‑Fi: set `CAPACITOR_SERVER_URL=http://YOUR_PC_IP:3000` before sync (see below).
 
 On Windows, use the npm scripts above (they set env vars via Node — do not rely on `VAR=value` in cmd).

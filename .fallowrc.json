@@ -16,6 +16,7 @@
   "ignoreDependencies": [
     "@capacitor/android",
     "@capacitor/app",
+    "@capacitor/browser",
     "@capacitor/status-bar"
   ],
   "duplicates": {
