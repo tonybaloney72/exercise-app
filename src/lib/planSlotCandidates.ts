@@ -41,7 +41,7 @@ export function getPlanSlotCandidates(options: {
 }
 
 /** Any category - full pool for add-slot (equipment + dislikes; excludes ids already in round). */
-export function getPlanAddCandidates(options: {
+function getPlanAddCandidates(options: {
   category: ExerciseCategory;
   roundExerciseIds: string[];
   availableEquipment: ExerciseEquipment[];

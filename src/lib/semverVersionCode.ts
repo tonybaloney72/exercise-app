@@ -1,5 +1,5 @@
 /** Parse `major.minor.patch` (supports 0.10.12-style versions). */
-export function parseSemverTriplet(version: string): [number, number, number] | null {
+function parseSemverTriplet(version: string): [number, number, number] | null {
   const match = version.trim().match(/^(\d+)\.(\d+)\.(\d+)/);
   if (!match) return null;
   return [Number(match[1]), Number(match[2]), Number(match[3])];

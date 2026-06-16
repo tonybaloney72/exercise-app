@@ -12,7 +12,7 @@ function nativeApkDismissStorageKey(apkBuildId: string): string {
   return `${NATIVE_APK_DISMISS_PREFIX}${apkBuildId}`;
 }
 
-export function isNativeApkUpdateDismissed(apkBuildId: string): boolean {
+function isNativeApkUpdateDismissed(apkBuildId: string): boolean {
   if (typeof sessionStorage === "undefined") return false;
   try {
     return (
@@ -67,8 +67,12 @@ export function evaluateVersionPrompt(options: {
   payload: AppVersionPayload;
   isNativeShell: boolean;
 }): VersionPromptState {
-  const { clientWebBuildId, installedNativeApkBuildId, payload, isNativeShell } =
-    options;
+  const {
+    clientWebBuildId,
+    installedNativeApkBuildId,
+    payload,
+    isNativeShell,
+  } = options;
 
   const webUpdate = needsWebBuildUpdate(clientWebBuildId, payload.buildId);
   const nativeApkUpdate = needsNativeApkUpdate(
@@ -92,8 +96,7 @@ export function evaluateVersionPrompt(options: {
     payload.buildId,
     payload.forceUpdate,
   );
-  const forceNative =
-    payload.forceUpdate && nativeApkUpdate && isNativeShell;
+  const forceNative = payload.forceUpdate && nativeApkUpdate && isNativeShell;
   const showForce = forceWeb || forceNative;
 
   const webDismissed = isSoftUpdateDismissed(payload.buildId);

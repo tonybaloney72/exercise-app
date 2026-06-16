@@ -14,7 +14,7 @@ export function shouldEnablePullToRefresh(
   return isStandaloneWebApp(env);
 }
 
-export function isStandaloneWebApp(
+function isStandaloneWebApp(
   env: Pick<
     PullToRefreshEnvironment,
     "displayModeStandalone" | "iosStandalone"
@@ -35,7 +35,8 @@ export function readPullToRefreshEnvironment(): PullToRefreshEnvironment {
   const nav = window.navigator as Navigator & { standalone?: boolean };
   return {
     isNativePlatform,
-    displayModeStandalone: window.matchMedia("(display-mode: standalone)").matches,
+    displayModeStandalone: window.matchMedia("(display-mode: standalone)")
+      .matches,
     iosStandalone: nav.standalone === true,
   };
 }
