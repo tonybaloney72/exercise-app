@@ -54,7 +54,7 @@ export function resolveAndroidAppDownloadAbsoluteUrl(): string {
   return `https://${LEGAL_DOMAIN}${url.startsWith("/") ? url : `/${url}`}`;
 }
 
-/** Open the hosted APK in the system browser (native) or navigate (web). */
+/** Open or download the hosted APK. Native uses the WebView download handler. */
 export async function openAndroidApkDownload(
   downloadUrl: string = resolveAndroidAppDownloadAbsoluteUrl(),
 ): Promise<void> {
@@ -62,10 +62,14 @@ export async function openAndroidApkDownload(
 
   const { isNativePlatform } = await import("@/lib/capacitorRuntime");
   if (isNativePlatform()) {
-    const { Browser } = await import("@capacitor/browser");
-    await Browser.open({ url: downloadUrl });
+    triggerNativeApkDownload(downloadUrl);
     return;
   }
 
+  window.location.assign(downloadUrl);
+}
+
+function triggerNativeApkDownload(downloadUrl: string): void {
+  // Handed off to MainActivity's DownloadListener (system DownloadManager).
   window.location.assign(downloadUrl);
 }

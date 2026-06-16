@@ -8,6 +8,7 @@ import CollapsibleSection from "@/components/common/CollapsibleSection";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import AboutDeveloperSection from "@/components/settings/AboutDeveloperSection";
 import AndroidAppDownloadSection from "@/components/settings/AndroidAppDownloadSection";
+import NativeAppUpdateSection from "@/components/settings/NativeAppUpdateSection";
 import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
 import SettingsFeedbackSection from "@/components/settings/SettingsFeedbackSection";
 import SettingsLegalLinks from "@/components/settings/SettingsLegalLinks";
@@ -511,6 +512,7 @@ export default function SettingsPage() {
       )}
 
       <AnimatedSection delay={0.05}>
+        <NativeAppUpdateSection />
         <AndroidAppDownloadSection />
       </AnimatedSection>
 

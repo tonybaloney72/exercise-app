@@ -4,6 +4,7 @@ import {
   shouldForceUpdate,
   shouldPromptSoftUpdate,
 } from "@/lib/appVersion";
+import { compareSemver } from "@/lib/semverVersionCode";
 
 const NATIVE_APK_DISMISS_PREFIX = "app-version-dismissed-native:";
 
@@ -49,7 +50,7 @@ export function needsNativeApkUpdate(
   serverApkBuildId: string,
 ): boolean {
   if (!installedNativeApkBuildId) return false;
-  return installedNativeApkBuildId !== serverApkBuildId;
+  return compareSemver(installedNativeApkBuildId, serverApkBuildId) < 0;
 }
 
 export type VersionPromptState = {

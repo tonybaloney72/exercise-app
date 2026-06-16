@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { semverToAndroidVersionCode } from "./lib/semver-version-code.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const androidDir = path.join(root, "android");
@@ -88,8 +89,7 @@ const packageJson = JSON.parse(
   fs.readFileSync(path.join(root, "package.json"), "utf8"),
 );
 const versionName = String(packageJson.version ?? "1.0.0");
-const [major, minor, patch] = versionName.split(".").map((part) => Number(part) || 0);
-const versionCode = major * 10000 + minor * 100 + patch;
+const versionCode = semverToAndroidVersionCode(versionName);
 
 const gradlePath = path.join(androidDir, "app", "build.gradle");
 let gradle = fs.readFileSync(gradlePath, "utf8");
@@ -122,3 +122,4 @@ console.log("Local URL:  http://localhost:3000/downloads/myexercise.apk");
 console.log("Production: https://myexercise.dev/downloads/myexercise.apk");
 console.log("");
 console.log("Commit public/downloads/myexercise.apk and deploy to Vercel.");
+console.log(`APK version: ${versionName} (versionCode ${versionCode})`);
