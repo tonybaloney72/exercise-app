@@ -47,6 +47,9 @@ function resolveWeeklyCardioByDay(
   if (!isPresetProgramMode(settings.programMode)) {
     return resolved;
   }
+  if (settings.weeklyCardioCustomized) {
+    return resolved;
+  }
   return sanitizePplWeeklyCardioByDayForSchedule(
     resolved,
     resolveWeeklyPplSchedule(settings),

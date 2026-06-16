@@ -79,9 +79,6 @@ export default function WorkoutSession({
 
   const [pickTarget, setPickTarget] =
     useState<SessionStructurePickTarget | null>(null);
-  const [categoryPickRound, setCategoryPickRound] = useState<number | null>(
-    null,
-  );
 
   const isEditing = isCompletedWorkoutLog(activeWorkout);
   const sessionPlan = useMemo(
@@ -172,13 +169,7 @@ export default function WorkoutSession({
       <WorkoutSessionStructurePick
         activeWorkout={activeWorkout}
         pickTarget={pickTarget}
-        categoryPickRound={categoryPickRound}
         onClosePick={() => setPickTarget(null)}
-        onCloseCategoryPick={() => setCategoryPickRound(null)}
-        onCategoryPicked={(roundNumber, category) => {
-          setCategoryPickRound(null);
-          setPickTarget({ kind: "addStrength", roundNumber, category });
-        }}
         onExercisePicked={handleExercisePicked}
       />
 
@@ -255,7 +246,12 @@ export default function WorkoutSession({
               disableRestTimer={isEditing}
               canRemoveRound={activeWorkout.rounds.length > 1}
               onRemoveRound={() => removeRoundFromWorkout(round.roundNumber)}
-              onAddExercise={() => setCategoryPickRound(round.roundNumber)}
+              onAddExercise={() =>
+                setPickTarget({
+                  kind: "addStrength",
+                  roundNumber: round.roundNumber,
+                })
+              }
               onRemoveExercise={(slotIndex) =>
                 removeRoundExercise(round.roundNumber, slotIndex)
               }
@@ -271,7 +267,12 @@ export default function WorkoutSession({
               onCopyStructure={() =>
                 applyRoundCopyFromPriorWorkout(round.roundNumber, "structure")
               }
-              onCustomize={() => setCategoryPickRound(round.roundNumber)}
+              onCustomize={() =>
+                setPickTarget({
+                  kind: "addStrength",
+                  roundNumber: round.roundNumber,
+                })
+              }
             />
           </div>
         );

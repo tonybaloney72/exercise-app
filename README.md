@@ -1,47 +1,31 @@
-# MyExercise App
+# MyExercise
 
-https://myexercise.dev/
+**https://myexercise.dev/**
 
-A Progressive Web App (PWA) for planning and logging workouts. Use it in the browser or add it to your home screen on iOS and Android for an app-like experience. MyExercise builds a weekly training plan from your equipment, priorities, and preferences, then guides you through each session with timers, stretch blocks, cardio logging, and progress charts. Sign in with Supabase to sync across devices, or use **Continue as guest** to try it locally without an account.
+Plan and log workouts in the browser, as an installed PWA, or in the **Android APK**. MyExercise builds a weekly plan from your equipment and preferences, then guides each session with timers, stretches, cardio logging, and progress charts. Sign in with Supabase to sync across devices, or use **Continue as guest** for local-only trial.
+
+## Platforms
+
+| Surface | Install | Notes |
+| ------- | ------- | ----- |
+| **Web** | Browser | Full app at myexercise.dev |
+| **PWA** | Add to Home Screen (iOS & Android) | Same UI as web; no app store |
+| **Android APK** | [Download](https://myexercise.dev/downloads/myexercise.apk) or Settings (installed PWA) | Capacitor shell → loads myexercise.dev; native Google OAuth, pull-to-refresh |
+| **iOS native** | Not planned near-term | iPhone uses PWA only ([ROADMAP](ROADMAP.md)) |
 
 ## What it does
 
-- **Today** - See today's prescribed workout, start or resume a session, log sets (reps or timed), warm-up and cool-down stretches, and optional jog/cardio. Finish with a summary and notes.
-- **Weekly** - Sun through Sat overview of the current calendar week. Open any day to preview the plan, review a completed workout, continue an unfinished session, or backfill a missed day.
-- **Library** - Browse the exercise catalog (strength, core, cardio, warm-up, cool-down). Set per-exercise defaults (reps vs timer, targets), favorites, and dislikes that influence plan generation.
-- **Progress** - Streaks, planned vs completed adherence, cardio mileage, Recharts trends, per-exercise history, and a workout calendar.
-- **Settings** - Equipment onboarding, training priorities or weekly layout modes, custom week builder, rest timers, sounds, vibration, dark mode, and default stretch lists.
+- **Today** — Today's workout, session logging (reps/timed sets), warm-up/cool-down, optional cardio, finish summary
+- **Weekly** — Sun–Sat overview; preview, continue, or backfill any day
+- **Library** — Exercise catalog; per-exercise defaults, favorites, dislikes
+- **Progress** — Streaks, adherence, cardio mileage, charts, exercise history, calendar
+- **Settings** — Equipment, program modes, week builder, timers, theme, default stretches
 
-### Program modes
-
-| Mode              | What you control                                                      | How the week is built                                             |
-| ----------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| **Priorities**    | Preset or custom 0-4 emphasis on core, cardio, lower body, push, pull | Catalog-themed days; generator fills rounds biased by your scores |
-| **Weekly layout** | Which emphasis groups appear on each weekday (0 = rest)               | Exercises only from allowed groups per day                        |
-| **Custom week**   | Wizard, per-day editor, day templates                                 | You own the week; stored as a custom plan                         |
-
-Plan changes generally apply to **today and upcoming days** in the current week; past days stay frozen so history stays accurate.
+Plan changes apply to **today and upcoming days** in the current week; past days stay frozen for accurate history.
 
 ## Tech stack
 
-| Layer       | Technology                                                                                                                                                    |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Framework   | [Next.js](https://nextjs.org/) 16 (App Router, React Server Components where applicable)                                                                      |
-| UI          | [React](https://react.dev/) 19, [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/) 4                                     |
-| State       | [Zustand](https://zustand.docs.pmnd.rs/)                                                                                                                      |
-| Motion / UX | [Framer Motion](https://www.framer.com/motion/), [@dnd-kit](https://dndkit.com/) (drag-and-drop in editors), [Sonner](https://sonner.emilkowal.ski/) (toasts) |
-| Charts      | [Recharts](https://recharts.org/)                                                                                                                             |
-| Backend     | [Supabase](https://supabase.com/) (Auth, Postgres, Row Level Security) via `@supabase/supabase-js` and `@supabase/ssr`                                        |
-| Deploy      | [Vercel](https://vercel.com/) (typical); PWA assets in `public/`                                                                                              |
-| Tests       | [Vitest](https://vitest.dev/) (unit tests under `src/lib/`, etc.)                                                                                             |
-
-Other notable pieces: **Web Audio API** for timer chimes, **Vibration API** for haptics, **canvas-confetti** on workout complete, and **uuid** for client-generated ids in guest mode.
-
-## How data flows
-
-- **Authenticated users** - Workouts and settings persist through a repository layer (`src/lib/repos/`) that talks to Supabase. RLS limits each user to their own rows (`profiles`, `user_settings`, `workout_logs`, `exercise_logs`, preferences, training weeks).
-- **Guests** - Same UI with `localStorage`-backed repos; no Supabase calls until you create an account (optional migration on first login).
-- **Plans** - Training weeks are materialized from a catalog plus generator (`src/lib/planGenerator.ts`, `planResolver.ts`) or saved as a custom week. Stretch lists are derived from settings and day focus (`src/lib/dayStretchPlan.ts`).
+Next.js 16 · React 19 · TypeScript · Tailwind 4 · Zustand · Supabase (auth + Postgres + RLS) · Recharts · Vitest · Vercel deploy · Capacitor 8 (Android shell)
 
 ## Getting started
 
@@ -49,69 +33,89 @@ Other notable pieces: **Web Audio API** for timer chimes, **Vibration API** for 
 
 - Node.js 20+
 - npm
-- A Supabase project (only required for sign-in and sync; guest mode works without it for local dev if guest API is enabled)
+- Supabase project (optional for guest-only local dev)
 
-### Environment variables
+### Environment
 
-Create `.env.local` in the project root:
+Create `.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 ```
 
-See [docs/deployment.md](docs/deployment.md) and [docs/supabase-migrations.md](docs/supabase-migrations.md) for production setup and schema migrations.
+(Supabase dashboard may still label this the anon key.)
 
-### Install and run
+See [docs/deployment.md](docs/deployment.md) and [docs/supabase-migrations.md](docs/supabase-migrations.md).
+
+### Run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Use **Sign up** / **Log in**, or **Continue as guest** to jump to Today.
+Open [http://localhost:3000](http://localhost:3000).
 
-### Useful scripts
+### Common scripts
 
-| Command                          | Purpose                                                                       |
-| -------------------------------- | ----------------------------------------------------------------------------- |
-| `npm run dev`                    | Development server                                                            |
-| `npm run build`                  | Production build                                                              |
-| `npm run start`                  | Run production build locally                                                  |
-| `npm run lint`                   | ESLint                                                                        |
-| `npm run test`                   | Vitest (single run)                                                           |
-| `npm run test:watch`             | Vitest watch mode                                                             |
-| `npm run fallow:audit`           | Optional Fallow audit vs `main`; prunes Fallow temp worktrees after           |
-| `npm run audit:catalog`          | Inventory / QA pass on the exercise catalog                                   |
-| `npm run generate:category-index`| **After catalog id/category edits** — regenerates `exerciseCategoryIndex.ts` (see [docs/catalog-maintenance.md](docs/catalog-maintenance.md)) |
-| `npm run catalog:enrich`         | Automated catalog metadata enrichment                                         |
-| `npm run icons`                  | Regenerate PWA icons from brand assets                                        |
-| `npm run android:remote`         | Sync Android project for production WebView (no launch) |
-| `npm run android:remote:run`     | Sync + run emulator against **https://myexercise.dev** |
-| `npm run android:dev`            | Run emulator against **local** `npm run dev` (needs dev server) |
+| Command | Purpose |
+| ------- | ------- |
+| `npm run dev` | Dev server (`0.0.0.0` for Android emulator) |
+| `npm run build` / `start` | Production build / local prod |
+| `npm run test` | Vitest |
+| `npm run lint` | ESLint |
+| `npm run icons` | Regenerate PWA icons |
+| `npm run fallow:audit` | Dead-code audit vs `main` + worktree prune |
+| `npm run android:remote:run` | Emulator → production site in APK shell |
+| `npm run android:dev` | Emulator → local dev (needs `npm run dev`) |
+| `npm run android:apk` | Build remote APK → `public/downloads/myexercise.apk` |
+| `npm run android:icons` | Regenerate launcher + splash from brand PNG |
 
-### Fallow and git worktrees
+Android details: [docs/capacitor-android.md](docs/capacitor-android.md).
 
-`fallow audit` (default `new-only` gate) keeps a reusable checkout of `main` under `%TEMP%/fallow-audit-base-cache-*` so it can tell new vs inherited findings. That shows up in the IDE as an extra worktree, not a real branch. `npm run fallow:audit` runs `git worktree prune` afterward so it usually disappears; if a run was interrupted, use `npm run fallow:prune-worktrees`. To skip the base snapshot entirely (no extra worktree, but no introduced/inherited split), use `fallow audit --base main --gate all`.
+## Data flow (short)
 
-## Project layout (high level)
+- **Signed-in** — `src/lib/repos/` → Supabase (RLS per user)
+- **Guest** — `localStorage` repos; optional migration on first login
+- **Plans** — Generator + catalog (`src/core/`, `src/lib/planGenerator.ts`) or custom week
+
+Guest vs account: [docs/guest-vs-account.md](docs/guest-vs-account.md).
+
+## What's next
+
+See [ROADMAP.md](ROADMAP.md). **Now:** Health Connect heart rate import (Android APK). **Backlog:** bundled offline export, native version channel, catalog media, share workout.
+
+## Project layout
 
 ```
 src/
-  app/              # Next.js routes (auth, today, weekly, library, progress, settings)
-  components/       # UI by feature (workout, progress, settings, common)
-  data/             # Exercise catalog, categories, training week catalog
-  hooks/            # Plan loading, resolved stretches, etc.
-  lib/              # Plan generator, repos, stretch logic, cardio, history
-  stores/           # Zustand (workout session, settings, auth, preferences)
-supabase/           # SQL migrations
-docs/               # Deployment, migrations, guest vs account, catalog maintenance
+  app/           # Next.js routes
+  components/    # UI by feature
+  core/          # Catalog, types, framework-agnostic rules
+  lib/           # Plans, repos, auth, Capacitor helpers
+  stores/        # Zustand
+android/         # Capacitor Android project
+docs/            # Deployment, Android, catalog, Supabase
+supabase/        # SQL migrations
+public/          # PWA assets, downloads/myexercise.apk
 ```
+
+## Docs
+
+| Doc | Topic |
+| --- | ----- |
+| [deployment.md](docs/deployment.md) | Vercel env, version checks, feedback digest |
+| [capacitor-android.md](docs/capacitor-android.md) | APK build, OAuth deep link, emulator dev |
+| [supabase-migrations.md](docs/supabase-migrations.md) | Database schema |
+| [guest-vs-account.md](docs/guest-vs-account.md) | Guest cookie vs signed-in sync |
+| [catalog-maintenance.md](docs/catalog-maintenance.md) | Exercise catalog tooling |
+| [ROADMAP.md](ROADMAP.md) | Open work and shipped features |
 
 ## Deploy
 
-The app is designed to deploy on Vercel with the environment variables above. After deploy, verify PWA install icons and Supabase auth redirect URLs for your production domain. Details: [docs/deployment.md](docs/deployment.md).
+Deploy to Vercel with env vars above. Configure Supabase auth redirect URLs for production and `dev.myexercise.app://auth/callback` for native Google OAuth. After native or manifest changes, run `npm run android:apk` and redeploy so `/downloads/myexercise.apk` stays current.
 
 ## License
 
-Private project. All rights reserved unless otherwise noted in the repository.
+Private project. All rights reserved unless otherwise noted.

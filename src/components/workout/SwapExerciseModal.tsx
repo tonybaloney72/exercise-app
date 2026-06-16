@@ -18,6 +18,8 @@ interface SwapExerciseModalProps {
   onClose: () => void;
   onPick: (exerciseId: string) => void;
   onClearSwap: () => void;
+  /** Shown when the candidate list is empty (before search). */
+  emptyPoolMessage?: string;
 }
 
 export default function SwapExerciseModal({
@@ -29,6 +31,7 @@ export default function SwapExerciseModal({
   onClose,
   onPick,
   onClearSwap,
+  emptyPoolMessage = "No other exercises in this category for this round.",
 }: SwapExerciseModalProps) {
   const [query, setQuery] = useState("");
   const byExerciseId = useExerciseSettingsStore((s) => s.byExerciseId);
@@ -176,7 +179,7 @@ export default function SwapExerciseModal({
             {filtered.length === 0 ? (
               <li className="px-3 py-6 text-center text-sm text-muted">
                 {candidates.length === 0
-                  ? "No other exercises in this category for this round."
+                  ? emptyPoolMessage
                   : "No matches."}
               </li>
             ) : (

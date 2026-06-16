@@ -6,14 +6,13 @@ import { useBalanceAlertToasts } from "@/hooks/useBalanceAlertToasts";
 import AnimatedSection from "@/components/common/AnimatedSection";
 import WorkoutSectionCard from "@/components/workout/WorkoutSectionCard";
 import SurfaceCard from "@/components/common/SurfaceCard";
-import CategoryPickModal from "@/components/workout/CategoryPickModal";
 import DayPlanCardioEditor from "@/components/workout/DayPlanCardioEditor";
 import RoundExerciseSortableList from "@/components/workout/RoundExerciseSortableList";
 import StretchPlanSection from "@/components/workout/StretchPlanSection";
 import WorkoutDayTemplateToolbar from "@/components/workout/WorkoutDayTemplateToolbar";
 import StretchPickModal from "@/components/workout/StretchPickModal";
 import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
-import { CATEGORIES, CATEGORY_ORDER } from "@/core/catalog";
+import { CATEGORY_ORDER } from "@/core/catalog";
 import { exerciseMap } from "@/core/catalog";
 import { rebuildDerivedStretches } from "@/lib/dayStretchPlan";
 import { buildStretchResolveContextFromStores } from "@/adapters/stretchResolveContextFromStores";
@@ -21,7 +20,7 @@ import { buildStretchUsedExerciseIds } from "@/lib/stretchDefaults";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import {
-  getPlanAddCandidates,
+  getPlanAddCandidatesAllCategories,
   getPlanSlotCandidates,
 } from "@/lib/planSlotCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
@@ -40,7 +39,6 @@ import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStor
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type {
   DayPlan,
-  ExerciseCategory,
   Round,
   RoundExercise,
   StretchEntry,
@@ -54,7 +52,7 @@ type StretchSectionKey = "warmUp" | "coolDown";
 
 type PickTarget =
   | { kind: "swap"; roundIndex: number; slotIndex: number }
-  | { kind: "add"; roundIndex: number; category: ExerciseCategory }
+  | { kind: "add"; roundIndex: number }
   | { kind: "stretch"; section: StretchSectionKey; index?: number };
 
 function stretchCategory(section: StretchSectionKey): "SW" | "SC" {
@@ -101,9 +99,6 @@ export default function WorkoutPlanEditor({
     prepareDayPlanForEditor(initialPlan, buildStretchResolveContextFromStores()),
   );
   const [pickTarget, setPickTarget] = useState<PickTarget | null>(null);
-  const [categoryPickRound, setCategoryPickRound] = useState<number | null>(
-    null,
-  );
   const [resetConfirm, setResetConfirm] = useState(false);
 
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
@@ -150,8 +145,8 @@ export default function WorkoutPlanEditor({
     if (!round) return [];
 
     if (pickTarget.kind === "add") {
-      return getPlanAddCandidates({
-        category: pickTarget.category,
+      return getPlanAddCandidatesAllCategories({
+        categories: ROUND_ADD_CATEGORIES,
         roundExerciseIds: round.exercises.map((e) => e.exerciseId),
         availableEquipment,
         dislikedExerciseIds: dislikedIds,
@@ -369,7 +364,7 @@ export default function WorkoutPlanEditor({
           ?.exerciseId;
       return exerciseMap[id ?? ""]?.name ?? "Exercise";
     }
-    return CATEGORIES[pickTarget.category].name;
+    return "Exercise";
   }, [pickTarget, draft]);
 
   const stretchLists = {
@@ -424,7 +419,7 @@ export default function WorkoutPlanEditor({
           menuItems={[
             {
               label: "Add exercise",
-              onClick: () => setCategoryPickRound(roundIndex),
+              onClick: () => openPickModal({ kind: "add", roundIndex }),
             },
             {
               label: "Remove round",
@@ -442,7 +437,7 @@ export default function WorkoutPlanEditor({
               onCopyStructure={() =>
                 applyCopyFromPrior(roundIndex, "structure")
               }
-              onCustomize={() => setCategoryPickRound(roundIndex)}
+              onCustomize={() => openPickModal({ kind: "add", roundIndex })}
             />
           }
         >
@@ -570,23 +565,6 @@ export default function WorkoutPlanEditor({
         )}
       </div>
 
-      <CategoryPickModal
-        open={categoryPickRound !== null}
-        title="Choose category"
-        hint="Any training category - respects your equipment and dislikes."
-        categories={ROUND_ADD_CATEGORIES}
-        onClose={() => setCategoryPickRound(null)}
-        onPick={(category) => {
-          if (categoryPickRound === null) return;
-          openPickModal({
-            kind: "add",
-            roundIndex: categoryPickRound,
-            category,
-          });
-          setCategoryPickRound(null);
-        }}
-      />
-
       <StretchPickModal
         open={pickTarget?.kind === "stretch"}
         title={
@@ -609,6 +587,11 @@ export default function WorkoutPlanEditor({
         candidates={pickCandidates}
         laterRoundByExerciseId={laterRoundByExerciseIdForSwap}
         hasSwap={pickTarget?.kind === "swap"}
+        emptyPoolMessage={
+          pickTarget?.kind === "add"
+            ? "No exercises available for this round."
+            : undefined
+        }
         onClose={() => setPickTarget(null)}
         onPick={applyPick}
         onClearSwap={() => {

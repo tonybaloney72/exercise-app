@@ -1,8 +1,8 @@
 import { CAPACITOR_APP_ID } from "@/lib/capacitorAppId";
 import { APP_HOME, safeReturnTo } from "@/lib/auth/constants";
 
-export const NATIVE_OAUTH_CALLBACK_HOST = "auth";
-export const NATIVE_OAUTH_CALLBACK_PATH = "/callback";
+const NATIVE_OAUTH_CALLBACK_HOST = "auth";
+const NATIVE_OAUTH_CALLBACK_PATH = "/callback";
 
 /** Supabase `redirectTo` for Capacitor deep-link return. */
 export function buildNativeOAuthCallbackUrl(

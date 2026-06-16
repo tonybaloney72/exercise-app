@@ -57,7 +57,10 @@ function CardioTooltipBody({ point }: { point: CardioChartPoint }) {
       className="rounded-lg border border-border px-3 py-2 text-xs shadow-lg"
       style={tooltipStyle}
     >
-      <p className="font-semibold text-foreground">{point.date}</p>
+      <p className="font-semibold text-foreground">
+        {point.date}
+        {point.sessionIndex != null ? ` · Run ${point.sessionIndex}` : ""}
+      </p>
       {dist && <p className="mt-1 text-muted">Distance: {dist}</p>}
       {time && <p className="text-muted">Time: {time}</p>}
       {paceLine && <p className="text-muted">{paceLine}</p>}

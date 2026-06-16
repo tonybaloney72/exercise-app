@@ -1,46 +1,40 @@
 "use client";
 
 import { useMemo } from "react";
-import CategoryPickModal from "@/components/workout/CategoryPickModal";
 import StretchPickModal from "@/components/workout/StretchPickModal";
 import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
-import { CATEGORIES, CATEGORY_ORDER } from "@/core/catalog";
-import { exerciseMap } from "@/core/catalog";
+import { CATEGORY_ORDER } from "@/core/catalog";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
-import { getPlanAddCandidates } from "@/lib/planSlotCandidates";
+import {
+  getPlanAddCandidatesAllCategories,
+} from "@/lib/planSlotCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
 import { buildStretchUsedExerciseIds } from "@/lib/stretchDefaults";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { stretchEntriesFromLogs } from "@/lib/workoutEditSession";
-import type { ExerciseCategory, WorkoutLog } from "@/types";
+import type { WorkoutLog } from "@/types";
 
 const ROUND_ADD_CATEGORIES = CATEGORY_ORDER.filter(
   (c) => c !== "SW" && c !== "SC",
 );
 
 export type SessionStructurePickTarget =
-  | { kind: "addStrength"; roundNumber: number; category: ExerciseCategory }
+  | { kind: "addStrength"; roundNumber: number }
   | { kind: "addWarmUp" }
   | { kind: "addCoolDown" };
 
 interface WorkoutSessionStructurePickProps {
   activeWorkout: WorkoutLog;
   pickTarget: SessionStructurePickTarget | null;
-  categoryPickRound: number | null;
   onClosePick: () => void;
-  onCloseCategoryPick: () => void;
-  onCategoryPicked: (roundNumber: number, category: ExerciseCategory) => void;
   onExercisePicked: (exerciseId: string) => void;
 }
 
 export default function WorkoutSessionStructurePick({
   activeWorkout,
   pickTarget,
-  categoryPickRound,
   onClosePick,
-  onCloseCategoryPick,
-  onCategoryPicked,
   onExercisePicked,
 }: WorkoutSessionStructurePickProps) {
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
@@ -77,41 +71,23 @@ export default function WorkoutSessionStructurePick({
       (r) => r.roundNumber === pickTarget.roundNumber,
     );
     if (!round) return [];
-    return getPlanAddCandidates({
-      category: pickTarget.category,
+    return getPlanAddCandidatesAllCategories({
+      categories: ROUND_ADD_CATEGORIES,
       roundExerciseIds: round.exercises.map((e) => e.exerciseId),
       availableEquipment,
       dislikedExerciseIds: dislikedIds,
     });
-  }, [pickTarget, activeWorkout, availableEquipment, dislikedIds]);
+  }, [pickTarget, activeWorkout, availableEquipment, dislikedIds, prefs]);
 
   const modalTitle = useMemo(() => {
     if (!pickTarget) return "Add exercise";
     if (pickTarget.kind === "addWarmUp") return "Add warm-up stretch";
     if (pickTarget.kind === "addCoolDown") return "Add cool-down stretch";
-    return `Add ${pickTarget.category} exercise`;
-  }, [pickTarget]);
-
-  const plannedName = useMemo(() => {
-    if (!pickTarget) return "Exercise";
-    if (pickTarget.kind === "addWarmUp") return "Warm-up stretch";
-    if (pickTarget.kind === "addCoolDown") return "Cool-down stretch";
-    return CATEGORIES[pickTarget.category].name;
+    return "Add exercise";
   }, [pickTarget]);
 
   return (
     <>
-      <CategoryPickModal
-        open={categoryPickRound != null}
-        title="Choose muscle group"
-        hint="Pick a category, then choose an exercise."
-        categories={ROUND_ADD_CATEGORIES}
-        onClose={onCloseCategoryPick}
-        onPick={(category) => {
-          if (categoryPickRound == null) return;
-          onCategoryPicked(categoryPickRound, category);
-        }}
-      />
       <StretchPickModal
         open={
           pickTarget?.kind === "addWarmUp" || pickTarget?.kind === "addCoolDown"
@@ -124,13 +100,14 @@ export default function WorkoutSessionStructurePick({
 
       <SwapExerciseModal
         open={pickTarget?.kind === "addStrength"}
-        plannedName={plannedName}
+        plannedName="Exercise"
         candidates={candidates}
         laterRoundByExerciseId={new Map()}
         hasSwap={false}
         onClose={onClosePick}
         onPick={onExercisePicked}
         onClearSwap={() => {}}
+        emptyPoolMessage="No exercises available for this round."
       />
     </>
   );

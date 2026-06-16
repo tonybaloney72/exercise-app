@@ -170,7 +170,6 @@ export default function WorkoutDayTemplateToolbar({
             maxLength={80}
             placeholder="e.g. Upper + core"
             className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-            autoFocus
           />
         </label>
       </BottomSheetModal>

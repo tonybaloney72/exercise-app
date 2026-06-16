@@ -16,11 +16,6 @@ import EquipmentPicker from "@/components/settings/EquipmentPicker";
 import { buildStretchResolveContextFromStores } from "@/adapters/stretchResolveContextFromStores";
 import { ROUND_DENSITY_OPTIONS } from "@/lib/programProfile";
 import { PPL_ROUND_DENSITY_OPTIONS } from "@/lib/pplRoundDensity";
-import {
-  pplWeeklyCardioEligibleDaysFromSchedule,
-  resolveWeeklyPplSchedule,
-  sanitizePplWeeklyCardioByDayForSchedule,
-} from "@/lib/pplWeekSchedule";
 import ProgramModeSelector from "@/components/settings/ProgramModeSelector";
 import CustomBuildStyleSelector from "@/components/settings/CustomBuildStyleSelector";
 import WeekBuilderMigrationBanner from "@/components/settings/WeekBuilderMigrationBanner";
@@ -415,30 +410,16 @@ export default function SettingsPage() {
                 title="Cardio & endurance"
                 hint={
                   settings.programMode === "preset"
-                    ? "Push and pull days: pick jog, walk, cycle, etc."
+                    ? "Pick jog, walk, cycle, etc. for any day of the week."
                     : "Jog, walk, cycle, hike, or swim per day - log time and distance in the workout."
                 }
                 defaultOpen={false}
               >
                 <WeeklyCardioEditor
                   value={settings.weeklyCardioByDay}
-                  editableDays={
-                    settings.programMode === "preset"
-                      ? pplWeeklyCardioEligibleDaysFromSchedule(
-                          resolveWeeklyPplSchedule(settings),
-                        )
-                      : undefined
-                  }
                   onChange={(weeklyCardioByDay, weeklyCardioCustomized) => {
-                    const next =
-                      settings.programMode === "preset"
-                        ? sanitizePplWeeklyCardioByDayForSchedule(
-                            weeklyCardioByDay,
-                            resolveWeeklyPplSchedule(settings),
-                          )
-                        : weeklyCardioByDay;
                     void settings.updateSettings({
-                      weeklyCardioByDay: next,
+                      weeklyCardioByDay,
                       weeklyCardioCustomized,
                     });
                   }}
