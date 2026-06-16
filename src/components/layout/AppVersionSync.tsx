@@ -8,14 +8,25 @@ import {
   dismissSoftUpdate,
   getClientBuildId,
   hardRefreshApp,
-  isSoftUpdateDismissed,
-  shouldForceUpdate,
-  shouldPromptSoftUpdate,
 } from "@/lib/appVersion";
+import {
+  dismissNativeApkUpdate,
+  evaluateVersionPrompt,
+  type VersionPromptState,
+} from "@/lib/appVersionSyncLogic";
 import { resolveApiUrl } from "@/lib/apiBaseUrl";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
+import { getInstalledNativeApkBuildId } from "@/lib/nativeApkVersion";
 
 const CHECK_INTERVAL_MS = 60 * 60 * 1000;
+
+const EMPTY_PROMPT: VersionPromptState = {
+  showSoft: false,
+  showForce: false,
+  webUpdate: false,
+  nativeApkUpdate: false,
+  preferApkDownload: false,
+};
 
 async function fetchAppVersion(): Promise<AppVersionPayload | null> {
   try {
@@ -30,53 +41,60 @@ async function fetchAppVersion(): Promise<AppVersionPayload | null> {
 export default function AppVersionSync() {
   const clientBuildId = getClientBuildId();
   const nativeShell = isNativePlatform();
-  const [forceOpen, setForceOpen] = useState(false);
-  const [softOpen, setSoftOpen] = useState(false);
+  const [prompt, setPrompt] = useState<VersionPromptState>(EMPTY_PROMPT);
   const [message, setMessage] = useState("");
   const [serverBuildId, setServerBuildId] = useState<string | null>(null);
+  const [serverApkBuildId, setServerApkBuildId] = useState<string | null>(null);
   const [apkDownloadUrl, setApkDownloadUrl] = useState<string | null>(null);
+  const [installedNativeApkBuildId, setInstalledNativeApkBuildId] = useState<
+    string | null
+  >(null);
   const checkingRef = useRef(false);
 
+  const refreshInstalledNativeBuild = useCallback(async () => {
+    if (!nativeShell) return;
+    const installed = await getInstalledNativeApkBuildId();
+    setInstalledNativeApkBuildId(installed);
+    return installed;
+  }, [nativeShell]);
+
   const applyVersionPayload = useCallback(
-    (payload: AppVersionPayload) => {
+    (
+      payload: AppVersionPayload,
+      installedApkBuildId: string | null = installedNativeApkBuildId,
+    ) => {
       setServerBuildId(payload.buildId);
+      setServerApkBuildId(payload.apkBuildId);
       setMessage(payload.message);
       setApkDownloadUrl(payload.apkDownloadUrl);
 
-      if (!shouldPromptSoftUpdate(clientBuildId, payload.buildId)) {
-        setForceOpen(false);
-        setSoftOpen(false);
-        return;
-      }
-
-      if (
-        shouldForceUpdate(
-          clientBuildId,
-          payload.buildId,
-          payload.forceUpdate,
-        )
-      ) {
-        setSoftOpen(false);
-        setForceOpen(true);
-        return;
-      }
-
-      setForceOpen(false);
-      setSoftOpen(!isSoftUpdateDismissed(payload.buildId));
+      setPrompt(
+        evaluateVersionPrompt({
+          clientWebBuildId: clientBuildId,
+          installedNativeApkBuildId: installedApkBuildId,
+          payload,
+          isNativeShell: nativeShell,
+        }),
+      );
     },
-    [clientBuildId],
+    [clientBuildId, installedNativeApkBuildId, nativeShell],
   );
 
   const checkForUpdate = useCallback(async () => {
     if (checkingRef.current) return;
     checkingRef.current = true;
     try {
-      const payload = await fetchAppVersion();
-      if (payload) applyVersionPayload(payload);
+      const [payload, installedApkBuildId] = await Promise.all([
+        fetchAppVersion(),
+        nativeShell ? refreshInstalledNativeBuild() : Promise.resolve(null),
+      ]);
+      if (payload) {
+        applyVersionPayload(payload, installedApkBuildId ?? null);
+      }
     } finally {
       checkingRef.current = false;
     }
-  }, [applyVersionPayload]);
+  }, [applyVersionPayload, nativeShell, refreshInstalledNativeBuild]);
 
   useEffect(() => {
     void checkForUpdate();
@@ -94,16 +112,33 @@ export default function AppVersionSync() {
       void checkForUpdate();
     }, CHECK_INTERVAL_MS);
 
+    let appStateListener: { remove: () => Promise<void> } | undefined;
+    if (nativeShell) {
+      void import("@capacitor/app").then(({ App }) => {
+        void App.addListener("appStateChange", ({ isActive }) => {
+          if (isActive) void checkForUpdate();
+        }).then((listener) => {
+          appStateListener = listener;
+        });
+      });
+    }
+
     return () => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("focus", onVisibilityChange);
       window.clearInterval(intervalId);
+      void appStateListener?.remove();
     };
-  }, [checkForUpdate]);
+  }, [checkForUpdate, nativeShell]);
 
   function handleDismissSoft() {
-    if (serverBuildId) dismissSoftUpdate(serverBuildId);
-    setSoftOpen(false);
+    if (prompt.nativeApkUpdate && serverApkBuildId) {
+      dismissNativeApkUpdate(serverApkBuildId);
+    }
+    if (prompt.webUpdate && serverBuildId) {
+      dismissSoftUpdate(serverBuildId);
+    }
+    setPrompt(EMPTY_PROMPT);
   }
 
   function handleDownloadApk() {
@@ -111,22 +146,26 @@ export default function AppVersionSync() {
     void openAndroidApkDownload(apkDownloadUrl);
   }
 
+  const bannerMessage = prompt.nativeApkUpdate
+    ? prompt.webUpdate
+      ? `${message} Reload for web updates or download the latest APK.`
+      : `A new Android app version (${serverApkBuildId}) is available. Download and install the latest APK.`
+    : message;
+
   return (
     <>
-      {softOpen && !forceOpen ? (
+      {prompt.showSoft && !prompt.showForce ? (
         <div
           role="status"
-          className="fixed inset-x-0 top-0 z-55 border-b border-accent/30 bg-accent px-4 py-3 text-white shadow-lg shadow-accent/20"
+          className="fixed inset-x-0 top-0 z-[100] border-b border-accent/30 bg-accent px-4 py-3 text-white shadow-lg shadow-accent/20"
           style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
         >
           <div className="mx-auto flex max-w-lg flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="min-w-0 text-sm font-medium leading-snug">
-              {nativeShell
-                ? `${message} Download the latest APK to update.`
-                : message}
+              {bannerMessage}
             </p>
             <div className="flex shrink-0 flex-wrap items-center gap-2">
-              {nativeShell ? (
+              {prompt.preferApkDownload ? (
                 <button
                   type="button"
                   onClick={handleDownloadApk}
@@ -142,28 +181,30 @@ export default function AppVersionSync() {
               >
                 Dismiss
               </button>
-              <button
-                type="button"
-                onClick={hardRefreshApp}
-                className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
-                  nativeShell
-                    ? "border border-white/40 text-white hover:bg-white/15"
-                    : "bg-white text-accent hover:bg-white/90"
-                }`}
-              >
-                {nativeShell ? "Reload" : "Refresh"}
-              </button>
+              {prompt.webUpdate ? (
+                <button
+                  type="button"
+                  onClick={hardRefreshApp}
+                  className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
+                    prompt.preferApkDownload
+                      ? "border border-white/40 text-white hover:bg-white/15"
+                      : "bg-white text-accent hover:bg-white/90"
+                  }`}
+                >
+                  {prompt.preferApkDownload ? "Reload" : "Refresh"}
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
       ) : null}
 
       <BottomSheetModal
-        open={forceOpen}
-        onClose={nativeShell ? handleDownloadApk : hardRefreshApp}
+        open={prompt.showForce}
+        onClose={prompt.preferApkDownload ? handleDownloadApk : hardRefreshApp}
         title="Update required"
         hint={
-          nativeShell
+          prompt.preferApkDownload
             ? "Download and install the latest APK to continue."
             : message
         }
@@ -172,7 +213,7 @@ export default function AppVersionSync() {
         closeOnBackdropClick={false}
         closeOnEscape={false}
         footer={
-          nativeShell ? (
+          prompt.preferApkDownload ? (
             <div className="flex w-full flex-col gap-2">
               <button
                 type="button"
@@ -181,13 +222,15 @@ export default function AppVersionSync() {
               >
                 Download latest APK
               </button>
-              <button
-                type="button"
-                onClick={hardRefreshApp}
-                className="w-full rounded-xl border border-border py-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover"
-              >
-                Reload app
-              </button>
+              {prompt.webUpdate ? (
+                <button
+                  type="button"
+                  onClick={hardRefreshApp}
+                  className="w-full rounded-xl border border-border py-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover"
+                >
+                  Reload app
+                </button>
+              ) : null}
             </div>
           ) : (
             <button
@@ -201,8 +244,10 @@ export default function AppVersionSync() {
         }
       >
         <p className="px-4 py-3 text-sm text-muted">
-          {nativeShell
-            ? "This version is no longer supported. Download the APK, install it, then reopen MyExercise. Reload only applies web changes inside the current install."
+          {prompt.preferApkDownload
+            ? prompt.webUpdate
+              ? "This release needs a newer APK and updated web content. Download the APK, install it, then reopen MyExercise."
+              : "This Android install is out of date. Download the APK, install it, then reopen MyExercise."
             : "This version is no longer supported. Refresh to load the latest MyExercise release and continue."}
         </p>
       </BottomSheetModal>

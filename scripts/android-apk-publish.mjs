@@ -84,6 +84,23 @@ if (javaHome) {
 console.log("Syncing Capacitor (remote → myexercise.dev)…");
 run("npx", ["cap", "sync", "android"], { env });
 
+const packageJson = JSON.parse(
+  fs.readFileSync(path.join(root, "package.json"), "utf8"),
+);
+const versionName = String(packageJson.version ?? "1.0.0");
+const [major, minor, patch] = versionName.split(".").map((part) => Number(part) || 0);
+const versionCode = major * 10000 + minor * 100 + patch;
+
+const gradlePath = path.join(androidDir, "app", "build.gradle");
+let gradle = fs.readFileSync(gradlePath, "utf8");
+gradle = gradle.replace(/versionCode\s+\d+/, `versionCode ${versionCode}`);
+gradle = gradle.replace(
+  /versionName\s+"[^"]*"/,
+  `versionName "${versionName}"`,
+);
+fs.writeFileSync(gradlePath, gradle);
+console.log(`Stamped Android versionName ${versionName} (versionCode ${versionCode})`);
+
 console.log("Building debug APK…");
 run(path.join(androidDir, gradleWrapper), ["assembleDebug"], {
   cwd: androidDir,

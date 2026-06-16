@@ -1,6 +1,5 @@
 import { LEGAL_DOMAIN } from "@/data/legal";
 import {
-  isStandaloneWebApp,
   readPullToRefreshEnvironment,
   type PullToRefreshEnvironment,
 } from "@/lib/pullToRefresh";
@@ -27,7 +26,7 @@ function isAndroidDownloadDevPreview(
   return nodeEnv === "development";
 }
 
-/** Installed PWA on Android — not the native APK or a normal browser tab. */
+/** Android browser tab, installed PWA, or dev preview — not the native APK shell. */
 export function shouldShowAndroidAppDownload(
   env: AndroidAppDownloadEnvironment = readAndroidAppDownloadEnvironment(),
   options: { isDevelopment?: boolean } = {},
@@ -37,7 +36,6 @@ export function shouldShowAndroidAppDownload(
 
   if (env.isNativePlatform()) return false;
   if (isDevelopment) return true;
-  if (!isStandaloneWebApp(env)) return false;
   return isAndroidUserAgent(env.userAgent);
 }
 

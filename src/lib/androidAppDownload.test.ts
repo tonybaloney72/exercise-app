@@ -30,6 +30,10 @@ describe("shouldShowAndroidAppDownload", () => {
     ).toBe(true);
   });
 
+  it("shows in Android Chrome browser tabs", () => {
+    expect(shouldShowAndroidAppDownload(env(), production)).toBe(true);
+  });
+
   it("shows in desktop browser during local dev", () => {
     expect(
       shouldShowAndroidAppDownload(
@@ -55,7 +59,15 @@ describe("shouldShowAndroidAppDownload", () => {
   });
 
   it("hides in normal browser tab in production", () => {
-    expect(shouldShowAndroidAppDownload(env(), production)).toBe(false);
+    expect(
+      shouldShowAndroidAppDownload(
+        env({
+          userAgent:
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        }),
+        production,
+      ),
+    ).toBe(false);
   });
 
   it("hides on iOS home-screen PWA", () => {

@@ -92,6 +92,12 @@ export default function LandingPage() {
           >
             {busy ? "Loading…" : "Continue as guest"}
           </button>
+          <Link
+            href="/download/android"
+            className="block w-full rounded-xl border border-border/80 py-3 text-center text-sm font-medium text-muted transition-colors hover:border-border hover:bg-surface-hover hover:text-foreground sm:py-3.5"
+          >
+            Download Android app (APK)
+          </Link>
           <p className="text-center text-caption leading-snug text-muted sm:text-sm">
             Guest mode keeps everything on this device - no account, no sync.
           </p>
@@ -103,6 +109,12 @@ export default function LandingPage() {
         </div>
 
         <p className="mt-6 text-center text-caption text-muted">
+          <Link href="/download/android" className="hover:text-foreground">
+            Android app
+          </Link>
+          <span aria-hidden className="mx-2">
+            ·
+          </span>
           <Link href="/privacy" className="hover:text-foreground">
             Privacy
           </Link>

@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import {
-  resolveAndroidAppDownloadUrl,
+  resolveAndroidAppDownloadAbsoluteUrl,
   shouldShowAndroidAppDownload,
 } from "@/lib/androidAppDownload";
 
@@ -47,7 +47,7 @@ export default function AndroidAppDownloadSection() {
 
   if (!show) return null;
 
-  const downloadUrl = resolveAndroidAppDownloadUrl();
+  const downloadUrl = resolveAndroidAppDownloadAbsoluteUrl();
 
   return (
     <CollapsibleSection
@@ -58,8 +58,8 @@ export default function AndroidAppDownloadSection() {
     >
       <p className="text-xs leading-snug text-muted">
         {process.env.NODE_ENV === "development"
-          ? "Dev preview: this section is visible in desktop browsers for testing. In production it only appears in the installed Android PWA."
-          : "You\u2019re using the installed web app. Download the native Android app for the launcher icon, splash screen, and pull-to-refresh without a browser tab."}
+          ? "Dev preview: visible in desktop browsers for testing. In production this appears for Android phones in the browser or installed PWA."
+          : "Install the native Android app for a launcher icon, splash screen, and pull-to-refresh without a browser tab. You can also open this page from myexercise.dev on any device."}
       </p>
       <a
         href={downloadUrl}

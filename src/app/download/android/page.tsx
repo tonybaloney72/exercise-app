@@ -3,7 +3,6 @@ import Link from "next/link";
 import { LEGAL_APP_NAME } from "@/data/legal";
 import {
   resolveAndroidAppDownloadAbsoluteUrl,
-  resolveAndroidAppDownloadUrl,
 } from "@/lib/androidAppDownload";
 
 export const metadata: Metadata = {
@@ -12,7 +11,6 @@ export const metadata: Metadata = {
 };
 
 export default function AndroidDownloadPage() {
-  const downloadPath = resolveAndroidAppDownloadUrl();
   const downloadUrl = resolveAndroidAppDownloadAbsoluteUrl();
 
   return (
@@ -20,10 +18,10 @@ export default function AndroidDownloadPage() {
       <div className="mx-auto max-w-2xl px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:py-12">
         <p className="mb-6">
           <Link
-            href="/settings"
+            href="/"
             className="text-sm text-muted transition-colors hover:text-foreground"
           >
-            ← Back to Settings
+            ← Back to home
           </Link>
         </p>
 
@@ -43,7 +41,7 @@ export default function AndroidDownloadPage() {
               device.
             </p>
             <a
-              href={downloadPath}
+              href={downloadUrl}
               download="myexercise.apk"
               className="inline-flex rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
             >

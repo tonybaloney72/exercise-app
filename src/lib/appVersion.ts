@@ -1,4 +1,5 @@
 import { resolveAndroidAppDownloadAbsoluteUrl } from "@/lib/androidAppDownload";
+import packageJson from "../../package.json";
 
 export type AppVersionPayload = {
   buildId: string;
@@ -7,6 +8,8 @@ export type AppVersionPayload = {
   message: string;
   /** Absolute URL for the latest Android APK (native update channel). */
   apkDownloadUrl: string;
+  /** Expected installed APK version (matches Android `versionName`). */
+  apkBuildId: string;
 };
 
 const DISMISS_KEY_PREFIX = "app-version-dismissed:";
@@ -42,6 +45,11 @@ function isForceUpdateEnabled(): boolean {
   return process.env.APP_FORCE_UPDATE === "true";
 }
 
+function resolveServerApkBuildId(): string {
+  const configured = process.env.NATIVE_APK_BUILD?.trim();
+  return configured && configured.length > 0 ? configured : packageJson.version;
+}
+
 export function buildAppVersionPayload(): AppVersionPayload {
   return {
     buildId: resolveServerBuildId(),
@@ -49,6 +57,7 @@ export function buildAppVersionPayload(): AppVersionPayload {
     forceUpdate: isForceUpdateEnabled(),
     message: resolveUpdateMessage(),
     apkDownloadUrl: resolveAndroidAppDownloadAbsoluteUrl(),
+    apkBuildId: resolveServerApkBuildId(),
   };
 }
 
