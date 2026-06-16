@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
+import { openAndroidApkDownload } from "@/lib/androidAppDownload";
 import {
   type AppVersionPayload,
   dismissSoftUpdate,
@@ -12,6 +13,7 @@ import {
   shouldPromptSoftUpdate,
 } from "@/lib/appVersion";
 import { resolveApiUrl } from "@/lib/apiBaseUrl";
+import { isNativePlatform } from "@/lib/capacitorRuntime";
 
 const CHECK_INTERVAL_MS = 60 * 60 * 1000;
 
@@ -27,16 +29,19 @@ async function fetchAppVersion(): Promise<AppVersionPayload | null> {
 
 export default function AppVersionSync() {
   const clientBuildId = getClientBuildId();
+  const nativeShell = isNativePlatform();
   const [forceOpen, setForceOpen] = useState(false);
   const [softOpen, setSoftOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [serverBuildId, setServerBuildId] = useState<string | null>(null);
+  const [apkDownloadUrl, setApkDownloadUrl] = useState<string | null>(null);
   const checkingRef = useRef(false);
 
   const applyVersionPayload = useCallback(
     (payload: AppVersionPayload) => {
       setServerBuildId(payload.buildId);
       setMessage(payload.message);
+      setApkDownloadUrl(payload.apkDownloadUrl);
 
       if (!shouldPromptSoftUpdate(clientBuildId, payload.buildId)) {
         setForceOpen(false);
@@ -101,6 +106,11 @@ export default function AppVersionSync() {
     setSoftOpen(false);
   }
 
+  function handleDownloadApk() {
+    if (!apkDownloadUrl) return;
+    void openAndroidApkDownload(apkDownloadUrl);
+  }
+
   return (
     <>
       {softOpen && !forceOpen ? (
@@ -109,9 +119,22 @@ export default function AppVersionSync() {
           className="fixed inset-x-0 top-0 z-55 border-b border-accent/30 bg-accent px-4 py-3 text-white shadow-lg shadow-accent/20"
           style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
         >
-          <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
-            <p className="min-w-0 text-sm font-medium leading-snug">{message}</p>
-            <div className="flex shrink-0 items-center gap-2">
+          <div className="mx-auto flex max-w-lg flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="min-w-0 text-sm font-medium leading-snug">
+              {nativeShell
+                ? `${message} Download the latest APK to update.`
+                : message}
+            </p>
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              {nativeShell ? (
+                <button
+                  type="button"
+                  onClick={handleDownloadApk}
+                  className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-accent transition-colors hover:bg-white/90"
+                >
+                  Download APK
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={handleDismissSoft}
@@ -122,9 +145,13 @@ export default function AppVersionSync() {
               <button
                 type="button"
                 onClick={hardRefreshApp}
-                className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-accent transition-colors hover:bg-white/90"
+                className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
+                  nativeShell
+                    ? "border border-white/40 text-white hover:bg-white/15"
+                    : "bg-white text-accent hover:bg-white/90"
+                }`}
               >
-                Refresh
+                {nativeShell ? "Reload" : "Refresh"}
               </button>
             </div>
           </div>
@@ -133,26 +160,50 @@ export default function AppVersionSync() {
 
       <BottomSheetModal
         open={forceOpen}
-        onClose={hardRefreshApp}
+        onClose={nativeShell ? handleDownloadApk : hardRefreshApp}
         title="Update required"
-        hint={message}
+        hint={
+          nativeShell
+            ? "Download and install the latest APK to continue."
+            : message
+        }
         placement="center"
         showCloseButton={false}
         closeOnBackdropClick={false}
         closeOnEscape={false}
         footer={
-          <button
-            type="button"
-            onClick={hardRefreshApp}
-            className="w-full rounded-xl bg-accent py-3 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
-          >
-            Refresh to update
-          </button>
+          nativeShell ? (
+            <div className="flex w-full flex-col gap-2">
+              <button
+                type="button"
+                onClick={handleDownloadApk}
+                className="w-full rounded-xl bg-accent py-3 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+              >
+                Download latest APK
+              </button>
+              <button
+                type="button"
+                onClick={hardRefreshApp}
+                className="w-full rounded-xl border border-border py-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover"
+              >
+                Reload app
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={hardRefreshApp}
+              className="w-full rounded-xl bg-accent py-3 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+            >
+              Refresh to update
+            </button>
+          )
         }
       >
         <p className="px-4 py-3 text-sm text-muted">
-          This version is no longer supported. Refresh to load the latest
-          MyExercise release and continue.
+          {nativeShell
+            ? "This version is no longer supported. Download the APK, install it, then reopen MyExercise. Reload only applies web changes inside the current install."
+            : "This version is no longer supported. Refresh to load the latest MyExercise release and continue."}
         </p>
       </BottomSheetModal>
     </>

@@ -96,3 +96,14 @@ describe("resolveAndroidAppDownloadUrl", () => {
     expect(resolveAndroidAppDownloadUrl()).toBe("/downloads/myexercise.apk");
   });
 });
+
+describe("resolveAndroidAppDownloadAbsoluteUrl", () => {
+  it("resolves relative paths against the production domain", async () => {
+    const { resolveAndroidAppDownloadAbsoluteUrl } = await import(
+      "@/lib/androidAppDownload"
+    );
+    expect(resolveAndroidAppDownloadAbsoluteUrl()).toBe(
+      "https://myexercise.dev/downloads/myexercise.apk",
+    );
+  });
+});

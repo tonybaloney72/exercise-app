@@ -23,5 +23,6 @@ describe("appVersion", () => {
     expect(payload.version).toBeTruthy();
     expect(payload.message).toContain("MyExercise");
     expect(typeof payload.forceUpdate).toBe("boolean");
+    expect(payload.apkDownloadUrl).toContain("myexercise.apk");
   });
 });

@@ -1,8 +1,12 @@
+import { resolveAndroidAppDownloadAbsoluteUrl } from "@/lib/androidAppDownload";
+
 export type AppVersionPayload = {
   buildId: string;
   version: string;
   forceUpdate: boolean;
   message: string;
+  /** Absolute URL for the latest Android APK (native update channel). */
+  apkDownloadUrl: string;
 };
 
 const DISMISS_KEY_PREFIX = "app-version-dismissed:";
@@ -44,6 +48,7 @@ export function buildAppVersionPayload(): AppVersionPayload {
     version: resolveServerAppVersion(),
     forceUpdate: isForceUpdateEnabled(),
     message: resolveUpdateMessage(),
+    apkDownloadUrl: resolveAndroidAppDownloadAbsoluteUrl(),
   };
 }
 

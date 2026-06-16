@@ -55,3 +55,19 @@ export function resolveAndroidAppDownloadAbsoluteUrl(): string {
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
   return `https://${LEGAL_DOMAIN}${url.startsWith("/") ? url : `/${url}`}`;
 }
+
+/** Open the hosted APK in the system browser (native) or navigate (web). */
+export async function openAndroidApkDownload(
+  downloadUrl: string = resolveAndroidAppDownloadAbsoluteUrl(),
+): Promise<void> {
+  if (typeof window === "undefined") return;
+
+  const { isNativePlatform } = await import("@/lib/capacitorRuntime");
+  if (isNativePlatform()) {
+    const { Browser } = await import("@capacitor/browser");
+    await Browser.open({ url: downloadUrl });
+    return;
+  }
+
+  window.location.assign(downloadUrl);
+}
