@@ -10,6 +10,7 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useTrainingWeekRefreshStore } from "@/stores/useTrainingWeekRefreshStore";
 import { useTrainingWeekStore } from "@/stores/useTrainingWeekStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { useWeightStore } from "@/stores/useWeightStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /** Reload persisted settings, caches, and the current training week. */
@@ -28,6 +29,7 @@ export async function refreshAppData(): Promise<void> {
     useExerciseSettingsStore.getState().load(),
     useExercisePreferencesStore.getState().load(),
     useWorkoutStore.getState().loadHistory({ force: true }),
+    useWeightStore.getState().load({ force: true }),
   ]);
 
   useTrainingWeekStore.getState().invalidate();

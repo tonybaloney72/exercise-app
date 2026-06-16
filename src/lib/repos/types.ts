@@ -70,6 +70,11 @@ export interface UserFeedbackRepo {
   submitGeneralFeedback(input: SubmitGeneralFeedbackInput): Promise<void>;
 }
 
+export interface WeightEntryRepo {
+  list(): Promise<import("@/types").WeightLogEntry[]>;
+  upsert(dateKey: string, weightLb: number): Promise<void>;
+}
+
 export type SubmitGeneralFeedbackInput = {
   category: "bug" | "suggestion" | "other";
   details: string;
@@ -145,7 +150,6 @@ export const DEFAULT_SETTINGS: UserSettings = {
   weeklyCardioByDay: suggestWeeklyCardioFromCatalog(),
   weeklyCardioCustomized: false,
   expertiseByGroup: { ...DEFAULT_EXPERTISE_BY_GROUP },
-  weightLog: [],
 };
 
 /** Stretch defaults seeded for guest localStorage when none are stored. */

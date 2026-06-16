@@ -46,7 +46,6 @@ import {
   DEFAULT_EXPERTISE_BY_GROUP,
   sanitizeExpertiseByGroup,
 } from "@/lib/expertiseLevels";
-import { sanitizeWeightLog } from "@/lib/weightLog";
 import type { UserSettings } from "@/types";
 
 /** Merge partial settings and migrate legacy `programFocus` → `trainingPriorityPreset`. */
@@ -185,8 +184,6 @@ export function normalizeUserSettings(
     partial.weekBuilderMigrationAcknowledged ??
     DEFAULT_SETTINGS.weekBuilderMigrationAcknowledged;
 
-  const weightLog = sanitizeWeightLog(partial.weightLog);
-
   return {
     ...DEFAULT_SETTINGS,
     ...rest,
@@ -211,6 +208,5 @@ export function normalizeUserSettings(
     weeklyPplScheduleCustomized,
     weeklyCardioByDay,
     weeklyCardioCustomized,
-    weightLog,
   };
 }

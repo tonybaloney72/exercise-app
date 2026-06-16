@@ -12,7 +12,6 @@ import type {
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeStretchEntries } from "@/lib/stretchDefaults";
 import { sanitizeExpertiseByGroup } from "@/lib/expertiseLevels";
-import { sanitizeWeightLog } from "@/lib/weightLog";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import {
   sanitizeTrainingPriorityPreset,
@@ -40,6 +39,7 @@ import type {
   UserFeedbackRepo,
   SubmitExerciseFeedbackInput,
   SubmitGeneralFeedbackInput,
+  WeightEntryRepo,
 } from "./types";
 import type { WorkoutDayTemplate } from "@/types";
 import {
@@ -134,7 +134,6 @@ interface SettingsRow {
   expertise_by_group?: unknown;
   expertise_by_group_customized?: boolean;
   progression_families_enabled?: boolean;
-  weight_log?: unknown;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -353,7 +352,6 @@ function rowToSettings(row: SettingsRow): UserSettings {
     weeklyCardioCustomized: row.weekly_cardio_customized ?? false,
     equipmentOnboardingCompleted: row.equipment_onboarding_completed ?? false,
     expertiseByGroup: sanitizeExpertiseByGroup(row.expertise_by_group),
-    weightLog: sanitizeWeightLog(row.weight_log),
   });
 }
 
@@ -393,7 +391,6 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     equipment_onboarding_completed: s.equipmentOnboardingCompleted,
     expertise_by_group: s.expertiseByGroup,
     expertise_by_group_customized: true,
-    weight_log: s.weightLog,
   };
 }
 
@@ -929,6 +926,63 @@ export const supabaseUserFeedbackRepo: UserFeedbackRepo = {
 
     if (error) {
       console.error("[supabaseUserFeedbackRepo.submitGeneralFeedback]", error);
+      throw error;
+    }
+  },
+};
+
+interface WeightEntryRow {
+  log_date: string;
+  weight_lb: number | string;
+}
+
+export const supabaseWeightEntryRepo: WeightEntryRepo = {
+  async list() {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from("weight_entries")
+      .select("log_date, weight_lb")
+      .eq("user_id", user.id)
+      .order("log_date", { ascending: true });
+
+    if (error) {
+      console.error("[supabaseWeightEntryRepo.list]", error);
+      return [];
+    }
+
+    return (data ?? []).map((row: WeightEntryRow) => ({
+      date:
+        typeof row.log_date === "string"
+          ? row.log_date.slice(0, 10)
+          : String(row.log_date),
+      weightLb: Number(row.weight_lb),
+    }));
+  },
+
+  async upsert(dateKey: string, weightLb: number) {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not signed in");
+
+    const { error } = await supabase.from("weight_entries").upsert(
+      {
+        user_id: user.id,
+        log_date: dateKey,
+        weight_lb: weightLb,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,log_date" },
+    );
+
+    if (error) {
+      console.error("[supabaseWeightEntryRepo.upsert]", error);
       throw error;
     }
   },

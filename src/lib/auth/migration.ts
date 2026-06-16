@@ -4,6 +4,7 @@ import {
   localSettingsRepo,
   localWorkoutRepo,
 } from "@/lib/repos/local";
+import { localWeightEntryRepo } from "@/lib/repos/weightLocal";
 import {
   hasLocalStoredSettings,
   mergeMigratedSettings,
@@ -12,6 +13,7 @@ import {
   supabaseExerciseSettingsRepo,
   supabaseSettingsRepo,
   supabaseWorkoutRepo,
+  supabaseWeightEntryRepo,
 } from "@/lib/repos/supabase";
 import { hydrateWorkoutLog } from "@/utils/exerciseLogDefaults";
 
@@ -66,6 +68,19 @@ export async function migrateLocalDataIfNeeded(userId: string): Promise<void> {
         await supabaseWorkoutRepo.saveWorkout(hydrateWorkoutLog(log));
       } catch (err) {
         console.error("[migrateLocalDataIfNeeded] failed to save workout", log.id, err);
+      }
+    }
+
+    const localWeightEntries = await localWeightEntryRepo.list();
+    for (const entry of localWeightEntries) {
+      try {
+        await supabaseWeightEntryRepo.upsert(entry.date, entry.weightLb);
+      } catch (err) {
+        console.error(
+          "[migrateLocalDataIfNeeded] failed weight entry",
+          entry.date,
+          err,
+        );
       }
     }
 

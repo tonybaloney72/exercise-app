@@ -5,6 +5,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
+import { useWeightStore } from "@/stores/useWeightStore";
 
 /**
  * Loads persisted settings once auth is known, and keeps
@@ -17,13 +18,15 @@ export default function AppSettingsSync() {
   const loadSettings = useSettingsStore((s) => s.loadSettings);
   const loadExerciseSettings = useExerciseSettingsStore((s) => s.load);
   const loadExercisePreferences = useExercisePreferencesStore((s) => s.load);
+  const loadWeight = useWeightStore((s) => s.load);
 
   useEffect(() => {
     if (mode === "loading") return;
     void loadSettings();
     void loadExerciseSettings();
     void loadExercisePreferences();
-  }, [mode, userId, loadSettings, loadExerciseSettings, loadExercisePreferences]);
+    void loadWeight();
+  }, [mode, userId, loadSettings, loadExerciseSettings, loadExercisePreferences, loadWeight]);
 
   useEffect(() => {
     const root = document.documentElement;

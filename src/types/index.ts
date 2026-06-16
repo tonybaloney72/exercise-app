@@ -331,8 +331,6 @@ export interface UserSettings {
   weeklyCardioCustomized: boolean;
   /** Per emphasis-group skill cap for generator / swap / library. */
   expertiseByGroup: ExpertiseByGroup;
-  /** Body weight log entries (one per calendar day; latest save wins). */
-  weightLog: WeightLogEntry[];
 }
 
 /** Body weight for a local calendar day (stored in pounds). */

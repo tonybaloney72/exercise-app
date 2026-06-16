@@ -26,6 +26,7 @@ import { DEFAULT_SETTINGS } from "./types";
 
 const LOCAL_HISTORY_KEY = "exercise-app-history";
 export const LOCAL_SETTINGS_KEY = "exercise-app-settings";
+export const LOCAL_WEIGHT_ENTRIES_KEY = "exercise-app-weight-entries";
 const LOCAL_EXERCISE_SETTINGS_KEY = "exercise-app-exercise-settings";
 const LOCAL_WORKOUT_TEMPLATES_KEY = "exercise-app-workout-day-templates";
 
@@ -236,4 +237,5 @@ export function clearLocalData(): void {
   localStorage.removeItem(LOCAL_SETTINGS_KEY);
   localStorage.removeItem(LOCAL_EXERCISE_SETTINGS_KEY);
   localStorage.removeItem(LOCAL_WORKOUT_TEMPLATES_KEY);
+  localStorage.removeItem(LOCAL_WEIGHT_ENTRIES_KEY);
 }

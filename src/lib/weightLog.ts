@@ -2,6 +2,8 @@ import type { WeightLogEntry } from "@/types";
 import { parseLocalDateKey } from "@/utils/weekCalendar";
 
 export interface WeightChartPoint {
+  /** Stable ordinal for the chart x-axis (one slot per entry). */
+  index: number;
   date: string;
   /** Short axis label (e.g. `5/12`) */
   xLabel: string;
@@ -10,18 +12,33 @@ export interface WeightChartPoint {
 
 const DATE_KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+/** `YYYY-MM-DD` from a date key or ISO timestamp. */
+export function normalizeWeightDateKey(raw: string): string {
+  const trimmed = raw.trim();
+  if (DATE_KEY_RE.test(trimmed)) return trimmed;
+  const match = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+  return match?.[1] ?? "";
+}
+
+function parseWeightLb(raw: unknown): number {
+  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+  if (typeof raw === "string") {
+    const parsed = Number(raw.trim());
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return NaN;
+}
+
 export function sanitizeWeightLog(raw: unknown): WeightLogEntry[] {
   if (!Array.isArray(raw)) return [];
   const out: WeightLogEntry[] = [];
   for (const item of raw) {
     if (!item || typeof item !== "object") continue;
     const o = item as Record<string, unknown>;
-    const date = typeof o.date === "string" ? o.date.trim() : "";
-    const weightLb =
-      typeof o.weightLb === "number" && Number.isFinite(o.weightLb)
-        ? o.weightLb
-        : NaN;
-    if (!DATE_KEY_RE.test(date) || !(weightLb > 0)) continue;
+    const date =
+      typeof o.date === "string" ? normalizeWeightDateKey(o.date) : "";
+    const weightLb = parseWeightLb(o.weightLb);
+    if (!date || !(weightLb > 0)) continue;
     out.push({ date, weightLb });
   }
   return dedupeByDate(out);
@@ -33,6 +50,17 @@ function dedupeByDate(entries: WeightLogEntry[]): WeightLogEntry[] {
     byDate.set(e.date, e);
   }
   return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/** Later sources win when the same calendar day appears more than once. */
+export function mergeWeightEntries(
+  ...sources: readonly (readonly WeightLogEntry[])[]
+): WeightLogEntry[] {
+  const merged: WeightLogEntry[] = [];
+  for (const source of sources) {
+    merged.push(...source);
+  }
+  return dedupeByDate(merged);
 }
 
 export function getWeightForDate(
@@ -52,28 +80,50 @@ export function upsertWeightEntry(
   return next.sort((a, b) => a.date.localeCompare(b.date));
 }
 
-function shortDateLabel(dateKey: string): string {
+function shortDateLabel(dateKey: string, includeYear = false): string {
   const d = parseLocalDateKey(dateKey);
   if (!d) return dateKey;
-  return `${d.getMonth() + 1}/${d.getDate()}`;
+  const monthDay = `${d.getMonth() + 1}/${d.getDate()}`;
+  if (!includeYear) return monthDay;
+  const year = d.getFullYear() % 100;
+  return `${monthDay}/${year}`;
 }
 
-/** Chronological points for charting (optionally limited to most recent entries). */
+/** True when chart points span more than one calendar year. */
+export function weightChartSpansYears(
+  points: readonly { date: string }[],
+): boolean {
+  if (points.length < 2) return false;
+  const firstYear = points[0]!.date.slice(0, 4);
+  return points.some((p) => p.date.slice(0, 4) !== firstYear);
+}
+
+/** Axis / tooltip label for a weight chart point. */
+export function formatWeightChartDateLabel(
+  dateKey: string,
+  includeYear = false,
+): string {
+  return shortDateLabel(normalizeWeightDateKey(dateKey), includeYear);
+}
+
+/** Chronological points for charting. */
 export function buildWeightChartSeries(
-  log: WeightLogEntry[],
-  maxPoints = 60,
+  log: readonly WeightLogEntry[],
 ): WeightChartPoint[] {
-  const sorted = [...sanitizeWeightLog(log)].sort((a, b) =>
-    a.date.localeCompare(b.date),
-  );
-  const slice =
-    maxPoints > 0 && sorted.length > maxPoints
-      ? sorted.slice(sorted.length - maxPoints)
-      : sorted;
-  return slice.map((e) => ({
-    date: e.date,
-    xLabel: shortDateLabel(e.date),
-    weightLb: e.weightLb,
+  const sorted = log
+    .filter(
+      (entry) =>
+        DATE_KEY_RE.test(entry.date) &&
+        Number.isFinite(entry.weightLb) &&
+        entry.weightLb > 0,
+    )
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const includeYear = weightChartSpansYears(sorted);
+  return sorted.map((entry, index) => ({
+    index,
+    date: entry.date,
+    xLabel: shortDateLabel(entry.date, includeYear),
+    weightLb: entry.weightLb,
   }));
 }
 

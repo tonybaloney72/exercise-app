@@ -8,6 +8,7 @@ import {
   localTrainingWeekRepo,
   localWorkoutDayTemplateRepo,
 } from "./local";
+import { localWeightEntryRepo } from "./weightLocal";
 import {
   supabaseExercisePreferenceRepo,
   supabaseExerciseSettingsRepo,
@@ -16,6 +17,7 @@ import {
   supabaseTrainingWeekRepo,
   supabaseWorkoutDayTemplateRepo,
   supabaseUserFeedbackRepo,
+  supabaseWeightEntryRepo,
 } from "./supabase";
 import type {
   ExercisePreferenceRepo,
@@ -25,6 +27,7 @@ import type {
   TrainingWeekRepo,
   WorkoutDayTemplateRepo,
   UserFeedbackRepo,
+  WeightEntryRepo,
 } from "./types";
 
 export type {
@@ -37,6 +40,7 @@ export type {
   TrainingWeekDays,
   TrainingWeekRepo,
   WorkoutDayTemplateRepo,
+  WeightEntryRepo,
 } from "./types";
 export { DEFAULT_SETTINGS } from "./types";
 
@@ -83,4 +87,8 @@ export function getWorkoutDayTemplateRepo(
 /** Always Supabase - guests may submit exercise reports (anon insert). */
 export function getUserFeedbackRepo(): UserFeedbackRepo {
   return supabaseUserFeedbackRepo;
+}
+
+export function getWeightEntryRepo(mode: AuthMode): WeightEntryRepo {
+  return isSupabaseMode(mode) ? supabaseWeightEntryRepo : localWeightEntryRepo;
 }

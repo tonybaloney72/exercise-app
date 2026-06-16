@@ -6,24 +6,28 @@ import SurfaceCard from "@/components/common/SurfaceCard";
 import {
   formatWeightLb,
   getWeightForDate,
-  upsertWeightEntry,
 } from "@/lib/weightLog";
-import { useSettingsStore } from "@/stores/useSettingsStore";
+import { useWeightStore } from "@/stores/useWeightStore";
 
 type Props = {
   dateKey: string;
 };
 
 export default function WeightLogCard({ dateKey }: Props) {
-  const weightLog = useSettingsStore((s) => s.weightLog);
-  const updateSettings = useSettingsStore((s) => s.updateSettings);
+  const entries = useWeightStore((s) => s.entries);
+  const load = useWeightStore((s) => s.load);
+  const upsert = useWeightStore((s) => s.upsert);
   const todayEntry = useMemo(
-    () => getWeightForDate(weightLog, dateKey),
-    [weightLog, dateKey],
+    () => getWeightForDate(entries, dateKey),
+    [entries, dateKey],
   );
 
   const [input, setInput] = useState("");
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   useEffect(() => {
     setInput(
@@ -32,11 +36,11 @@ export default function WeightLogCard({ dateKey }: Props) {
   }, [todayEntry?.weightLb, dateKey]);
 
   const lastOther = useMemo(() => {
-    const sorted = [...weightLog]
+    const sorted = [...entries]
       .filter((e) => e.date !== dateKey)
       .sort((a, b) => b.date.localeCompare(a.date));
     return sorted[0];
-  }, [weightLog, dateKey]);
+  }, [entries, dateKey]);
 
   const handleSave = useCallback(async () => {
     const trimmed = input.trim();
@@ -52,14 +56,12 @@ export default function WeightLogCard({ dateKey }: Props) {
 
     setSaving(true);
     try {
-      await updateSettings({
-        weightLog: upsertWeightEntry(weightLog, dateKey, weightLb),
-      });
+      await upsert(dateKey, weightLb);
       toast.success("Weight saved");
     } finally {
       setSaving(false);
     }
-  }, [dateKey, input, updateSettings, weightLog]);
+  }, [dateKey, input, upsert]);
 
   return (
     <SurfaceCard className="p-4 space-y-3">
