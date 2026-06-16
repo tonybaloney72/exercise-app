@@ -2,7 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import { exerciseMap } from "@/core/catalog";
 import { CARDIO_KIND_TO_EXERCISE_ID } from "@/lib/cardioKinds";
 import { hydrateCardioFromNotes } from "@/lib/workoutCardioPersistence";
-import { applyCardioHealthMeta, type CardioHealthMeta } from "@/lib/health/cardioHealthFields";
+import { type CardioHealthMeta } from "@/lib/health/cardioHealth";
+import { applyCardioHealthMeta } from "@/lib/health/cardioHealthFields";
 import type { CardioActivityKind, ExerciseLog, WorkoutLog } from "@/types";
 
 function cardioRows(log: WorkoutLog): ExerciseLog[] {
