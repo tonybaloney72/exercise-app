@@ -57,6 +57,19 @@ describe("appVersionSyncLogic", () => {
     expect(result.showSoft).toBe(true);
     expect(result.webUpdate).toBe(true);
     expect(result.nativeApkUpdate).toBe(false);
-    expect(result.preferApkDownload).toBe(true);
+    expect(result.preferApkDownload).toBe(false);
+  });
+
+  it("prefers APK download only when the installed APK is behind", () => {
+    const bothBehind = evaluateVersionPrompt({
+      clientWebBuildId: "old-web",
+      installedNativeApkBuildId: "0.8.0",
+      payload: payload(),
+      isNativeShell: true,
+    });
+
+    expect(bothBehind.webUpdate).toBe(true);
+    expect(bothBehind.nativeApkUpdate).toBe(true);
+    expect(bothBehind.preferApkDownload).toBe(true);
   });
 });

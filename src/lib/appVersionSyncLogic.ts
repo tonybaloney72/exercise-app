@@ -113,6 +113,6 @@ export function evaluateVersionPrompt(options: {
     showForce,
     webUpdate,
     nativeApkUpdate,
-    preferApkDownload: isNativeShell && (nativeApkUpdate || webUpdate),
+    preferApkDownload: isNativeShell && nativeApkUpdate,
   };
 }
