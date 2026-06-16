@@ -100,6 +100,7 @@ export default function WorkoutSessionStructurePick({
 
       <SwapExerciseModal
         open={pickTarget?.kind === "addStrength"}
+        mode="add"
         plannedName="Exercise"
         candidates={candidates}
         laterRoundByExerciseId={new Map()}

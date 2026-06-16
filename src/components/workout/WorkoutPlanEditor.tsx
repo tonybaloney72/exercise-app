@@ -583,6 +583,7 @@ export default function WorkoutPlanEditor({
 
       <SwapExerciseModal
         open={pickTarget != null && pickTarget.kind !== "stretch"}
+        mode={pickTarget?.kind === "add" ? "add" : "swap"}
         plannedName={plannedNameForModal}
         candidates={pickCandidates}
         laterRoundByExerciseId={laterRoundByExerciseIdForSwap}

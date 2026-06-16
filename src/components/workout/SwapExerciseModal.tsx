@@ -13,6 +13,8 @@ interface SwapExerciseModalProps {
   plannedName: string;
   candidates: Exercise[];
   hasSwap: boolean;
+  /** Add vs replace an existing slot (affects title and confirm copy). */
+  mode?: "swap" | "add";
   /** Exercise id → round numbers after the current round where it already appears. */
   laterRoundByExerciseId?: ReadonlyMap<string, readonly number[]>;
   onClose: () => void;
@@ -27,6 +29,7 @@ export default function SwapExerciseModal({
   plannedName,
   candidates,
   hasSwap,
+  mode = "swap",
   laterRoundByExerciseId,
   onClose,
   onPick,
@@ -101,13 +104,20 @@ export default function SwapExerciseModal({
     ? formatLaterRoundWarning(pendingLaterRound.roundNumbers)
     : "";
 
+  const title = mode === "add" ? "Add exercise" : "Swap exercise";
+  const hint =
+    mode === "add"
+      ? "Search the catalog or pick from the list."
+      : `Same category as prescribed · planned: ${plannedName}`;
+  const confirmVerb = mode === "add" ? "add" : "swap to";
+
   return (
     <BottomSheetModal
       open={open}
       onClose={handleClose}
-      title="Swap exercise"
-      hint={`Same category as prescribed · planned: ${plannedName}`}
-      ariaLabel="Swap exercise"
+      title={title}
+      hint={hint}
+      ariaLabel={title}
       headerExtra={
         <div className="flex flex-wrap gap-2 border-b border-border px-4 py-2">
           <button
@@ -142,7 +152,7 @@ export default function SwapExerciseModal({
             </p>
             <p className="text-sm text-foreground leading-snug">
               <span className="font-semibold">{pendingLaterRound.name}</span>{" "}
-              {confirmHint}. You can still swap to it, but you&apos;ll repeat that
+              {confirmHint}. You can still {confirmVerb} it, but you&apos;ll repeat that
               movement later unless you change those slots too.
             </p>
           </div>
@@ -152,7 +162,7 @@ export default function SwapExerciseModal({
               onClick={() => commitPick(pendingLaterRound.exerciseId)}
               className="flex-1 rounded-xl bg-accent py-2.5 text-sm font-semibold text-white hover:bg-accent/90"
             >
-              Swap anyway
+              {mode === "add" ? "Add anyway" : "Swap anyway"}
             </button>
             <button
               type="button"

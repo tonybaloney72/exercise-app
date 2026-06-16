@@ -30,7 +30,7 @@ import SwapExerciseModal from "./SwapExerciseModal";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
 import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
-import { MenuIconDislike, MenuIconReport, MenuIconStar } from "./WorkoutRowMenuIcons";
+import { MenuIconDislike, MenuIconRemove, MenuIconReport, MenuIconStar, MenuIconSwap } from "./WorkoutRowMenuIcons";
 import ExerciseReportSheet from "@/components/feedback/ExerciseReportSheet";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 
@@ -214,6 +214,7 @@ export default function ExerciseRow({
   if (!log.skipped) {
     overflowItems.push({
       label: "Swap exercise",
+      icon: <MenuIconSwap />,
       onClick: () => {
         setSwapModalKey((k) => k + 1);
         setSwapOpen(true);
@@ -235,6 +236,7 @@ export default function ExerciseRow({
   if (onRemoveFromWorkout) {
     overflowItems.push({
       label: "Remove from workout",
+      icon: <MenuIconRemove />,
       onClick: onRemoveFromWorkout,
     });
   }

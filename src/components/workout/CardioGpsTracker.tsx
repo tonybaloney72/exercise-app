@@ -51,7 +51,9 @@ export default function CardioGpsTracker({ onComplete }: Props) {
       setTracking(true);
     } catch (err) {
       sessionRef.current = null;
-      setError(err instanceof Error ? err.message : "Could not start GPS tracking.");
+      setError(
+        err instanceof Error ? err.message : "Could not start GPS tracking.",
+      );
     }
   }
 
@@ -79,7 +81,7 @@ export default function CardioGpsTracker({ onComplete }: Props) {
         <div>
           <p className="text-sm font-medium text-foreground">Track with GPS</p>
           <p className="text-xs text-muted mt-0.5">
-            Native app only. Distance and time fill in automatically.
+            Distance and time fill in automatically.
           </p>
         </div>
         {tracking ? (
@@ -103,7 +105,9 @@ export default function CardioGpsTracker({ onComplete }: Props) {
       {tracking && snapshot ? (
         <p className="text-xs text-muted tabular-nums">
           {formatGpsTrackDuration(snapshot.durationSeconds)}
-          {snapshot.distanceMi > 0 ? ` · ${snapshot.distanceMi} mi` : " · acquiring GPS…"}
+          {snapshot.distanceMi > 0
+            ? ` · ${snapshot.distanceMi} mi`
+            : " · acquiring GPS…"}
         </p>
       ) : null}
       {error ? <p className="text-xs text-red-400">{error}</p> : null}
