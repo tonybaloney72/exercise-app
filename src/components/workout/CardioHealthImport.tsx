@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   ensureCardioHealthReadAccess,
-  fetchHeartRateAverage,
+  fetchCardioHealthMetricsForWindow,
   importRecentCardioSessions,
   type ImportedCardioSession,
 } from "@/lib/health";
@@ -50,15 +50,23 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
   async function handlePick(session: ImportedCardioSession) {
     let enriched = session;
     try {
-      const avgHeartRateBpm = await fetchHeartRateAverage(
+      const metrics = await fetchCardioHealthMetricsForWindow(
         session.startDate,
         session.endDate,
+        {
+          activeCaloriesKcal: session.activeCaloriesKcal,
+          healthSourceName: session.sourceName,
+        },
       );
-      if (avgHeartRateBpm != null) {
-        enriched = { ...session, avgHeartRateBpm };
-      }
+      enriched = {
+        ...session,
+        stepCount: metrics.stepCount,
+        activeCaloriesKcal:
+          metrics.activeCaloriesKcal ?? session.activeCaloriesKcal,
+        avgHeartRateBpm: metrics.avgHeartRateBpm,
+      };
     } catch {
-      // HR is optional; still import distance/time/calories.
+      // Steps/HR are optional; still import distance/time/calories.
     }
     onImport(enriched);
     toast.success("Imported from Health Connect");
@@ -70,7 +78,8 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
         <div>
           <p className="text-sm font-medium text-foreground">Health Connect</p>
           <p className="text-xs text-muted mt-0.5">
-            Import distance, time, calories, and heart rate from a recent session.
+            Import distance, time, steps, calories, and heart rate from a recent
+            session.
           </p>
         </div>
         <button

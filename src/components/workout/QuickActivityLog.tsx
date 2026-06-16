@@ -15,6 +15,8 @@ import { formatSecondsToMMSS, parseTimeInput } from "@/utils/time";
 import CardioGpsTracker from "@/components/workout/CardioGpsTracker";
 import CardioHealthImport from "@/components/workout/CardioHealthImport";
 import {
+  enrichCardioHealthMeta,
+  formatCardioHealthSummary,
   writeCardioSessionToHealth,
   type CardioHealthMeta,
   type ImportedCardioSession,
@@ -81,9 +83,11 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     }
     setTimeInput(formatSecondsToMMSS(session.durationSeconds));
     setHealthMeta({
+      stepCount: session.stepCount,
       activeCaloriesKcal: session.activeCaloriesKcal,
       avgHeartRateBpm: session.avgHeartRateBpm,
       source: "health_connect",
+      healthSourceName: session.sourceName,
     });
     setGpsSession({ startDate: session.startDate, endDate: session.endDate });
   }
@@ -119,16 +123,24 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     }
 
     setSaving(true);
+    let resolvedHealth = healthMeta;
+    if (gpsSession && isNativePlatform()) {
+      resolvedHealth = await enrichCardioHealthMeta(
+        gpsSession.startDate,
+        gpsSession.endDate,
+        healthMeta,
+      );
+    }
     const ok = await quickLogCardio(plan, dateKey, pendingKind, {
       distanceMi: hasDistance ? distanceMi : undefined,
       durationSeconds: hasDuration ? durationSeconds : undefined,
-      health: healthMeta,
+      health: resolvedHealth,
     });
-    if (ok && isNativePlatform() && gpsSession && healthMeta?.source === "gps") {
+    if (ok && isNativePlatform() && gpsSession && resolvedHealth?.source === "gps") {
       void writeCardioSessionToHealth({
         distanceMi: hasDistance ? distanceMi : undefined,
         durationSeconds: hasDuration ? durationSeconds! : 0,
-        activeCaloriesKcal: healthMeta?.activeCaloriesKcal,
+        activeCaloriesKcal: resolvedHealth?.activeCaloriesKcal,
         startDate: gpsSession.startDate,
         endDate: gpsSession.endDate,
       }).catch(() => {
@@ -145,6 +157,8 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
   const modalTitle = pendingKind
     ? `Log ${CARDIO_ACTIVITY_LABELS[pendingKind].toLowerCase()}`
     : "";
+
+  const healthPreview = formatCardioHealthSummary(healthMeta ?? {});
 
   return (
     <>
@@ -276,6 +290,9 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
               className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
             />
           </label>
+          {healthPreview ? (
+            <p className="text-xs text-muted">{healthPreview}</p>
+          ) : null}
         </div>
       </BottomSheetModal>
     </>

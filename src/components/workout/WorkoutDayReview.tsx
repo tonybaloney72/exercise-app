@@ -7,6 +7,7 @@ import CollapsibleSection from "@/components/common/CollapsibleSection";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/core/catalog";
+import { formatCardioHealthSummary } from "@/lib/health";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import { cardioLabelForRow } from "@/lib/cardioInstances";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
@@ -154,24 +155,33 @@ export default function WorkoutDayReview({
         const allCardio = resolveWorkoutCardioExercises(log);
         const title = cardioLabelForRow(entry, allCardio);
         const rowKey = entry.cardioInstanceId ?? entry.exerciseId;
+        const healthSummary = formatCardioHealthSummary(entry);
         return (
           <CollapsibleSection key={rowKey} title={title} defaultOpen>
             <div className="space-y-1 px-3 py-2">
               {entry.skipped ? (
                 <p className="text-xs text-muted">Skipped</p>
               ) : entry.completed ? (
-                <p className="text-xs text-muted">
-                  {[
-                    entry.actualDistanceMi != null
-                      ? `${entry.actualDistanceMi} mi`
-                      : null,
-                    entry.actualDuration != null
-                      ? formatLoggedDuration(entry.actualDuration)
-                      : null,
-                  ]
-                    .filter(Boolean)
-                    .join(" · ") || "Logged complete"}
-                </p>
+                <>
+                  <p className="text-xs text-muted">
+                    {[
+                      entry.actualDistanceMi != null
+                        ? `${entry.actualDistanceMi} mi`
+                        : null,
+                      entry.actualDuration != null
+                        ? formatLoggedDuration(entry.actualDuration)
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ") || "Logged complete"}
+                  </p>
+                  {healthSummary ? (
+                    <p className="text-xs text-muted">{healthSummary}</p>
+                  ) : null}
+                  {entry.notes ? (
+                    <p className="text-sm text-muted italic">{entry.notes}</p>
+                  ) : null}
+                </>
               ) : (
                 <p className="text-xs text-muted">Not logged as completed</p>
               )}

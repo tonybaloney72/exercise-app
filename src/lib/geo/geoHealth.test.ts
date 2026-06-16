@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 import { haversineDistanceMeters, metersToMiles } from "@/lib/geo/haversine";
 import { computeGpsTrackSnapshot } from "@/lib/geo/gpsTrackSession";
 import {
-  formatCardioHealthNotes,
+  dominantHealthSampleSource,
   mapWorkoutToImportedSession,
+  sumHealthSampleValues,
 } from "@/lib/health/cardioHealth";
+import { applyCardioHealthMeta } from "@/lib/health/cardioHealthFields";
+import { formatCardioHealthSummary } from "@/lib/health/cardioHealthDisplay";
 import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
 
 describe("haversine", () => {
@@ -42,14 +45,54 @@ describe("cardio health helpers", () => {
     expect(cardioKindToWorkoutType("jog")).toBe("running");
   });
 
-  it("formats health notes for cardio rows", () => {
+  it("sums health sample values", () => {
     expect(
-      formatCardioHealthNotes({
+      sumHealthSampleValues([
+        { value: 120 },
+        { value: 80 },
+        { value: -1 },
+        { value: Number.NaN },
+      ]),
+    ).toBe(200);
+  });
+
+  it("picks the dominant health sample source", () => {
+    expect(
+      dominantHealthSampleSource([
+        { sourceName: "Samsung Health" },
+        { sourceName: "Samsung Health" },
+        { sourceName: "Pixel" },
+      ]),
+    ).toBe("Samsung Health");
+  });
+
+  it("formats health summary for display", () => {
+    expect(
+      formatCardioHealthSummary({
+        stepCount: 4832,
         activeCaloriesKcal: 182,
         avgHeartRateBpm: 141,
-        source: "gps",
+        activitySource: "gps",
+        healthSourceName: "Samsung Health",
       }),
-    ).toBe("182 active kcal · 141 bpm avg · GPS");
+    ).toBe("4,832 steps · 182 active kcal · 141 bpm avg · GPS · Samsung Health");
+  });
+
+  it("maps health metadata onto exercise log fields", () => {
+    expect(
+      applyCardioHealthMeta({
+        stepCount: 3200,
+        activeCaloriesKcal: 150,
+        source: "health_connect",
+        healthSourceName: "Health Connect",
+      }),
+    ).toEqual({
+      stepCount: 3200,
+      activeCaloriesKcal: 150,
+      avgHeartRateBpm: undefined,
+      activitySource: "health_connect",
+      healthSourceName: "Health Connect",
+    });
   });
 
   it("maps Health Connect workouts into imported sessions", () => {

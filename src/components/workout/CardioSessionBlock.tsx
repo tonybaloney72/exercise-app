@@ -6,6 +6,7 @@ import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
 import WorkoutRowOverflowMenu, {
   type WorkoutRowMenuItem,
 } from "./WorkoutRowOverflowMenu";
+import { formatCardioHealthSummary } from "@/lib/health";
 import type { ExerciseLog } from "@/types";
 
 type Props = {
@@ -34,6 +35,7 @@ export default function CardioSessionBlock({
   const meta = exerciseMap[log.exerciseId];
   const title = meta?.name ?? log.exerciseId;
   const done = log.completed || log.skipped;
+  const healthSummary = formatCardioHealthSummary(log);
 
   const overflowItems: WorkoutRowMenuItem[] = [];
   if (!log.completed && !log.skipped) {
@@ -141,6 +143,9 @@ export default function CardioSessionBlock({
           />
         </label>
       </span>
+      {healthSummary ? (
+        <p className="px-11 pb-3 text-xs text-muted">{healthSummary}</p>
+      ) : null}
     </section>
   );
 }

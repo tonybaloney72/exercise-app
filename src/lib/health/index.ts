@@ -10,13 +10,20 @@ export {
   writeNativeHealthSample,
 } from "@/lib/health/nativeHealth";
 export {
+  dominantHealthSampleSource,
+  enrichCardioHealthMeta,
   ensureCardioHealthReadAccess,
+  fetchCardioHealthMetricsForWindow,
   fetchHeartRateAverage,
-  formatCardioHealthNotes,
   importRecentCardioSessions,
   mapWorkoutToImportedSession,
+  sumHealthSampleValues,
   writeCardioSessionToHealth,
   type CardioHealthMeta,
   type ImportedCardioSession,
 } from "@/lib/health/cardioHealth";
+export {
+  formatCardioHealthSummary,
+  type CardioHealthDisplayFields,
+} from "@/lib/health/cardioHealthDisplay";
 export { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";

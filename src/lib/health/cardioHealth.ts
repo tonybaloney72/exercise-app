@@ -1,5 +1,5 @@
 import type { Workout } from "@capgo/capacitor-health";
-import type { CardioActivityKind } from "@/types";
+import type { CardioActivityKind, CardioActivitySource } from "@/types";
 import { metersToMiles } from "@/lib/geo/haversine";
 import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
 import {
@@ -13,9 +13,11 @@ import {
 } from "@/lib/health/nativeHealth";
 
 export interface CardioHealthMeta {
+  stepCount?: number;
   activeCaloriesKcal?: number;
   avgHeartRateBpm?: number;
-  source?: "manual" | "gps" | "health_connect";
+  source?: CardioActivitySource;
+  healthSourceName?: string;
 }
 
 export interface ImportedCardioSession {
@@ -23,23 +25,39 @@ export interface ImportedCardioSession {
   durationSeconds: number;
   activeCaloriesKcal?: number;
   avgHeartRateBpm?: number;
+  stepCount?: number;
   startDate: Date;
   endDate: Date;
   sourceName?: string;
 }
 
-export function formatCardioHealthNotes(meta?: CardioHealthMeta): string | undefined {
-  if (!meta) return undefined;
-  const parts: string[] = [];
-  if (meta.activeCaloriesKcal != null && meta.activeCaloriesKcal > 0) {
-    parts.push(`${Math.round(meta.activeCaloriesKcal)} active kcal`);
+export function sumHealthSampleValues(
+  samples: ReadonlyArray<{ value: number }>,
+): number {
+  return samples
+    .map((sample) => sample.value)
+    .filter((value) => Number.isFinite(value) && value > 0)
+    .reduce((sum, value) => sum + value, 0);
+}
+
+export function dominantHealthSampleSource(
+  samples: ReadonlyArray<{ sourceName?: string }>,
+): string | undefined {
+  const counts = new Map<string, number>();
+  for (const sample of samples) {
+    const name = sample.sourceName?.trim();
+    if (!name) continue;
+    counts.set(name, (counts.get(name) ?? 0) + 1);
   }
-  if (meta.avgHeartRateBpm != null && meta.avgHeartRateBpm > 0) {
-    parts.push(`${Math.round(meta.avgHeartRateBpm)} bpm avg`);
+  let best: string | undefined;
+  let bestCount = 0;
+  for (const [name, count] of counts) {
+    if (count > bestCount) {
+      best = name;
+      bestCount = count;
+    }
   }
-  if (meta.source === "gps") parts.push("GPS");
-  if (meta.source === "health_connect") parts.push("Health Connect");
-  return parts.length > 0 ? parts.join(" · ") : undefined;
+  return best;
 }
 
 function workoutDurationSeconds(workout: Workout): number {
@@ -111,6 +129,85 @@ export async function fetchHeartRateAverage(
   if (values.length === 0) return undefined;
   const total = values.reduce((sum, value) => sum + value, 0);
   return Math.round(total / values.length);
+}
+
+export async function fetchCardioHealthMetricsForWindow(
+  startDate: Date,
+  endDate: Date,
+  options?: {
+    /** When already known (e.g. imported workout totalEnergyBurned). */
+    activeCaloriesKcal?: number;
+    healthSourceName?: string;
+  },
+): Promise<CardioHealthMeta> {
+  const isoStart = startDate.toISOString();
+  const isoEnd = endDate.toISOString();
+
+  const needsCalories =
+    options?.activeCaloriesKcal == null || options.activeCaloriesKcal <= 0;
+
+  const [stepSamples, calorieSamples, avgHeartRateBpm] = await Promise.all([
+    readNativeHealthSamples({
+      dataType: "steps",
+      startDate: isoStart,
+      endDate: isoEnd,
+      limit: 500,
+    }),
+    needsCalories
+      ? readNativeHealthSamples({
+          dataType: "calories",
+          startDate: isoStart,
+          endDate: isoEnd,
+          limit: 500,
+        })
+      : Promise.resolve([]),
+    fetchHeartRateAverage(startDate, endDate),
+  ]);
+
+  const stepTotal = sumHealthSampleValues(stepSamples);
+  const calorieTotal = needsCalories
+    ? sumHealthSampleValues(calorieSamples)
+    : options?.activeCaloriesKcal ?? 0;
+
+  const healthSourceName =
+    options?.healthSourceName?.trim() ||
+    dominantHealthSampleSource(stepSamples) ||
+    dominantHealthSampleSource(calorieSamples);
+
+  return {
+    stepCount: stepTotal > 0 ? Math.round(stepTotal) : undefined,
+    activeCaloriesKcal:
+      calorieTotal > 0 ? Math.round(calorieTotal) : options?.activeCaloriesKcal,
+    avgHeartRateBpm,
+    healthSourceName,
+  };
+}
+
+export async function enrichCardioHealthMeta(
+  startDate: Date,
+  endDate: Date,
+  base?: CardioHealthMeta,
+): Promise<CardioHealthMeta | undefined> {
+  if (!(await isNativeHealthAvailable())) return base;
+  const granted = await ensureCardioHealthReadAccess();
+  if (!granted) return base;
+
+  try {
+    const fetched = await fetchCardioHealthMetricsForWindow(startDate, endDate, {
+      activeCaloriesKcal: base?.activeCaloriesKcal,
+      healthSourceName: base?.healthSourceName,
+    });
+    return {
+      ...base,
+      stepCount: fetched.stepCount ?? base?.stepCount,
+      activeCaloriesKcal: fetched.activeCaloriesKcal ?? base?.activeCaloriesKcal,
+      avgHeartRateBpm: fetched.avgHeartRateBpm ?? base?.avgHeartRateBpm,
+      healthSourceName: fetched.healthSourceName ?? base?.healthSourceName,
+      source: base?.source,
+    };
+  } catch {
+    return base;
+  }
 }
 
 export async function writeCardioSessionToHealth(options: {

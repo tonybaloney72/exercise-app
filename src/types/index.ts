@@ -182,6 +182,9 @@ export interface WorkoutDayTemplate {
   updatedAt?: string;
 }
 
+/** Cardio capture / enrichment source for {@link ExerciseLog.activitySource}. */
+export type CardioActivitySource = "manual" | "gps" | "health_connect";
+
 export interface ExerciseLog {
   exerciseId: string;
   completed: boolean;
@@ -208,6 +211,16 @@ export interface ExerciseLog {
   loggingMode?: ExerciseSetMode;
   /** Miles (endurance / cardio block). */
   actualDistanceMi?: number;
+  /** Steps during this cardio session (from Health Connect / phone sensors). */
+  stepCount?: number;
+  /** Active energy burned during this session (kilocalories). */
+  activeCaloriesKcal?: number;
+  /** Average heart rate during this session (watch / band when available). */
+  avgHeartRateBpm?: number;
+  /** How distance/time/health metrics were captured for this row. */
+  activitySource?: CardioActivitySource;
+  /** Health Connect recorder name (e.g. Samsung Health, Pixel). */
+  healthSourceName?: string;
   /**
    * Unique row id for cardio/endurance logs (multiple walks per day, etc.).
    * When omitted, legacy rows are keyed by `exerciseId` only.

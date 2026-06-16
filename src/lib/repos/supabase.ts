@@ -97,6 +97,11 @@ interface ExerciseRow {
   skipped: boolean;
   swapped_with: string | null;
   notes: string | null;
+  step_count: number | null;
+  active_calories_kcal: number | null;
+  avg_heart_rate_bpm: number | null;
+  activity_source: string | null;
+  health_source_name: string | null;
 }
 
 interface SettingsRow {
@@ -149,6 +154,16 @@ function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
       ? migrateExerciseId(r.swapped_with)
       : undefined,
     notes: r.notes ?? undefined,
+    stepCount: r.step_count ?? undefined,
+    activeCaloriesKcal: r.active_calories_kcal ?? undefined,
+    avgHeartRateBpm: r.avg_heart_rate_bpm ?? undefined,
+    activitySource:
+      r.activity_source === "manual" ||
+      r.activity_source === "gps" ||
+      r.activity_source === "health_connect"
+        ? r.activity_source
+        : undefined,
+    healthSourceName: r.health_source_name ?? undefined,
   };
 }
 
@@ -222,6 +237,11 @@ type ExerciseLogSaveRow = {
   skipped: boolean;
   swapped_with: string | null;
   notes: string | null;
+  step_count: number | null;
+  active_calories_kcal: number | null;
+  avg_heart_rate_bpm: number | null;
+  activity_source: string | null;
+  health_source_name: string | null;
 };
 
 function exerciseLogToSaveRow(
@@ -243,6 +263,11 @@ function exerciseLogToSaveRow(
     skipped: ex.skipped,
     swapped_with: ex.swappedWith ?? null,
     notes: ex.notes ?? null,
+    step_count: ex.stepCount ?? null,
+    active_calories_kcal: ex.activeCaloriesKcal ?? null,
+    avg_heart_rate_bpm: ex.avgHeartRateBpm ?? null,
+    activity_source: ex.activitySource ?? null,
+    health_source_name: ex.healthSourceName ?? null,
   };
 }
 
