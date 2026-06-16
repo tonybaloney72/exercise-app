@@ -11,12 +11,22 @@ import {
   CARDIO_ACTIVITY_ORDER,
   cardioKindAllowed,
 } from "@/lib/cardioActivities";
-import { parseTimeInput } from "@/utils/time";
+import { formatSecondsToMMSS, parseTimeInput } from "@/utils/time";
+import CardioGpsTracker from "@/components/workout/CardioGpsTracker";
+import CardioHealthImport from "@/components/workout/CardioHealthImport";
+import {
+  writeCardioSessionToHealth,
+  type CardioHealthMeta,
+  type ImportedCardioSession,
+} from "@/lib/health";
+import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import type { CardioActivityKind, DayPlan } from "@/types";
 
 const PRIMARY_KINDS: CardioActivityKind[] = ["walk", "jog"];
+
+const GPS_KINDS: CardioActivityKind[] = ["walk", "jog"];
 
 type Props = {
   plan: DayPlan;
@@ -35,6 +45,11 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
   const [morePickerOpen, setMorePickerOpen] = useState(false);
   const [distanceInput, setDistanceInput] = useState("");
   const [timeInput, setTimeInput] = useState("");
+  const [healthMeta, setHealthMeta] = useState<CardioHealthMeta | undefined>();
+  const [gpsSession, setGpsSession] = useState<{
+    startDate: Date;
+    endDate: Date;
+  } | null>(null);
   const [saving, setSaving] = useState(false);
 
   const moreKinds = useMemo(
@@ -51,11 +66,40 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     setPendingKind(null);
     setDistanceInput("");
     setTimeInput("");
+    setHealthMeta(undefined);
+    setGpsSession(null);
   }, []);
 
   function openLogForm(kind: CardioActivityKind) {
     setMorePickerOpen(false);
     setPendingKind(kind);
+  }
+
+  function applyImportedSession(session: ImportedCardioSession) {
+    if (session.distanceMi != null) {
+      setDistanceInput(String(session.distanceMi));
+    }
+    setTimeInput(formatSecondsToMMSS(session.durationSeconds));
+    setHealthMeta({
+      activeCaloriesKcal: session.activeCaloriesKcal,
+      avgHeartRateBpm: session.avgHeartRateBpm,
+      source: "health_connect",
+    });
+    setGpsSession({ startDate: session.startDate, endDate: session.endDate });
+  }
+
+  function applyGpsTrack(result: {
+    distanceMi?: number;
+    durationSeconds: number;
+    startDate: Date;
+    endDate: Date;
+  }) {
+    if (result.distanceMi != null) {
+      setDistanceInput(String(result.distanceMi));
+    }
+    setTimeInput(formatSecondsToMMSS(result.durationSeconds));
+    setHealthMeta((prev) => ({ ...prev, source: "gps" }));
+    setGpsSession({ startDate: result.startDate, endDate: result.endDate });
   }
 
   async function handleSave() {
@@ -78,7 +122,19 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     const ok = await quickLogCardio(plan, dateKey, pendingKind, {
       distanceMi: hasDistance ? distanceMi : undefined,
       durationSeconds: hasDuration ? durationSeconds : undefined,
+      health: healthMeta,
     });
+    if (ok && isNativePlatform() && gpsSession && healthMeta?.source === "gps") {
+      void writeCardioSessionToHealth({
+        distanceMi: hasDistance ? distanceMi : undefined,
+        durationSeconds: hasDuration ? durationSeconds! : 0,
+        activeCaloriesKcal: healthMeta?.activeCaloriesKcal,
+        startDate: gpsSession.startDate,
+        endDate: gpsSession.endDate,
+      }).catch(() => {
+        // Optional mirror to Health Connect; logging in-app already succeeded.
+      });
+    }
     setSaving(false);
     if (ok) {
       toast.success(`${CARDIO_ACTIVITY_LABELS[pendingKind]} logged`);
@@ -177,6 +233,12 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
         }
       >
         <div className="space-y-3 px-4 py-1">
+          {pendingKind && GPS_KINDS.includes(pendingKind) ? (
+            <CardioGpsTracker onComplete={applyGpsTrack} />
+          ) : null}
+          {pendingKind ? (
+            <CardioHealthImport kind={pendingKind} onImport={applyImportedSession} />
+          ) : null}
           <label className="block">
             <span className="text-caption text-muted uppercase tracking-wider">
               Distance (mi)

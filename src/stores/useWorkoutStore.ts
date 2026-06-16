@@ -37,6 +37,7 @@ import {
   resolveCardioActivities,
 } from "@/lib/cardioActivities";
 import { workoutLogForPersistence } from "@/lib/workoutCardioPersistence";
+import type { CardioHealthMeta } from "@/lib/health/cardioHealth";
 import { getCardioLog, patchCardioLog } from "@/lib/cardioWorkoutLog";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { settingsHydrationKey } from "@/lib/settingsHydration";
@@ -383,7 +384,11 @@ interface WorkoutState {
     plan: DayPlan,
     dateKey: string,
     kind: CardioActivityKind,
-    input: { distanceMi?: number; durationSeconds?: number },
+    input: {
+      distanceMi?: number;
+      durationSeconds?: number;
+      health?: CardioHealthMeta;
+    },
   ) => Promise<boolean>;
 
   /** Auth session key when `workoutHistory` was last loaded from repos. */
@@ -1223,6 +1228,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     const row = buildCompletedQuickCardioRow(kind, {
       distanceMi: hasDistance ? input.distanceMi : undefined,
       durationSeconds: hasDuration ? input.durationSeconds : undefined,
+      health: input.health,
     });
 
     const persistCompletedWorkout = async (log: WorkoutLog): Promise<boolean> => {

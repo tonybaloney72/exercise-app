@@ -4,4 +4,5 @@
     <string name="title_activity_main">MyExercise</string>
     <string name="package_name">dev.myexercise.app</string>
     <string name="custom_url_scheme">dev.myexercise.app</string>
+    <string name="health_connect_privacy_policy_url">https://myexercise.dev/privacy</string>
 </resources>
