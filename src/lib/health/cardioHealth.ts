@@ -12,6 +12,7 @@ import {
   requestNativeHealthAuthorization,
   writeNativeHealthSample,
 } from "@/lib/health/nativeHealth";
+import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 export const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
@@ -110,12 +111,21 @@ export function mapWorkoutToImportedSession(workout: Workout): ImportedCardioSes
 }
 
 export async function hasCardioHealthReadAccess(): Promise<boolean> {
-  if (!(await isNativeHealthAvailable())) return false;
+  if (!(await isNativeHealthAvailable())) {
+    clientTrace("health-cardio", "hasReadAccess_skip", { reason: "unavailable" });
+    return false;
+  }
   const status = await checkNativeHealthAuthorization({
     read: CARDIO_HEALTH_READ_TYPES,
     write: [],
   });
-  return (status?.readAuthorized.length ?? 0) > 0;
+  const granted = (status?.readAuthorized.length ?? 0) > 0;
+  clientTrace("health-cardio", "hasReadAccess", {
+    granted,
+    readAuthorized: status?.readAuthorized?.length ?? 0,
+    readDenied: status?.readDenied?.length ?? 0,
+  });
+  return granted;
 }
 
 /** Prompts for Health Connect read access (use Import / explicit health flows only). */
@@ -222,19 +232,43 @@ export async function enrichCardioHealthMeta(
   endDate: Date,
   base?: CardioHealthMeta,
 ): Promise<CardioHealthMeta | undefined> {
-  if (!(await isNativeHealthAvailable())) return base;
-  // Never prompt during save — only read if the user already granted access.
-  if (!(await hasCardioHealthReadAccess())) return base;
+  clientTrace("health-cardio", "enrich_start", {
+    source: base?.source,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+  });
+  if (!(await isNativeHealthAvailable())) {
+    clientTrace("health-cardio", "enrich_skip", { reason: "unavailable" });
+    return base;
+  }
+  if (!(await hasCardioHealthReadAccess())) {
+    clientTrace("health-cardio", "enrich_skip", { reason: "not_authorized" });
+    return base;
+  }
 
   try {
     const fetched = await withTimeout(
-      fetchCardioHealthMetricsForWindow(startDate, endDate, {
-        activeCaloriesKcal: base?.activeCaloriesKcal,
-        healthSourceName: base?.healthSourceName,
-      }),
+      clientTraceAsync(
+        "health-cardio",
+        "fetchMetricsForWindow",
+        () =>
+          fetchCardioHealthMetricsForWindow(startDate, endDate, {
+            activeCaloriesKcal: base?.activeCaloriesKcal,
+            healthSourceName: base?.healthSourceName,
+          }),
+        {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+        },
+      ),
       CARDIO_HEALTH_ENRICH_TIMEOUT_MS,
       "Health Connect read timed out",
     );
+    clientTrace("health-cardio", "enrich_ok", {
+      stepCount: fetched.stepCount,
+      activeCaloriesKcal: fetched.activeCaloriesKcal,
+      avgHeartRateBpm: fetched.avgHeartRateBpm,
+    });
     return {
       ...base,
       stepCount: fetched.stepCount ?? base?.stepCount,
@@ -243,7 +277,15 @@ export async function enrichCardioHealthMeta(
       healthSourceName: fetched.healthSourceName ?? base?.healthSourceName,
       source: base?.source,
     };
-  } catch {
+  } catch (err) {
+    clientTrace(
+      "health-cardio",
+      "enrich_error",
+      {
+        message: err instanceof Error ? err.message : String(err),
+      },
+      "error",
+    );
     return base;
   }
 }

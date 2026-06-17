@@ -11,6 +11,7 @@ import AndroidAppDownloadSection from "@/components/settings/AndroidAppDownloadS
 import NativeAppUpdateSection from "@/components/settings/NativeAppUpdateSection";
 import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
 import SettingsFeedbackSection from "@/components/settings/SettingsFeedbackSection";
+import DiagnosticLogSection from "@/components/settings/DiagnosticLogSection";
 import SettingsLegalLinks from "@/components/settings/SettingsLegalLinks";
 import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
@@ -514,6 +515,17 @@ export default function SettingsPage() {
       <AnimatedSection delay={0.05}>
         <NativeAppUpdateSection />
         <AndroidAppDownloadSection />
+      </AnimatedSection>
+
+      <AnimatedSection delay={0.05}>
+        <CollapsibleSection
+          title="Diagnostic log"
+          hint="Debug GPS, Health Connect, and save issues"
+          defaultOpen={false}
+          contentClassName="space-y-3 p-4"
+        >
+          <DiagnosticLogSection />
+        </CollapsibleSection>
       </AnimatedSection>
 
       <AnimatedSection delay={0.05}>

@@ -38,6 +38,7 @@ import {
 } from "@/lib/cardioActivities";
 import { workoutLogForPersistence } from "@/lib/workoutCardioPersistence";
 import type { CardioHealthMeta } from "@/lib/health/cardioHealth";
+import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { getCardioLog, patchCardioLog } from "@/lib/cardioWorkoutLog";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { settingsHydrationKey } from "@/lib/settingsHydration";
@@ -1223,7 +1224,17 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       input.durationSeconds != null &&
       input.durationSeconds > 0 &&
       !Number.isNaN(input.durationSeconds);
-    if (!hasDistance && !hasDuration) return false;
+    clientTrace("quickLogCardio", "start", {
+      dateKey,
+      kind,
+      hasDistance,
+      hasDuration,
+      authMode: useAuthStore.getState().mode,
+    });
+    if (!hasDistance && !hasDuration) {
+      clientTrace("quickLogCardio", "abort_invalid_input");
+      return false;
+    }
 
     const row = buildCompletedQuickCardioRow(kind, {
       distanceMi: hasDistance ? input.distanceMi : undefined,
@@ -1240,9 +1251,20 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         workoutHistory: upsertWorkoutInHistory(historyBefore, saved),
       });
       try {
-        await workoutRepo().saveWorkout(saved);
+        await clientTraceAsync(
+          "quickLogCardio",
+          "persistCompleted",
+          () => workoutRepo().saveWorkout(saved),
+          { workoutId: saved.id, date: saved.date },
+        );
         return true;
       } catch (err) {
+        clientTrace(
+          "quickLogCardio",
+          "persistCompleted_error",
+          { message: err instanceof Error ? err.message : String(err) },
+          "error",
+        );
         toastSaveError("activity log", err);
         set({ workoutHistory: historyBefore });
         return false;
@@ -1273,38 +1295,49 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     const active = state.activeWorkout;
 
     if (active && !active.endTime && active.date === dateKey) {
+      clientTrace("quickLogCardio", "branch_active_today");
       commitInProgressQuickCardio(appendCardioRow(active, row));
       return true;
     }
 
     if (active && !active.endTime && active.date !== dateKey) {
+      clientTrace("quickLogCardio", "branch_blocked_other_day");
       return false;
     }
 
     const completed = findCompletedWorkoutForDate(state.workoutHistory, dateKey);
     if (completed) {
+      clientTrace("quickLogCardio", "branch_completed_day");
       return persistCompletedWorkout(appendCardioRow(completed, row));
     }
 
     const inProgress = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
     if (inProgress) {
+      clientTrace("quickLogCardio", "branch_in_progress_history");
       commitInProgressQuickCardio(appendCardioRow(inProgress, row));
       return true;
     }
 
+    clientTrace("quickLogCardio", "branch_new_workout");
     const dayOfWeek =
       parseLocalDateKey(dateKey)?.getDay() ?? plan.dayOfWeek;
     const nowIso = new Date().toISOString();
     const weekAnchor = weekKeyFromDateKey(dateKey) ?? undefined;
     const authMode = useAuthStore.getState().mode;
-    const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(
-      plan,
-      stretchContextForWorkoutStart(weekAnchor),
-      {
-        weekAnchorDateKey: weekAnchor,
-        authMode,
-        loadWeek: loadTrainingWeekForStretches,
-      },
+    const { warmUp, coolDown } = await clientTraceAsync(
+      "quickLogCardio",
+      "resolveStretches",
+      () =>
+        resolveStretchesForWorkoutStart(
+          plan,
+          stretchContextForWorkoutStart(weekAnchor),
+          {
+            weekAnchorDateKey: weekAnchor,
+            authMode,
+            loadWeek: loadTrainingWeekForStretches,
+          },
+        ),
+      { dateKey, authMode },
     );
     const fresh: WorkoutLog = {
       id: uuidv4(),
@@ -1320,6 +1353,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       paused: false,
     };
     commitInProgressQuickCardio(fresh);
+    clientTrace("quickLogCardio", "new_workout_committed", { workoutId: fresh.id });
     return true;
   },
 

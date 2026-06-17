@@ -9,6 +9,7 @@ import {
   type ImportedCardioSession,
 } from "@/lib/health";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
+import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import { formatSecondsToMMSS } from "@/utils/time";
 import type { CardioActivityKind } from "@/types";
 
@@ -25,13 +26,16 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
 
   async function handleLoad() {
     setLoading(true);
+    clientTrace("health-import", "import_click", { kind });
     try {
       const granted = await ensureCardioHealthReadAccess();
+      clientTrace("health-import", "import_auth", { granted });
       if (!granted) {
         toast.error("Health Connect access was not granted.");
         return;
       }
       const imported = await importRecentCardioSessions(kind);
+      clientTrace("health-import", "import_sessions", { count: imported.length });
       if (imported.length === 0) {
         toast.message("No recent sessions found in Health Connect.");
         setSessions([]);
@@ -39,6 +43,12 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
       }
       setSessions(imported);
     } catch (err) {
+      clientTrace(
+        "health-import",
+        "import_error",
+        { message: err instanceof Error ? err.message : String(err) },
+        "error",
+      );
       toast.error(
         err instanceof Error ? err.message : "Could not read Health Connect.",
       );
@@ -48,6 +58,10 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
   }
 
   async function handlePick(session: ImportedCardioSession) {
+    clientTrace("health-import", "pick_session", {
+      durationSeconds: session.durationSeconds,
+      distanceMi: session.distanceMi,
+    });
     let enriched = session;
     try {
       const metrics = await fetchCardioHealthMetricsForWindow(

@@ -1,5 +1,6 @@
 import type { WorkoutLog } from "@/types";
 import { getWorkoutRepo } from "@/lib/repos";
+import { clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { workoutLogForPersistence } from "@/lib/workoutCardioPersistence";
 import { hydrateWorkoutLog } from "@/utils/exerciseLogDefaults";
 import { toastSaveError } from "@/utils/saveErrorToast";
@@ -105,7 +106,12 @@ export async function flushPersistInProgressWorkout(
   }
 
   try {
-    await getWorkoutRepo("authenticated").saveWorkout(prepared);
+    await clientTraceAsync(
+      "workout-repo",
+      "flushInProgressWorkout",
+      () => getWorkoutRepo("authenticated").saveWorkout(prepared),
+      { workoutId: log.id, date: log.date, paused: options.paused },
+    );
     if (shouldSkipInProgressPersist(log, generation)) {
       return null;
     }

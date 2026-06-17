@@ -13,6 +13,7 @@ import { createClient } from "@/lib/supabase/client";
 import { sanitizeStretchEntries } from "@/lib/stretchDefaults";
 import { sanitizeExpertiseByGroup } from "@/lib/expertiseLevels";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
+import { clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import {
   sanitizeTrainingPriorityPreset,
   sanitizeTrainingPriorityScores,
@@ -435,16 +436,28 @@ export const supabaseWorkoutRepo: WorkoutRepo = {
   },
 
   async saveWorkout(log: WorkoutLog): Promise<void> {
-    const supabase = createClient();
     const { workout, exerciseLogs } = workoutToSavePayload(log);
-    const { error } = await supabase.rpc("save_workout", {
-      p_workout_log: workout,
-      p_exercise_logs: exerciseLogs,
-    });
-    if (error) {
-      console.error("[supabaseWorkoutRepo.saveWorkout]", error);
-      throw error;
-    }
+    await clientTraceAsync(
+      "workout-repo",
+      "supabase_saveWorkout",
+      async () => {
+        const supabase = createClient();
+        const { error } = await supabase.rpc("save_workout", {
+          p_workout_log: workout,
+          p_exercise_logs: exerciseLogs,
+        });
+        if (error) {
+          console.error("[supabaseWorkoutRepo.saveWorkout]", error);
+          throw error;
+        }
+      },
+      {
+        workoutId: log.id,
+        date: log.date,
+        cardioCount: log.cardioExercises?.length ?? 0,
+        exerciseLogCount: exerciseLogs.length,
+      },
+    );
   },
 
   async deleteWorkout(id: string): Promise<void> {

@@ -8,6 +8,7 @@ import {
   GpsTrackSession,
 } from "@/lib/geo/gpsTrackSession";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
+import { clientTrace } from "@/lib/diagnostics/clientTrace";
 
 type Props = {
   onComplete: (result: {
@@ -60,17 +61,26 @@ export default function CardioGpsTracker({ onComplete }: Props) {
     const session = new GpsTrackSession();
     sessionRef.current = session;
     setPhase("acquiring");
+    clientTrace("gps-tracker", "prepare_start");
     try {
       await session.prepare((position, watchError) => {
         if (watchError || !position || readyPromptedRef.current) return;
         if (session.getPhase() !== "watching") return;
         readyPromptedRef.current = true;
+        clientTrace("gps-tracker", "gps_ready");
         setPhase("ready");
         setReadyModalOpen(true);
       });
+      clientTrace("gps-tracker", "prepare_watch_started");
     } catch (err) {
       sessionRef.current = null;
       setPhase("idle");
+      clientTrace(
+        "gps-tracker",
+        "prepare_error",
+        { message: err instanceof Error ? err.message : String(err) },
+        "error",
+      );
       setError(
         err instanceof Error ? err.message : "Could not start GPS tracking.",
       );
@@ -82,6 +92,7 @@ export default function CardioGpsTracker({ onComplete }: Props) {
     if (!session) return;
     try {
       session.beginRecording();
+      clientTrace("gps-tracker", "recording_started");
       setReadyModalOpen(false);
       setPhase("recording");
     } catch (err) {
@@ -116,6 +127,11 @@ export default function CardioGpsTracker({ onComplete }: Props) {
       durationSeconds: result.durationSeconds,
       startDate: result.startDate,
       endDate: result.endDate,
+    });
+    clientTrace("gps-tracker", "stop_complete", {
+      distanceMi: result.distanceMi,
+      durationSeconds: result.durationSeconds,
+      pointCount: result.pointCount,
     });
   }
 

@@ -22,6 +22,7 @@ import {
   type ImportedCardioSession,
 } from "@/lib/health";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
+import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import type { CardioActivityKind, DayPlan } from "@/types";
@@ -123,6 +124,13 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     }
 
     setSaving(true);
+    clientTrace("cardio-save", "save_click", {
+      kind: pendingKind,
+      hasGpsSession: Boolean(gpsSession),
+      hasDistance,
+      hasDuration,
+      healthSource: healthMeta?.source,
+    });
     try {
       let resolvedHealth = healthMeta;
       if (gpsSession && isNativePlatform()) {
@@ -132,11 +140,16 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
           healthMeta,
         );
       }
+      clientTrace("cardio-save", "quickLog_invoke", {
+        healthSource: resolvedHealth?.source,
+        stepCount: resolvedHealth?.stepCount,
+      });
       const ok = await quickLogCardio(plan, dateKey, pendingKind, {
         distanceMi: hasDistance ? distanceMi : undefined,
         durationSeconds: hasDuration ? durationSeconds : undefined,
         health: resolvedHealth,
       });
+      clientTrace("cardio-save", ok ? "quickLog_ok" : "quickLog_failed");
       if (ok && isNativePlatform() && gpsSession && resolvedHealth?.source === "gps") {
         void writeCardioSessionToHealth({
           distanceMi: hasDistance ? distanceMi : undefined,

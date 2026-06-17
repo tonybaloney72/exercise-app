@@ -21,6 +21,7 @@ import type {
   SaveWorkoutDayTemplateInput,
 } from "./types";
 import { migrateExerciseId, migrateWorkoutLog } from "@/lib/cpToPcMigration";
+import { clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import { DEFAULT_SETTINGS } from "./types";
 
@@ -48,11 +49,18 @@ export const localWorkoutRepo: WorkoutRepo = {
   },
 
   async saveWorkout(log: WorkoutLog): Promise<void> {
-    if (!isBrowser()) return;
-    const current = await this.loadHistory();
-    const without = current.filter((w) => w.id !== log.id);
-    const next = [log, ...without];
-    localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(next));
+    await clientTraceAsync(
+      "workout-repo",
+      "local_saveWorkout",
+      async () => {
+        if (!isBrowser()) return;
+        const current = await localWorkoutRepo.loadHistory();
+        const without = current.filter((w) => w.id !== log.id);
+        const next = [log, ...without];
+        localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(next));
+      },
+      { workoutId: log.id, date: log.date },
+    );
   },
 
   async deleteWorkout(id: string): Promise<void> {
