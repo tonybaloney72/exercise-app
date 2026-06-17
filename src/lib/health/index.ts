@@ -15,10 +15,13 @@ export {
   ensureCardioHealthReadAccess,
   fetchCardioHealthMetricsForWindow,
   fetchHeartRateAverage,
+  hasCardioHealthReadAccess,
   importRecentCardioSessions,
   mapWorkoutToImportedSession,
   sumHealthSampleValues,
+  withTimeout,
   writeCardioSessionToHealth,
+  CARDIO_HEALTH_ENRICH_TIMEOUT_MS,
   type CardioHealthMeta,
   type ImportedCardioSession,
 } from "@/lib/health/cardioHealth";

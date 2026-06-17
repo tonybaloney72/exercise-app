@@ -123,34 +123,37 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     }
 
     setSaving(true);
-    let resolvedHealth = healthMeta;
-    if (gpsSession && isNativePlatform()) {
-      resolvedHealth = await enrichCardioHealthMeta(
-        gpsSession.startDate,
-        gpsSession.endDate,
-        healthMeta,
-      );
-    }
-    const ok = await quickLogCardio(plan, dateKey, pendingKind, {
-      distanceMi: hasDistance ? distanceMi : undefined,
-      durationSeconds: hasDuration ? durationSeconds : undefined,
-      health: resolvedHealth,
-    });
-    if (ok && isNativePlatform() && gpsSession && resolvedHealth?.source === "gps") {
-      void writeCardioSessionToHealth({
+    try {
+      let resolvedHealth = healthMeta;
+      if (gpsSession && isNativePlatform()) {
+        resolvedHealth = await enrichCardioHealthMeta(
+          gpsSession.startDate,
+          gpsSession.endDate,
+          healthMeta,
+        );
+      }
+      const ok = await quickLogCardio(plan, dateKey, pendingKind, {
         distanceMi: hasDistance ? distanceMi : undefined,
-        durationSeconds: hasDuration ? durationSeconds! : 0,
-        activeCaloriesKcal: resolvedHealth?.activeCaloriesKcal,
-        startDate: gpsSession.startDate,
-        endDate: gpsSession.endDate,
-      }).catch(() => {
-        // Optional mirror to Health Connect; logging in-app already succeeded.
+        durationSeconds: hasDuration ? durationSeconds : undefined,
+        health: resolvedHealth,
       });
-    }
-    setSaving(false);
-    if (ok) {
-      toast.success(`${CARDIO_ACTIVITY_LABELS[pendingKind]} logged`);
-      closeLogModal();
+      if (ok && isNativePlatform() && gpsSession && resolvedHealth?.source === "gps") {
+        void writeCardioSessionToHealth({
+          distanceMi: hasDistance ? distanceMi : undefined,
+          durationSeconds: hasDuration ? durationSeconds! : 0,
+          activeCaloriesKcal: resolvedHealth?.activeCaloriesKcal,
+          startDate: gpsSession.startDate,
+          endDate: gpsSession.endDate,
+        }).catch(() => {
+          // Optional mirror to Health Connect; logging in-app already succeeded.
+        });
+      }
+      if (ok) {
+        toast.success(`${CARDIO_ACTIVITY_LABELS[pendingKind]} logged`);
+        closeLogModal();
+      }
+    } finally {
+      setSaving(false);
     }
   }
 

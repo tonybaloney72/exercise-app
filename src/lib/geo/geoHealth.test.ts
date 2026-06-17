@@ -5,6 +5,7 @@ import {
   dominantHealthSampleSource,
   mapWorkoutToImportedSession,
   sumHealthSampleValues,
+  withTimeout,
 } from "@/lib/health/cardioHealth";
 import { applyCardioHealthMeta } from "@/lib/health/cardioHealthFields";
 import { formatCardioHealthSummary } from "@/lib/health/cardioHealthDisplay";
@@ -43,6 +44,15 @@ describe("cardio health helpers", () => {
   it("maps cardio kinds to workout types", () => {
     expect(cardioKindToWorkoutType("walk")).toBe("walking");
     expect(cardioKindToWorkoutType("jog")).toBe("running");
+  });
+
+  it("withTimeout rejects when the promise is too slow", async () => {
+    await expect(
+      withTimeout(
+        new Promise<number>((resolve) => setTimeout(() => resolve(1), 50)),
+        5,
+      ),
+    ).rejects.toThrow(/timed out/i);
   });
 
   it("sums health sample values", () => {

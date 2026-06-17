@@ -5,12 +5,35 @@ import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
 import {
   CARDIO_HEALTH_READ_TYPES,
   CARDIO_HEALTH_WRITE_TYPES,
+  checkNativeHealthAuthorization,
   isNativeHealthAvailable,
   queryNativeWorkouts,
   readNativeHealthSamples,
   requestNativeHealthAuthorization,
   writeNativeHealthSample,
 } from "@/lib/health/nativeHealth";
+
+/** Max wait for optional Health Connect reads during GPS/quick-log save. */
+export const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
+
+export function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  message = `Timed out after ${ms}ms`,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), ms);
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
 
 export interface CardioHealthMeta {
   stepCount?: number;
@@ -86,8 +109,19 @@ export function mapWorkoutToImportedSession(workout: Workout): ImportedCardioSes
   };
 }
 
+export async function hasCardioHealthReadAccess(): Promise<boolean> {
+  if (!(await isNativeHealthAvailable())) return false;
+  const status = await checkNativeHealthAuthorization({
+    read: CARDIO_HEALTH_READ_TYPES,
+    write: [],
+  });
+  return (status?.readAuthorized.length ?? 0) > 0;
+}
+
+/** Prompts for Health Connect read access (use Import / explicit health flows only). */
 export async function ensureCardioHealthReadAccess(): Promise<boolean> {
   if (!(await isNativeHealthAvailable())) return false;
+  if (await hasCardioHealthReadAccess()) return true;
   const status = await requestNativeHealthAuthorization({
     read: CARDIO_HEALTH_READ_TYPES,
     write: [],
@@ -189,14 +223,18 @@ export async function enrichCardioHealthMeta(
   base?: CardioHealthMeta,
 ): Promise<CardioHealthMeta | undefined> {
   if (!(await isNativeHealthAvailable())) return base;
-  const granted = await ensureCardioHealthReadAccess();
-  if (!granted) return base;
+  // Never prompt during save — only read if the user already granted access.
+  if (!(await hasCardioHealthReadAccess())) return base;
 
   try {
-    const fetched = await fetchCardioHealthMetricsForWindow(startDate, endDate, {
-      activeCaloriesKcal: base?.activeCaloriesKcal,
-      healthSourceName: base?.healthSourceName,
-    });
+    const fetched = await withTimeout(
+      fetchCardioHealthMetricsForWindow(startDate, endDate, {
+        activeCaloriesKcal: base?.activeCaloriesKcal,
+        healthSourceName: base?.healthSourceName,
+      }),
+      CARDIO_HEALTH_ENRICH_TIMEOUT_MS,
+      "Health Connect read timed out",
+    );
     return {
       ...base,
       stepCount: fetched.stepCount ?? base?.stepCount,
