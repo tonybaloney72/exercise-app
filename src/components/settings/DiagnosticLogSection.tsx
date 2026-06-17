@@ -9,10 +9,12 @@ import {
 } from "@/lib/diagnostics/clientTrace";
 import { getInstalledNativeApkBuildId } from "@/lib/nativeApkVersion";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
+import { testNativeHealthBridge } from "@/lib/health/nativeHealth";
 
 export default function DiagnosticLogSection() {
   const [entryCount, setEntryCount] = useState(() => getClientTraceEntries().length);
   const [busy, setBusy] = useState(false);
+  const [bridgeBusy, setBridgeBusy] = useState(false);
 
   const refreshCount = useCallback(() => {
     setEntryCount(getClientTraceEntries().length);
@@ -68,6 +70,29 @@ export default function DiagnosticLogSection() {
     toast.message("Diagnostic log cleared");
   }
 
+  async function handleTestHealthBridge() {
+    setBridgeBusy(true);
+    try {
+      const result = await testNativeHealthBridge();
+      refreshCount();
+      if (result.ok) {
+        const availability =
+          result.available === true
+            ? "Health Connect available"
+            : result.available === false
+              ? `Health Connect unavailable${result.reason ? `: ${result.reason}` : ""}`
+              : "availability unknown";
+        toast.success(
+          `Health bridge OK (plugin ${result.pluginVersion ?? "?"} · ${availability})`,
+        );
+      } else {
+        toast.error(result.error ?? "Health bridge failed");
+      }
+    } finally {
+      setBridgeBusy(false);
+    }
+  }
+
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted leading-relaxed">
@@ -78,6 +103,16 @@ export default function DiagnosticLogSection() {
       <p className="text-xs text-muted">
         {entryCount} event{entryCount === 1 ? "" : "s"} in buffer
       </p>
+      {isNativePlatform() ? (
+        <button
+          type="button"
+          disabled={bridgeBusy}
+          onClick={() => void handleTestHealthBridge()}
+          className="w-full rounded-xl border border-accent/30 bg-accent/10 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent/50 disabled:opacity-50"
+        >
+          {bridgeBusy ? "Testing Health bridge…" : "Test Health bridge"}
+        </button>
+      ) : null}
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <button
           type="button"

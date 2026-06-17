@@ -89,6 +89,15 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
     toast.success("Imported from Health Connect");
   }
 
+  async function handleOpenSettings() {
+    const opened = await openNativeHealthSettings();
+    if (!opened) {
+      toast.error(
+        "Could not open Health Connect. Try Settings → Apps → Health Connect → App permissions.",
+      );
+    }
+  }
+
   return (
     <div className="rounded-xl border border-border bg-surface-hover/60 p-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
@@ -110,7 +119,7 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
       </div>
       <button
         type="button"
-        onClick={() => void openNativeHealthSettings()}
+        onClick={() => void handleOpenSettings()}
         className="text-xs font-medium text-accent hover:underline"
       >
         Open Health Connect settings

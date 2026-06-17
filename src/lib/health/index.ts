@@ -4,10 +4,13 @@ export {
   checkNativeHealthAuthorization,
   isNativeHealthAvailable,
   openNativeHealthSettings,
+  probeNativeHealthBridgeOnStartup,
   queryNativeWorkouts,
   readNativeHealthSamples,
   requestNativeHealthAuthorization,
+  testNativeHealthBridge,
   writeNativeHealthSample,
+  type HealthBridgeTestResult,
 } from "@/lib/health/nativeHealth";
 export {
   dominantHealthSampleSource,

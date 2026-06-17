@@ -1,3 +1,4 @@
+import { Health } from "@capgo/capacitor-health";
 import type {
   AuthorizationOptions,
   AuthorizationStatus,
@@ -13,6 +14,9 @@ export const NATIVE_HEALTH_SILENT_TIMEOUT_MS = 10_000;
 /** Permission UI — user may need time to read Health Connect screens. */
 export const NATIVE_HEALTH_INTERACTIVE_TIMEOUT_MS = 120_000;
 
+const HEALTH_CONNECT_SETTINGS_INTENT =
+  "intent:#Intent;action=androidx.health.ACTION_HEALTH_CONNECT_SETTINGS;end";
+
 export const CARDIO_HEALTH_READ_TYPES: HealthDataType[] = [
   "workouts",
   "distance",
@@ -26,10 +30,14 @@ export const CARDIO_HEALTH_WRITE_TYPES: HealthDataType[] = [
   "calories",
 ];
 
-async function getHealthPlugin() {
-  const { Health } = await import("@capgo/capacitor-health");
-  return Health;
-}
+export type HealthBridgeTestResult = {
+  ok: boolean;
+  pluginVersion?: string;
+  available?: boolean;
+  platform?: string;
+  reason?: string;
+  error?: string;
+};
 
 async function runTimedNativeCall<T>(
   event: string,
@@ -50,6 +58,65 @@ async function runTimedNativeCall<T>(
   );
 }
 
+/** Runs once at app startup on native to register the Health plugin early. */
+export async function probeNativeHealthBridgeOnStartup(): Promise<void> {
+  if (!isNativePlatform()) return;
+  try {
+    const { version } = await withTimeout(
+      Health.getPluginVersion(),
+      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
+      "Health bridge probe timed out",
+    );
+    clientTrace("health-native", "bridge_eager_ok", { version });
+  } catch (err) {
+    clientTrace(
+      "health-native",
+      "bridge_eager_failed",
+      { message: err instanceof Error ? err.message : String(err) },
+      "warn",
+    );
+  }
+}
+
+export async function testNativeHealthBridge(): Promise<HealthBridgeTestResult> {
+  if (!isNativePlatform()) {
+    return { ok: false, error: "Not on native platform" };
+  }
+  try {
+    const { version } = await runTimedNativeCall(
+      "getPluginVersion",
+      () => Health.getPluginVersion(),
+      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
+    );
+    const availability = await runTimedNativeCall(
+      "isAvailable",
+      () => Health.isAvailable(),
+      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
+    );
+    clientTrace("health-native", "bridge_test_ok", {
+      version,
+      available: availability.available,
+      platform: availability.platform,
+    });
+    return {
+      ok: true,
+      pluginVersion: version,
+      available: availability.available,
+      platform: availability.platform,
+      reason: availability.reason,
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    clientTrace(
+      "health-native",
+      "bridge_test_failed",
+      { message },
+      "error",
+    );
+    return { ok: false, error: message };
+  }
+}
+
 /**
  * Some devices hang on {@link Health.isAvailable}; treat timeout as unavailable.
  * Prefer {@link checkNativeHealthAuthorization} on user-initiated flows.
@@ -59,11 +126,7 @@ export async function isNativeHealthAvailable(): Promise<boolean> {
   try {
     return await runTimedNativeCall(
       "isAvailable",
-      async () => {
-        const Health = await getHealthPlugin();
-        const availability = await Health.isAvailable();
-        return availability.available;
-      },
+      () => Health.isAvailable().then((a) => a.available),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
     );
   } catch (err) {
@@ -84,10 +147,7 @@ export async function requestNativeHealthAuthorization(
   try {
     return await runTimedNativeCall(
       "requestAuthorization",
-      async () => {
-        const Health = await getHealthPlugin();
-        return Health.requestAuthorization(options);
-      },
+      () => Health.requestAuthorization(options),
       NATIVE_HEALTH_INTERACTIVE_TIMEOUT_MS,
       {
         read: options.read,
@@ -112,10 +172,7 @@ export async function checkNativeHealthAuthorization(
   try {
     return await runTimedNativeCall(
       "checkAuthorization",
-      async () => {
-        const Health = await getHealthPlugin();
-        return Health.checkAuthorization(options);
-      },
+      () => Health.checkAuthorization(options),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
       {
         read: options.read,
@@ -140,10 +197,7 @@ export async function queryNativeWorkouts(
   try {
     const { workouts } = await runTimedNativeCall(
       "queryWorkouts",
-      async () => {
-        const Health = await getHealthPlugin();
-        return Health.queryWorkouts(options);
-      },
+      () => Health.queryWorkouts(options),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
       {
         workoutType: options.workoutType,
@@ -168,10 +222,7 @@ export async function readNativeHealthSamples(options: {
   try {
     const { samples } = await runTimedNativeCall(
       "readSamples",
-      async () => {
-        const Health = await getHealthPlugin();
-        return Health.readSamples(options);
-      },
+      () => Health.readSamples(options),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
       {
         dataType: options.dataType,
@@ -196,10 +247,7 @@ export async function writeNativeHealthSample(options: {
   try {
     await runTimedNativeCall(
       "saveSample",
-      async () => {
-        const Health = await getHealthPlugin();
-        await Health.saveSample(options);
-      },
+      () => Health.saveSample(options),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
       { dataType: options.dataType },
     );
@@ -208,17 +256,48 @@ export async function writeNativeHealthSample(options: {
   }
 }
 
-export async function openNativeHealthSettings(): Promise<void> {
-  if (!isNativePlatform()) return;
+async function fallbackOpenHealthConnectSettings(): Promise<boolean> {
+  clientTrace("health-native", "openHealthConnectSettings_fallback", {});
+  try {
+    const { Browser } = await import("@capacitor/browser");
+    await Browser.open({ url: HEALTH_CONNECT_SETTINGS_INTENT });
+    clientTrace("health-native", "openHealthConnectSettings_fallback_ok", {});
+    return true;
+  } catch (err) {
+    clientTrace(
+      "health-native",
+      "openHealthConnectSettings_fallback_intent_failed",
+      { message: err instanceof Error ? err.message : String(err) },
+      "warn",
+    );
+  }
+  try {
+    const { Browser } = await import("@capacitor/browser");
+    await Browser.open({
+      url: "https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata",
+    });
+    clientTrace("health-native", "openHealthConnectSettings_fallback_store", {});
+    return true;
+  } catch (err) {
+    clientTrace(
+      "health-native",
+      "openHealthConnectSettings_fallback_failed",
+      { message: err instanceof Error ? err.message : String(err) },
+      "error",
+    );
+    return false;
+  }
+}
+
+export async function openNativeHealthSettings(): Promise<boolean> {
+  if (!isNativePlatform()) return false;
   try {
     await runTimedNativeCall(
       "openHealthConnectSettings",
-      async () => {
-        const Health = await getHealthPlugin();
-        await Health.openHealthConnectSettings();
-      },
+      () => Health.openHealthConnectSettings(),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
     );
+    return true;
   } catch (err) {
     clientTrace(
       "health-native",
@@ -226,5 +305,6 @@ export async function openNativeHealthSettings(): Promise<void> {
       { message: err instanceof Error ? err.message : String(err) },
       "error",
     );
+    return fallbackOpenHealthConnectSettings();
   }
 }
