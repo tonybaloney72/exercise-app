@@ -15,6 +15,8 @@ export interface GpsTrackSnapshot {
   pointCount: number;
 }
 
+export type GpsTrackPhase = "idle" | "watching" | "recording";
+
 export function computeGpsTrackSnapshot(
   points: readonly GpsTrackPoint[],
   startedAtMs: number,
@@ -49,9 +51,18 @@ export class GpsTrackSession {
   private watchId: string | null = null;
   private points: GpsTrackPoint[] = [];
   private startedAtMs: number | null = null;
+  private phase: GpsTrackPhase = "idle";
 
-  get isTracking(): boolean {
+  getPhase(): GpsTrackPhase {
+    return this.phase;
+  }
+
+  get isWatching(): boolean {
     return this.watchId != null;
+  }
+
+  get isRecording(): boolean {
+    return this.phase === "recording" && this.startedAtMs != null;
   }
 
   getPoints(): readonly GpsTrackPoint[] {
@@ -62,7 +73,8 @@ export class GpsTrackSession {
     return this.startedAtMs;
   }
 
-  async start(onUpdate?: WatchCallback): Promise<void> {
+  /** Request location permission and wait for GPS (timer does not start yet). */
+  async prepare(onUpdate?: WatchCallback): Promise<void> {
     if (!isNativePlatform()) {
       throw new Error("GPS tracking is only available in the Android app.");
     }
@@ -75,7 +87,8 @@ export class GpsTrackSession {
     }
 
     this.points = [];
-    this.startedAtMs = Date.now();
+    this.startedAtMs = null;
+    this.phase = "watching";
 
     this.watchId = await Geolocation.watchPosition(
       {
@@ -88,22 +101,41 @@ export class GpsTrackSession {
           onUpdate?.(null, error);
           return;
         }
-        const point: GpsTrackPoint = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          timestamp: position.timestamp,
-        };
-        const last = this.points[this.points.length - 1];
-        if (
-          !last ||
-          haversineDistanceMeters(last, point) >= 3 ||
-          point.timestamp - last.timestamp >= 5_000
-        ) {
-          this.points.push(point);
+        if (this.phase === "recording") {
+          this.appendPoint(position);
         }
         onUpdate?.(position, undefined);
       },
     );
+  }
+
+  /** Start the walk timer and distance tally (call after GPS is acquired). */
+  beginRecording(): void {
+    if (this.phase !== "watching" || !this.watchId) {
+      throw new Error("GPS must be ready before starting the walk.");
+    }
+    this.points = [];
+    this.startedAtMs = Date.now();
+    this.phase = "recording";
+  }
+
+  private appendPoint(position: {
+    coords: { latitude: number; longitude: number };
+    timestamp: number;
+  }): void {
+    const point: GpsTrackPoint = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      timestamp: position.timestamp,
+    };
+    const last = this.points[this.points.length - 1];
+    if (
+      !last ||
+      haversineDistanceMeters(last, point) >= 3 ||
+      point.timestamp - last.timestamp >= 5_000
+    ) {
+      this.points.push(point);
+    }
   }
 
   snapshot(): GpsTrackSnapshot | null {
@@ -112,14 +144,25 @@ export class GpsTrackSession {
   }
 
   async stop(): Promise<GpsTrackSnapshot | null> {
-    if (this.watchId) {
-      const { Geolocation } = await import("@capacitor/geolocation");
-      await Geolocation.clearWatch({ id: this.watchId });
-      this.watchId = null;
-    }
+    await this.clearWatch();
     if (this.startedAtMs == null) return null;
     const snapshot = computeGpsTrackSnapshot(this.points, this.startedAtMs);
     this.startedAtMs = null;
+    this.phase = "idle";
     return snapshot;
+  }
+
+  async dispose(): Promise<void> {
+    await this.clearWatch();
+    this.points = [];
+    this.startedAtMs = null;
+    this.phase = "idle";
+  }
+
+  private async clearWatch(): Promise<void> {
+    if (!this.watchId) return;
+    const { Geolocation } = await import("@capacitor/geolocation");
+    await Geolocation.clearWatch({ id: this.watchId });
+    this.watchId = null;
   }
 }

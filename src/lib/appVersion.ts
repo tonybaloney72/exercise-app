@@ -1,4 +1,5 @@
 import { resolveAndroidAppDownloadAbsoluteUrl } from "@/lib/androidAppDownload";
+import { isNativePlatform } from "@/lib/capacitorRuntime";
 import packageJson from "../../package.json";
 
 export type AppVersionPayload = {
@@ -105,5 +106,11 @@ export function dismissSoftUpdate(serverBuildId: string): void {
 }
 
 export function hardRefreshApp(): void {
+  if (isNativePlatform()) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("_refresh", String(Date.now()));
+    window.location.replace(`${url.pathname}${url.search}${url.hash}`);
+    return;
+  }
   window.location.reload();
 }
