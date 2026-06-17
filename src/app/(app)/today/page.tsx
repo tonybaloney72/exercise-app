@@ -110,6 +110,7 @@ function TodayPageInner() {
   const handleEditCompletedWorkout = () => {
     if (!completedLogForUi) return;
     setShowWorkoutDetails(false);
+    scrollTodayToTop();
     startEditingCompletedWorkout(completedLogForUi.id);
   };
   const pausedDraftTodayKey = useMemo(
@@ -191,6 +192,15 @@ function TodayPageInner() {
     !showPlanEditor &&
     !activeWorkout &&
     !hasPausedDraftToday;
+  /** Quick cardio + body weight — hidden during workout detail, more-details review, or live session. */
+  const showQuickLogsSection =
+    showQuickActivityLog &&
+    !showWorkoutDetails &&
+    (showTodaysCompletedReview || !workoutDetailOpen);
+  const showQuickLogsBeforeReview =
+    showQuickLogsSection && !showTodaysCompletedReview;
+  const showQuickLogsAfterReview =
+    showQuickLogsSection && showTodaysCompletedReview;
 
   const showWorkoutEntry =
     !activeWorkout && !completedLogForUi && !hasPausedDraftToday;
@@ -371,21 +381,22 @@ function TodayPageInner() {
         />
       ) : null}
 
-      {showQuickActivityLog &&
-        !showTodaysCompletedReview &&
-        !workoutDetailOpen && (
-          <AnimatedSection className="space-y-3" delay={0.12}>
-            <QuickActivityLog plan={plan} dateKey={todayKey} />
-            <WeightLogCard dateKey={todayKey} />
-          </AnimatedSection>
-        )}
+      {showQuickLogsBeforeReview ? (
+        <AnimatedSection className="space-y-3" delay={0.12}>
+          <QuickActivityLog plan={plan} dateKey={todayKey} />
+          <WeightLogCard dateKey={todayKey} />
+        </AnimatedSection>
+      ) : null}
 
       {/* Completed today - summary card unchanged */}
       {isTodaySession && showTodaysCompletedReview && !showWorkoutDetails && (
         <PostWorkoutSummary
           plan={plan}
           log={completedLogForUi!}
-          onMoreDetails={() => setShowWorkoutDetails(true)}
+          onMoreDetails={() => {
+            setShowWorkoutDetails(true);
+            scrollTodayToTop();
+          }}
           onEditWorkout={handleEditCompletedWorkout}
         />
       )}
@@ -394,7 +405,10 @@ function TodayPageInner() {
         <div className="space-y-3">
           <button
             type="button"
-            onClick={() => setShowWorkoutDetails(false)}
+            onClick={() => {
+              setShowWorkoutDetails(false);
+              scrollTodayToTop();
+            }}
             className="text-sm font-medium text-accent hover:underline"
           >
             ← Back to summary
@@ -413,12 +427,12 @@ function TodayPageInner() {
 
       <StaleWorkoutSessionsBanner hidden={hideStaleBanner} />
 
-      {showQuickActivityLog && showTodaysCompletedReview && (
+      {showQuickLogsAfterReview ? (
         <AnimatedSection className="space-y-3" delay={0.12}>
           <QuickActivityLog plan={plan} dateKey={todayKey} />
           <WeightLogCard dateKey={todayKey} />
         </AnimatedSection>
-      )}
+      ) : null}
     </div>
   );
 }
