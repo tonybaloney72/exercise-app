@@ -6,6 +6,7 @@ import {
   ensureCardioHealthReadAccess,
   fetchCardioHealthMetricsForWindow,
   importRecentCardioSessions,
+  openNativeHealthSettings,
   type ImportedCardioSession,
 } from "@/lib/health";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
@@ -31,7 +32,9 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
       const granted = await ensureCardioHealthReadAccess();
       clientTrace("health-import", "import_auth", { granted });
       if (!granted) {
-        toast.error("Health Connect access was not granted.");
+        toast.error(
+          "Health Connect did not respond or access was denied. Try opening Health Connect settings.",
+        );
         return;
       }
       const imported = await importRecentCardioSessions(kind);
@@ -105,6 +108,13 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
           {loading ? "Loading…" : "Import"}
         </button>
       </div>
+      <button
+        type="button"
+        onClick={() => void openNativeHealthSettings()}
+        className="text-xs font-medium text-accent hover:underline"
+      >
+        Open Health Connect settings
+      </button>
       {sessions && sessions.length > 0 ? (
         <ul className="space-y-1.5">
           {sessions.map((session) => {

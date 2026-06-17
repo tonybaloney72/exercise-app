@@ -12,29 +12,14 @@ import {
   requestNativeHealthAuthorization,
   writeNativeHealthSample,
 } from "@/lib/health/nativeHealth";
+import { isNativePlatform } from "@/lib/capacitorRuntime";
+import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 export const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
 
-export function withTimeout<T>(
-  promise: Promise<T>,
-  ms: number,
-  message = `Timed out after ${ms}ms`,
-): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(message)), ms);
-    promise
-      .then((value) => {
-        clearTimeout(timer);
-        resolve(value);
-      })
-      .catch((err) => {
-        clearTimeout(timer);
-        reject(err);
-      });
-  });
-}
+export { withTimeout } from "@/lib/async/withTimeout";
 
 export interface CardioHealthMeta {
   stepCount?: number;
@@ -111,8 +96,8 @@ export function mapWorkoutToImportedSession(workout: Workout): ImportedCardioSes
 }
 
 export async function hasCardioHealthReadAccess(): Promise<boolean> {
-  if (!(await isNativeHealthAvailable())) {
-    clientTrace("health-cardio", "hasReadAccess_skip", { reason: "unavailable" });
+  if (!isNativePlatform()) {
+    clientTrace("health-cardio", "hasReadAccess_skip", { reason: "not_native" });
     return false;
   }
   const status = await checkNativeHealthAuthorization({
@@ -130,13 +115,16 @@ export async function hasCardioHealthReadAccess(): Promise<boolean> {
 
 /** Prompts for Health Connect read access (use Import / explicit health flows only). */
 export async function ensureCardioHealthReadAccess(): Promise<boolean> {
-  if (!(await isNativeHealthAvailable())) return false;
+  if (!isNativePlatform()) return false;
   if (await hasCardioHealthReadAccess()) return true;
+  // Skip isAvailable() — it can hang on some devices; requestAuthorization opens HC directly.
   const status = await requestNativeHealthAuthorization({
     read: CARDIO_HEALTH_READ_TYPES,
     write: [],
   });
-  return (status?.readAuthorized.length ?? 0) > 0;
+  const granted = (status?.readAuthorized.length ?? 0) > 0;
+  clientTrace("health-cardio", "ensureReadAccess", { granted });
+  return granted;
 }
 
 export async function importRecentCardioSessions(
@@ -237,10 +225,6 @@ export async function enrichCardioHealthMeta(
     startDate: startDate.toISOString(),
     endDate: endDate.toISOString(),
   });
-  if (!(await isNativeHealthAvailable())) {
-    clientTrace("health-cardio", "enrich_skip", { reason: "unavailable" });
-    return base;
-  }
   if (!(await hasCardioHealthReadAccess())) {
     clientTrace("health-cardio", "enrich_skip", { reason: "not_authorized" });
     return base;

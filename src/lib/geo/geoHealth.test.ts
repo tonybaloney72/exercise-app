@@ -5,8 +5,8 @@ import {
   dominantHealthSampleSource,
   mapWorkoutToImportedSession,
   sumHealthSampleValues,
-  withTimeout,
 } from "@/lib/health/cardioHealth";
+import { withTimeout } from "@/lib/async/withTimeout";
 import { applyCardioHealthMeta } from "@/lib/health/cardioHealthFields";
 import { formatCardioHealthSummary } from "@/lib/health/cardioHealthDisplay";
 import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
