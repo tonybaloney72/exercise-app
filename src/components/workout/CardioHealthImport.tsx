@@ -40,7 +40,9 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
       const imported = await importRecentCardioSessions(kind);
       clientTrace("health-import", "import_sessions", { count: imported.length });
       if (imported.length === 0) {
-        toast.message("No recent sessions found in Health Connect.");
+        toast.message(
+          "No matching sessions in Health Connect. Try Start/End to pull data from your activity window.",
+        );
         setSessions([]);
         return;
       }
@@ -104,8 +106,7 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
         <div>
           <p className="text-sm font-medium text-foreground">Health Connect</p>
           <p className="text-xs text-muted mt-0.5">
-            Import distance, time, steps, calories, and heart rate from a recent
-            session.
+            Import a session from the last 48 hours if you forgot to track live.
           </p>
         </div>
         <button
@@ -150,8 +151,16 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
                   <span className="font-medium text-foreground">
                     {labelParts.join(" · ")}
                   </span>
-                  {session.sourceName ? (
-                    <span className="mt-0.5 block text-muted">{session.sourceName}</span>
+                  {session.workoutType ? (
+                    <span className="mt-0.5 block text-muted capitalize">
+                      {session.sourceName
+                        ? `${session.workoutType} · ${session.sourceName}`
+                        : session.workoutType}
+                    </span>
+                  ) : session.sourceName ? (
+                    <span className="mt-0.5 block text-muted">
+                      {session.sourceName}
+                    </span>
                   ) : null}
                 </button>
               </li>

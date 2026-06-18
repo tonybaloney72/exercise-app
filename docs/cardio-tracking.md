@@ -80,23 +80,27 @@ queryWorkouts_ok (workoutType: running) → import_sessions count: 0
 
 ---
 
-## Timed cardio log + Health Connect window (preferred UX)
+## Timed cardio log + Health Connect window (shipped)
 
-Replace or simplify the **Import** vs **GPS** fork on quick log:
+Quick log uses a unified **Start / End** flow (`CardioActivityRecorder` → `resolveCardioQuickLog`):
 
 1. User picks activity (**walk / jog / cycle / swim / hike / …**).
-2. **Start** / **End** records `startDate` / `endDate` only (no live GPS path required for primary distance).
-3. On **End**, pull Health Connect for that window:
-   - **First:** `queryWorkouts` for mapped type; if a session overlaps the window, use its distance / duration / source.
-   - **Else:** aggregate **distance**, **steps**, **active calories**, **avg HR** from samples (`readSamples` / existing enrich helpers).
-4. Pre-fill quick-log form; user confirms and saves (`activity_source`: `health_connect` or hybrid if GPS added later).
+2. **Start** runs timer + GPS (`GpsTrackSession.startImmediate()` on native).
+3. **End** resolves metrics via `resolveCardioQuickLog`:
+   - **First:** `queryWorkoutsOverlappingWindow` (no type filter) → rank by overlap, type match, GPS distance agreement → auto-pick or show up to 3 candidates.
+   - **Else:** aggregate **distance**, **steps**, **active calories**, **avg HR** from samples in the user window.
+   - **Else:** GPS distance + optional sample enrich.
+   - **Last:** timer-only (duration filled).
+4. Form pre-fills distance/time/health; user confirms and saves.
 
-**Why:** Matches how phones record activity (samples + occasional sessions). Avoids depending on exercise-session sync from Samsung / Pixel. GPS can remain optional enhancement.
+**Retroactive import:** "Import an earlier session instead" uses the same broad query + ranking (`importRecentCardioSessions`).
+
+**Resolution types:** `health_connect_session` | `health_connect_samples` | `gps` | `timer_only`
+
+**Distance authority:** session distance → sample distance → GPS distance (`pickDistanceMi` in `resolveCardioQuickLog.ts`).
 
 **Open product questions:**
 
-- Distance authority when both session distance and sample distance exist — prefer session, else sum distance records, else steps-only estimate?
-- Overlap matching when multiple HC sessions in window.
-- Whether to keep GPS as optional “route track” or deprecate for walk/jog on Android.
-- Minimum distance / route threshold to treat a session as cardio vs strength when type is generic `workout`.
-- Whether `@capgo/capacitor-health` exposes route or location series on `Workout` — if not, fall back to distance samples in the session window only.
+- Whether to keep improving GPS foreground service for screen-off accuracy (see GPS section).
+- Minimum distance / route threshold refinements for generic `workout` sessions.
+- Whether `@capgo/capacitor-health` exposes route series on `Workout` — if not, distance samples remain the fallback.

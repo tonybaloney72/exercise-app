@@ -69,6 +69,38 @@ export class GpsTrackSession {
     return this.startedAtMs;
   }
 
+  /** Start timer and GPS together (no separate warm-up modal). */
+  async startImmediate(): Promise<void> {
+    if (!isNativePlatform()) {
+      throw new Error("GPS tracking is only available in the Android app.");
+    }
+    if (this.watchId) return;
+
+    const { Geolocation } = await import("@capacitor/geolocation");
+    const status = await Geolocation.requestPermissions();
+    if (status.location !== "granted" && status.coarseLocation !== "granted") {
+      throw new Error("Location permission is required to track distance.");
+    }
+
+    this.points = [];
+    this.startedAtMs = Date.now();
+    this.phase = "recording";
+
+    this.watchId = await Geolocation.watchPosition(
+      {
+        enableHighAccuracy: true,
+        timeout: 20_000,
+        maximumAge: 2_000,
+      },
+      (position, error) => {
+        if (error || !position) return;
+        if (this.phase === "recording") {
+          this.appendPoint(position);
+        }
+      },
+    );
+  }
+
   /** Request location permission and wait for GPS (timer does not start yet). */
   async prepare(onUpdate?: WatchCallback): Promise<void> {
     if (!isNativePlatform()) {

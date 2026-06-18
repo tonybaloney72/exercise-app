@@ -16,6 +16,7 @@ import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { formatLocalDateKey } from "@/utils/localDateKey";
+import { rankCardioSessionsForImport } from "@/lib/health/cardioSessionMatch";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
@@ -24,6 +25,8 @@ export interface CardioHealthMeta {
   stepCount?: number;
   activeCaloriesKcal?: number;
   avgHeartRateBpm?: number;
+  /** Distance from HC samples in the user window (miles). */
+  distanceMi?: number;
   source?: CardioActivitySource;
   healthSourceName?: string;
 }
@@ -37,6 +40,7 @@ export interface ImportedCardioSession {
   startDate: Date;
   endDate: Date;
   sourceName?: string;
+  workoutType?: string;
 }
 
 export function sumHealthSampleValues(
@@ -91,6 +95,7 @@ export function mapWorkoutToImportedSession(workout: Workout): ImportedCardioSes
     startDate: new Date(workout.startDate),
     endDate: new Date(workout.endDate),
     sourceName: workout.sourceName,
+    workoutType: workout.workoutType,
   };
 }
 
@@ -131,17 +136,48 @@ export async function importRecentCardioSessions(
   lookbackHours = 48,
   limit = 8,
 ): Promise<ImportedCardioSession[]> {
-  const workoutType = cardioKindToWorkoutType(kind);
   const endDate = new Date();
   const startDate = new Date(endDate.getTime() - lookbackHours * 60 * 60 * 1000);
+  const workouts = await queryWorkoutsOverlappingWindow(startDate, endDate, {
+    limit: 40,
+  });
+  const sessions = workouts
+    .map(mapWorkoutToImportedSession)
+    .filter((s) => s.durationSeconds > 0);
+  const ranked = rankCardioSessionsForImport(kind, sessions);
+  return ranked.slice(0, limit).map((row) => row.session);
+}
+
+const WORKOUT_WINDOW_PAD_MS = 2 * 60 * 1000;
+
+/** All HC exercise sessions overlapping a time window (no strict type filter). */
+export async function queryWorkoutsOverlappingWindow(
+  startDate: Date,
+  endDate: Date,
+  options?: { limit?: number },
+): Promise<Workout[]> {
+  if (!isNativePlatform()) return [];
+  if (!(await hasCardioHealthReadAccess())) return [];
+
+  const paddedStart = new Date(startDate.getTime() - WORKOUT_WINDOW_PAD_MS);
+  const paddedEnd = new Date(endDate.getTime() + WORKOUT_WINDOW_PAD_MS);
+
   const workouts = await queryNativeWorkouts({
-    workoutType,
-    startDate: startDate.toISOString(),
-    endDate: endDate.toISOString(),
-    limit,
+    startDate: paddedStart.toISOString(),
+    endDate: paddedEnd.toISOString(),
+    limit: options?.limit ?? 30,
     ascending: false,
   });
-  return workouts.map(mapWorkoutToImportedSession).filter((s) => s.durationSeconds > 0);
+
+  const windowStart = startDate.getTime();
+  const windowEnd = endDate.getTime();
+
+  return workouts.filter((workout) => {
+    const s = Date.parse(workout.startDate);
+    const e = Date.parse(workout.endDate);
+    if (!Number.isFinite(s) || !Number.isFinite(e)) return false;
+    return e > windowStart && s < windowEnd;
+  });
 }
 
 async function fetchHeartRateAverage(
@@ -177,25 +213,37 @@ export async function fetchCardioHealthMetricsForWindow(
   const needsCalories =
     options?.activeCaloriesKcal == null || options.activeCaloriesKcal <= 0;
 
-  const [stepSamples, calorieSamples, avgHeartRateBpm] = await Promise.all([
-    readNativeHealthSamples({
-      dataType: "steps",
-      startDate: isoStart,
-      endDate: isoEnd,
-      limit: 500,
-    }),
-    needsCalories
-      ? readNativeHealthSamples({
-          dataType: "calories",
-          startDate: isoStart,
-          endDate: isoEnd,
-          limit: 500,
-        })
-      : Promise.resolve([]),
-    fetchHeartRateAverage(startDate, endDate),
-  ]);
+  const [stepSamples, distanceSamples, calorieSamples, avgHeartRateBpm] =
+    await Promise.all([
+      readNativeHealthSamples({
+        dataType: "steps",
+        startDate: isoStart,
+        endDate: isoEnd,
+        limit: 500,
+      }),
+      readNativeHealthSamples({
+        dataType: "distance",
+        startDate: isoStart,
+        endDate: isoEnd,
+        limit: 500,
+      }),
+      needsCalories
+        ? readNativeHealthSamples({
+            dataType: "calories",
+            startDate: isoStart,
+            endDate: isoEnd,
+            limit: 500,
+          })
+        : Promise.resolve([]),
+      fetchHeartRateAverage(startDate, endDate),
+    ]);
 
   const stepTotal = sumHealthSampleValues(stepSamples);
+  const distanceMeters = sumHealthSampleValues(distanceSamples);
+  const distanceMi =
+    distanceMeters > 0
+      ? Math.round(metersToMiles(distanceMeters) * 100) / 100
+      : undefined;
   const calorieTotal = needsCalories
     ? sumHealthSampleValues(calorieSamples)
     : options?.activeCaloriesKcal ?? 0;
@@ -203,6 +251,7 @@ export async function fetchCardioHealthMetricsForWindow(
   const healthSourceName =
     options?.healthSourceName?.trim() ||
     dominantHealthSampleSource(stepSamples) ||
+    dominantHealthSampleSource(distanceSamples) ||
     dominantHealthSampleSource(calorieSamples);
 
   return {
@@ -210,6 +259,7 @@ export async function fetchCardioHealthMetricsForWindow(
     activeCaloriesKcal:
       calorieTotal > 0 ? Math.round(calorieTotal) : options?.activeCaloriesKcal,
     avgHeartRateBpm,
+    distanceMi,
     healthSourceName,
   };
 }
@@ -257,6 +307,7 @@ export async function enrichCardioHealthMeta(
       stepCount: fetched.stepCount ?? base?.stepCount,
       activeCaloriesKcal: fetched.activeCaloriesKcal ?? base?.activeCaloriesKcal,
       avgHeartRateBpm: fetched.avgHeartRateBpm ?? base?.avgHeartRateBpm,
+      distanceMi: fetched.distanceMi ?? base?.distanceMi,
       healthSourceName: fetched.healthSourceName ?? base?.healthSourceName,
       source: base?.source,
     };

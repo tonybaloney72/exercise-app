@@ -12,15 +12,15 @@ import {
   cardioKindAllowed,
 } from "@/lib/cardioActivities";
 import { formatSecondsToMMSS, parseTimeInput } from "@/utils/time";
-import CardioGpsTracker from "@/components/workout/CardioGpsTracker";
+import CardioActivityRecorder from "@/components/workout/CardioActivityRecorder";
 import CardioHealthImport from "@/components/workout/CardioHealthImport";
 import {
-  enrichCardioHealthMeta,
   formatCardioHealthSummary,
   writeCardioSessionToHealth,
   type CardioHealthMeta,
   type ImportedCardioSession,
 } from "@/lib/health";
+import type { ResolvedCardioQuickLog } from "@/lib/health/resolveCardioQuickLog";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -28,8 +28,6 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import type { CardioActivityKind, DayPlan } from "@/types";
 
 const PRIMARY_KINDS: CardioActivityKind[] = ["walk", "jog"];
-
-const GPS_KINDS: CardioActivityKind[] = ["walk", "jog"];
 
 type Props = {
   plan: DayPlan;
@@ -46,13 +44,17 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     null,
   );
   const [morePickerOpen, setMorePickerOpen] = useState(false);
+  const [showEarlierImport, setShowEarlierImport] = useState(false);
   const [distanceInput, setDistanceInput] = useState("");
   const [timeInput, setTimeInput] = useState("");
   const [healthMeta, setHealthMeta] = useState<CardioHealthMeta | undefined>();
-  const [gpsSession, setGpsSession] = useState<{
+  const [activityWindow, setActivityWindow] = useState<{
     startDate: Date;
     endDate: Date;
   } | null>(null);
+  const [resolution, setResolution] = useState<
+    ResolvedCardioQuickLog["resolution"] | null
+  >(null);
   const [saving, setSaving] = useState(false);
 
   const moreKinds = useMemo(
@@ -67,15 +69,31 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
 
   const closeLogModal = useCallback(() => {
     setPendingKind(null);
+    setShowEarlierImport(false);
     setDistanceInput("");
     setTimeInput("");
     setHealthMeta(undefined);
-    setGpsSession(null);
+    setActivityWindow(null);
+    setResolution(null);
   }, []);
 
   function openLogForm(kind: CardioActivityKind) {
     setMorePickerOpen(false);
     setPendingKind(kind);
+    setShowEarlierImport(false);
+  }
+
+  function applyResolved(result: ResolvedCardioQuickLog) {
+    if (result.distanceMi != null) {
+      setDistanceInput(String(result.distanceMi));
+    }
+    setTimeInput(formatSecondsToMMSS(result.durationSeconds));
+    setHealthMeta(result.health);
+    setActivityWindow({
+      startDate: result.startDate,
+      endDate: result.endDate,
+    });
+    setResolution(result.resolution);
   }
 
   function applyImportedSession(session: ImportedCardioSession) {
@@ -90,21 +108,11 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
       source: "health_connect",
       healthSourceName: session.sourceName,
     });
-    setGpsSession({ startDate: session.startDate, endDate: session.endDate });
-  }
-
-  function applyGpsTrack(result: {
-    distanceMi?: number;
-    durationSeconds: number;
-    startDate: Date;
-    endDate: Date;
-  }) {
-    if (result.distanceMi != null) {
-      setDistanceInput(String(result.distanceMi));
-    }
-    setTimeInput(formatSecondsToMMSS(result.durationSeconds));
-    setHealthMeta((prev) => ({ ...prev, source: "gps" }));
-    setGpsSession({ startDate: result.startDate, endDate: result.endDate });
+    setActivityWindow({
+      startDate: session.startDate,
+      endDate: session.endDate,
+    });
+    setResolution("health_connect_session");
   }
 
   async function handleSave() {
@@ -126,23 +134,18 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     setSaving(true);
     clientTrace("cardio-save", "save_click", {
       kind: pendingKind,
-      hasGpsSession: Boolean(gpsSession),
+      hasActivityWindow: Boolean(activityWindow),
       hasDistance,
       hasDuration,
       healthSource: healthMeta?.source,
+      resolution,
     });
     try {
-      let resolvedHealth = healthMeta;
-      if (gpsSession && isNativePlatform()) {
-        resolvedHealth = await enrichCardioHealthMeta(
-          gpsSession.startDate,
-          gpsSession.endDate,
-          healthMeta,
-        );
-      }
+      const resolvedHealth = healthMeta;
       clientTrace("cardio-save", "quickLog_invoke", {
         healthSource: resolvedHealth?.source,
         stepCount: resolvedHealth?.stepCount,
+        resolution,
       });
       const ok = await quickLogCardio(plan, dateKey, pendingKind, {
         distanceMi: hasDistance ? distanceMi : undefined,
@@ -150,13 +153,13 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
         health: resolvedHealth,
       });
       clientTrace("cardio-save", ok ? "quickLog_ok" : "quickLog_failed");
-      if (ok && isNativePlatform() && gpsSession && resolvedHealth?.source === "gps") {
+      if (ok && isNativePlatform() && activityWindow && resolution === "gps") {
         void writeCardioSessionToHealth({
           distanceMi: hasDistance ? distanceMi : undefined,
           durationSeconds: hasDuration ? durationSeconds! : 0,
           activeCaloriesKcal: resolvedHealth?.activeCaloriesKcal,
-          startDate: gpsSession.startDate,
-          endDate: gpsSession.endDate,
+          startDate: activityWindow.startDate,
+          endDate: activityWindow.endDate,
         }).catch(() => {
           // Optional mirror to Health Connect; logging in-app already succeeded.
         });
@@ -217,7 +220,9 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
             <span className="text-xl text-muted" aria-hidden>
               ⋯
             </span>
-            <span className="text-caption font-medium text-foreground">More</span>
+            <span className="text-caption font-medium text-foreground">
+              More
+            </span>
           </button>
         </div>
       </SurfaceCard>
@@ -236,7 +241,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
         open={pendingKind != null}
         onClose={closeLogModal}
         title={modalTitle}
-        hint="Distance and/or time required."
+        hint="Start and end your activity, then confirm distance and time."
         ariaLabel={modalTitle}
         placement="center"
         initialFocus="none"
@@ -262,13 +267,34 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
           </div>
         }
       >
-        <div className="flex flex-col gap-3 px-4 py-1">
-          {pendingKind && GPS_KINDS.includes(pendingKind) ? (
-            <CardioGpsTracker onComplete={applyGpsTrack} />
-          ) : null}
+        <div className="flex flex-col gap-3 p-4">
           {pendingKind ? (
-            <CardioHealthImport kind={pendingKind} onImport={applyImportedSession} />
+            <CardioActivityRecorder
+              kind={pendingKind}
+              onResolved={applyResolved}
+            />
           ) : null}
+
+          {pendingKind && isNativePlatform() ? (
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setShowEarlierImport((v) => !v)}
+                className="text-xs font-medium text-accent hover:underline text-left"
+              >
+                {showEarlierImport
+                  ? "Hide earlier Health Connect sessions"
+                  : "Import an earlier session instead"}
+              </button>
+              {showEarlierImport ? (
+                <CardioHealthImport
+                  kind={pendingKind}
+                  onImport={applyImportedSession}
+                />
+              ) : null}
+            </div>
+          ) : null}
+
           <label className="block">
             <span className="text-caption text-muted uppercase tracking-wider">
               Distance (mi)
