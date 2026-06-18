@@ -41,6 +41,7 @@ import type {
   SubmitExerciseFeedbackInput,
   SubmitGeneralFeedbackInput,
   WeightEntryRepo,
+  DailyHealthMetricRepo,
 } from "./types";
 import type { WorkoutDayTemplate } from "@/types";
 import {
@@ -48,6 +49,12 @@ import {
   sanitizeTemplateSnapshot,
 } from "@/lib/workoutDayTemplates";
 import { DEFAULT_SETTINGS } from "./types";
+import type {
+  HealthDailyMetricRecord,
+  HealthDailyMetricUpsert,
+  HealthMetricAggMethod,
+  HealthMetricCategory,
+} from "@/types/healthDailyMetrics";
 import {
   ALL_EXERCISE_EQUIPMENT,
   DEFAULT_AVAILABLE_EQUIPMENT,
@@ -1021,6 +1028,101 @@ export const supabaseWeightEntryRepo: WeightEntryRepo = {
 
     if (error) {
       console.error("[supabaseWeightEntryRepo.upsert]", error);
+      throw error;
+    }
+  },
+};
+
+interface HealthDailyMetricRow {
+  log_date: string;
+  category: HealthMetricCategory;
+  metric_key: string;
+  value_num: number | string | null;
+  value_json: Record<string, unknown> | null;
+  unit: string;
+  agg_method: HealthMetricAggMethod;
+  source: string;
+  synced_at: string;
+}
+
+function mapHealthDailyMetricRow(row: HealthDailyMetricRow): HealthDailyMetricRecord {
+  return {
+    logDate:
+      typeof row.log_date === "string"
+        ? row.log_date.slice(0, 10)
+        : String(row.log_date),
+    category: row.category,
+    metricKey: row.metric_key as HealthDailyMetricRecord["metricKey"],
+    valueNum: row.value_num == null ? null : Number(row.value_num),
+    valueJson: row.value_json,
+    unit: row.unit,
+    aggMethod: row.agg_method,
+    source: row.source,
+    syncedAt: row.synced_at,
+  };
+}
+
+function mapHealthDailyMetricUpsert(
+  userId: string,
+  entry: HealthDailyMetricUpsert,
+): Record<string, unknown> {
+  return {
+    user_id: userId,
+    log_date: entry.logDate,
+    category: entry.category,
+    metric_key: entry.metricKey,
+    value_num: entry.valueNum,
+    value_json: entry.valueJson,
+    unit: entry.unit,
+    agg_method: entry.aggMethod,
+    source: entry.source,
+    synced_at: entry.syncedAt ?? new Date().toISOString(),
+  };
+}
+
+export const supabaseDailyHealthMetricRepo: DailyHealthMetricRepo = {
+  async listSince(sinceDateKey: string) {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from("health_daily_metrics")
+      .select(
+        "log_date, category, metric_key, value_num, value_json, unit, agg_method, source, synced_at",
+      )
+      .eq("user_id", user.id)
+      .gte("log_date", sinceDateKey)
+      .order("log_date", { ascending: true });
+
+    if (error) {
+      console.error("[supabaseDailyHealthMetricRepo.listSince]", error);
+      return [];
+    }
+
+    return (data ?? []).map((row) =>
+      mapHealthDailyMetricRow(row as HealthDailyMetricRow),
+    );
+  },
+
+  async upsertMany(entries) {
+    if (entries.length === 0) return;
+
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not signed in");
+
+    const { error } = await supabase.from("health_daily_metrics").upsert(
+      entries.map((entry) => mapHealthDailyMetricUpsert(user.id, entry)),
+      { onConflict: "user_id,log_date,metric_key" },
+    );
+
+    if (error) {
+      console.error("[supabaseDailyHealthMetricRepo.upsertMany]", error);
       throw error;
     }
   },

@@ -5,6 +5,7 @@ import {
   localWorkoutRepo,
 } from "@/lib/repos/local";
 import { localWeightEntryRepo } from "@/lib/repos/weightLocal";
+import { localDailyHealthMetricRepo } from "@/lib/repos/healthDailyLocal";
 import {
   hasLocalStoredSettings,
   mergeMigratedSettings,
@@ -14,6 +15,7 @@ import {
   supabaseSettingsRepo,
   supabaseWorkoutRepo,
   supabaseWeightEntryRepo,
+  supabaseDailyHealthMetricRepo,
 } from "@/lib/repos/supabase";
 import { hydrateWorkoutLog } from "@/utils/exerciseLogDefaults";
 
@@ -79,6 +81,22 @@ export async function migrateLocalDataIfNeeded(userId: string): Promise<void> {
         console.error(
           "[migrateLocalDataIfNeeded] failed weight entry",
           entry.date,
+          err,
+        );
+      }
+    }
+
+    const localHealthMetrics = await localDailyHealthMetricRepo.listSince(
+      "1970-01-01",
+    );
+    if (localHealthMetrics.length > 0) {
+      try {
+        await supabaseDailyHealthMetricRepo.upsertMany(
+          localHealthMetrics.map(({ syncedAt, ...entry }) => entry),
+        );
+      } catch (err) {
+        console.error(
+          "[migrateLocalDataIfNeeded] failed health daily metrics",
           err,
         );
       }

@@ -7,17 +7,25 @@ import {
   fetchDailyHealthMetricsForKeys,
   lastNLocalDateKeys,
 } from "@/lib/health/cardioHealth";
-import { buildDailyStepsChartSeries } from "@/lib/health/dailyStepsChart";
+import {
+  buildDailyHealthProgressFromRecords,
+  mergeLiveTodayOverProgressView,
+  recordsHaveAnySyncedData,
+} from "@/lib/health/dailyHealthRecords";
+import {
+  DAILY_HEALTH_CHART_DAYS,
+  syncDailyHealthMetricsToRepo,
+} from "@/lib/health/dailyHealthSync";
 import type { DailyStepsChartPoint } from "@/lib/health/dailyStepsChart";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
+import { getDailyHealthMetricRepo } from "@/lib/repos";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
-
-const DAILY_HEALTH_CHART_DAYS = 14;
 
 export type DailyHealthUnavailableReason = "web" | "no_access";
 
 export type DailyHealthState = {
-  /** Native app with Health Connect read access granted. */
+  /** Health data available from HC and/or synced daily metrics. */
   available: boolean;
   loading: boolean;
   todaySteps: number | null;
@@ -29,8 +37,9 @@ export type DailyHealthState = {
 };
 
 export function useDailyHealthFromHealth(): DailyHealthState {
+  const authMode = useAuthStore((s) => s.mode);
   const [available, setAvailable] = useState(false);
-  const [loading, setLoading] = useState(isNativePlatform());
+  const [loading, setLoading] = useState(true);
   const [todaySteps, setTodaySteps] = useState<number | null>(null);
   const [todayActiveKcal, setTodayActiveKcal] = useState<number | null>(null);
   const [todayAvgHeartRateBpm, setTodayAvgHeartRateBpm] = useState<number | null>(
@@ -38,62 +47,81 @@ export function useDailyHealthFromHealth(): DailyHealthState {
   );
   const [chartSeries, setChartSeries] = useState<DailyStepsChartPoint[]>([]);
   const [unavailableReason, setUnavailableReason] =
-    useState<DailyHealthUnavailableReason | null>(
-      isNativePlatform() ? null : "web",
-    );
+    useState<DailyHealthUnavailableReason | null>(null);
+
+  const applyView = useCallback(
+    (view: ReturnType<typeof buildDailyHealthProgressFromRecords>) => {
+      setTodaySteps(view.todaySteps);
+      setTodayActiveKcal(view.todayActiveKcal);
+      setTodayAvgHeartRateBpm(view.todayAvgHeartRateBpm);
+      setChartSeries(view.chartSeries);
+    },
+    [],
+  );
 
   const load = useCallback(async () => {
-    if (!isNativePlatform()) {
-      setAvailable(false);
-      setLoading(false);
-      setTodaySteps(null);
-      setTodayActiveKcal(null);
-      setTodayAvgHeartRateBpm(null);
-      setChartSeries([]);
-      setUnavailableReason("web");
-      return;
-    }
+    if (authMode === "loading") return;
 
     setLoading(true);
     try {
-      const granted = await checkCardioHealthReadAccess();
-      if (!granted) {
-        setAvailable(false);
-        setTodaySteps(null);
-        setTodayActiveKcal(null);
-        setTodayAvgHeartRateBpm(null);
-        setChartSeries([]);
-        setUnavailableReason("no_access");
-        return;
-      }
-
-      setAvailable(true);
-      setUnavailableReason(null);
       const now = new Date();
       const todayKey = formatLocalDateKey(now);
       const dayKeys = lastNLocalDateKeys(DAILY_HEALTH_CHART_DAYS, now);
-      const [today, byDate] = await Promise.all([
-        fetchDailyHealthMetrics(todayKey, now),
-        fetchDailyHealthMetricsForKeys(dayKeys, now),
-      ]);
+      const sinceKey = dayKeys[0] ?? todayKey;
+      const repo = getDailyHealthMetricRepo(authMode);
 
-      setTodaySteps(today?.steps ?? null);
-      setTodayActiveKcal(today?.activeKcal ?? null);
-      setTodayAvgHeartRateBpm(today?.avgHeartRateBpm ?? null);
-      setChartSeries(
-        buildDailyStepsChartSeries(
-          Object.fromEntries(
-            Object.entries(byDate).map(([date, metrics]) => [
-              date,
-              metrics.steps,
-            ]),
-          ),
-        ),
-      );
+      let records = await repo.listSince(sinceKey);
+      let view = buildDailyHealthProgressFromRecords(records, todayKey, dayKeys);
+
+      let hcGranted = false;
+      if (isNativePlatform()) {
+        hcGranted = await checkCardioHealthReadAccess();
+        if (hcGranted) {
+          const metricsByDate = await fetchDailyHealthMetricsForKeys(
+            dayKeys,
+            now,
+          );
+          const liveToday = await fetchDailyHealthMetrics(todayKey, now);
+
+          try {
+            await syncDailyHealthMetricsToRepo({
+              repo,
+              todayKey,
+              metricsByDate,
+            });
+            records = await repo.listSince(sinceKey);
+            view = buildDailyHealthProgressFromRecords(
+              records,
+              todayKey,
+              dayKeys,
+            );
+          } catch (err) {
+            console.error("[useDailyHealthFromHealth] sync failed", err);
+          }
+
+          view = mergeLiveTodayOverProgressView(view, todayKey, liveToday);
+          setAvailable(true);
+          setUnavailableReason(null);
+          applyView(view);
+          return;
+        }
+      }
+
+      const hasSynced = recordsHaveAnySyncedData(records);
+      setAvailable(hasSynced);
+      applyView(view);
+
+      if (hasSynced) {
+        setUnavailableReason(null);
+      } else if (isNativePlatform()) {
+        setUnavailableReason("no_access");
+      } else {
+        setUnavailableReason("web");
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [applyView, authMode]);
 
   useEffect(() => {
     void load();

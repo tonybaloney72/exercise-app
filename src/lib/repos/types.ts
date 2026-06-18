@@ -75,6 +75,15 @@ export interface WeightEntryRepo {
   upsert(dateKey: string, weightLb: number): Promise<void>;
 }
 
+export interface DailyHealthMetricRepo {
+  listSince(sinceDateKey: string): Promise<
+    import("@/types/healthDailyMetrics").HealthDailyMetricRecord[]
+  >;
+  upsertMany(
+    entries: import("@/types/healthDailyMetrics").HealthDailyMetricUpsert[],
+  ): Promise<void>;
+}
+
 export type SubmitGeneralFeedbackInput = {
   category: "bug" | "suggestion" | "other";
   details: string;

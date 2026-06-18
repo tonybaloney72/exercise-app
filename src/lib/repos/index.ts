@@ -9,6 +9,7 @@ import {
   localWorkoutDayTemplateRepo,
 } from "./local";
 import { localWeightEntryRepo } from "./weightLocal";
+import { localDailyHealthMetricRepo } from "./healthDailyLocal";
 import {
   supabaseExercisePreferenceRepo,
   supabaseExerciseSettingsRepo,
@@ -18,6 +19,7 @@ import {
   supabaseWorkoutDayTemplateRepo,
   supabaseUserFeedbackRepo,
   supabaseWeightEntryRepo,
+  supabaseDailyHealthMetricRepo,
 } from "./supabase";
 import type {
   ExercisePreferenceRepo,
@@ -28,6 +30,7 @@ import type {
   WorkoutDayTemplateRepo,
   UserFeedbackRepo,
   WeightEntryRepo,
+  DailyHealthMetricRepo,
 } from "./types";
 
 export type {
@@ -41,6 +44,7 @@ export type {
   TrainingWeekRepo,
   WorkoutDayTemplateRepo,
   WeightEntryRepo,
+  DailyHealthMetricRepo,
 } from "./types";
 export { DEFAULT_SETTINGS } from "./types";
 
@@ -91,4 +95,10 @@ export function getUserFeedbackRepo(): UserFeedbackRepo {
 
 export function getWeightEntryRepo(mode: AuthMode): WeightEntryRepo {
   return isSupabaseMode(mode) ? supabaseWeightEntryRepo : localWeightEntryRepo;
+}
+
+export function getDailyHealthMetricRepo(mode: AuthMode): DailyHealthMetricRepo {
+  return isSupabaseMode(mode)
+    ? supabaseDailyHealthMetricRepo
+    : localDailyHealthMetricRepo;
 }

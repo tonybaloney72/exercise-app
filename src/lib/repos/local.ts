@@ -23,6 +23,7 @@ import type {
 import { migrateExerciseId, migrateWorkoutLog } from "@/lib/cpToPcMigration";
 import { clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
+import { LOCAL_HEALTH_DAILY_METRICS_KEY } from "@/lib/repos/healthDailyLocal";
 import { DEFAULT_SETTINGS } from "./types";
 
 const LOCAL_HISTORY_KEY = "exercise-app-history";
@@ -246,4 +247,5 @@ export function clearLocalData(): void {
   localStorage.removeItem(LOCAL_EXERCISE_SETTINGS_KEY);
   localStorage.removeItem(LOCAL_WORKOUT_TEMPLATES_KEY);
   localStorage.removeItem(LOCAL_WEIGHT_ENTRIES_KEY);
+  localStorage.removeItem(LOCAL_HEALTH_DAILY_METRICS_KEY);
 }
