@@ -12,6 +12,7 @@ import {
   Legend,
 } from "recharts";
 import type { DailyStepsChartPoint } from "@/lib/health/dailyStepsChart";
+import type { DailyHealthUnavailableReason } from "@/hooks/useDailyHealthFromHealth";
 import { PROGRESS_LINE_CHART_HEIGHT } from "@/components/progress/chartLayout";
 
 const tooltipStyle: CSSProperties = {
@@ -27,9 +28,21 @@ const axisTick = { fill: "var(--muted)", fontSize: 11 };
 interface Props {
   series: DailyStepsChartPoint[];
   loading?: boolean;
+  unavailableReason?: DailyHealthUnavailableReason | null;
 }
 
-export default function DailyStepsProgressChart({ series, loading }: Props) {
+function unavailableCopy(reason: DailyHealthUnavailableReason): string {
+  if (reason === "web") {
+    return "Daily step totals sync from Health Connect in the Android app.";
+  }
+  return "Connect Health Connect in Settings to see daily step totals.";
+}
+
+export default function DailyStepsProgressChart({
+  series,
+  loading,
+  unavailableReason,
+}: Props) {
   if (loading) {
     return (
       <div className="flex flex-col gap-3">
@@ -41,7 +54,26 @@ export default function DailyStepsProgressChart({ series, loading }: Props) {
     );
   }
 
-  if (series.length === 0) return null;
+  if (series.length === 0) {
+    return (
+      <div className="flex flex-col gap-3">
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">Daily steps</h2>
+          <p className="text-xs text-muted mt-0.5">
+            Total steps per calendar day from Health Connect (today through midnight
+            so far).
+          </p>
+        </div>
+        <div className="w-full rounded-xl border border-dashed border-border bg-surface/50 px-4 py-8 text-center">
+          <p className="text-sm text-muted">
+            {unavailableReason
+              ? unavailableCopy(unavailableReason)
+              : "No step data for the last two weeks yet."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3">

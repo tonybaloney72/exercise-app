@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
-import { useDailyStepsFromHealth } from "@/hooks/useDailyStepsFromHealth";
+import { useDailyHealthFromHealth } from "@/hooks/useDailyHealthFromHealth";
 import TabEnterMotion from "@/components/common/TabEnterMotion";
 import ProgressPageSkeleton from "@/components/common/ProgressPageSkeleton";
 import ProgressChartsSkeleton from "@/components/progress/ProgressChartsSkeleton";
@@ -13,7 +13,6 @@ import {
   buildCardioMilesTotals,
   formatCardioRecentLine,
 } from "@/lib/resolveWorkoutCardio";
-import { buildCardioHealthTotals } from "@/utils/cardioHealthProgressStats";
 import {
   CARDIO_ACTIVITY_ORDER,
   CARDIO_KIND_TO_EXERCISE_ID,
@@ -27,7 +26,14 @@ import RotatingCardioStatCard, {
 type ProgressStatCard = CardioStatCard;
 type ProgressGridItem =
   | ProgressStatCard
+  | { kind: "health-rotate"; healthStats: CardioStatCard[] }
   | { kind: "cardio-rotate"; cardioStats: CardioStatCard[] };
+
+function isRotatingHealthSlot(
+  item: ProgressGridItem,
+): item is { kind: "health-rotate"; healthStats: CardioStatCard[] } {
+  return "kind" in item && item.kind === "health-rotate";
+}
 
 function isRotatingCardioSlot(
   item: ProgressGridItem,
@@ -51,10 +57,20 @@ const ProgressChartsBlock = dynamic(
   { ssr: false, loading: () => <ProgressChartsSkeleton /> },
 );
 
+function formatDailyHealthStatValue(
+  loading: boolean,
+  value: number | null,
+  format: (value: number) => string = (v) => v.toLocaleString(),
+): string {
+  if (loading) return "…";
+  if (value == null) return "—";
+  return format(value);
+}
+
 export default function ProgressPage() {
   const historyReady = useHistoryReady();
   const { workoutHistory } = useWorkoutStore();
-  const dailySteps = useDailyStepsFromHealth();
+  const dailyHealth = useDailyHealthFromHealth();
 
   const completedHistory = useMemo(
     () => filterCompletedWorkouts(workoutHistory),
@@ -83,9 +99,8 @@ export default function ProgressPage() {
     }
 
     const cardioMiles = buildCardioMilesTotals(completedHistory);
-    const cardioHealth = buildCardioHealthTotals(completedHistory);
 
-    return { totalWorkouts, currentStreak, cardioMiles, cardioHealth };
+    return { totalWorkouts, currentStreak, cardioMiles };
   }, [completedHistory]);
 
   const statCards = useMemo(() => {
@@ -118,28 +133,49 @@ export default function ProgressPage() {
       ];
     });
 
-    const healthStats: ProgressStatCard[] = [];
-    if (dailySteps.available && dailySteps.todaySteps != null) {
-      healthStats.push({
+    const healthStats: ProgressStatCard[] = [
+      {
         label: "Steps today",
-        value: dailySteps.todaySteps.toLocaleString(),
+        value: formatDailyHealthStatValue(
+          dailyHealth.loading,
+          dailyHealth.todaySteps,
+        ),
         icon: "👟",
-      });
-    }
-    if (stats.cardioHealth.totalActiveKcal > 0) {
-      healthStats.push({
-        label: "Active kcal",
-        value: Math.round(stats.cardioHealth.totalActiveKcal).toLocaleString(),
+      },
+      {
+        label: "Active kcal today",
+        value: formatDailyHealthStatValue(
+          dailyHealth.loading,
+          dailyHealth.todayActiveKcal,
+        ),
         icon: "⚡",
-      });
-    }
+      },
+      {
+        label: "Avg HR today",
+        value: formatDailyHealthStatValue(
+          dailyHealth.loading,
+          dailyHealth.todayAvgHeartRateBpm,
+          (v) => `${Math.round(v)} bpm`,
+        ),
+        icon: "❤️",
+      },
+    ];
 
     return { base, cardioStats, healthStats };
-  }, [stats, dailySteps.available, dailySteps.todaySteps]);
+  }, [
+    stats,
+    dailyHealth.loading,
+    dailyHealth.todaySteps,
+    dailyHealth.todayActiveKcal,
+    dailyHealth.todayAvgHeartRateBpm,
+  ]);
 
   const gridCards = useMemo((): ProgressGridItem[] => {
     const { base, cardioStats, healthStats } = statCards;
-    const items: ProgressGridItem[] = [...base, ...healthStats];
+    const items: ProgressGridItem[] = [
+      ...base,
+      { kind: "health-rotate", healthStats },
+    ];
     if (cardioStats.length <= 1) {
       return [...items, ...cardioStats];
     }
@@ -160,7 +196,11 @@ export default function ProgressPage() {
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3">
         {gridCards.map((card, i) =>
-          isRotatingCardioSlot(card) ? (
+          isRotatingHealthSlot(card) ? (
+            <TabEnterMotion key="health-stats-rotate" delay={i * 0.05}>
+              <RotatingCardioStatCard cards={card.healthStats} />
+            </TabEnterMotion>
+          ) : isRotatingCardioSlot(card) ? (
             <TabEnterMotion key="cardio-stats-rotate" delay={i * 0.05}>
               <RotatingCardioStatCard cards={card.cardioStats} />
             </TabEnterMotion>
@@ -184,8 +224,9 @@ export default function ProgressPage() {
 
       <ProgressChartsBlock
         history={completedHistory}
-        dailyStepsSeries={dailySteps.chartSeries}
-        dailyStepsLoading={dailySteps.loading && dailySteps.available}
+        dailyStepsSeries={dailyHealth.chartSeries}
+        dailyStepsLoading={dailyHealth.loading && dailyHealth.available}
+        dailyStepsUnavailableReason={dailyHealth.unavailableReason}
       />
 
       {completedHistory.length > 0 && (

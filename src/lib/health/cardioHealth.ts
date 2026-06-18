@@ -300,41 +300,105 @@ export function lastNLocalDateKeys(
   return keys;
 }
 
+export type DailyHealthDayMetrics = {
+  steps: number;
+  activeKcal: number;
+  avgHeartRateBpm?: number;
+};
+
+function averageHealthSampleValues(
+  samples: ReadonlyArray<{ value: number }>,
+): number | undefined {
+  const values = samples
+    .map((sample) => sample.value)
+    .filter((value) => Number.isFinite(value) && value > 0);
+  if (values.length === 0) return undefined;
+  const total = values.reduce((sum, value) => sum + value, 0);
+  return Math.round(total / values.length);
+}
+
+/** Health Connect totals for one local calendar day (midnight → now if today). */
+export async function fetchDailyHealthMetrics(
+  dateKey: string,
+  now: Date = new Date(),
+): Promise<DailyHealthDayMetrics | undefined> {
+  if (!isNativePlatform()) return undefined;
+  if (!(await hasCardioHealthReadAccess())) return undefined;
+
+  const { start, end } = localDayHealthWindow(dateKey, now);
+  const isoStart = start.toISOString();
+  const isoEnd = end.toISOString();
+
+  const [stepSamples, calorieSamples, heartRateSamples] = await Promise.all([
+    readNativeHealthSamples({
+      dataType: "steps",
+      startDate: isoStart,
+      endDate: isoEnd,
+      limit: 500,
+    }),
+    readNativeHealthSamples({
+      dataType: "calories",
+      startDate: isoStart,
+      endDate: isoEnd,
+      limit: 500,
+    }),
+    readNativeHealthSamples({
+      dataType: "heartRate",
+      startDate: isoStart,
+      endDate: isoEnd,
+      limit: 500,
+    }),
+  ]);
+
+  const steps = Math.round(sumHealthSampleValues(stepSamples));
+  const activeKcal = Math.round(sumHealthSampleValues(calorieSamples));
+  const avgHeartRateBpm = averageHealthSampleValues(heartRateSamples);
+
+  return {
+    steps,
+    activeKcal,
+    ...(avgHeartRateBpm != null ? { avgHeartRateBpm } : {}),
+  };
+}
+
+export async function fetchDailyHealthMetricsForKeys(
+  dateKeys: readonly string[],
+  now: Date = new Date(),
+): Promise<Record<string, DailyHealthDayMetrics>> {
+  if (!isNativePlatform() || dateKeys.length === 0) return {};
+  if (!(await hasCardioHealthReadAccess())) return {};
+
+  const entries = await Promise.all(
+    dateKeys.map(async (dateKey) => {
+      const metrics = await fetchDailyHealthMetrics(dateKey, now);
+      return [dateKey, metrics] as const;
+    }),
+  );
+
+  const out: Record<string, DailyHealthDayMetrics> = {};
+  for (const [dateKey, metrics] of entries) {
+    if (metrics != null) out[dateKey] = metrics;
+  }
+  return out;
+}
+
 /** Steps from Health Connect for one local calendar day (midnight → now if today). */
 export async function fetchDailyStepCount(
   dateKey: string,
   now: Date = new Date(),
 ): Promise<number | undefined> {
-  if (!isNativePlatform()) return undefined;
-  if (!(await hasCardioHealthReadAccess())) return undefined;
-
-  const { start, end } = localDayHealthWindow(dateKey, now);
-  const samples = await readNativeHealthSamples({
-    dataType: "steps",
-    startDate: start.toISOString(),
-    endDate: end.toISOString(),
-    limit: 500,
-  });
-  return Math.round(sumHealthSampleValues(samples));
+  const metrics = await fetchDailyHealthMetrics(dateKey, now);
+  return metrics?.steps;
 }
 
 export async function fetchDailyStepCountsForKeys(
   dateKeys: readonly string[],
   now: Date = new Date(),
 ): Promise<Record<string, number>> {
-  if (!isNativePlatform() || dateKeys.length === 0) return {};
-  if (!(await hasCardioHealthReadAccess())) return {};
-
-  const entries = await Promise.all(
-    dateKeys.map(async (dateKey) => {
-      const count = await fetchDailyStepCount(dateKey, now);
-      return [dateKey, count] as const;
-    }),
-  );
-
+  const byDate = await fetchDailyHealthMetricsForKeys(dateKeys, now);
   const out: Record<string, number> = {};
-  for (const [dateKey, count] of entries) {
-    if (count != null) out[dateKey] = count;
+  for (const [dateKey, metrics] of Object.entries(byDate)) {
+    out[dateKey] = metrics.steps;
   }
   return out;
 }
