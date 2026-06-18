@@ -12,7 +12,10 @@
     "scripts/prune-consolidated-exercises.mjs",
     "scripts/capacitor-restore.mjs",
     "scripts/android-apk-publish.mjs",
-    "scripts/lib/semver-version-code.mjs"
+    "scripts/lib/semver-version-code.mjs",
+    "scripts/catalog-low-end-reps.mjs",
+    "scripts/catalog-overlap-report.mjs",
+    "scripts/enrich-hc-notes.mjs"
   ],
   "ignoreDependencies": [
     "@capacitor/android",

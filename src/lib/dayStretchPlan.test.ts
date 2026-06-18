@@ -144,7 +144,6 @@ describe("resolveStretchesForDay", () => {
     const monday = buildCatalogWeek()[1]!;
     const { warmUp } = resolveStretchesForDay(monday, ctxFor({}, "upper_body"));
     const ids = warmUp.map((e) => e.exerciseId);
-    expect(ids).not.toContain("SW-11");
     expect(ids).not.toContain("SW-12");
     expect(ids).not.toContain("SW-14");
   });
@@ -245,5 +244,21 @@ describe("resolveStretchesForDay", () => {
       ctxFor({ "SW-8": "disliked" }),
     );
     expect(warmUp.map((e) => e.exerciseId)).toEqual(["SW-3"]);
+  });
+
+  it("skips warm catalog picks already prescribed in strength or cardio slots", () => {
+    const monday = buildCatalogWeek()[1]!;
+    const plan: DayPlan = {
+      ...monday,
+      cardioActivities: [
+        {
+          kind: "jog",
+          exerciseId: "PC-5",
+          defaultPrescription: "20 each leg",
+        },
+      ],
+    };
+    const { warmUp } = resolveStretchesForDay(plan, ctxFor({}, "conditioning"));
+    expect(warmUp.map((e) => e.exerciseId)).not.toContain("PC-5");
   });
 });

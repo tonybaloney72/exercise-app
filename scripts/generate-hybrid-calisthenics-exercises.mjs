@@ -10,6 +10,7 @@ import { spawnSync } from "node:child_process";
 import { writeFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { eachQualifier, generateHcNote } from "./enrich-hc-notes.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = join(__dirname, "../src/core/catalog/data/hybridCalisthenicsExercises.ts");
@@ -599,9 +600,10 @@ let seq = 1;
 const lines = sorted.map((e) => {
   const id = `HC-${String(seq++).padStart(3, "0")}`;
   const muscleGroups = [...e.muscleGroups].sort();
-  const notes = `Muscle focus: ${muscleGroups.join(", ")}. Reference: Hybrid Calisthenics exercise library.`;
   const timeBased = isTimeBased(e.name);
-  const defaultReps = timeBased ? "30 sec" : "10";
+  const baseReps = timeBased ? "30 sec" : "10";
+  const defaultReps = eachQualifier(e.name, baseReps, timeBased);
+  const notes = generateHcNote(e.name, e.category);
   const muscleGroupsJson = JSON.stringify(muscleGroups);
 
   return `\t{

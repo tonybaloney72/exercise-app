@@ -28,7 +28,7 @@ function toStretchEntry(ex: Exercise): StretchEntry {
 }
 
 /** Workout ids that also appear in warm-up themed pools (no duplicate SW row). */
-const WORKOUT_WARM_CROSSOVER_IDS = ["CS-3", "PC-1"] as const;
+const WORKOUT_WARM_CROSSOVER_IDS = ["CS-3", "PC-1", "PC-5"] as const;
 
 function buildThemedPools(
   category: "SW" | "SC",

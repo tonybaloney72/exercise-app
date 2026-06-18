@@ -107,6 +107,20 @@ function categoriesInPlan(plan: DayPlan): Set<ExerciseCategory> {
   return cats;
 }
 
+/** Strength + cardio slots already on the plan — skip the same ids in warm-up picks. */
+function prescribedExerciseIdsInPlan(plan: DayPlan): ReadonlySet<string> {
+  const ids = new Set<string>();
+  for (const round of plan.rounds) {
+    for (const ex of round.exercises) {
+      ids.add(ex.exerciseId);
+    }
+  }
+  for (const cardio of plan.cardioActivities ?? []) {
+    ids.add(cardio.exerciseId);
+  }
+  return ids;
+}
+
 function isLightRecoveryDay(plan: DayPlan): boolean {
   if (plan.strengthFocus.length > 0) return false;
   const slotCount = plan.rounds.reduce((n, r) => n + r.exercises.length, 0);
@@ -121,6 +135,7 @@ function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[]
     ctx;
   const daySeed = `d${plan.dayOfWeek}-tp:${preset}`;
   const warmParts: StretchEntry[] = [...ctx.defaultWarmUp];
+  const excludePlanIds = prescribedExerciseIdsInPlan(plan);
 
   const poolIds: StretchThemePoolId[] = [
     "upper",
@@ -141,7 +156,7 @@ function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[]
       quota,
       `${ctx.weekRotationKey}-${daySeed}-warm-${id}`,
       ctx,
-      mergeExcludeIds(ctx.weekUsedStretchIds),
+      mergeExcludeIds(ctx.weekUsedStretchIds, excludePlanIds),
     );
   }
 

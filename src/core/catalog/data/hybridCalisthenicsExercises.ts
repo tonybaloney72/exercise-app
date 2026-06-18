@@ -13,7 +13,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Spinal Erectors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Spinal Erectors. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips over the pad; raise torso to a neutral line, pause briefly, lower with control.",
     source: "Pete Rubish",
     videoUrl: "https://www.youtube.com/watch?v=7aS0zMN3Fo8",
     isTimeBased: false,
@@ -27,7 +27,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abs. Reference: Hybrid Calisthenics exercise library.",
+      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=mnRhbUB3Fjs",
     isTimeBased: false,
@@ -41,7 +41,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abductors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abductors. Reference: Hybrid Calisthenics exercise library.",
+      "Press leg out against resistance; control the return without letting weight slam.",
     source: "Forma Gym",
     videoUrl: "https://www.youtube.com/watch?v=dL92FqMJqVY",
     isTimeBased: false,
@@ -55,7 +55,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
+      "Squeeze legs together against resistance; smooth motion, full controlled range.",
     source: "Colossus Fitness",
     videoUrl: "https://www.youtube.com/watch?v=MLBm7i341Rw",
     isTimeBased: false,
@@ -71,7 +71,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     hcProgressionStep: 8,
     hcProgressionTotal: 10,
     notes:
-      "Muscle focus: Spinal Erectors. Late in the HC back-bridge chain (~step 8 of 10). Reference: Hybrid Calisthenics exercise library.",
+      "Press through feet and shoulders to lift hips; keep knees aligned and avoid cranking the neck.",
     source: "Core Balance Training",
     videoUrl: "https://www.youtube.com/watch?v=IV9Y-52NOY0",
     isTimeBased: false,
@@ -98,7 +98,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Spinal Erectors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Spinal Erectors. Reference: Hybrid Calisthenics exercise library.",
+      "Pad at hips; extend spine to neutral and lower under control. Add load only when form is solid.",
     source: "Precision Wellbeing",
     videoUrl: "https://www.youtube.com/watch?v=-MTjHC3NC2s",
     isTimeBased: false,
@@ -112,7 +112,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Squat University",
     videoUrl: "https://www.youtube.com/watch?v=my0tLDaWyDU",
     isTimeBased: false,
@@ -126,7 +126,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "LGN Lyfestile",
     videoUrl: "https://www.youtube.com/watch?v=20xtfGZ37nw",
     isTimeBased: false,
@@ -140,7 +140,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "LGN Lyfestile",
     videoUrl: "https://www.youtube.com/watch?v=T0UJ0W-_yIE",
     isTimeBased: false,
@@ -154,7 +154,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Spinal Erectors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Spinal Erectors. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "LGN Lyfestile",
     videoUrl: "https://www.youtube.com/watch?v=zTSKROuBMNY",
     isTimeBased: false,
@@ -168,7 +168,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rotator Cuff"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rotator Cuff. Reference: Hybrid Calisthenics exercise library.",
+      "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
     source: "Gear Up Physical Therapy and Wellness",
     videoUrl: "https://www.youtube.com/watch?v=dS9ORQCnWsE",
     isTimeBased: false,
@@ -182,7 +182,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rotator Cuff"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rotator Cuff. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward face with elbows high; externally rotate at the end of the rep.",
     source: "Men's Health",
     videoUrl: "https://www.youtube.com/watch?v=CSP7YpPv3ds",
     isTimeBased: false,
@@ -196,7 +196,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms to shoulder height with soft elbows; lower without swinging.",
     source: "STRAFFR",
     videoUrl: "https://www.youtube.com/watch?v=9cDGMzxXVcU",
     isTimeBased: false,
@@ -208,9 +208,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Glutes"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
     source: "Paragon Training Methods",
     videoUrl: "https://www.youtube.com/watch?v=Z62kaaLCWfE",
     isTimeBased: false,
@@ -224,7 +224,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Brachialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Brachialis. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "ConquerHer Fitness",
     videoUrl: "https://www.youtube.com/watch?v=nXHTK7s0CFM",
     isTimeBased: false,
@@ -238,7 +238,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abductors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abductors. Reference: Hybrid Calisthenics exercise library.",
+      "Press leg out against resistance; control the return without letting weight slam.",
     source: "Incline Strength & Fitness",
     videoUrl: "https://www.youtube.com/watch?v=z_gJepa56CU",
     isTimeBased: false,
@@ -252,7 +252,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
+      "Squeeze legs together against resistance; smooth motion, full controlled range.",
     source: "PersonalBestOz",
     videoUrl: "https://www.youtube.com/watch?v=WMtrDM8HsX0",
     isTimeBased: false,
@@ -266,7 +266,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rotator Cuff"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rotator Cuff. Reference: Hybrid Calisthenics exercise library.",
+      "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
     source: "Gear Up Physical Therapy and Wellness",
     videoUrl: "https://www.youtube.com/watch?v=w8R0nUp347M",
     isTimeBased: false,
@@ -278,9 +278,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Glutes"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
     source: "AZ PRIVATE GYM",
     videoUrl: "https://www.youtube.com/watch?v=pOZtZYVJphw",
     isTimeBased: false,
@@ -294,7 +294,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats. Reference: Hybrid Calisthenics exercise library.",
+      "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
     source: "Neil & Linds - RWND Fit",
     videoUrl: "https://www.youtube.com/watch?v=8zv8Pray4-w",
     isTimeBased: false,
@@ -308,7 +308,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
     source: "Evan Harrison",
     videoUrl: "https://www.youtube.com/watch?v=__0jIbOwnfI",
     isTimeBased: false,
@@ -320,9 +320,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Obliques"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
     source: "Joe Leone",
     videoUrl: "https://www.youtube.com/watch?v=6kv9jZSCQnM",
     isTimeBased: false,
@@ -336,7 +336,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids", "Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids, Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
     source: "LGN Lyfestile",
     videoUrl: "https://www.youtube.com/watch?v=1-VfJqjYquQ",
     isTimeBased: false,
@@ -350,7 +350,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Keep upper arms still; extend elbows fully, lower weight with control.",
     source: "FitnessBlender",
     videoUrl: "https://www.youtube.com/watch?v=Yi_zNoIsNcc",
     isTimeBased: false,
@@ -362,9 +362,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Obliques"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Press band or cable straight out from chest; resist rotation and hold a tall posture.",
     source: "Queens University of Charlotte Sports Performance",
     videoUrl: "https://www.youtube.com/watch?v=99evyH71IWs",
     isTimeBased: false,
@@ -378,7 +378,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
     source: "PT LevelUp",
     videoUrl: "https://www.youtube.com/watch?v=Z169-oD7Pl4",
     isTimeBased: false,
@@ -392,7 +392,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Rotate forearm slowly against band resistance; keep elbow stable at your side.",
     source: "CHC Wellness SEK",
     videoUrl: "https://www.youtube.com/watch?v=uxLwKX9BIkQ",
     isTimeBased: false,
@@ -406,7 +406,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Arms straight; pull band apart by squeezing shoulder blades, control the return.",
     source: "Physical Therapy 101",
     videoUrl: "https://www.youtube.com/watch?v=osRimvxXlKQ",
     isTimeBased: false,
@@ -420,7 +420,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves. Reference: Hybrid Calisthenics exercise library.",
+      "Rise onto toes with control; pause at top, lower heels below platform if available.",
     source: "PRIME Physical Performance",
     videoUrl: "https://www.youtube.com/watch?v=DU0s3wT5o7Q",
     isTimeBased: false,
@@ -434,7 +434,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abs. Reference: Hybrid Calisthenics exercise library.",
+      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
     source: "RADCENTRE",
     videoUrl: "https://www.youtube.com/watch?v=aHPw6OxR_ns",
     isTimeBased: false,
@@ -446,9 +446,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "novice",
     muscleGroups: ["Hip Flexors"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
+      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
     source: "freeweight forge",
     videoUrl: "https://www.youtube.com/watch?v=IUGYDf1mWuk",
     isTimeBased: false,
@@ -462,7 +462,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hip Flexors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
+      "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
     source: "Dayton Burnett",
     videoUrl: "https://www.youtube.com/watch?v=C5bgqCmcvds",
     isTimeBased: false,
@@ -474,9 +474,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Quadriceps"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Extend knees to straight; pause at top, lower without dropping the weight.",
     source: "Bodylastics",
     videoUrl: "https://www.youtube.com/watch?v=Nt3CMsVgKZU",
     isTimeBased: false,
@@ -490,7 +490,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abs. Reference: Hybrid Calisthenics exercise library.",
+      "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
     source: "Taylor Catrett",
     videoUrl: "https://www.youtube.com/watch?v=2pfCs_Vr4Jc",
     isTimeBased: false,
@@ -504,7 +504,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Testosterone Nation",
     videoUrl: "https://www.youtube.com/watch?v=LtTcXXgeRYo",
     isTimeBased: false,
@@ -518,7 +518,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Clench Fitness",
     videoUrl: "https://www.youtube.com/watch?v=9nEyLG-mjxg",
     isTimeBased: false,
@@ -530,9 +530,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "novice",
     muscleGroups: ["Abductors"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Abductors. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=5_F-smr-ez8",
     isTimeBased: false,
@@ -546,7 +546,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes", "Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes, Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Live Lean TV Daily Exercises",
     videoUrl: "https://www.youtube.com/watch?v=Eaqr79zvqIw",
     isTimeBased: false,
@@ -560,7 +560,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves. Reference: Hybrid Calisthenics exercise library.",
+      "Rise onto toes with control; pause at top, lower heels below platform if available.",
     source: "GB",
     videoUrl: "https://www.youtube.com/watch?v=U7PlGgKwuZA",
     isTimeBased: false,
@@ -574,7 +574,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "Resistbnd",
     videoUrl: "https://www.youtube.com/watch?v=uGJU-oOmJ7E",
     isTimeBased: false,
@@ -588,7 +588,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Tibialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Tibialis. Reference: Hybrid Calisthenics exercise library.",
+      "Dorsiflex against resistance; lift toes toward shins, pause, lower slowly.",
     source: "Aubin Grove, Kwinana & Harrisdale Physiotherapy",
     videoUrl: "https://www.youtube.com/watch?v=WkmxXN4yq8M",
     isTimeBased: false,
@@ -602,7 +602,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "66 Days Fitness Coaching",
     videoUrl: "https://www.youtube.com/watch?v=3gjEi1TxyHs",
     isTimeBased: false,
@@ -616,7 +616,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
     source: "ScottHermanFitness",
     videoUrl: "https://www.youtube.com/watch?v=cyihFNmsq-A",
     isTimeBased: false,
@@ -630,7 +630,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats, Rear Deltoids, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "Get Healthy U - with Chris Freytag",
     videoUrl: "https://www.youtube.com/watch?v=LSkyinhmA8k",
     isTimeBased: false,
@@ -644,7 +644,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
     source: "Nick Forgione",
     videoUrl: "https://www.youtube.com/watch?v=OjHqkDWGXlw",
     isTimeBased: false,
@@ -658,7 +658,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Rotate forearm slowly against band resistance; keep elbow stable at your side.",
     source: "Aubin Grove, Kwinana & Harrisdale Physiotherapy",
     videoUrl: "https://www.youtube.com/watch?v=katrOeSo9xg",
     isTimeBased: false,
@@ -672,7 +672,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Keep upper arms still; extend elbows fully, lower weight with control.",
     source: "Shape Bands",
     videoUrl: "https://www.youtube.com/watch?v=PkGesjlH7RQ",
     isTimeBased: false,
@@ -686,7 +686,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "freeweight forge",
     videoUrl: "https://www.youtube.com/watch?v=4engp4e6KzU",
     isTimeBased: false,
@@ -698,9 +698,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Obliques"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Chop diagonally across the body; rotate through the torso, not the arms alone.",
     source: "Kade Jungkurth",
     videoUrl: "https://www.youtube.com/watch?v=lZfTfU7CfRE",
     isTimeBased: false,
@@ -714,7 +714,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Forearms supported; flex or extend wrists through full range under control.",
     source: "Movement Physio",
     videoUrl: "https://www.youtube.com/watch?v=zOlFpUujHAE",
     isTimeBased: false,
@@ -728,7 +728,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Forearms supported; flex or extend wrists through full range under control.",
     source: "Aubin Grove, Kwinana & Harrisdale Physiotherapy",
     videoUrl: "https://www.youtube.com/watch?v=GHh-MfStFKY",
     isTimeBased: false,
@@ -742,7 +742,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "Bullett Performance Training",
     videoUrl: "https://www.youtube.com/watch?v=K-cdF3zbZTU",
     isTimeBased: false,
@@ -756,7 +756,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major", "Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major, Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Body in one line; lower chest toward floor, press back up without sagging hips.",
     source: "E3 Rehab",
     videoUrl: "https://www.youtube.com/watch?v=8cTohcawjCM",
     isTimeBased: false,
@@ -770,7 +770,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Serratus Anterior"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Protract shoulder blades forward; reach through full range without shrugging.",
     source: "Rude Rock Human Performance",
     videoUrl: "https://www.youtube.com/watch?v=vK6NOfS9wW8",
     isTimeBased: false,
@@ -784,7 +784,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "Groundwork Rehab & Fitness",
     videoUrl: "https://www.youtube.com/watch?v=pNp2f8l82Zg",
     isTimeBased: false,
@@ -798,7 +798,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Serratus Anterior"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Body in one line; lower chest toward floor, press back up without sagging hips.",
     source: "Fitness Pain Free",
     videoUrl: "https://www.youtube.com/watch?v=2FEV7sdZZW0",
     isTimeBased: false,
@@ -812,7 +812,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abs. Reference: Hybrid Calisthenics exercise library.",
+      "Brace core; roll or crunch through a controlled range without sagging the lower back.",
     source: "Danielle Marie Fitness",
     videoUrl: "https://www.youtube.com/watch?v=lpXOnRMBp5A",
     isTimeBased: false,
@@ -826,7 +826,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "PureGym",
     videoUrl: "https://www.youtube.com/watch?v=rrJIyZGlK8c",
     isTimeBased: false,
@@ -840,7 +840,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=ejI1Nlsul9k",
     isTimeBased: false,
@@ -854,7 +854,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves. Reference: Hybrid Calisthenics exercise library.",
+      "Rise onto toes with control; pause at top, lower heels below platform if available.",
     source: "MVMNT Exercise Library",
     videoUrl: "https://www.youtube.com/watch?v=xXYXbL89KfM",
     isTimeBased: false,
@@ -869,7 +869,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats, Rear Deltoids, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=p9RihhjmJsw",
     isTimeBased: false,
@@ -883,7 +883,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Testosterone Nation",
     videoUrl: "https://www.youtube.com/watch?v=ZQWL7omZh94",
     isTimeBased: false,
@@ -897,7 +897,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=ZHa0OAcn7Bc",
     isTimeBased: false,
@@ -911,7 +911,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms to shoulder height with soft elbows; lower without swinging.",
     source: "ScottHermanFitness",
     videoUrl: "https://www.youtube.com/watch?v=Ofo2DQdT7DA",
     isTimeBased: false,
@@ -925,7 +925,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "Elite Performance",
     videoUrl: "https://www.youtube.com/watch?v=L9UKMQw1Nss",
     isTimeBased: false,
@@ -944,7 +944,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids, Lateral Deltoids, Rotator Cuff, Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=4LBVP2Oe7fg",
     isTimeBased: false,
@@ -958,7 +958,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Keep upper arms still; extend elbows fully, lower weight with control.",
     source: "Zach Erickson",
     videoUrl: "https://www.youtube.com/watch?v=w4NSd3kug5Q",
     isTimeBased: false,
@@ -972,7 +972,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Brachialis", "Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Brachialis, Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Capital University Athletics",
     videoUrl: "https://www.youtube.com/watch?v=ahDqj6yPy5M",
     isTimeBased: false,
@@ -986,7 +986,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "A2Z ",
     videoUrl: "https://www.youtube.com/watch?v=NcDp9dkWr7g",
     isTimeBased: false,
@@ -1000,7 +1000,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "Sennergy Health Training",
     videoUrl: "https://www.youtube.com/watch?v=g5u75sgpn04",
     isTimeBased: false,
@@ -1014,7 +1014,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=zfAHfyTB_Ao",
     isTimeBased: false,
@@ -1028,7 +1028,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Keep upper arms still; extend elbows fully, lower weight with control.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=l3rHYPtMUo8",
     isTimeBased: false,
@@ -1040,9 +1040,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Abductors"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Abductors. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Strength Conditioning",
     videoUrl: "https://www.youtube.com/watch?v=Jl1cxp0Iwv0",
     isTimeBased: false,
@@ -1056,7 +1056,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves. Reference: Hybrid Calisthenics exercise library.",
+      "Rise onto toes with control; pause at top, lower heels below platform if available.",
     source: "ScottHermanFitness",
     videoUrl: "https://www.youtube.com/watch?v=3UWi44yN-wM",
     isTimeBased: false,
@@ -1071,7 +1071,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "Bodybuilding.com",
     videoUrl: "https://www.youtube.com/watch?v=VFIKI6ihCmc",
     isTimeBased: false,
@@ -1085,7 +1085,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Obliques"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Rotate torso side to side with control; keep chest up and core braced throughout.",
     source: "Shaun Fitt",
     videoUrl: "https://www.youtube.com/watch?v=gFrIasgk5tE",
     isTimeBased: false,
@@ -1099,7 +1099,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=um3VVzqunPU",
     isTimeBased: false,
@@ -1113,7 +1113,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Andres Suarez",
     videoUrl: "https://www.youtube.com/watch?v=jPsOEeTt_Js",
     isTimeBased: false,
@@ -1127,7 +1127,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves. Reference: Hybrid Calisthenics exercise library.",
+      "Rise onto toes with control; pause at top, lower heels below platform if available.",
     source: "Runna",
     videoUrl: "https://www.youtube.com/watch?v=NcMjGCO_-J0",
     isTimeBased: false,
@@ -1141,7 +1141,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "The Strength Center",
     videoUrl: "https://www.youtube.com/watch?v=IOOLhrkN_NI",
     isTimeBased: false,
@@ -1156,7 +1156,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=I-Ue34qLxc4",
     isTimeBased: false,
@@ -1170,7 +1170,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "Elite Performance",
     videoUrl: "https://www.youtube.com/watch?v=A12UEw70jio",
     isTimeBased: false,
@@ -1184,7 +1184,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abs. Reference: Hybrid Calisthenics exercise library.",
+      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
     source: "Kade Howell",
     videoUrl: "https://www.youtube.com/watch?v=dkGwcfo9zto",
     isTimeBased: false,
@@ -1198,7 +1198,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Colossus Fitness",
     videoUrl: "https://www.youtube.com/watch?v=2MUEL4nL6hA",
     isTimeBased: false,
@@ -1212,7 +1212,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rotator Cuff"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rotator Cuff. Reference: Hybrid Calisthenics exercise library.",
+      "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
     source: "Ultimate Strength and Nutrition",
     videoUrl: "https://www.youtube.com/watch?v=6xGIVNYBIwE",
     isTimeBased: false,
@@ -1226,7 +1226,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rotator Cuff"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rotator Cuff. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward face with elbows high; externally rotate at the end of the rep.",
     source: "Elite Performance",
     videoUrl: "https://www.youtube.com/watch?v=vQCi5Xzhoyw",
     isTimeBased: false,
@@ -1240,7 +1240,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms to shoulder height with soft elbows; lower without swinging.",
     source: "Elite Performance",
     videoUrl: "https://www.youtube.com/watch?v=NdQE5Fhfqn4",
     isTimeBased: false,
@@ -1254,7 +1254,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Serratus Anterior"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms to shoulder height with soft elbows; lower without swinging.",
     source: "Elite Performance",
     videoUrl: "https://www.youtube.com/watch?v=NdQE5Fhfqn4",
     isTimeBased: false,
@@ -1266,9 +1266,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: ["Glutes"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
     source: "Lean4ever_",
     videoUrl: "https://www.youtube.com/watch?v=_bWqrQp7wJY",
     isTimeBased: false,
@@ -1282,7 +1282,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Brachialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Brachialis. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Kraken Fitness",
     videoUrl: "https://www.youtube.com/watch?v=p1XzMk3gsU0",
     isTimeBased: false,
@@ -1296,7 +1296,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abductors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abductors. Reference: Hybrid Calisthenics exercise library.",
+      "Press leg out against resistance; control the return without letting weight slam.",
     source: "LIVESTRONG",
     videoUrl: "https://www.youtube.com/watch?v=pvnR8CDb4BU",
     isTimeBased: false,
@@ -1310,7 +1310,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
+      "Squeeze legs together against resistance; smooth motion, full controlled range.",
     source: "Just Raw Skill",
     videoUrl: "https://www.youtube.com/watch?v=EHq78mQYLbI",
     isTimeBased: false,
@@ -1324,7 +1324,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rotator Cuff"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rotator Cuff. Reference: Hybrid Calisthenics exercise library.",
+      "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
     source: "Devin Riley",
     videoUrl: "https://www.youtube.com/watch?v=S_d3qeTMtl4",
     isTimeBased: false,
@@ -1336,9 +1336,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: ["Glutes"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
     source: "Tashana Charles",
     videoUrl: "https://www.youtube.com/watch?v=A9aN_L4vexk",
     isTimeBased: false,
@@ -1352,7 +1352,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats. Reference: Hybrid Calisthenics exercise library.",
+      "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=bNmvKpJSWKM",
     isTimeBased: false,
@@ -1366,7 +1366,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats. Reference: Hybrid Calisthenics exercise library.",
+      "Push handles down in an arc; keep ribs down and finish with lats engaged.",
     source: "ScottHermanFitness",
     videoUrl: "https://www.youtube.com/watch?v=AjCCGN2tU3Q",
     isTimeBased: false,
@@ -1380,7 +1380,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
     source: "Aakash Wadhwani",
     videoUrl: "https://www.youtube.com/watch?v=lMJUXEvcMkQ",
     isTimeBased: false,
@@ -1392,9 +1392,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: ["Quadriceps"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Extend knees to straight; pause at top, lower without dropping the weight.",
     source: "York Performance",
     videoUrl: "https://www.youtube.com/watch?v=SAnhEcQPLJY",
     isTimeBased: false,
@@ -1408,7 +1408,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hip Flexors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
+      "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
     source: "Simmi ",
     videoUrl: "https://www.youtube.com/watch?v=V6r-SQmBr8U",
     isTimeBased: false,
@@ -1420,9 +1420,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: ["Obliques"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
     source: "Live Lean TV Daily Exercises",
     videoUrl: "https://www.youtube.com/watch?v=xUulEXD1AQc",
     isTimeBased: false,
@@ -1436,7 +1436,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
     source: "Repetitions Fitness RPT",
     videoUrl: "https://www.youtube.com/watch?v=-hVwoRumVCo",
     isTimeBased: false,
@@ -1448,9 +1448,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: ["Obliques"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Press band or cable straight out from chest; resist rotation and hold a tall posture.",
     source: "Warbird Academy",
     videoUrl: "https://www.youtube.com/watch?v=ma2OjgP5XDc",
     isTimeBased: false,
@@ -1464,7 +1464,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
     source: "Sam Johnston",
     videoUrl: "https://www.youtube.com/watch?v=y8XQibXDnNo",
     isTimeBased: false,
@@ -1478,7 +1478,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Serratus Anterior"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Protract shoulder blades forward; reach through full range without shrugging.",
     source: "Strength Coach Phil",
     videoUrl: "https://www.youtube.com/watch?v=JtCyUP4CjA8",
     isTimeBased: false,
@@ -1492,7 +1492,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves. Reference: Hybrid Calisthenics exercise library.",
+      "Rise onto toes with control; pause at top, lower heels below platform if available.",
     source: "Hybrid Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=w4nmA7p4EoY",
     isTimeBased: false,
@@ -1506,7 +1506,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves. Reference: Hybrid Calisthenics exercise library.",
+      "Rise onto toes with control; pause at top, lower heels below platform if available.",
     source: "Hybrid Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=Kx5fAImDxeQ",
     isTimeBased: false,
@@ -1520,7 +1520,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "ChadMollickDotCom",
     videoUrl: "https://www.youtube.com/watch?v=HwB-DevuJjU",
     isTimeBased: false,
@@ -1534,7 +1534,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
     source: "Hailey Happens Fitness",
     videoUrl: "https://www.youtube.com/watch?v=yt096xH6b4g",
     isTimeBased: false,
@@ -1548,7 +1548,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Fit Prabh",
     videoUrl: "https://www.youtube.com/watch?v=LNckss7fzx4",
     isTimeBased: false,
@@ -1562,7 +1562,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats, Rear Deltoids, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "Max Euceda",
     videoUrl: "https://www.youtube.com/watch?v=vwHG9Jfu4sw",
     isTimeBased: false,
@@ -1576,7 +1576,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
     source: "BPI Sports",
     videoUrl: "https://www.youtube.com/watch?v=Wab3-dsZohU",
     isTimeBased: false,
@@ -1590,7 +1590,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Tibialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Tibialis. Reference: Hybrid Calisthenics exercise library.",
+      "Dorsiflex against resistance; lift toes toward shins, pause, lower slowly.",
     source: "8letic Fitness Club",
     videoUrl: "https://www.youtube.com/watch?v=3oEqmZCbVuo",
     isTimeBased: false,
@@ -1604,7 +1604,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Keep upper arms still; extend elbows fully, lower weight with control.",
     source: "TylerPath",
     videoUrl: "https://www.youtube.com/watch?v=DofcfjlgOTs",
     isTimeBased: false,
@@ -1618,7 +1618,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=qr3ziolhjvQ",
     isTimeBased: false,
@@ -1630,9 +1630,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: ["Obliques"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Chop diagonally across the body; rotate through the torso, not the arms alone.",
     source: "QuanBFit",
     videoUrl: "https://www.youtube.com/watch?v=KG4Bf-1U_BY",
     isTimeBased: false,
@@ -1646,7 +1646,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "BrooklynFitness ",
     videoUrl: "https://www.youtube.com/watch?v=PVEDWd2FjHM",
     isTimeBased: false,
@@ -1660,7 +1660,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
     source: "Bradley Bowden",
     videoUrl: "https://www.youtube.com/watch?v=Zy0M8JMLnD0",
     isTimeBased: false,
@@ -1675,7 +1675,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "JayCutlerTV",
     videoUrl: "https://www.youtube.com/watch?v=qcYGEGqfScw",
     isTimeBased: false,
@@ -1689,7 +1689,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "Be Fit",
     videoUrl: "https://www.youtube.com/watch?v=C5cq0Yvecu0",
     isTimeBased: false,
@@ -1703,7 +1703,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Body in one line; lower chest toward floor, press back up without sagging hips.",
     source: "Atomic Athlete",
     videoUrl: "https://www.youtube.com/watch?v=2cdIRe5tcqI",
     isTimeBased: false,
@@ -1717,7 +1717,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Full hang to start; pull until chin clears the bar, lower with control.",
     source: "Major Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=XWppPUTlSwE",
     isTimeBased: false,
@@ -1729,9 +1729,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["plyo_box"],
     expertiseLevel: "novice",
     muscleGroups: ["Adductors"],
-    defaultReps: "30 sec",
+    defaultReps: "30 sec each side",
     notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
+      "Stack shoulders over elbow or wrist; lift hips in a straight line and breathe steadily.",
     source: "[P]rehab",
     videoUrl: "https://www.youtube.com/watch?v=AiYzzRoXOEY",
     isTimeBased: true,
@@ -1745,7 +1745,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10 each side",
     notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Dr. Carl Baird",
     videoUrl: "https://www.youtube.com/watch?v=nLNqEQ4B6XI",
     isTimeBased: false,
@@ -1759,7 +1759,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Keep upper arms still; extend elbows fully, lower weight with control.",
     source: "Rachel Gregory",
     videoUrl: "https://www.youtube.com/watch?v=KweUYETA8RU",
     isTimeBased: false,
@@ -1773,7 +1773,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abs. Reference: Hybrid Calisthenics exercise library.",
+      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
     source: "Howcast",
     videoUrl: "https://www.youtube.com/watch?v=MKmrqcoCZ-M",
     isTimeBased: false,
@@ -1788,7 +1788,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "Davis Diley",
     videoUrl: "https://www.youtube.com/watch?v=vfKwjT5-86k",
     isTimeBased: false,
@@ -1802,7 +1802,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "Coach Joey",
     videoUrl: "https://www.youtube.com/watch?v=lYHVBZ-XqT8",
     isTimeBased: false,
@@ -1816,7 +1816,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Body in one line; lower chest toward floor, press back up without sagging hips.",
     source: "Hybrid Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=QBlYp-EwHlo",
     isTimeBased: false,
@@ -1828,9 +1828,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
     muscleGroups: ["Hip Flexors"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
+      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
     source: "Sears",
     videoUrl: "https://www.youtube.com/watch?v=5cnJKhhw2as",
     isTimeBased: false,
@@ -1844,7 +1844,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Lower until upper arms are roughly parallel; press up without flaring elbows wide.",
     source: "TygaVEVO",
     videoUrl: "https://www.youtube.com/watch?v=YyWru2XOiK0",
     isTimeBased: false,
@@ -1858,7 +1858,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Lower until upper arms are roughly parallel; press up without flaring elbows wide.",
     source: "Garage Strength",
     videoUrl: "https://www.youtube.com/watch?v=y0M6Iebclq0",
     isTimeBased: false,
@@ -1870,9 +1870,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
     muscleGroups: ["Glutes"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Upper back on bench; drive hips up, squeeze glutes at top, lower under control.",
     source: "Kenssey",
     videoUrl: "https://www.youtube.com/watch?v=Rtor33qMmhQ",
     isTimeBased: false,
@@ -1886,7 +1886,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=WbCEvFA0NJs",
     isTimeBased: false,
@@ -1900,7 +1900,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves. Reference: Hybrid Calisthenics exercise library.",
+      "Rise onto toes with control; pause at top, lower heels below platform if available.",
     source: "Bía Coaching",
     videoUrl: "https://www.youtube.com/watch?v=4atz03A80dg",
     isTimeBased: false,
@@ -1914,7 +1914,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rear Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rear Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "The Strength Center",
     videoUrl: "https://www.youtube.com/watch?v=IOOLhrkN_NI",
     isTimeBased: false,
@@ -1928,7 +1928,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "My PT Hub",
     videoUrl: "https://www.youtube.com/watch?v=5PdEraHkF1A",
     isTimeBased: false,
@@ -1942,7 +1942,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=rk8YayRoTRQ",
     isTimeBased: false,
@@ -1956,7 +1956,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms to shoulder height with soft elbows; lower without swinging.",
     source: "Kraken Fitness",
     videoUrl: "https://www.youtube.com/watch?v=h9xfpTrAvkE",
     isTimeBased: false,
@@ -1970,7 +1970,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Serratus Anterior"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms to shoulder height with soft elbows; lower without swinging.",
     source: "Tom Houpt",
     videoUrl: "https://www.youtube.com/watch?v=JXYIr4FcUHw",
     isTimeBased: false,
@@ -1984,7 +1984,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Brachialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Brachialis. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Daily Workout Builder",
     videoUrl: "https://www.youtube.com/watch?v=VqoFbCmRyyk",
     isTimeBased: false,
@@ -1998,7 +1998,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "Taylored Physical Therapy",
     videoUrl: "https://www.youtube.com/watch?v=G1mCi5idEbk",
     isTimeBased: false,
@@ -2012,7 +2012,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
     source: "National Academy of Sports Medicine (NASM)",
     videoUrl: "https://www.youtube.com/watch?v=XPPfnSEATJA",
     isTimeBased: false,
@@ -2024,9 +2024,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Rotator Cuff"],
-    defaultReps: "10",
+    defaultReps: "10 each arm",
     notes:
-      "Muscle focus: Rotator Cuff. Reference: Hybrid Calisthenics exercise library.",
+      "Lying on side; raise arm through Lu raise path with control, keep shoulder packed.",
     source: "Slight Edge Fitness & Performance",
     videoUrl: "https://www.youtube.com/watch?v=oZgHeEFY8pc",
     isTimeBased: false,
@@ -2040,7 +2040,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids", "Lateral Deltoids", "Serratus Anterior"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids, Lateral Deltoids, Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
     source: "Testosterone Nation",
     videoUrl: "https://www.youtube.com/watch?v=b132W5N8Jrg",
     isTimeBased: false,
@@ -2054,7 +2054,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Keep upper arms still; extend elbows fully, lower weight with control.",
     source: "SquatCouple",
     videoUrl: "https://www.youtube.com/watch?v=AYqg9S5FrUU",
     isTimeBased: false,
@@ -2068,7 +2068,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Luke Selway | Strength Coaching Online",
     videoUrl: "https://www.youtube.com/watch?v=Mg0NnlF5NZQ",
     isTimeBased: false,
@@ -2082,7 +2082,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Arms extended; lower weight behind head with control, pull back over the chest.",
     source: "DEMIC",
     videoUrl: "https://www.youtube.com/watch?v=JdzaVp3zEAM",
     isTimeBased: false,
@@ -2096,7 +2096,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Brachialis", "Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Brachialis, Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=hUA-fIpM7nA",
     isTimeBased: false,
@@ -2110,7 +2110,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rear Deltoids, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
     source: "BUILT BY FITNESS",
     videoUrl: "https://www.youtube.com/watch?v=xvEkgGUrGPM",
     isTimeBased: false,
@@ -2124,7 +2124,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Blue Collar Fitness",
     videoUrl: "https://www.youtube.com/watch?v=cRLJ86m00cU",
     isTimeBased: false,
@@ -2138,7 +2138,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "Denvyr | Tall Girl Nutritionist",
     videoUrl: "https://www.youtube.com/watch?v=5WxMW-Fu5KU",
     isTimeBased: false,
@@ -2152,7 +2152,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
     source: "Gym And Fitness",
     videoUrl: "https://www.youtube.com/watch?v=j2-RccWDhDo",
     isTimeBased: false,
@@ -2164,9 +2164,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Obliques"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Stand tall; bend laterally toward one side, return to center without twisting.",
     source: "Kraken Fitness",
     videoUrl: "https://www.youtube.com/watch?v=44DazvtgpGE",
     isTimeBased: false,
@@ -2180,7 +2180,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Keep upper arms still; extend elbows fully, lower weight with control.",
     source: "J&J Body Fitness",
     videoUrl: "https://www.youtube.com/watch?v=KiTJ7qJP2t8",
     isTimeBased: false,
@@ -2194,7 +2194,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=ke2shAeQ0O8",
     isTimeBased: false,
@@ -2206,9 +2206,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
     muscleGroups: ["Abductors"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Abductors. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=Wcmg-3iHwjQ",
     isTimeBased: false,
@@ -2222,7 +2222,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves. Reference: Hybrid Calisthenics exercise library.",
+      "Rise onto toes with control; pause at top, lower heels below platform if available.",
     source: "Hybrid Calisthenics",
     videoUrl: "https://www.youtube.com/shorts/ADITZCcUyVo",
     isTimeBased: false,
@@ -2236,7 +2236,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "Live Lean TV Daily Exercises",
     videoUrl: "https://www.youtube.com/watch?v=R6KXyhU4nTY",
     isTimeBased: false,
@@ -2250,7 +2250,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Serratus Anterior"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Protract shoulder blades forward; reach through full range without shrugging.",
     source: "Snap Fitness Clayton",
     videoUrl: "https://www.youtube.com/watch?v=ZpIx4drJXdU",
     isTimeBased: false,
@@ -2264,7 +2264,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=29-4QWdqd-g",
     isTimeBased: false,
@@ -2278,7 +2278,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Forearms"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Forearms. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Kraken Fitness",
     videoUrl: "https://www.youtube.com/watch?v=M8TpHw5aYgA",
     isTimeBased: false,
@@ -2292,7 +2292,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
     source: "Jeremy Daniels",
     videoUrl: "https://www.youtube.com/watch?v=9hI-RFziBz8",
     isTimeBased: false,
@@ -2306,7 +2306,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
     source: "Valhalla Strength YYC",
     videoUrl: "https://www.youtube.com/watch?v=4wI9d3O6Cks",
     isTimeBased: false,
@@ -2320,7 +2320,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Pull shoulders down and back; lift or press through the lats with a braced core.",
     source: "Paul Lodzik",
     videoUrl: "https://www.youtube.com/watch?v=f1S9isJY-ZI",
     isTimeBased: false,
@@ -2334,7 +2334,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Kaitlin Daur",
     videoUrl: "https://www.youtube.com/watch?v=eajnajdu6lw",
     isTimeBased: false,
@@ -2348,7 +2348,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rear Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rear Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward face with elbows high; externally rotate at the end of the rep.",
     source: "ATHLEAN-X™",
     videoUrl: "https://www.youtube.com/watch?v=ljgqer1ZpXg",
     isTimeBased: false,
@@ -2363,7 +2363,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "CrossFit",
     videoUrl: "https://www.youtube.com/watch?v=uYumuL_G_V0",
     isTimeBased: false,
@@ -2376,9 +2376,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: ["Glutes"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
     source: "Exercise Demo QR Codes",
     videoUrl: "https://www.youtube.com/watch?v=m5TPll_PZbI",
     isTimeBased: false,
@@ -2392,7 +2392,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes", "Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes, Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "SquatCouple",
     videoUrl: "https://www.youtube.com/watch?v=lRYBbchqxtI",
     isTimeBased: false,
@@ -2406,7 +2406,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Spinal Erectors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Spinal Erectors. Reference: Hybrid Calisthenics exercise library.",
+      "Bar on upper back; hinge at hips with a flat back, then drive hips forward to stand.",
     source: "ABC News",
     videoUrl: "https://www.youtube.com/watch?v=7GPVy6nYcWo",
     isTimeBased: false,
@@ -2420,7 +2420,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors", "Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Adductors, Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=rYgNArpwE7E",
     isTimeBased: false,
@@ -2434,7 +2434,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "30 sec",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Control the eccentric; use padding under knees and progress range gradually.",
     source: "ATH Sport",
     videoUrl: "https://www.youtube.com/watch?v=lLUniqm00KM",
     isTimeBased: true,
@@ -2448,7 +2448,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Body in one line; lower chest toward floor, press back up without sagging hips.",
     source: "yvguo",
     videoUrl: "https://www.youtube.com/watch?v=eWvKVjSpIW8",
     isTimeBased: false,
@@ -2463,7 +2463,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "High Performance Muscle",
     videoUrl: "https://www.youtube.com/watch?v=xaMJYDzqTZg",
     isTimeBased: false,
@@ -2477,7 +2477,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hip Flexors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
+      "Lift knee against pad resistance; avoid rocking the torso, control the lowering phase.",
     source: "Tiffany LeRoy - Envision Personalized Training ",
     videoUrl: "https://www.youtube.com/watch?v=QE1v7QK0zLI",
     isTimeBased: false,
@@ -2491,7 +2491,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Upper back on bench; drive hips up, squeeze glutes at top, lower under control.",
     source: "Nuffield Health",
     videoUrl: "https://www.youtube.com/watch?v=RR0oZhhUVWo",
     isTimeBased: false,
@@ -2506,7 +2506,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Upper back on bench; drive hips up, squeeze glutes at top, lower under control.",
     source: "Ascend Kinetics Fitness",
     videoUrl: "https://www.youtube.com/watch?v=m8g9VogoxMo",
     isTimeBased: false,
@@ -2521,7 +2521,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "Unite Coaching",
     videoUrl: "https://www.youtube.com/watch?v=5pC1skpc7e0",
     isTimeBased: false,
@@ -2535,7 +2535,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "TylerPath",
     videoUrl: "https://www.youtube.com/watch?v=XhIsIcjIbCw",
     isTimeBased: false,
@@ -2549,7 +2549,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Spinal Erectors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Spinal Erectors. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "PractiCali_Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=vKKGdwyA8Lc",
     isTimeBased: false,
@@ -2578,7 +2578,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=bNmvKpJSWKM",
     isTimeBased: false,
@@ -2592,7 +2592,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats. Reference: Hybrid Calisthenics exercise library.",
+      "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
     source: "Arsenal Strength",
     videoUrl: "https://www.youtube.com/watch?v=1AtgcEMZ2cQ",
     isTimeBased: false,
@@ -2606,7 +2606,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Extend knees to straight; pause at top, lower without dropping the weight.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=N32sIi1ktv4",
     isTimeBased: false,
@@ -2620,7 +2620,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors", "Glutes", "Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Adductors, Glutes, Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Jeff Nippard",
     videoUrl: "https://www.youtube.com/watch?v=nDh_BlnLCGc",
     isTimeBased: false,
@@ -2634,7 +2634,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abs, Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
+      "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
     source: "Health",
     videoUrl: "https://www.youtube.com/watch?v=qvi8aM02_GY",
     isTimeBased: false,
@@ -2646,9 +2646,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
     muscleGroups: ["Glutes"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
     source: "Fundamentals Physiotherapy & Wellness Clinic",
     videoUrl: "https://www.youtube.com/watch?v=1cS-6KsJW9g",
     isTimeBased: false,
@@ -2662,7 +2662,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Hammer Fitness",
     videoUrl: "https://www.youtube.com/watch?v=Atl5qhOfJpQ",
     isTimeBased: false,
@@ -2676,7 +2676,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=d6sg829PgNs",
     isTimeBased: false,
@@ -2690,7 +2690,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=VJ33rNSn3UI",
     isTimeBased: false,
@@ -2704,7 +2704,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "PureGym",
     videoUrl: "https://www.youtube.com/watch?v=sqNwDkUU_Ps",
     isTimeBased: false,
@@ -2718,7 +2718,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "Ben Jones Fitness",
     videoUrl: "https://www.youtube.com/watch?v=MchdwQ855Ls",
     isTimeBased: false,
@@ -2732,7 +2732,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
     source: "Virtual Trainer - Jhonbafit",
     videoUrl: "https://www.youtube.com/watch?v=hkU6fSHcslw",
     isTimeBased: false,
@@ -2746,7 +2746,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
     source: "Etage Athletic Club",
     videoUrl: "https://www.youtube.com/watch?v=Zi9nYtLsuz0",
     isTimeBased: false,
@@ -2765,7 +2765,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids, Lateral Deltoids, Rotator Cuff, Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=PM1hB_2xNBU",
     isTimeBased: false,
@@ -2779,7 +2779,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rear Deltoids, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
     source: "Rapid Fitness",
     videoUrl: "https://www.youtube.com/watch?v=TJgaFyUSBaY",
     isTimeBased: false,
@@ -2793,7 +2793,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lats, Rear Deltoids, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "James Gardner Personal Training",
     videoUrl: "https://www.youtube.com/watch?v=Kh2WA2Y1M0k",
     isTimeBased: false,
@@ -2807,7 +2807,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves", "Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves, Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Wittenberg University Strength and Conditioning",
     videoUrl: "https://www.youtube.com/watch?v=7o_-YMUdLdM",
     isTimeBased: false,
@@ -2819,9 +2819,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Obliques"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
     source: "IgnasFit",
     videoUrl: "https://www.youtube.com/watch?v=AcvfBd9C2kA",
     isTimeBased: false,
@@ -2835,7 +2835,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Obliques"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Rotate torso side to side with control; keep chest up and core braced throughout.",
     source: "Klub 20 Gym Beaconsfield",
     videoUrl: "https://www.youtube.com/watch?v=4LoAmWp_h9g",
     isTimeBased: false,
@@ -2849,7 +2849,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Full hang to start; pull until chin clears the bar, lower with control.",
     source: "The Bodyweight Process",
     videoUrl: "https://www.youtube.com/watch?v=YCSZNJkrYag",
     isTimeBased: false,
@@ -2863,7 +2863,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Julian Titanium",
     videoUrl: "https://www.youtube.com/watch?v=RE9k04SVWOo",
     isTimeBased: false,
@@ -2877,7 +2877,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hip Flexors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
+      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
     source: "The Wong Way",
     videoUrl: "https://www.youtube.com/watch?v=0twbwdI5ZMg",
     isTimeBased: false,
@@ -2891,7 +2891,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids", "Lateral Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids, Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Body in one line; lower chest toward floor, press back up without sagging hips.",
     source: "cory robinson",
     videoUrl: "https://www.youtube.com/watch?v=D_Ed8Ltoomc",
     isTimeBased: false,
@@ -2905,7 +2905,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Transverse Abdominis"],
     defaultReps: "30 sec",
     notes:
-      "Muscle focus: Transverse Abdominis. Reference: Hybrid Calisthenics exercise library.",
+      "Hold a rigid plank from shoulders to heels; keep ribs down and glutes engaged.",
     source: "Children's Hospital Colorado",
     videoUrl: "https://www.youtube.com/watch?v=pvIjsG5Svck",
     isTimeBased: true,
@@ -2919,7 +2919,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Serratus Anterior"],
     defaultReps: "5",
     notes:
-      "Muscle focus: Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Hold a rigid plank from shoulders to heels; keep ribs down and glutes engaged.",
     source: "Dr. Kira Steele",
     videoUrl: "https://www.youtube.com/watch?v=UPxe-ciAovo",
     isTimeBased: false,
@@ -2933,7 +2933,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=S4dDLfp3e8w",
     isTimeBased: false,
@@ -2947,7 +2947,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Front Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Body in one line; lower chest toward floor, press back up without sagging hips.",
     source: "Andry Strong",
     videoUrl: "https://www.youtube.com/watch?v=C90o5ImqzJ0",
     isTimeBased: false,
@@ -2961,7 +2961,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Brachialis", "Forearms", "Lats", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Brachialis, Forearms, Lats, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Full hang to start; pull until chin clears the bar, lower with control.",
     source: "Summerfunfitness",
     videoUrl: "https://www.youtube.com/watch?v=l6-aIZTbAR0",
     isTimeBased: false,
@@ -2975,7 +2975,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Pectoralis Major"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Pectoralis Major. Reference: Hybrid Calisthenics exercise library.",
+      "Body in one line; lower chest toward floor, press back up without sagging hips.",
     source: "Pierre Dalati",
     videoUrl: "https://www.youtube.com/watch?v=_YrJc-kTYA0",
     isTimeBased: false,
@@ -2989,7 +2989,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rear Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rear Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=LsT-bR_zxLo",
     isTimeBased: false,
@@ -3018,7 +3018,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Spinal Erectors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Spinal Erectors. Reference: Hybrid Calisthenics exercise library.",
+      "Torso on bench or pad; swing legs up to hip height with control, avoid jerking at the top.",
     source: "AMR Physiotherapy",
     videoUrl: "https://www.youtube.com/watch?v=ubYywlR_8VM",
     isTimeBased: false,
@@ -3032,7 +3032,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Control the eccentric; use padding under knees and progress range gradually.",
     source: "Movementgems",
     videoUrl: "https://www.youtube.com/watch?v=GtBxjoLlHyA",
     isTimeBased: false,
@@ -3046,7 +3046,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Brachialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Brachialis. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Nick Ball Training",
     videoUrl: "https://www.youtube.com/watch?v=adTY0XNPpWc",
     isTimeBased: false,
@@ -3060,7 +3060,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Get Fit With Viktor",
     videoUrl: "https://www.youtube.com/watch?v=jNeKcCxoWBk",
     isTimeBased: false,
@@ -3074,7 +3074,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rear Deltoids", "Rotator Cuff"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rear Deltoids, Rotator Cuff. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward face with elbows high; externally rotate at the end of the rep.",
     source: "Nick Halverson",
     videoUrl: "https://www.youtube.com/watch?v=s-lbVHmOnpk",
     isTimeBased: false,
@@ -3088,7 +3088,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rear Deltoids, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
     source: "calisthenicsCOM",
     videoUrl: "https://www.youtube.com/watch?v=sb3SNc2mkpU",
     isTimeBased: false,
@@ -3102,7 +3102,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Serratus Anterior"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abs, Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Brace core; roll or crunch through a controlled range without sagging the lower back.",
     source: "Bill Maeda ",
     videoUrl: "https://www.youtube.com/watch?v=nlL-zfAuQ0Q",
     isTimeBased: false,
@@ -3116,7 +3116,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rear Deltoids"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rear Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "CrossFit",
     videoUrl: "https://www.youtube.com/watch?v=sEAOZc77wk8",
     isTimeBased: false,
@@ -3130,7 +3130,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Lateral Deltoids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
     source: "Team Training Day",
     videoUrl: "https://www.youtube.com/watch?v=WVczdS3d9nE",
     isTimeBased: false,
@@ -3144,7 +3144,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Keep upper arms still; extend elbows fully, lower weight with control.",
     source: "SquatCouple",
     videoUrl: "https://www.youtube.com/watch?v=AYqg9S5FrUU",
     isTimeBased: false,
@@ -3158,7 +3158,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Brachialis", "Forearms", "Lats", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Brachialis, Forearms, Lats, Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "Sail North",
     videoUrl: "https://www.youtube.com/watch?v=Nlxm8A9Gc4E",
     isTimeBased: false,
@@ -3173,7 +3173,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Tibialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Tibialis. Reference: Hybrid Calisthenics exercise library.",
+      "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
     source: "Arbilla Exercise Physiology",
     videoUrl: "https://www.youtube.com/watch?v=DB1QegPQQeg",
     isTimeBased: false,
@@ -3185,9 +3185,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Lateral Deltoids"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
     source: "Martyn Pace",
     videoUrl: "https://www.youtube.com/watch?v=agPq9Z3uPFs",
     isTimeBased: false,
@@ -3199,9 +3199,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Rotator Cuff"],
-    defaultReps: "10",
+    defaultReps: "10 each arm",
     notes:
-      "Muscle focus: Rotator Cuff. Reference: Hybrid Calisthenics exercise library.",
+      "Elbow at side, forearm rotates through range; move slowly, no momentum.",
     source: "MidwestOrtho",
     videoUrl: "https://www.youtube.com/watch?v=v5bPOsQbq7g",
     isTimeBased: false,
@@ -3213,9 +3213,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Rotator Cuff"],
-    defaultReps: "10",
+    defaultReps: "10 each arm",
     notes:
-      "Muscle focus: Rotator Cuff. Reference: Hybrid Calisthenics exercise library.",
+      "Elbow at side, forearm rotates through range; move slowly, no momentum.",
     source: "Sapien Rehab and Performance",
     videoUrl: "https://www.youtube.com/watch?v=PSJLb2nH1K0",
     isTimeBased: false,
@@ -3227,9 +3227,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Abductors"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Abductors. Reference: Hybrid Calisthenics exercise library.",
+      "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
     source: "3v",
     videoUrl: "https://www.youtube.com/watch?v=jgh6sGwtTwk",
     isTimeBased: false,
@@ -3243,7 +3243,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "IgnasFit",
     videoUrl: "https://www.youtube.com/watch?v=AYN-U5nZieY",
     isTimeBased: false,
@@ -3257,7 +3257,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Andy Tait",
     videoUrl: "https://www.youtube.com/watch?v=UgKMi-g4RM8",
     isTimeBased: false,
@@ -3269,9 +3269,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: ["Glutes"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Madeline Snacks",
     videoUrl: "https://www.youtube.com/watch?v=LPhYdIg1cbg",
     isTimeBased: false,
@@ -3283,9 +3283,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: ["Hip Flexors"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
+      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
     source: "FusionFitRx_CPT Personal & Online Training",
     videoUrl: "https://www.youtube.com/watch?v=ngxMg0nuPyY",
     isTimeBased: false,
@@ -3299,7 +3299,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Spinal Erectors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Spinal Erectors. Reference: Hybrid Calisthenics exercise library.",
+      "Bar on upper back; hinge at hips with a flat back, then drive hips forward to stand.",
     source: "Naomi Kong",
     videoUrl: "https://www.youtube.com/watch?v=8Tp_Hx1jdSc",
     isTimeBased: false,
@@ -3311,9 +3311,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: ["Abductors"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Abductors. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=j-TJxRRPu64",
     isTimeBased: false,
@@ -3327,7 +3327,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=ZhO7ZOgEzuI",
     isTimeBased: false,
@@ -3341,7 +3341,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "Hypertrophy Dad",
     videoUrl: "https://www.youtube.com/watch?v=FrjJpcsHzQM",
     isTimeBased: false,
@@ -3353,9 +3353,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
     muscleGroups: ["Abductors", "Quadriceps"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Abductors, Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Atomic Athlete",
     videoUrl: "https://www.youtube.com/watch?v=hXpGSa5HYqY",
     isTimeBased: false,
@@ -3369,7 +3369,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes", "Quadriceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Glutes, Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Metro Physical Therapy",
     videoUrl: "https://www.youtube.com/watch?v=CsPAsICeRsM",
     isTimeBased: false,
@@ -3383,7 +3383,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Hamstrings"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Hamstrings. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Propel Fitness Center",
     videoUrl: "https://www.youtube.com/watch?v=bkwW1flKchc",
     isTimeBased: false,
@@ -3397,7 +3397,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Biceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Biceps. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "Chris McCarthy",
     videoUrl: "https://www.youtube.com/watch?v=6DeLZ6cbgWQ",
     isTimeBased: false,
@@ -3411,7 +3411,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Calves"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Calves. Reference: Hybrid Calisthenics exercise library.",
+      "Rise onto toes with control; pause at top, lower heels below platform if available.",
     source: "VersAbility",
     videoUrl: "https://www.youtube.com/watch?v=WX1zyGuTLCA",
     isTimeBased: false,
@@ -3425,7 +3425,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
+      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
     source: "NatLifting",
     videoUrl: "https://www.youtube.com/watch?v=RX_UkyjMhp4",
     isTimeBased: false,
@@ -3440,7 +3440,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Rhomboids, Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Pull toward the torso; squeeze shoulder blades together and control the return.",
     source: "Jesse James East",
     videoUrl: "https://www.youtube.com/watch?v=Nm3M-4fmprk",
     isTimeBased: false,
@@ -3454,7 +3454,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Tibialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Tibialis. Reference: Hybrid Calisthenics exercise library.",
+      "Dorsiflex against resistance; lift toes toward shins, pause, lower slowly.",
     source: "Home Gym Reviews",
     videoUrl: "https://www.youtube.com/watch?v=aor9rapicfk",
     isTimeBased: false,
@@ -3468,7 +3468,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Lower until upper arms are roughly parallel; press up without flaring elbows wide.",
     source: "TylerPath",
     videoUrl: "https://www.youtube.com/watch?v=NNyuuN2sJb0",
     isTimeBased: false,
@@ -3482,7 +3482,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Triceps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Triceps. Reference: Hybrid Calisthenics exercise library.",
+      "Lower until upper arms are roughly parallel; press up without flaring elbows wide.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=LBpNVgVTLqY",
     isTimeBased: false,
@@ -3496,7 +3496,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Traps"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Traps. Reference: Hybrid Calisthenics exercise library.",
+      "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
     source: "Calisthenics Chris The Bodyweight BodyBuilder",
     videoUrl: "https://www.youtube.com/watch?v=zVARrISE_XY",
     isTimeBased: false,
@@ -3510,7 +3510,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "5 each side",
     notes:
-      "Muscle focus: Lateral Deltoids. Reference: Hybrid Calisthenics exercise library.",
+      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
     source: "Rehab Hero",
     videoUrl: "https://www.youtube.com/watch?v=32vhy2hpgaY",
     isTimeBased: false,
@@ -3539,7 +3539,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Serratus Anterior"],
     defaultReps: "30 sec",
     notes:
-      "Muscle focus: Serratus Anterior. Reference: Hybrid Calisthenics exercise library.",
+      "Protract shoulder blades forward; reach through full range without shrugging.",
     source: "Claire DeFitt",
     videoUrl: "https://www.youtube.com/watch?v=kFkohmjibdc",
     isTimeBased: true,
@@ -3565,9 +3565,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
     muscleGroups: ["Spinal Erectors", "Transverse Abdominis"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Spinal Erectors, Transverse Abdominis. Reference: Hybrid Calisthenics exercise library.",
+      "On all fours, extend opposite arm and leg; keep hips level and avoid rotating the torso.",
     source: "Dangerfit Personal Training",
     videoUrl: "https://www.youtube.com/watch?v=a7PLkU4TIrA",
     isTimeBased: false,
@@ -3579,9 +3579,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
     muscleGroups: ["Adductors"],
-    defaultReps: "30 sec",
+    defaultReps: "30 sec each side",
     notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
+      "Stack shoulders over elbow or wrist; lift hips in a straight line and breathe steadily.",
     source: "Sustain Physical Therapy and Performance",
     videoUrl: "https://www.youtube.com/watch?v=0_haQMgNxh8",
     isTimeBased: true,
@@ -3593,9 +3593,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
     muscleGroups: ["Adductors"],
-    defaultReps: "10",
+    defaultReps: "10 each side",
     notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "BeginnersGuide",
     videoUrl: "https://www.youtube.com/watch?v=O2Ce-XhPLuA",
     isTimeBased: false,
@@ -3610,7 +3610,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Abs. Reference: Hybrid Calisthenics exercise library.",
+      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
     source: "Kraken Fitness",
     videoUrl: "https://www.youtube.com/watch?v=Yg6GsyZoqK0",
     isTimeBased: false,
@@ -3625,7 +3625,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Transverse Abdominis. Reference: Hybrid Calisthenics exercise library.",
+      "Low back flat on floor; extend opposite arm and leg without letting ribs flare.",
     source: "Workout Worthy ",
     videoUrl: "https://www.youtube.com/watch?v=KfhoH2Q7mpk",
     isTimeBased: false,
@@ -3637,9 +3637,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
     muscleGroups: ["Hip Flexors"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Hip Flexors. Reference: Hybrid Calisthenics exercise library.",
+      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
     source: "Grown Strong",
     videoUrl: "https://www.youtube.com/watch?v=UlmDIw7ekBE",
     isTimeBased: false,
@@ -3654,7 +3654,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "Elastaboy 😎",
     videoUrl: "https://www.youtube.com/watch?v=ujwHRJukl-M",
     isTimeBased: false,
@@ -3669,7 +3669,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Transverse Abdominis"],
     defaultReps: "30 sec",
     notes:
-      "Muscle focus: Abs, Transverse Abdominis. Reference: Hybrid Calisthenics exercise library.",
+      "Lower back pressed down; lift shoulders and legs off floor and hold a tight hollow shape.",
     source: "The Sustainable Training Method",
     videoUrl: "https://www.youtube.com/watch?v=V7VhUlU3p_U",
     isTimeBased: true,
@@ -3697,9 +3697,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
     muscleGroups: ["Glutes"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Glutes. Reference: Hybrid Calisthenics exercise library.",
+      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=mJilHWIBWO8",
     isTimeBased: false,
@@ -3713,7 +3713,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Obliques"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Rotate torso side to side with control; keep chest up and core braced throughout.",
     source: "Drago Boxing",
     videoUrl: "https://www.youtube.com/watch?v=9DI8kQeK5cU",
     isTimeBased: false,
@@ -3727,7 +3727,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Tibialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Tibialis. Reference: Hybrid Calisthenics exercise library.",
+      "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
     source: "FeRRUM Athletic Company",
     videoUrl: "https://www.youtube.com/watch?v=b_xNeXBvMlo",
     isTimeBased: false,
@@ -3740,9 +3740,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
     muscleGroups: ["Abductors", "Obliques"],
-    defaultReps: "30 sec",
+    defaultReps: "30 sec each side",
     notes:
-      "Muscle focus: Abductors, Obliques. Reference: Hybrid Calisthenics exercise library.",
+      "Stack shoulders over elbow or wrist; lift hips in a straight line and breathe steadily.",
     source: "Boss Lifting",
     videoUrl: "https://www.youtube.com/watch?v=GIDLif1n0bM",
     isTimeBased: true,
@@ -3754,9 +3754,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
     muscleGroups: ["Quadriceps"],
-    defaultReps: "10",
+    defaultReps: "10 each leg",
     notes:
-      "Muscle focus: Quadriceps. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "ZAP Endurance",
     videoUrl: "https://www.youtube.com/watch?v=y_26ssEpBX4",
     isTimeBased: false,
@@ -3771,7 +3771,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Adductors. Reference: Hybrid Calisthenics exercise library.",
+      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
     source: "ArielYu_Fit",
     videoUrl: "https://www.youtube.com/watch?v=sQ-lwJtpwUc",
     isTimeBased: false,
@@ -3785,7 +3785,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Tibialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Tibialis. Reference: Hybrid Calisthenics exercise library.",
+      "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
     source: "Do Better Fitness",
     videoUrl: "https://www.youtube.com/watch?v=awSgbYEXPY8",
     isTimeBased: false,
@@ -3799,7 +3799,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Tibialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Tibialis. Reference: Hybrid Calisthenics exercise library.",
+      "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
     source: "Strength Coach Phil",
     videoUrl: "https://www.youtube.com/watch?v=AFBbyAdNvg8",
     isTimeBased: false,
@@ -3814,7 +3814,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Brachialis"],
     defaultReps: "10",
     notes:
-      "Muscle focus: Brachialis. Reference: Hybrid Calisthenics exercise library.",
+      "Curl with elbows fixed; full range up and controlled lower on the way down.",
     source: "ScottHermanFitness",
     videoUrl: "https://www.youtube.com/watch?v=ZrpRBgswtHs",
     isTimeBased: false,
