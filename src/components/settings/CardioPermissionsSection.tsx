@@ -1,0 +1,213 @@
+"use client";
+
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { toast } from "sonner";
+import {
+  CARDIO_HEALTH_READ_TYPES,
+  checkNativeHealthAuthorization,
+  openNativeHealthSettings,
+} from "@/lib/health/nativeHealth";
+import {
+  ensureCardioHealthReadAccess,
+} from "@/lib/health";
+import {
+  openNativeLocationSettings,
+  requestNativeLocationPermission,
+} from "@/lib/geo/openLocationSettings";
+
+type HealthAccessState = "unknown" | "granted" | "denied";
+
+export default function CardioPermissionsSection() {
+  const [healthAccess, setHealthAccess] = useState<HealthAccessState>("unknown");
+  const [locationGranted, setLocationGranted] = useState<boolean | null>(null);
+  const [healthBusy, setHealthBusy] = useState(false);
+  const [locationBusy, setLocationBusy] = useState(false);
+
+  const refreshHealthAccess = useCallback(async () => {
+    const status = await checkNativeHealthAuthorization({
+      read: CARDIO_HEALTH_READ_TYPES,
+      write: [],
+    });
+    const granted = (status?.readAuthorized.length ?? 0) > 0;
+    setHealthAccess(granted ? "granted" : "denied");
+  }, []);
+
+  useEffect(() => {
+    void refreshHealthAccess();
+  }, [refreshHealthAccess]);
+
+  async function handleConnectHealth() {
+    setHealthBusy(true);
+    try {
+      const granted = await ensureCardioHealthReadAccess();
+      setHealthAccess(granted ? "granted" : "denied");
+      if (granted) {
+        toast.success("Health Connect access granted");
+      } else {
+        toast.error(
+          "Health Connect did not grant access. Open settings below to allow MyExercise.",
+        );
+      }
+    } finally {
+      setHealthBusy(false);
+    }
+  }
+
+  async function handleOpenHealthSettings() {
+    const opened = await openNativeHealthSettings();
+    if (!opened) {
+      toast.error(
+        "Could not open Health Connect. Try Settings → Apps → Health Connect.",
+      );
+      return;
+    }
+    window.setTimeout(() => void refreshHealthAccess(), 1500);
+  }
+
+  async function handleRequestLocation() {
+    setLocationBusy(true);
+    try {
+      const granted = await requestNativeLocationPermission();
+      setLocationGranted(granted);
+      if (granted) {
+        toast.success("Location access granted");
+      } else {
+        toast.message(
+          "Location was not granted. Turn on GPS and allow location for MyExercise in system settings.",
+        );
+      }
+    } finally {
+      setLocationBusy(false);
+    }
+  }
+
+  async function handleOpenLocationSettings() {
+    const opened = await openNativeLocationSettings();
+    if (!opened) {
+      toast.error("Could not open location settings.");
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-xs text-muted leading-relaxed">
+        Walk, jog, and other cardio can pull steps, calories, and heart rate
+        from Health Connect, or track distance with GPS. Grant access once here
+        so quick log and import work without hunting through Android settings
+        mid-workout.
+      </p>
+
+      <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface-hover/40 p-3">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <p className="text-sm font-medium text-foreground">Health Connect</p>
+            <p className="text-xs text-muted mt-0.5">
+              Import sessions and enrich logs with steps, active calories, and
+              average heart rate.
+            </p>
+          </div>
+          <HealthStatusBadge state={healthAccess} />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <ActionButton
+            onClick={() => void handleConnectHealth()}
+            disabled={healthBusy}
+          >
+            {healthBusy ? "Connecting…" : "Connect Health Connect"}
+          </ActionButton>
+          <ActionButton
+            variant="secondary"
+            onClick={() => void handleOpenHealthSettings()}
+          >
+            Open Health Connect settings
+          </ActionButton>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface-hover/40 p-3">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <p className="text-sm font-medium text-foreground">Location (GPS)</p>
+            <p className="text-xs text-muted mt-0.5">
+              Track distance while the app is open. For best accuracy, keep
+              location on and allow MyExercise to use it.
+            </p>
+          </div>
+          {locationGranted != null ? (
+            <span
+              className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                locationGranted
+                  ? "bg-green-500/15 text-green-400"
+                  : "bg-amber-500/15 text-amber-400"
+              }`}
+            >
+              {locationGranted ? "Allowed" : "Denied"}
+            </span>
+          ) : null}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <ActionButton
+            onClick={() => void handleRequestLocation()}
+            disabled={locationBusy}
+          >
+            {locationBusy ? "Requesting…" : "Allow location access"}
+          </ActionButton>
+          <ActionButton
+            variant="secondary"
+            onClick={() => void handleOpenLocationSettings()}
+          >
+            Open location settings
+          </ActionButton>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HealthStatusBadge({ state }: { state: HealthAccessState }) {
+  if (state === "unknown") {
+    return (
+      <span className="shrink-0 rounded-full bg-surface-hover px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted">
+        Checking…
+      </span>
+    );
+  }
+  return (
+    <span
+      className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+        state === "granted"
+          ? "bg-green-500/15 text-green-400"
+          : "bg-amber-500/15 text-amber-400"
+      }`}
+    >
+      {state === "granted" ? "Connected" : "Not connected"}
+    </span>
+  );
+}
+
+function ActionButton({
+  children,
+  onClick,
+  disabled,
+  variant = "primary",
+}: {
+  children: ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  variant?: "primary" | "secondary";
+}) {
+  const base =
+    variant === "primary"
+      ? "border-accent/40 bg-accent/10 text-foreground hover:bg-accent/20"
+      : "border-border bg-background text-foreground hover:border-accent/30";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50 ${base}`}
+    >
+      {children}
+    </button>
+  );
+}

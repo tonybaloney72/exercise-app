@@ -7,6 +7,12 @@ MyExercise on Android uses **Capacitor** with the same React/Next UI. Two load m
 | **Remote** | WebView → `https://myexercise.dev` | Fastest to ship; sideload APK while iterating |
 | **Bundled** | Static export in `out/` copied into APK | Offline-capable UI; `/api/*` still hits production until ported |
 
+## Platform scope (May 2026)
+
+**Android Capacitor + Health Connect first.** Web/PWA on all platforms. **iPhone: PWA only** — no App Store or HealthKit in the near term. React/Next UI is unchanged; native code is a thin shell only. iOS native and other deferred ideas → [ROADMAP — Ideas](../ROADMAP.md#ideas--future-considerations).
+
+Cardio import/GPS notes → [cardio-tracking.md](cardio-tracking.md).
+
 ## Prerequisites
 
 - [Android Studio](https://developer.android.com/studio) (SDK + emulator or USB device)

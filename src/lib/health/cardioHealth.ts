@@ -15,6 +15,7 @@ import {
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
+import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
@@ -270,6 +271,77 @@ export async function enrichCardioHealthMeta(
     );
     return base;
   }
+}
+
+/** Local calendar-day window for Health Connect daily aggregates. Today ends at `now`. */
+export function localDayHealthWindow(
+  dateKey: string,
+  now: Date = new Date(),
+): { start: Date; end: Date } {
+  const [y, m, d] = dateKey.split("-").map(Number);
+  const start = new Date(y!, (m ?? 1) - 1, d ?? 1, 0, 0, 0, 0);
+  if (dateKey === formatLocalDateKey(now)) {
+    return { start, end: new Date(now) };
+  }
+  const end = new Date(y!, (m ?? 1) - 1, d ?? 1, 23, 59, 59, 999);
+  return { start, end };
+}
+
+export function lastNLocalDateKeys(
+  dayCount: number,
+  now: Date = new Date(),
+): string[] {
+  const keys: string[] = [];
+  for (let i = dayCount - 1; i >= 0; i -= 1) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    keys.push(formatLocalDateKey(d));
+  }
+  return keys;
+}
+
+/** Steps from Health Connect for one local calendar day (midnight → now if today). */
+export async function fetchDailyStepCount(
+  dateKey: string,
+  now: Date = new Date(),
+): Promise<number | undefined> {
+  if (!isNativePlatform()) return undefined;
+  if (!(await hasCardioHealthReadAccess())) return undefined;
+
+  const { start, end } = localDayHealthWindow(dateKey, now);
+  const samples = await readNativeHealthSamples({
+    dataType: "steps",
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+    limit: 500,
+  });
+  return Math.round(sumHealthSampleValues(samples));
+}
+
+export async function fetchDailyStepCountsForKeys(
+  dateKeys: readonly string[],
+  now: Date = new Date(),
+): Promise<Record<string, number>> {
+  if (!isNativePlatform() || dateKeys.length === 0) return {};
+  if (!(await hasCardioHealthReadAccess())) return {};
+
+  const entries = await Promise.all(
+    dateKeys.map(async (dateKey) => {
+      const count = await fetchDailyStepCount(dateKey, now);
+      return [dateKey, count] as const;
+    }),
+  );
+
+  const out: Record<string, number> = {};
+  for (const [dateKey, count] of entries) {
+    if (count != null) out[dateKey] = count;
+  }
+  return out;
+}
+
+/** Read-only check — does not open the Health Connect permission UI. */
+export async function checkCardioHealthReadAccess(): Promise<boolean> {
+  return hasCardioHealthReadAccess();
 }
 
 export async function writeCardioSessionToHealth(options: {

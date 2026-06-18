@@ -22,8 +22,9 @@ import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
-import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
+import { findCompletedWorkoutForDate, filterCompletedWorkouts } from "@/utils/workoutLogLookup";
 import { countRoundExerciseSlots } from "@/utils/workoutLogCounts";
+import { weekToDatePlanAdherence } from "@/utils/progressStats";
 
 const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 /** Same Sun–Sat order as the week strip and `weekDates`. */
@@ -100,6 +101,11 @@ export default function WeeklyPage() {
     return set;
   }, [workoutHistory, weekDateKeys]);
 
+  const weekAdherence = useMemo(() => {
+    const completedHistory = filterCompletedWorkouts(workoutHistory);
+    return weekToDatePlanAdherence(completedHistory, weekByDow);
+  }, [workoutHistory, weekByDow]);
+
   if (mode === "loading") {
     return <WeeklyPageSkeleton />;
   }
@@ -111,6 +117,14 @@ export default function WeeklyPage() {
         <p className="text-sm text-muted mt-1">
           Your training week at a glance
         </p>
+        {!weekLoading && weekAdherence.planned > 0 ? (
+          <p className="text-xs text-muted mt-2 tabular-nums">
+            <span className="font-medium text-foreground">
+              {weekAdherence.completed} / {weekAdherence.planned}
+            </span>{" "}
+            main-round exercises completed ({weekAdherence.spanShort})
+          </p>
+        ) : null}
       </div>
 
       {weekError && (

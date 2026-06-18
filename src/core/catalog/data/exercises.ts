@@ -3184,7 +3184,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Chest", "Front Deltoids", "Mobility"],
     defaultReps: "10",
     notes:
-      "Arms wide at shoulder height, bring hands together in front of chest, open back out. DAREBEE Universal / Quick / Classic / 2-Min / 4-Min.",
+      "Arms wide at shoulder height, bring hands together in front of chest, open back out.",
     source: "DAREBEE",
     videoUrl: "https://darebee.com/exercises/chest-expansions.html",
     isTimeBased: false,
@@ -3199,7 +3199,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Chest", "Front Deltoids", "Mobility"],
     defaultReps: "10 each side",
     notes:
-      "One arm reaches up and back while the other reaches down; switch in a controlled rhythm. DAREBEE Quick / 4-Min.",
+      "One arm reaches up and back while the other reaches down; switch in a controlled rhythm.",
     source: "DAREBEE - Quick Warmup",
     videoUrl: "https://darebee.com/workouts/quick-warmup-workout.html",
     isTimeBased: false,
@@ -3214,7 +3214,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Biceps", "Lats", "Mobility", "Rear Deltoids", "Rhomboids"],
     defaultReps: "10 each side",
     notes:
-      "Alternate reaching one arm up and slightly back while the other stays down. Opens chest and shoulders. DAREBEE 2-Minute Warmup.",
+      "Alternate reaching one arm up and slightly back while the other stays down. Opens chest and shoulders.",
     source: "DAREBEE - 2-Minute Warmup",
     videoUrl: "https://darebee.com/workouts/2-minute-warmup-workout.html",
     isTimeBased: false,
@@ -3229,7 +3229,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Front Deltoids", "Mobility"],
     defaultReps: "10",
     notes:
-      "Raise both arms out to the sides and overhead in a wide arc, lower with control. DAREBEE Classic Warmup.",
+      "Raise both arms out to the sides and overhead in a wide arc, lower with control.",
     source: "DAREBEE - Classic Warmup",
     videoUrl: "https://darebee.com/workouts/classic-warmup-workout.html",
     isTimeBased: false,
@@ -3243,8 +3243,7 @@ const catalogExercises: Exercise[] = [
     expertiseLevel: "beginner",
     muscleGroups: ["Calves", "Mobility"],
     defaultReps: "10",
-    notes:
-      "Light bounces on the balls of the feet, minimal knee bend. Also used for 20 sec intervals in DAREBEE 4-Minute Warmup.",
+    notes: "Light bounces on the balls of the feet, minimal knee bend.",
     source: "DAREBEE",
     videoUrl: "https://darebee.com/exercises/hops-on-the-spot.html",
     isTimeBased: false,
@@ -3258,8 +3257,7 @@ const catalogExercises: Exercise[] = [
     expertiseLevel: "beginner",
     muscleGroups: ["Calves", "Mobility"],
     defaultReps: "10",
-    notes:
-      "Small lateral hops, feet land softly shoulder-width apart. DAREBEE Quick / Classic / 2-Min / 4-Min.",
+    notes: "Small lateral hops, feet land softly shoulder-width apart.",
     source: "DAREBEE",
     videoUrl: "https://darebee.com/exercises/hops-side-to-side.html",
     isTimeBased: false,
@@ -3273,8 +3271,7 @@ const catalogExercises: Exercise[] = [
     expertiseLevel: "beginner",
     muscleGroups: ["Calves", "Mobility"],
     defaultReps: "10",
-    notes:
-      "Hop left and right with feet together; stay light on the toes. DAREBEE 2-Minute Warmup.",
+    notes: "Hop left and right with feet together; stay light on the toes.",
     source: "DAREBEE - 2-Minute Warmup",
     videoUrl:
       "https://darebee.com/exercises/hops-side-to-side-feet-together.html",
@@ -3290,7 +3287,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Calves", "Glutes", "Mobility", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
-      "Small hops on one foot, then switch; use a wall for balance if needed. DAREBEE Quick / 4-Min.",
+      "Small hops on one foot, then switch; use a wall for balance if needed.",
     source: "DAREBEE - Quick Warmup",
     videoUrl: "https://darebee.com/workouts/quick-warmup-workout.html",
     isTimeBased: false,
@@ -3305,7 +3302,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Glutes", "Mobility", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
-      "Stand on one leg, lift the other knee and rotate the hip outward in a circle, then switch legs. DAREBEE Quick / 2-Min / 4-Min.",
+      "Stand on one leg, lift the other knee and rotate the hip outward in a circle, then switch legs.",
     source: "DAREBEE - Quick Warmup",
     videoUrl: "https://darebee.com/workouts/quick-warmup-workout.html",
     isTimeBased: false,
@@ -3320,7 +3317,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Mobility", "Obliques"],
     defaultReps: "10",
     notes:
-      "Hands on hips, rotate upper body in a controlled circle; switch direction halfway. Distinct from arm-driven torso twists. DAREBEE Quick / Classic / 2-Min / 4-Min / Fighter's.",
+      "Hands on hips, rotate upper body in a controlled circle; switch direction halfway. Distinct from arm-driven torso twists.",
     source: "DAREBEE",
     videoUrl: "https://darebee.com/workouts/classic-warmup-workout.html",
     isTimeBased: false,
@@ -3335,7 +3332,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Chest", "Front Deltoids", "Mobility", "Triceps"],
     defaultReps: "30 sec",
     notes:
-      "Loose jabs and crosses at easy speed, stay on the balls of the feet. DAREBEE Fighter's Warmup.",
+      "Loose jabs and crosses at easy speed, stay on the balls of the feet.",
     source: "DAREBEE - Fighter's Warmup",
     videoUrl: "https://darebee.com/workouts/fighters-warmup-workout.html",
     isTimeBased: true,
@@ -3349,8 +3346,7 @@ const catalogExercises: Exercise[] = [
     expertiseLevel: "beginner",
     muscleGroups: ["Glutes", "Hip Flexors", "Mobility", "Quadriceps"],
     defaultReps: "30 sec (alternate legs)",
-    notes:
-      "Low snap kicks straight ahead, light contact, alternate legs. DAREBEE Fighter's Warmup.",
+    notes: "Low snap kicks straight ahead, light contact, alternate legs.",
     source: "DAREBEE - Fighter's Warmup",
     videoUrl: "https://darebee.com/exercises/front-kicks.html",
     isTimeBased: true,
@@ -3365,7 +3361,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Glutes", "Mobility", "Quadriceps"],
     defaultReps: "30 sec",
     notes:
-      "Low roundhouse-style kick with controlled hip turn; stay light and mobile. DAREBEE Fighter's Warmup.",
+      "Low roundhouse-style kick with controlled hip turn; stay light and mobile.",
     source: "DAREBEE - Fighter's Warmup",
     videoUrl: "https://darebee.com/exercises/turning-kicks.html",
     isTimeBased: true,
@@ -3380,7 +3376,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Calves", "Chest", "Mobility"],
     defaultReps: "16",
     notes:
-      "Jump feet wide while clapping hands in front of chest; stay light on the toes. DAREBEE Classic / 2-Min / 4-Min.",
+      "Jump feet wide while clapping hands in front of chest; stay light on the toes.",
     source: "DAREBEE",
     videoUrl: "https://darebee.com/exercises/seal-jacks.html",
     isTimeBased: false,
@@ -3394,8 +3390,7 @@ const catalogExercises: Exercise[] = [
     expertiseLevel: "beginner",
     muscleGroups: ["Calves", "Hip Flexors", "Mobility"],
     defaultReps: "20 each leg",
-    notes:
-      "Lift knees to a comfortable height, opposite arm swing, easy pace. DAREBEE Universal Warmup.",
+    notes: "Lift knees to a comfortable height, opposite arm swing, easy pace.",
     source: "DAREBEE - Universal Warmup",
     videoUrl: "https://darebee.com/workouts/universal-warmup-workout.html",
     isTimeBased: false,
@@ -3410,7 +3405,7 @@ const catalogExercises: Exercise[] = [
     muscleGroups: ["Calves", "Glutes", "Mobility"],
     defaultReps: "20 sec",
     notes:
-      "Small skip hops on the balls of the feet, soft landings, stay tall. DAREBEE Quick / 4-Min warmups.",
+      "Small skip hops on the balls of the feet, soft landings, stay tall.",
     source: "DAREBEE - Quick Warmup",
     videoUrl: "https://darebee.com/workouts/quick-warmup-workout.html",
     isTimeBased: true,
@@ -3615,12 +3610,7 @@ const catalogExercises: Exercise[] = [
     category: "UPL",
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
-    muscleGroups: [
-      "Lats",
-      "Rear Deltoids",
-      "Rhomboids",
-      "Spinal Erectors",
-    ],
+    muscleGroups: ["Lats", "Rear Deltoids", "Rhomboids", "Spinal Erectors"],
     defaultReps: "5",
     notes:
       "Face down, arms long: lift into I (arms/head/chest off floor), sweep to Y, bend elbows to W (scapular retraction), extend to T, sweep forward to I - one rep. Wakes postural muscles before rows, runs, or deadlifts. Peloton warm-up.",

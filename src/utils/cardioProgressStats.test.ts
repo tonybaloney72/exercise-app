@@ -36,4 +36,28 @@ describe("buildCardioChartSeries", () => {
     expect(series[1]?.xLabel).toContain("#2");
     expect(series[1]?.sessionIndex).toBe(2);
   });
+
+  it("includes session step counts from Health Connect", () => {
+    const walkId = CARDIO_KIND_TO_EXERCISE_ID.walk;
+    const history = [
+      {
+        id: "w1",
+        date: "2026-05-18",
+        cardioExercises: [
+          {
+            exerciseId: walkId,
+            completed: true,
+            skipped: false,
+            actualDuration: 1200,
+            stepCount: 3100,
+          },
+        ],
+      } satisfies Partial<WorkoutLog> as WorkoutLog,
+    ];
+
+    const series = buildCardioChartSeries(history, walkId);
+    expect(series).toHaveLength(1);
+    expect(series[0]?.stepCount).toBe(3100);
+    expect(series[0]?.activeCaloriesKcal).toBeUndefined();
+  });
 });

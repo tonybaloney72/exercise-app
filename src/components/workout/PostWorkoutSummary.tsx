@@ -105,15 +105,13 @@ export default function PostWorkoutSummary({
           </p>
         ) : null}
 
-        <div className="border-t border-border py-4">
-          <button
-            type="button"
-            onClick={onMoreDetails}
-            className="w-full rounded-xl border border-border bg-surface-hover py-3 text-sm font-semibold text-foreground transition-colors hover:border-accent/40 hover:bg-accent/10"
-          >
-            More details
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onMoreDetails}
+          className="w-full rounded-xl border border-border bg-surface-hover py-3 text-sm font-semibold text-foreground transition-colors hover:border-accent/40 hover:bg-accent/10"
+        >
+          More details
+        </button>
       </SurfaceCard>
     </AnimatedSection>
   );

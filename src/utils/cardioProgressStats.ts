@@ -12,6 +12,10 @@ export interface CardioChartPoint {
   durationSec?: number;
   durationMin?: number;
   paceSecondsPerMile?: number;
+  /** Health Connect metrics for this session window. */
+  stepCount?: number;
+  activeCaloriesKcal?: number;
+  avgHeartRateBpm?: number;
 }
 
 function parseDateKeyMs(key: string): number {
@@ -40,6 +44,18 @@ export function buildCardioChartSeries(
     entries.forEach((entry, index) => {
       const dist = entry.actualDistanceMi;
       const dur = entry.actualDuration;
+      const steps =
+        entry.stepCount != null && entry.stepCount > 0
+          ? entry.stepCount
+          : undefined;
+      const kcal =
+        entry.activeCaloriesKcal != null && entry.activeCaloriesKcal > 0
+          ? entry.activeCaloriesKcal
+          : undefined;
+      const hr =
+        entry.avgHeartRateBpm != null && entry.avgHeartRateBpm > 0
+          ? entry.avgHeartRateBpm
+          : undefined;
       if (dist == null && dur == null) return;
 
       let pace: number | undefined;
@@ -59,6 +75,9 @@ export function buildCardioChartSeries(
         durationSec: dur ?? undefined,
         durationMin: dur != null ? dur / 60 : undefined,
         paceSecondsPerMile: pace,
+        stepCount: steps,
+        activeCaloriesKcal: kcal,
+        avgHeartRateBpm: hr,
       });
     });
   }

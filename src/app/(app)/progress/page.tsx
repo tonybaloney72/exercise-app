@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
-import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { useDailyStepsFromHealth } from "@/hooks/useDailyStepsFromHealth";
 import TabEnterMotion from "@/components/common/TabEnterMotion";
 import ProgressPageSkeleton from "@/components/common/ProgressPageSkeleton";
 import ProgressChartsSkeleton from "@/components/progress/ProgressChartsSkeleton";
@@ -13,6 +13,7 @@ import {
   buildCardioMilesTotals,
   formatCardioRecentLine,
 } from "@/lib/resolveWorkoutCardio";
+import { buildCardioHealthTotals } from "@/utils/cardioHealthProgressStats";
 import {
   CARDIO_ACTIVITY_ORDER,
   CARDIO_KIND_TO_EXERCISE_ID,
@@ -43,7 +44,6 @@ import {
   formatWorkoutHistoryDayLabel,
   workoutHistoryRowMeta,
 } from "@/lib/workoutHistoryGroups";
-import { weekToDatePlanAdherence } from "@/utils/progressStats";
 import { filterCompletedWorkouts } from "@/utils/workoutLogLookup";
 
 const ProgressChartsBlock = dynamic(
@@ -54,16 +54,7 @@ const ProgressChartsBlock = dynamic(
 export default function ProgressPage() {
   const historyReady = useHistoryReady();
   const { workoutHistory } = useWorkoutStore();
-  const weekDates = useMemo(() => {
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(now);
-      d.setDate(now.getDate() - dayOfWeek + i);
-      return d;
-    });
-  }, []);
-  const { weekByDow } = useTrainingWeekPlans(weekDates);
+  const dailySteps = useDailyStepsFromHealth();
 
   const completedHistory = useMemo(
     () => filterCompletedWorkouts(workoutHistory),
@@ -92,10 +83,10 @@ export default function ProgressPage() {
     }
 
     const cardioMiles = buildCardioMilesTotals(completedHistory);
-    const weekPlan = weekToDatePlanAdherence(completedHistory, weekByDow);
+    const cardioHealth = buildCardioHealthTotals(completedHistory);
 
-    return { totalWorkouts, currentStreak, cardioMiles, weekPlan };
-  }, [completedHistory, weekByDow]);
+    return { totalWorkouts, currentStreak, cardioMiles, cardioHealth };
+  }, [completedHistory]);
 
   const statCards = useMemo(() => {
     const base = [
@@ -108,11 +99,6 @@ export default function ProgressPage() {
         label: "Current Streak",
         value: `${stats.currentStreak} day${stats.currentStreak !== 1 ? "s" : ""}`,
         icon: "🔥",
-      },
-      {
-        label: `Completed / planned`,
-        value: `${stats.weekPlan.completed} / ${stats.weekPlan.planned}`,
-        icon: "✅",
       },
     ];
 
@@ -132,15 +118,32 @@ export default function ProgressPage() {
       ];
     });
 
-    return { base, cardioStats };
-  }, [stats]);
+    const healthStats: ProgressStatCard[] = [];
+    if (dailySteps.available && dailySteps.todaySteps != null) {
+      healthStats.push({
+        label: "Steps today",
+        value: dailySteps.todaySteps.toLocaleString(),
+        icon: "👟",
+      });
+    }
+    if (stats.cardioHealth.totalActiveKcal > 0) {
+      healthStats.push({
+        label: "Active kcal",
+        value: Math.round(stats.cardioHealth.totalActiveKcal).toLocaleString(),
+        icon: "⚡",
+      });
+    }
+
+    return { base, cardioStats, healthStats };
+  }, [stats, dailySteps.available, dailySteps.todaySteps]);
 
   const gridCards = useMemo((): ProgressGridItem[] => {
-    const { base, cardioStats } = statCards;
+    const { base, cardioStats, healthStats } = statCards;
+    const items: ProgressGridItem[] = [...base, ...healthStats];
     if (cardioStats.length <= 1) {
-      return [...base, ...cardioStats];
+      return [...items, ...cardioStats];
     }
-    return [...base, { kind: "cardio-rotate", cardioStats }];
+    return [...items, { kind: "cardio-rotate", cardioStats }];
   }, [statCards]);
 
   if (!historyReady) {
@@ -171,9 +174,7 @@ export default function ProgressPage() {
               <p className="mt-2 text-xl font-bold tabular-nums text-foreground">
                 {card.value}
               </p>
-              <p className="text-sm leading-snug text-muted">
-                {card.label}
-              </p>
+              <p className="text-sm leading-snug text-muted">{card.label}</p>
             </TabEnterMotion>
           ),
         )}
@@ -181,7 +182,11 @@ export default function ProgressPage() {
 
       {completedHistory.length > 0 && <ProgressHistoryLink />}
 
-      <ProgressChartsBlock history={completedHistory} />
+      <ProgressChartsBlock
+        history={completedHistory}
+        dailyStepsSeries={dailySteps.chartSeries}
+        dailyStepsLoading={dailySteps.loading && dailySteps.available}
+      />
 
       {completedHistory.length > 0 && (
         <div className="flex flex-col gap-3">

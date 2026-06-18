@@ -51,6 +51,18 @@ function CardioTooltipBody({ point }: { point: CardioChartPoint }) {
       : null;
   const pace = formatPacePerMile(point.paceSecondsPerMile);
   const paceLine = pace !== "-" ? `Pace: ${pace}` : null;
+  const steps =
+    point.stepCount != null && point.stepCount > 0
+      ? point.stepCount.toLocaleString()
+      : null;
+  const kcal =
+    point.activeCaloriesKcal != null && point.activeCaloriesKcal > 0
+      ? Math.round(point.activeCaloriesKcal).toLocaleString()
+      : null;
+  const hr =
+    point.avgHeartRateBpm != null && point.avgHeartRateBpm > 0
+      ? Math.round(point.avgHeartRateBpm).toLocaleString()
+      : null;
 
   return (
     <div
@@ -64,7 +76,12 @@ function CardioTooltipBody({ point }: { point: CardioChartPoint }) {
       {dist && <p className="mt-1 text-muted">Distance: {dist}</p>}
       {time && <p className="text-muted">Time: {time}</p>}
       {paceLine && <p className="text-muted">{paceLine}</p>}
-      {!dist && !time && <p className="text-muted">No metrics logged</p>}
+      {steps && <p className="text-muted">Steps: {steps}</p>}
+      {kcal && <p className="text-muted">Active kcal: {kcal}</p>}
+      {hr && <p className="text-muted">Avg HR: {hr} bpm</p>}
+      {!dist && !time && !steps && !kcal && !hr && (
+        <p className="text-muted">No metrics logged</p>
+      )}
     </div>
   );
 }
@@ -141,7 +158,7 @@ export default function CardioProgressChart({
     return (
       <ChartShell
         title={activityTitle}
-        subtitle="Distance (bars) and session time (line). Tooltip shows pace per mile when both are logged."
+        subtitle="Distance (bars) and session time (line). Tap a session for pace and Health Connect metrics when logged."
       >
         <ResponsiveContainer
           width="100%"
@@ -253,7 +270,7 @@ export default function CardioProgressChart({
     return (
       <ChartShell
         title={activityTitle}
-        subtitle={`Distance per completed session (log time as well to see pace).`}
+        subtitle="Distance per completed session. Tap a session for pace and Health Connect metrics when logged."
       >
         <ResponsiveContainer
           width="100%"
@@ -315,7 +332,7 @@ export default function CardioProgressChart({
   return (
     <ChartShell
       title={activityTitle}
-      subtitle="Session time per completed session (add distance to see pace per mile)."
+      subtitle="Session time per completed session. Tap a session for Health Connect metrics when logged."
     >
       <ResponsiveContainer
         width="100%"

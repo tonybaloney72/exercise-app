@@ -32,6 +32,7 @@ import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStor
 import { createClient } from "@/lib/supabase/client";
 import { resolveApiUrl } from "@/lib/apiBaseUrl";
 import { isCapacitorBundledBuild, isNativePlatform } from "@/lib/capacitorRuntime";
+import CardioPermissionsSection from "@/components/settings/CardioPermissionsSection";
 import { clearGuestCookie } from "@/lib/auth/guestCookieClient";
 import { useDiagnosticLogUnlock } from "@/hooks/useDiagnosticLogUnlock";
 export default function SettingsPage() {
@@ -281,6 +282,19 @@ export default function SettingsPage() {
           />
         </CollapsibleSection>
       </AnimatedSection>
+
+      {isNativePlatform() ? (
+        <AnimatedSection delay={0.046}>
+          <CollapsibleSection
+            title="Cardio & sensors"
+            hint="Health Connect and GPS permissions for walk/jog logging"
+            defaultOpen={false}
+            contentClassName="p-4"
+          >
+            <CardioPermissionsSection />
+          </CollapsibleSection>
+        </AnimatedSection>
+      ) : null}
 
       {/* Equipment */}
       <AnimatedSection delay={0.048}>
