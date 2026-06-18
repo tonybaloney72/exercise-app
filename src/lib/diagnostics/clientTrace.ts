@@ -151,12 +151,12 @@ export function clearClientTrace(): void {
   }
 }
 
-export type ClientTraceExport = {
+type ClientTraceExport = {
   meta: Record<string, unknown>;
   entries: TraceEntry[];
 };
 
-export function buildClientTraceExport(
+function buildClientTraceExport(
   extraMeta?: Record<string, unknown>,
 ): ClientTraceExport {
   return {

@@ -148,7 +148,7 @@ export default function CardioGpsTracker({ onComplete }: Props) {
 
   return (
     <>
-      <div className="rounded-xl border border-border bg-surface-hover/60 p-3 space-y-2">
+      <div className="flex flex-col rounded-xl border border-border bg-surface-hover/60 p-3 gap-2">
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-sm font-medium text-foreground">Track with GPS</p>

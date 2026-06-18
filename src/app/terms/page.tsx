@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <LegalDocumentLayout title="Terms of Service">
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <p>
           These Terms of Service (&quot;Terms&quot;) govern your use of{" "}
           {LEGAL_APP_NAME} at {LEGAL_DOMAIN}, a personal project built and
@@ -24,7 +24,7 @@ export default function TermsPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           Solo developer project
         </h2>
@@ -35,7 +35,7 @@ export default function TermsPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           Not medical advice
         </h2>
@@ -49,7 +49,7 @@ export default function TermsPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">Your account</h2>
         <p>
           You may use guest mode without an account or create an account to sync
@@ -60,7 +60,7 @@ export default function TermsPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           Your content and data
         </h2>
@@ -74,7 +74,7 @@ export default function TermsPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           Availability and changes
         </h2>
@@ -86,7 +86,7 @@ export default function TermsPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           Limitation of liability
         </h2>
@@ -98,7 +98,7 @@ export default function TermsPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">Termination</h2>
         <p>
           You may stop using the app at any time. We may suspend or terminate
@@ -107,7 +107,7 @@ export default function TermsPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">Contact</h2>
         <p>
           Questions about these Terms? Email{" "}
@@ -121,7 +121,7 @@ export default function TermsPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">Changes</h2>
         <p>
           These Terms may be updated from time to time. The &quot;Last

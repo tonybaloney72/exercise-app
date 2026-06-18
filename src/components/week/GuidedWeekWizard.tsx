@@ -87,7 +87,7 @@ export default function GuidedWeekWizard() {
 
   if (!hydrated || mode === "loading" || !isGuidedCustomSettings(settings)) {
     return (
-      <div className="py-12 space-y-3">
+      <div className="flex flex-col py-12 gap-3">
         <PlanCardSkeleton />
         <PlanCardSkeleton />
       </div>
@@ -102,7 +102,7 @@ export default function GuidedWeekWizard() {
   if (step === "review") {
     const globalWarnings = warnings.filter((w) => w.dayOfWeek == null);
     return (
-      <div className="py-6 space-y-5 pb-24">
+      <div className="flex flex-col py-6 gap-5 pb-24">
         <div>
           <button
             type="button"
@@ -120,7 +120,7 @@ export default function GuidedWeekWizard() {
         </div>
 
         {globalWarnings.length > 0 ? (
-          <SurfaceCard className="border-amber-500/30 bg-amber-500/5 p-4 space-y-1">
+          <SurfaceCard className="flex flex-col border-amber-500/30 bg-amber-500/5 p-4 gap-1">
             {globalWarnings.map((w) => (
               <p
                 key={w.id}
@@ -132,7 +132,7 @@ export default function GuidedWeekWizard() {
           </SurfaceCard>
         ) : null}
 
-        <ul className="space-y-2">
+        <ul className="flex flex-col gap-2">
           {WEEK_DAY_ABBRS.map((label, dow) => (
             <li
               key={label}
@@ -181,7 +181,7 @@ export default function GuidedWeekWizard() {
       }
       onSelectDow={setActiveDow}
       footer={
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           {activeDow < 6 ? (
             <button
               type="button"

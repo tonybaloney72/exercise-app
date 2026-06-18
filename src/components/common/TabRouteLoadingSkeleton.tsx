@@ -4,11 +4,11 @@ import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
 export default function TabRouteLoadingSkeleton() {
   return (
     <div
-      className="py-6 space-y-5 animate-pulse"
+      className="flex flex-col py-6 gap-5 animate-pulse"
       aria-busy="true"
       aria-label="Loading page"
     >
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <div className="h-8 w-44 max-w-[70%] rounded bg-border" />
         <div className="h-4 w-56 max-w-[85%] rounded bg-border/80" />
       </div>

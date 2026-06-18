@@ -29,7 +29,7 @@ export default function ExpertiseByGroupEditor({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {variant === "settings" ? (
         <p className="text-sm text-muted leading-relaxed">
           Plans and swaps only use exercises at or below each group&apos;s
@@ -44,9 +44,9 @@ export default function ExpertiseByGroupEditor({
         </p>
       )}
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {EMPHASIS_GROUP_ORDER.map((group) => (
-          <div key={group} className="space-y-1.5">
+          <div key={group} className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-medium text-foreground">
                 {EMPHASIS_GROUP_LABELS[group]}

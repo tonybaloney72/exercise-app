@@ -17,9 +17,7 @@ import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
-export const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
-
-export { withTimeout } from "@/lib/async/withTimeout";
+const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
 
 export interface CardioHealthMeta {
   stepCount?: number;
@@ -95,7 +93,7 @@ export function mapWorkoutToImportedSession(workout: Workout): ImportedCardioSes
   };
 }
 
-export async function hasCardioHealthReadAccess(): Promise<boolean> {
+async function hasCardioHealthReadAccess(): Promise<boolean> {
   if (!isNativePlatform()) {
     clientTrace("health-cardio", "hasReadAccess_skip", { reason: "not_native" });
     return false;
@@ -145,7 +143,7 @@ export async function importRecentCardioSessions(
   return workouts.map(mapWorkoutToImportedSession).filter((s) => s.durationSeconds > 0);
 }
 
-export async function fetchHeartRateAverage(
+async function fetchHeartRateAverage(
   startDate: Date,
   endDate: Date,
 ): Promise<number | undefined> {

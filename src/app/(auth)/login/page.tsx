@@ -51,7 +51,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="space-y-3 sm:space-y-5">
+    <div className="flex flex-col gap-3 sm:gap-5">
       <div className="flex justify-center">
         <Image
           src="/branding/ME_Logo_Simple.png"
@@ -62,7 +62,7 @@ function LoginForm() {
           priority
         />
       </div>
-      <div className="space-y-0.5 sm:space-y-1">
+      <div className="flex flex-col gap-0.5 sm:gap-1">
         <h1 className="text-xl font-bold text-foreground sm:text-2xl">
           Welcome back
         </h1>
@@ -86,7 +86,7 @@ function LoginForm() {
 
       <AuthOrDivider />
 
-      <form method="post" onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
+      <form method="post" onSubmit={handleSubmit} className="flex flex-col gap-2 sm:gap-3">
         <AuthField
           id="email"
           label="Email"
@@ -122,7 +122,7 @@ function LoginForm() {
         </button>
       </form>
 
-      <div className="space-y-1 text-center text-sm text-muted sm:space-y-2 sm:text-xs">
+      <div className="flex flex-col gap-1 text-center text-sm text-muted sm:gap-2 sm:text-xs">
         <p>
           <Link href="/forgot-password" className="text-accent hover:underline">
             Forgot password?

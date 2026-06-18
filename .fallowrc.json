@@ -11,7 +11,8 @@
     "scripts/generate-hybrid-calisthenics-exercises.mjs",
     "scripts/prune-consolidated-exercises.mjs",
     "scripts/capacitor-restore.mjs",
-    "scripts/android-apk-publish.mjs"
+    "scripts/android-apk-publish.mjs",
+    "scripts/lib/semver-version-code.mjs"
   ],
   "ignoreDependencies": [
     "@capacitor/android",
@@ -34,6 +35,7 @@
   "rules": {
     "unused-dependencies": "warn"
   },
+  "usedClassMembers": ["dispose"],
   "ignoreExports": [
     {
       "file": "src/lib/exerciseSwap.ts",

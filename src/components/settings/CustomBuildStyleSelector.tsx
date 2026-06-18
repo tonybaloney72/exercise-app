@@ -17,7 +17,7 @@ export default function CustomBuildStyleSelector({ value, onChange }: Props) {
   const active = CUSTOM_BUILD_STYLE_LABELS[value];
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <p className="text-xs font-medium text-muted">How to build your custom week</p>
       <div
         className="grid grid-cols-2 gap-1 rounded-lg bg-surface-hover p-1"

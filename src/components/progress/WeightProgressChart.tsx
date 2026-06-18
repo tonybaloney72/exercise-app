@@ -72,12 +72,12 @@ export default function WeightProgressChart() {
 
   if (!authReady) {
     return (
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
           <p className="text-xs text-muted mt-0.5">Loading weight history…</p>
         </div>
-        <SurfaceCard className="w-full p-2 pt-3">
+        <SurfaceCard className="w-full p-2 py-3">
           <div
             className="flex items-center justify-center text-xs text-muted"
             style={{ height: PROGRESS_LINE_CHART_HEIGHT }}
@@ -91,7 +91,7 @@ export default function WeightProgressChart() {
 
   if (entries.length === 0) {
     return (
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
           <p className="text-xs text-muted mt-0.5">
@@ -111,7 +111,7 @@ export default function WeightProgressChart() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
@@ -134,7 +134,7 @@ export default function WeightProgressChart() {
         </div>
       </div>
       {series.length === 0 ? (
-        <SurfaceCard className="border-dashed bg-surface/50 px-4 py-8 text-center space-y-3">
+        <SurfaceCard className="flex flex-col border-dashed bg-surface/50 px-4 py-8 text-center gap-3">
           <p className="text-sm font-medium text-foreground">
             No entries in this range.
           </p>
@@ -150,7 +150,7 @@ export default function WeightProgressChart() {
           </button>
         </SurfaceCard>
       ) : (
-        <SurfaceCard className="w-full p-2 pt-3">
+        <SurfaceCard className="w-full p-2 py-3">
           <ResponsiveContainer
             width="100%"
             height={PROGRESS_LINE_CHART_HEIGHT}

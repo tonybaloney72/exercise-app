@@ -145,8 +145,8 @@ export default function SwapExerciseModal({
       bodyClassName="overflow-hidden"
     >
       {pendingLaterRound ? (
-        <div className="space-y-4 px-4 py-4">
-          <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 space-y-2">
+        <div className="flex flex-col gap-4 px-4 py-4">
+          <div className="flex flex-col rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 gap-2">
             <p className="text-sm font-medium text-amber-200">
               Already in a later round
             </p>

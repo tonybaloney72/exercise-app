@@ -21,8 +21,8 @@ export default function WeekBlueprintPresetPicker({
   onApplySavedBlueprint,
 }: Props) {
   return (
-    <SurfaceCard className="p-4 space-y-3">
-      <div className="space-y-1">
+    <SurfaceCard className="flex flex-col p-4 gap-3">
+      <div className="flex flex-col gap-1">
         <p className="text-sm font-semibold text-foreground">Start from a template</p>
         <p className="text-xs text-muted leading-snug">
           Generate exercises for the whole week, then tweak each day in the

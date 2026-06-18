@@ -39,7 +39,7 @@ export default function LandingPage() {
   return (
     <main className="flex-1">
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-start px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:justify-center sm:py-10 sm:pb-10">
-        <div className="space-y-1.5 sm:space-y-2">
+        <div className="flex flex-col gap-1.5 sm:gap-2">
           <div className="flex justify-center">
             <Image
               src="/branding/ME_Logo_Simple.png"
@@ -63,7 +63,7 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className="mt-4 space-y-2 sm:mt-8 sm:space-y-3">
+        <div className="flex flex-col mt-4 gap-2 sm:mt-8 sm:gap-3">
           <Link
             href="/login"
             className="block w-full rounded-xl bg-accent py-3 text-center text-base font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98] disabled:opacity-60 sm:py-4"

@@ -3,11 +3,11 @@ import { surfaceCardClassName } from "@/components/common/SurfaceCard";
 export default function ProgressPageSkeleton() {
   return (
     <div
-      className="py-6 space-y-5 animate-pulse"
+      className="flex flex-col py-6 gap-5 animate-pulse"
       aria-busy="true"
       aria-label="Loading progress"
     >
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <div className="h-8 w-36 rounded bg-border" />
         <div className="h-4 w-48 rounded bg-border/80" />
       </div>

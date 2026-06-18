@@ -10,9 +10,9 @@ import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 
-export const NATIVE_HEALTH_SILENT_TIMEOUT_MS = 10_000;
+const NATIVE_HEALTH_SILENT_TIMEOUT_MS = 10_000;
 /** Permission UI — user may need time to read Health Connect screens. */
-export const NATIVE_HEALTH_INTERACTIVE_TIMEOUT_MS = 120_000;
+const NATIVE_HEALTH_INTERACTIVE_TIMEOUT_MS = 120_000;
 
 const HEALTH_CONNECT_SETTINGS_INTENT =
   "intent:#Intent;action=androidx.health.ACTION_HEALTH_CONNECT_SETTINGS;end";

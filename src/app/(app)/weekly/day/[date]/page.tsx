@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import CategoryBadge from "@/components/common/CategoryBadge";
+import PlanMetaPill from "@/components/common/PlanMetaPill";
 import { useNavigateBack } from "@/components/common/BackNavLink";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import FloatingTimer from "@/components/common/FloatingTimer";
@@ -13,6 +14,7 @@ import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import WorkoutSession from "@/components/workout/WorkoutSession";
 import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
 import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
+import { cardioBadgesForPlan, restBadgeForPlan } from "@/lib/planCardioDisplay";
 import {
   isFullRestDay,
   isOptionalRestDay,
@@ -222,6 +224,8 @@ export default function WeeklyDayPage() {
   }
 
   const allCategories = categoriesPresentInPlan(plan);
+  const restBadge = restBadgeForPlan(plan);
+  const cardioBadges = cardioBadgesForPlan(plan);
   const showPlanEditor = customizing && canCustomize && !logForDay;
   const weekdayMatchesPlanName = (() => {
     const d = parseLocalDateKey(dateKey);
@@ -260,13 +264,13 @@ export default function WeeklyDayPage() {
   }
 
   return (
-    <div className="py-6 space-y-5">
+    <div className="flex flex-col py-6 gap-5">
       <div className="flex flex-col gap-3">
         <WeeklyOverviewBackLink />
         <motion.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-1"
+          className="flex flex-col gap-1"
         >
           {!weekdayMatchesPlanName && (
             <p className="text-xs font-medium uppercase tracking-wider text-accent">
@@ -283,11 +287,14 @@ export default function WeeklyDayPage() {
         {allCategories.map((cat) => (
           <CategoryBadge key={cat} category={cat} size="md" />
         ))}
-        {plan.hasJog && (
-          <span className="inline-flex items-center rounded-full bg-sky-500/20 px-2.5 py-1 text-xs font-medium text-sky-400">
-            🏃 Jog
-          </span>
-        )}
+        {restBadge ? (
+          <PlanMetaPill variant="rest">{restBadge}</PlanMetaPill>
+        ) : null}
+        {cardioBadges.map((label) => (
+          <PlanMetaPill key={label} variant="cardio">
+            {label}
+          </PlanMetaPill>
+        ))}
       </div>
 
       {isOptionalRestDay(plan) && !showPlanEditor && !customizing && (
@@ -375,7 +382,7 @@ export default function WeeklyDayPage() {
       {when !== "future" && !logForDay && (
         <>
           {when === "past" ? (
-            <SurfaceCard className="px-4 py-3 text-center space-y-3">
+            <SurfaceCard className="flex flex-col px-4 py-3 text-center gap-3">
               <p className="text-sm text-muted">
                 No workout was logged on this day.
               </p>
@@ -441,7 +448,7 @@ export default function WeeklyDayPage() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-2"
+          className="flex flex-col gap-2"
         >
           {continueWorkoutHere ? (
             <Link

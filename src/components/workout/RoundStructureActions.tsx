@@ -37,9 +37,9 @@ export default function RoundStructureActions({
   if (!showEmptyChoices && !canAdd) return null;
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       {showEmptyChoices ? (
-        <div className="rounded-lg border border-border bg-surface-hover/30 px-3 py-2.5 space-y-2">
+        <div className="flex flex-col rounded-lg border border-border bg-surface-hover/30 px-3 py-2.5 gap-2">
           <p className="text-xs text-muted">
             {canCopyFromPrior
               ? "Fill this round from the one above, or customize it yourself."

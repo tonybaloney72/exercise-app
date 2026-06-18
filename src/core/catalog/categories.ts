@@ -1,13 +1,14 @@
 import type { CategoryMeta, ExerciseCategory } from "@/types";
 
+/** Pill/badge colors: soft tints on dark; stronger bg + darker text in light mode. */
 export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
   CF: {
     id: "CF",
     name: "Core – Front/Flexion",
     shortName: "Core Front",
     color: "#3b82f6",
-    bgColor: "bg-blue-500/20",
-    textColor: "text-blue-400",
+    bgColor: "bg-blue-500/20 light:bg-blue-100",
+    textColor: "text-blue-400 light:text-blue-900",
     description: "Rectus abdominis (the 'six-pack' muscles), hip flexors",
   },
   CL: {
@@ -15,8 +16,8 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
     name: "Core – Lower Abs",
     shortName: "Core Lower",
     color: "#6366f1",
-    bgColor: "bg-indigo-500/20",
-    textColor: "text-indigo-400",
+    bgColor: "bg-indigo-500/20 light:bg-indigo-100",
+    textColor: "text-indigo-400 light:text-indigo-900",
     description: "Lower portion of rectus abdominis, deep hip flexors",
   },
   CR: {
@@ -24,8 +25,8 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
     name: "Core – Rotational/Obliques",
     shortName: "Obliques",
     color: "#a855f7",
-    bgColor: "bg-purple-500/20",
-    textColor: "text-purple-400",
+    bgColor: "bg-purple-500/20 light:bg-purple-100",
+    textColor: "text-purple-400 light:text-purple-900",
     description: "Internal and external obliques, rotational stability",
   },
   CS: {
@@ -33,17 +34,18 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
     name: "Core – Stability/Anti-Extension",
     shortName: "Core Stability",
     color: "#14b8a6",
-    bgColor: "bg-teal-500/20",
-    textColor: "text-teal-400",
-    description: "Deep core stabilizers (transverse abdominis), anti-extension strength",
+    bgColor: "bg-teal-500/20 light:bg-teal-100",
+    textColor: "text-teal-400 light:text-teal-900",
+    description:
+      "Deep core stabilizers (transverse abdominis), anti-extension strength",
   },
   UP: {
     id: "UP",
     name: "Upper Body – Push",
     shortName: "Upper Push",
     color: "#f43f5e",
-    bgColor: "bg-rose-500/20",
-    textColor: "text-rose-400",
+    bgColor: "bg-rose-500/20 light:bg-rose-100",
+    textColor: "text-rose-400 light:text-rose-900",
     description: "Chest (pectorals), shoulders (deltoids), triceps",
   },
   UPL: {
@@ -51,8 +53,8 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
     name: "Upper Body – Pull",
     shortName: "Upper Pull",
     color: "#f97316",
-    bgColor: "bg-orange-500/20",
-    textColor: "text-orange-400",
+    bgColor: "bg-orange-500/20 light:bg-orange-100",
+    textColor: "text-orange-400 light:text-orange-900",
     description: "Back (lats, rhomboids, traps), biceps, rear deltoids",
   },
   LB: {
@@ -60,8 +62,8 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
     name: "Lower Body",
     shortName: "Lower Body",
     color: "#22c55e",
-    bgColor: "bg-green-500/20",
-    textColor: "text-green-400",
+    bgColor: "bg-green-500/20 light:bg-green-100",
+    textColor: "text-green-400 light:text-green-900",
     description: "Quadriceps, hamstrings, glutes, calves",
   },
   PC: {
@@ -69,8 +71,8 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
     name: "Plyometric Cardio",
     shortName: "Cardio",
     color: "#eab308",
-    bgColor: "bg-amber-500/20",
-    textColor: "text-amber-400",
+    bgColor: "bg-amber-500/20 light:bg-amber-100",
+    textColor: "text-amber-400 light:text-amber-950",
     description: "Heart rate elevation, conditioning, explosive power",
   },
   SW: {
@@ -78,8 +80,8 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
     name: "Stretch – Warm-Up",
     shortName: "Warm-Up",
     color: "#f59e0b",
-    bgColor: "bg-yellow-500/20",
-    textColor: "text-yellow-400",
+    bgColor: "bg-yellow-500/20 light:bg-amber-100",
+    textColor: "text-yellow-400 light:text-amber-950",
     description: "Dynamic stretches to prepare muscles and joints for exercise",
   },
   SC: {
@@ -87,12 +89,21 @@ export const CATEGORIES: Record<ExerciseCategory, CategoryMeta> = {
     name: "Stretch – Cool-Down",
     shortName: "Cool-Down",
     color: "#06b6d4",
-    bgColor: "bg-cyan-500/20",
-    textColor: "text-cyan-400",
+    bgColor: "bg-cyan-500/20 light:bg-cyan-100",
+    textColor: "text-cyan-400 light:text-cyan-900",
     description: "Static stretches to improve flexibility and aid recovery",
   },
 };
 
 export const CATEGORY_ORDER: ExerciseCategory[] = [
-  "CF", "CL", "CR", "CS", "UP", "UPL", "LB", "PC", "SW", "SC",
+  "CF",
+  "CL",
+  "CR",
+  "CS",
+  "UP",
+  "UPL",
+  "LB",
+  "PC",
+  "SW",
+  "SC",
 ];

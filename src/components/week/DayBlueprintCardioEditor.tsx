@@ -25,7 +25,7 @@ export default function DayBlueprintCardioEditor({ value, onChange }: Props) {
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="flex flex-col gap-1.5">
       <p className="text-xs font-medium text-muted">Cardio & endurance (optional)</p>
       <div className="flex flex-wrap gap-1.5" role="group" aria-label="Cardio activities">
         {CARDIO_ACTIVITY_ORDER.map((kind) => {

@@ -31,7 +31,7 @@ export default function WeekWizardShell({
   const todayKey = formatLocalDateKey(new Date());
 
   return (
-    <div className="py-6 space-y-5 pb-24">
+    <div className="flex flex-col py-6 gap-5 pb-24">
       <div>
         <BackNavLink label={backLabel} />
         <h1 className="mt-2 text-2xl font-bold text-foreground">{title}</h1>

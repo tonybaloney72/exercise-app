@@ -74,7 +74,7 @@ export default function ExerciseProgressChart({ history }: Props) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       <div>
         <h2 className="text-sm font-semibold text-foreground">
           Exercise over time
@@ -172,7 +172,7 @@ export default function ExerciseProgressChart({ history }: Props) {
         )}
       </BottomSheetModal>
 
-      <SurfaceCard ref={chartRef} className="w-full p-2 pt-3">
+      <SurfaceCard ref={chartRef} className="w-full p-2 py-3">
         {series.length === 0 ? (
           <div
             className="flex items-center justify-center px-4"

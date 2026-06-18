@@ -27,7 +27,7 @@ export default function EmptyState({
           {icon}
         </span>
       ) : null}
-      <div className="space-y-1">
+      <div className="flex flex-col gap-1">
         <p className="text-sm font-medium text-foreground">{title}</p>
         {description ? (
           <p className="text-xs text-muted max-w-xs mx-auto">{description}</p>

@@ -64,7 +64,7 @@ export default function WeightLogCard({ dateKey }: Props) {
   }, [dateKey, input, upsert]);
 
   return (
-    <SurfaceCard className="p-4 space-y-3">
+    <SurfaceCard className="flex flex-col p-4 gap-3">
       <div>
         <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
         <p className="text-xs text-muted mt-0.5 leading-relaxed">

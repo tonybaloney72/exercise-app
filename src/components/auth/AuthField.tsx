@@ -91,7 +91,7 @@ export default function AuthField({
   );
 
   return (
-    <div className="space-y-1 sm:space-y-1.5">
+    <div className="flex flex-col gap-1 sm:gap-1.5">
       <label htmlFor={id} className="text-xs font-medium text-muted">
         {label}
       </label>

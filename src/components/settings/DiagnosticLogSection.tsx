@@ -94,7 +94,7 @@ export default function DiagnosticLogSection() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       <p className="text-xs text-muted leading-relaxed">
         Recent app actions (GPS save, Health Connect, cloud sync) are recorded
         here. If something hangs, wait a few seconds, then copy or share this

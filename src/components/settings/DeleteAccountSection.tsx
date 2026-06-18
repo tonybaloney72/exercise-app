@@ -64,7 +64,7 @@ export default function DeleteAccountSection() {
         ariaLabel="Confirm account deletion"
         closeOnBackdropClick={!busy}
         closeOnEscape={!busy}
-        bodyClassName="space-y-3 px-4 py-4"
+        bodyClassName="flex flex-col gap-3 px-4 py-4"
         footer={
           <div className="flex gap-2 border-t border-border px-4 py-3">
             <button

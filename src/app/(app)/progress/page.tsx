@@ -148,7 +148,7 @@ export default function ProgressPage() {
   }
 
   return (
-    <div className="py-6 space-y-5">
+    <div className="flex flex-col py-6 gap-5">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Progress</h1>
         <p className="text-sm text-muted mt-1">Track your gains over time</p>
@@ -184,7 +184,7 @@ export default function ProgressPage() {
       <ProgressChartsBlock history={completedHistory} />
 
       {completedHistory.length > 0 && (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-foreground">Recent</h2>
             <Link
@@ -194,7 +194,7 @@ export default function ProgressPage() {
               View all
             </Link>
           </div>
-          <ul className="space-y-2">
+          <ul className="flex flex-col gap-2">
             {[...completedHistory]
               .sort((a, b) => b.date.localeCompare(a.date))
               .slice(0, 5)

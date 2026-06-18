@@ -81,7 +81,7 @@ export default function GeneralFeedbackSheet({
       hint="Report bugs, share ideas, or tell us what's confusing."
       ariaLabel="Send app feedback"
       maxWidth="lg"
-      bodyClassName="space-y-4 px-4 py-4"
+      bodyClassName="flex flex-col gap-4 px-4 py-4"
       footer={
         <div className="flex gap-2 border-t border-border px-4 py-3">
           <button
@@ -103,7 +103,7 @@ export default function GeneralFeedbackSheet({
         </div>
       }
     >
-      <fieldset className="space-y-2">
+      <fieldset className="flex flex-col gap-2">
         <legend className="text-xs font-medium uppercase tracking-wide text-muted">
           Category
         </legend>
@@ -126,7 +126,7 @@ export default function GeneralFeedbackSheet({
         </div>
       </fieldset>
 
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-1.5">
         <label
           htmlFor="general-feedback-message"
           className="text-xs font-medium uppercase tracking-wide text-muted"

@@ -95,7 +95,7 @@ export default function WorkoutHistoryDayPage() {
 
   if (!parsed) {
     return (
-      <div className="py-8 space-y-4 px-2 text-center">
+      <div className="flex flex-col py-8 gap-4 px-2 text-center">
         <p className="text-sm text-muted">Invalid date in URL.</p>
         <ProgressBackLink />
       </div>
@@ -105,12 +105,12 @@ export default function WorkoutHistoryDayPage() {
   if (!log || !reviewPlan) {
     const logHref = `/progress/history/${dateKey}/log`;
     return (
-      <div className="py-8 space-y-4">
+      <div className="flex flex-col py-8 gap-4">
         <ProgressBackLink />
         <h1 className="text-2xl font-bold text-foreground">
           {formatPageTitle(dateKey)}
         </h1>
-        <SurfaceCard className="px-4 py-6 text-center space-y-3">
+        <SurfaceCard className="flex flex-col px-4 py-6 text-center gap-3">
           <p className="text-sm text-foreground">
             No completed workout found for this day.
           </p>
@@ -157,8 +157,8 @@ export default function WorkoutHistoryDayPage() {
   }
 
   return (
-    <div className="py-6 space-y-5">
-      <div className="space-y-3">
+    <div className="flex flex-col py-6 gap-5">
+      <div className="flex flex-col gap-3">
         <ProgressBackLink />
         <h1 className="text-2xl font-bold text-foreground">
           {formatPageTitle(dateKey)}

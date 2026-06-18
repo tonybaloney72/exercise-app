@@ -36,7 +36,7 @@ export default function DayPlanCardioEditor({ plan, onChange }: Props) {
   }
 
   return (
-    <section className="rounded-xl border border-border bg-surface-hover/30 p-3 space-y-2">
+    <section className="flex flex-col rounded-xl border border-border bg-surface-hover/30 p-3 gap-2">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">
         Cardio & endurance
       </p>

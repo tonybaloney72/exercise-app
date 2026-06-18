@@ -9,8 +9,8 @@ type Props = {
 
 export default function WeekBuilderMigrationBanner({ onDismiss }: Props) {
   return (
-    <SurfaceCard className="border-accent/30 bg-accent/5 p-4 space-y-3">
-      <div className="space-y-1">
+    <SurfaceCard className="flex flex-col border-accent/30 bg-accent/5 p-4 gap-3">
+      <div className="flex flex-col gap-1">
         <p className="text-sm font-semibold text-foreground">
           Workout generation has changed
         </p>

@@ -56,7 +56,7 @@ export default function CollapsibleSection({
       : "flex w-full items-start gap-2 border-b border-border px-4 py-3 text-left";
 
   const bodyClass =
-    contentClassName ?? (embedded || flat ? "space-y-3" : undefined);
+    contentClassName ?? (embedded || flat ? "flex flex-col gap-3" : undefined);
 
   const panel = (
     <>

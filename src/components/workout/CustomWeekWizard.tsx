@@ -198,7 +198,7 @@ export default function CustomWeekWizard() {
 
   if (!hydrated || mode === "loading" || programMode !== "custom") {
     return (
-      <div className="py-12 space-y-3">
+      <div className="flex flex-col py-12 gap-3">
         <PlanCardSkeleton />
         <PlanCardSkeleton />
       </div>
@@ -207,7 +207,7 @@ export default function CustomWeekWizard() {
 
   if (loading || !localWeek || !plan) {
     return (
-      <div className="py-6 space-y-4">
+      <div className="flex flex-col py-6 gap-4">
         <h1 className="text-2xl font-bold text-foreground">Build your week</h1>
         <PlanCardSkeleton />
         <PlanCardSkeleton />
@@ -217,7 +217,7 @@ export default function CustomWeekWizard() {
 
   if (error) {
     return (
-      <div className="py-8 space-y-4">
+      <div className="flex flex-col py-8 gap-4">
         <p className="text-sm text-red-400">{error}</p>
         <BackNavLink label="Back" />
       </div>
@@ -284,7 +284,7 @@ export default function CustomWeekWizard() {
       </p>
 
       {pendingDow != null && (
-        <SurfaceCard className="border-amber-500/40 bg-amber-500/10 p-4 space-y-3">
+        <SurfaceCard className="flex flex-col border-amber-500/40 bg-amber-500/10 p-4 gap-3">
           <p className="text-sm text-foreground">
             Save changes to {WEEK_DAY_ABBRS[activeDow]} before switching to{" "}
             {WEEK_DAY_ABBRS[pendingDow]}?

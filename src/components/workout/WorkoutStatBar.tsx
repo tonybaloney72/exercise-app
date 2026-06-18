@@ -25,7 +25,7 @@ export default function WorkoutStatBar({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.25 }}
-      className="space-y-1.5"
+      className="flex flex-col gap-1.5"
     >
       <div className="flex items-baseline justify-between gap-2">
         <span className="text-sm font-medium text-foreground">{label}</span>

@@ -48,7 +48,7 @@ export default function TimerTargetControls({
   }, [storedTargetSeconds]);
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <p className="text-caption text-muted">Timer length (this set)</p>
       <div className="flex flex-wrap gap-1.5">
         {TIMER_DURATION_PRESET_SECONDS.map((sec) => (
@@ -81,7 +81,7 @@ export default function TimerTargetControls({
         </button>
       </div>
       {showCustomInput && (
-        <div className="flex flex-col gap-1.5 pt-0.5">
+        <div className="flex flex-col gap-1.5 py-0.5">
           <label className="text-caption font-medium uppercase tracking-wide text-muted">
             Custom seconds
           </label>

@@ -41,8 +41,8 @@ function StaleWorkoutSessionCard({
   const logHref = `/progress/history/${session.date}/log`;
 
   return (
-    <SurfaceCard className="border-amber-500/30 bg-amber-500/5 p-4 space-y-3 h-full">
-      <div className="space-y-1">
+    <SurfaceCard className="flex flex-col border-amber-500/30 bg-amber-500/5 p-4 gap-3 h-full">
+      <div className="flex flex-col gap-1">
         <p className="text-sm font-medium text-foreground">
           {formatStaleSessionDateLabel(session.date)}
         </p>
@@ -153,7 +153,7 @@ export default function StaleWorkoutSessionsBanner({
   const showCarousel = count > 1 && !showAll;
 
   return (
-    <AnimatedSection delay={0.14} className="space-y-3">
+    <AnimatedSection delay={0.14} className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3 px-0.5">
         <div>
           <h2 className="text-sm font-semibold text-foreground">
@@ -177,7 +177,7 @@ export default function StaleWorkoutSessionsBanner({
       </div>
 
       {showAll ? (
-        <ul className="space-y-3" aria-label="All unfinished workouts">
+        <ul className="flex flex-col gap-3" aria-label="All unfinished workouts">
           {staleSessions.map((session) => (
             <li key={session.id}>
               <StaleWorkoutSessionCard
@@ -190,7 +190,7 @@ export default function StaleWorkoutSessionsBanner({
           ))}
         </ul>
       ) : showCarousel ? (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <div className="flex items-stretch gap-2">
             <CarouselChevron
               direction="prev"

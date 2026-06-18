@@ -47,7 +47,7 @@ function LibraryFilterRow({
   children: ReactNode;
 }) {
   return (
-    <div className="space-y-1.5">
+    <div className="flex flex-col gap-1.5">
       <p className="text-sm font-medium text-muted px-1">
         {label}
         <span className="font-normal text-muted/80">
@@ -165,7 +165,7 @@ export default function LibraryPageContent() {
     withinMyLevel;
 
   return (
-    <div className="py-6 space-y-5">
+    <div className="flex flex-col py-6 gap-5">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Exercise Library</h1>
         <p className="text-sm text-muted mt-1">
@@ -207,7 +207,7 @@ export default function LibraryPageContent() {
         title="Filters"
         hint={""}
         defaultOpen
-        contentClassName="space-y-4"
+        contentClassName="flex flex-col gap-4"
       >
         <LibraryFilterRow label="Category">
           <button
@@ -312,7 +312,7 @@ export default function LibraryPageContent() {
       </CollapsibleSection>
 
       {/* Exercise list */}
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         <AnimatePresence mode="popLayout">
           {visibleCategories.map((cat, index) => {
             const count = grouped[cat]!.length;
@@ -323,7 +323,7 @@ export default function LibraryPageContent() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="space-y-2"
+                className="flex flex-col gap-2"
               >
                 <CollapsibleSection
                   flat
@@ -340,7 +340,7 @@ export default function LibraryPageContent() {
                   }
                   hint={String(count)}
                   defaultOpen={false}
-                  contentClassName="space-y-1"
+                  contentClassName="flex flex-col gap-1"
                 >
                   {grouped[cat]!.map((ex) => (
                     <ExerciseCard key={ex.id} exercise={ex} />
@@ -607,7 +607,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="border-t border-border px-3 py-3 space-y-2">
+            <div className="flex flex-col border-t border-border px-3 py-3 gap-2">
               <p className="text-caption font-mono text-muted">{exercise.id}</p>
               <p className="text-xs text-muted">{exercise.notes}</p>
               {exercise.source && (
@@ -654,7 +654,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                 </a>
               )}
 
-              <div className="mt-3 space-y-2 border-t border-border pt-3">
+              <div className="flex flex-col mt-3 gap-2 border-t border-border py-3">
                 <p className="text-caption font-medium uppercase tracking-wide text-muted">
                   Default logging
                 </p>
@@ -683,7 +683,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                   </button>
                 </div>
                 {resolved.defaultSetMode === "timer" && (
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <div className="flex flex-wrap gap-1.5">
                       {TIMER_DURATION_PRESET_SECONDS.map((sec) => (
                         <button
@@ -712,7 +712,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                       </button>
                     </div>
                     {showCustomInput && (
-                      <div className="flex flex-col gap-1.5 pt-0.5">
+                      <div className="flex flex-col gap-1.5 py-0.5">
                         <label className="text-caption font-medium uppercase tracking-wide text-muted">
                           Seconds
                         </label>
@@ -733,7 +733,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                   </div>
                 )}
                 {resolved.defaultSetMode === "reps" && (
-                  <div className="space-y-3 pt-0.5">
+                  <div className="flex flex-col gap-3 py-0.5">
                     <div className="flex flex-col gap-2.5">
                       <label className="text-caption font-medium uppercase tracking-wide text-muted">
                         Default reps

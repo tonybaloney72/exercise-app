@@ -71,7 +71,7 @@ export default function WorkoutPlanPreview({
   const body = (
     <>
       {showBanner && (
-        <SurfaceCard className="p-4 space-y-1">
+        <SurfaceCard className="flex flex-col p-4 gap-1">
           {bannerTitle && (
             <p className="text-xs font-medium uppercase tracking-wider text-accent">
               {bannerTitle}
@@ -89,11 +89,11 @@ export default function WorkoutPlanPreview({
       )}
 
       {showTargetMuscleList && (
-        <SurfaceCard className="p-4 space-y-3">
+        <SurfaceCard className="flex flex-col p-4 gap-3">
           <h2 className="text-sm font-semibold text-foreground">
             Target muscles
           </h2>
-          <div className="space-y-1.5">
+          <div className="flex flex-col gap-1.5">
             {allCategories.map((cat) => (
               <div key={cat} className="flex items-start gap-2">
                 <div
@@ -207,11 +207,11 @@ export default function WorkoutPlanPreview({
   );
 
   if (embedded) {
-    return <div className="space-y-4">{body}</div>;
+    return <div className="flex flex-col gap-4">{body}</div>;
   }
 
   return (
-    <AnimatedSection className="space-y-4" delay={0.05}>
+    <AnimatedSection className="flex flex-col gap-4" delay={0.05}>
       {body}
     </AnimatedSection>
   );

@@ -54,7 +54,7 @@ export default function AndroidAppDownloadSection() {
       title="Android app"
       hint="Native install (APK)"
       defaultOpen={false}
-      contentClassName="space-y-3 p-4"
+      contentClassName="flex flex-col gap-3 p-4"
     >
       <p className="text-xs leading-snug text-muted">
         {process.env.NODE_ENV === "development"

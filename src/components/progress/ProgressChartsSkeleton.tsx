@@ -3,7 +3,7 @@ import { surfaceCardClassName } from "@/components/common/SurfaceCard";
 export default function ProgressChartsSkeleton() {
   return (
     <div
-      className="space-y-5 animate-pulse"
+      className="flex flex-col gap-5 animate-pulse"
       aria-busy="true"
       aria-label="Loading charts"
     >

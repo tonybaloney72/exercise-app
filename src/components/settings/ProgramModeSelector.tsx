@@ -16,7 +16,7 @@ export default function ProgramModeSelector({ value, onChange }: Props) {
   const active = PROGRAM_MODE_LABELS[value];
 
   return (
-    <div className="space-y-2" id="your-week-settings">
+    <div className="flex flex-col gap-2" id="your-week-settings">
       <div
         className="grid grid-cols-2 gap-1 rounded-lg bg-surface-hover p-1"
         role="radiogroup"

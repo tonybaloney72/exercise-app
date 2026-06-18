@@ -99,7 +99,7 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-surface-hover/60 p-3 space-y-2">
+    <div className="flex flex-col rounded-xl border border-border bg-surface-hover/60 p-3 gap-2">
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-sm font-medium text-foreground">Health Connect</p>
@@ -125,7 +125,7 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
         Open Health Connect settings
       </button>
       {sessions && sessions.length > 0 ? (
-        <ul className="space-y-1.5">
+        <ul className="flex flex-col gap-1.5">
           {sessions.map((session) => {
             const labelParts = [
               session.startDate.toLocaleString(undefined, {

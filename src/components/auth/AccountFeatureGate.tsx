@@ -32,7 +32,7 @@ export default function AccountFeatureGate({
 
   return (
     <div
-      className={`rounded-xl border border-accent/30 bg-accent/5 px-4 py-3 space-y-3 ${className}`.trim()}
+      className={`flex flex-col gap-3 rounded-xl border border-accent/30 bg-accent/5 px-4 py-3 ${className}`.trim()}
       role="region"
       aria-label={title}
     >
@@ -41,7 +41,7 @@ export default function AccountFeatureGate({
         <p className="mt-1 text-xs text-muted leading-relaxed">{description}</p>
       </div>
       {benefits.length > 0 ? (
-        <ul className="text-xs text-muted space-y-1 list-disc pl-4">
+        <ul className="flex flex-col text-xs text-muted gap-1 list-disc pl-4">
           {benefits.map((line) => (
             <li key={line}>{line}</li>
           ))}

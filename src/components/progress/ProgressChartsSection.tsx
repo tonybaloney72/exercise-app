@@ -56,7 +56,7 @@ export default function ProgressChartsSection({ history }: Props) {
           ref={categoryChartRef}
           className="mt-3 w-full overflow-hidden p-0"
         >
-          <div className="w-full px-4 pt-4">
+          <div className="w-full px-4 py-4">
             <ResponsiveContainer
               width="100%"
               height={PROGRESS_PIE_CHART_HEIGHT}
@@ -102,7 +102,7 @@ export default function ProgressChartsSection({ history }: Props) {
             </ResponsiveContainer>
           </div>
           <ul
-            className="flex flex-wrap justify-center gap-x-4 gap-y-2.5 px-4 pb-4 pt-1"
+            className="flex flex-wrap justify-center gap-x-4 gap-y-2.5 px-4 pb-4 py-1"
             aria-label="Category legend"
           >
             {categoryData.map((entry) => (

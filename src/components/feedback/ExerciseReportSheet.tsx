@@ -97,7 +97,7 @@ export default function ExerciseReportSheet({
       hint="Flag wrong descriptions or broken resource links."
       ariaLabel="Report exercise issue"
       maxWidth="lg"
-      bodyClassName="space-y-4 px-4 py-4"
+      bodyClassName="flex flex-col gap-4 px-4 py-4"
       footer={
         <div className="flex gap-2 border-t border-border px-4 py-3">
           <button
@@ -119,7 +119,7 @@ export default function ExerciseReportSheet({
         </div>
       }
     >
-      <div className="space-y-1 rounded-lg border border-border bg-surface-hover/50 px-3 py-2.5">
+      <div className="flex flex-col gap-1 rounded-lg border border-border bg-surface-hover/50 px-3 py-2.5">
         <p className="text-sm font-medium text-foreground">
           {snapshots.snapshotName}
         </p>
@@ -144,7 +144,7 @@ export default function ExerciseReportSheet({
         )}
       </div>
 
-      <fieldset className="space-y-2">
+      <fieldset className="flex flex-col gap-2">
         <legend className="text-xs font-medium uppercase tracking-wide text-muted">
           Issue type
         </legend>
@@ -172,7 +172,7 @@ export default function ExerciseReportSheet({
         ))}
       </fieldset>
 
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-1.5">
         <label
           htmlFor="feedback-details"
           className="text-xs font-medium uppercase tracking-wide text-muted"

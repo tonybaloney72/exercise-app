@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <div className="space-y-3 text-center sm:space-y-4">
+      <div className="flex flex-col gap-3 text-center sm:gap-4">
         <h1 className="text-xl font-bold text-foreground sm:text-2xl">Check your email</h1>
         <p className="text-xs leading-snug text-muted sm:text-sm">
           If an account exists for <span className="text-foreground">{email}</span>,
@@ -53,15 +53,15 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="space-y-3 sm:space-y-5">
-      <div className="space-y-0.5 sm:space-y-1">
+    <div className="flex flex-col gap-3 sm:gap-5">
+      <div className="flex flex-col gap-0.5 sm:gap-1">
         <h1 className="text-xl font-bold text-foreground sm:text-2xl">Reset password</h1>
         <p className="text-xs text-muted sm:text-sm">
           Enter your email and we&apos;ll send a reset link.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:gap-3">
         <AuthField
           id="email"
           label="Email"
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
         </button>
       </form>
 
-      <div className="space-y-1 text-center text-sm text-muted sm:space-y-2 sm:text-xs">
+      <div className="flex flex-col gap-1 text-center text-sm text-muted sm:gap-2 sm:text-xs">
         <p>
           <BackNavLink
             label="Back to log in"

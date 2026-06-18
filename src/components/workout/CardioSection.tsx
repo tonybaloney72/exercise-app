@@ -124,7 +124,7 @@ export default function CardioSection({
               transition={{ duration: 0.25 }}
               className="overflow-hidden"
             >
-              <div className="border-t border-border px-2 py-1 space-y-2">
+              <div className="flex flex-col border-t border-border px-2 py-1 gap-2">
                 {cardioRows.length === 0 ? (
                   <p className="px-2 py-3 text-xs text-muted">
                     No cardio yet. Tap + Add to log an activity.

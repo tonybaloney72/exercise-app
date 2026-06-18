@@ -48,7 +48,7 @@ export default function WeeklyCardioEditor({
   }
 
   return (
-    <section className="space-y-2">
+    <section className="flex flex-col gap-2">
       <p className="text-sm text-muted leading-snug">
         {editableDays != null ? (
           <>
@@ -68,11 +68,11 @@ export default function WeeklyCardioEditor({
           </>
         )}
       </p>
-      <ul className="space-y-2">
+      <ul className="flex flex-col gap-2">
         {visibleDays.map(({ shortName, dayOfWeek }) => (
           <li
             key={dayOfWeek}
-            className="rounded-lg border border-border bg-surface-hover/50 px-3 py-2 space-y-2"
+            className="flex flex-col rounded-lg border border-border bg-surface-hover/50 px-3 py-2 gap-2"
           >
             <span className="text-sm font-medium text-foreground">
               {shortName}

@@ -9,6 +9,7 @@ import EmptyState from "@/components/common/EmptyState";
 import PlanCardSkeleton from "@/components/common/PlanCardSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
+import PlanMetaPill from "@/components/common/PlanMetaPill";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import { cardioBadgesForPlan, restBadgeForPlan } from "@/lib/planCardioDisplay";
 import { isFullRestDay, REST_DAY_DESCRIPTIONS } from "@/lib/restDays";
@@ -104,7 +105,7 @@ export default function WeeklyPage() {
   }
 
   return (
-    <div className="py-6 space-y-5">
+    <div className="flex flex-col py-6 gap-5">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Weekly Overview</h1>
         <p className="text-sm text-muted mt-1">
@@ -207,7 +208,7 @@ export default function WeeklyPage() {
       )}
 
       {/* Daily plans */}
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {weekLoading &&
           OVERVIEW_DOW_ORDER.map((dow) => <PlanCardSkeleton key={dow} />)}
 
@@ -231,6 +232,8 @@ export default function WeeklyPage() {
             const loggedExerciseCount = completedLog
               ? countRoundExerciseSlots(completedLog)
               : null;
+            const restBadge = restBadgeForPlan(plan);
+            const cardioBadges = cardioBadgesForPlan(plan);
 
             return (
               <AnimatedSection
@@ -254,35 +257,26 @@ export default function WeeklyPage() {
                           {plan.name}
                         </h3>
                         {isToday && (
-                          <span className="rounded-full bg-accent/20 px-2 py-0.5 text-caption font-medium text-accent">
-                            Today
-                          </span>
+                          <PlanMetaPill variant="today">Today</PlanMetaPill>
                         )}
                         {isCompleted && (
-                          <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-caption font-medium text-green-400">
-                            Done
-                          </span>
+                          <PlanMetaPill variant="done">Done</PlanMetaPill>
                         )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                  <div className="mt-2.5 flex flex-wrap gap-2">
                     {categoriesPresentInPlan(plan).map((cat) => (
-                      <CategoryBadge key={cat} category={cat} />
+                      <CategoryBadge key={cat} category={cat} size="md" />
                     ))}
-                    {restBadgeForPlan(plan) ? (
-                      <span className="inline-flex items-center rounded-full bg-muted/30 px-2 py-0.5 text-caption font-medium text-muted">
-                        {restBadgeForPlan(plan)}
-                      </span>
+                    {restBadge ? (
+                      <PlanMetaPill variant="rest">{restBadge}</PlanMetaPill>
                     ) : null}
-                    {cardioBadgesForPlan(plan).map((label) => (
-                      <span
-                        key={label}
-                        className="inline-flex items-center rounded-full bg-sky-500/20 px-2 py-0.5 text-caption font-medium text-sky-400"
-                      >
+                    {cardioBadges.map((label) => (
+                      <PlanMetaPill key={label} variant="cardio">
                         {label}
-                      </span>
+                      </PlanMetaPill>
                     ))}
                   </div>
 
@@ -313,7 +307,7 @@ export default function WeeklyPage() {
 
       {mode === "authenticated" && isCustomWeek && (
         <AnimatedSection delay={0.12}>
-          <SurfaceCard className="p-4 space-y-2">
+          <SurfaceCard className="flex flex-col p-4 gap-2">
             <h2 className="text-sm font-semibold text-foreground">
               Reset training week
             </h2>
@@ -328,7 +322,7 @@ export default function WeeklyPage() {
               </p>
             )}
             {resetWeekConfirm ? (
-              <div className="flex flex-wrap gap-2 pt-1">
+              <div className="flex flex-wrap gap-2 py-1">
                 <button
                   type="button"
                   disabled={resettingWeek}

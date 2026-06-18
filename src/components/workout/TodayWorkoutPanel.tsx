@@ -58,7 +58,7 @@ export default function TodayWorkoutPanel({
 
   if (mode === "session") {
     return (
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <WorkoutSession plan={plan} />
         <FloatingTimer />
       </div>
@@ -67,7 +67,7 @@ export default function TodayWorkoutPanel({
 
   if (mode === "plan-edit") {
     return (
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <WorkoutActionBar>
           <button
             type="button"
@@ -106,8 +106,8 @@ export default function TodayWorkoutPanel({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <button
           type="button"
           onClick={onStart}

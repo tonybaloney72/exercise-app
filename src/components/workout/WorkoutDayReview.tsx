@@ -101,20 +101,20 @@ export default function WorkoutDayReview({
   };
 
   return (
-    <AnimatedSection className="space-y-4" delay={0.1}>
+    <AnimatedSection className="flex flex-col gap-4" delay={0.1}>
       {!hideCompletionBanner && (
         <motion.div
           initial={{ opacity: 0, y: 10, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: "spring", stiffness: 320, damping: 26 }}
         >
-          <SurfaceCard className="p-4 border-green-500/25 bg-green-500/5">
+          <SurfaceCard className="flex flex-col gap-1 border-green-500/25 bg-green-500/5 p-4">
             <p className="text-xs font-medium uppercase tracking-wider text-green-400">
               {completedBannerTitle}
             </p>
-            {endLabel && (
-              <p className="mt-1 text-sm text-muted">Finished {endLabel}</p>
-            )}
+            {endLabel ? (
+              <p className="text-sm text-muted">Finished {endLabel}</p>
+            ) : null}
           </SurfaceCard>
         </motion.div>
       )}
@@ -158,7 +158,7 @@ export default function WorkoutDayReview({
         const healthSummary = formatCardioHealthSummary(entry);
         return (
           <CollapsibleSection key={rowKey} title={title} defaultOpen>
-            <div className="space-y-1 px-3 py-2">
+            <div className="flex flex-col gap-1 px-3 py-2">
               {entry.skipped ? (
                 <p className="text-xs text-muted">Skipped</p>
               ) : entry.completed ? (
@@ -263,7 +263,7 @@ export default function WorkoutDayReview({
         </div>
       </CollapsibleSection>
 
-      <SurfaceCard className="p-4">
+      <SurfaceCard className="flex flex-col gap-2 p-4">
         <label className="text-xs font-medium text-muted" htmlFor="review-notes">
           Notes
         </label>
@@ -275,9 +275,9 @@ export default function WorkoutDayReview({
           defaultValue={log.notes ?? ""}
           onBlur={() => void handleNotesBlur()}
           placeholder="How did it feel today?"
-          className="mt-2 w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted"
+          className="w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent placeholder:text-muted"
         />
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm text-muted">
             Tap <span className="font-medium text-foreground">Save notes</span> or
             leave this field to save on close.
@@ -291,12 +291,12 @@ export default function WorkoutDayReview({
             {saving ? "Saving…" : "Save notes"}
           </button>
         </div>
-        {saveHint === "saved" && (
-          <p className="mt-2 text-xs font-medium text-green-400">Saved.</p>
-        )}
-        {saveHint === "unchanged" && (
-          <p className="mt-2 text-xs text-muted">Nothing new to save.</p>
-        )}
+        {saveHint === "saved" ? (
+          <p className="text-xs font-medium text-green-400">Saved.</p>
+        ) : null}
+        {saveHint === "unchanged" ? (
+          <p className="text-xs text-muted">Nothing new to save.</p>
+        ) : null}
       </SurfaceCard>
     </AnimatedSection>
   );
@@ -318,13 +318,13 @@ function ReviewRow({
   badge?: ReactNode;
 }) {
   return (
-    <div className="px-2 py-2.5 space-y-0.5">
+    <div className="flex flex-col gap-0.5 px-2 py-2.5">
       <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <p className="text-sm font-medium text-foreground">{name}</p>
-          {prescribedLabel && (
-            <p className="text-caption text-muted mt-0.5">{prescribedLabel}</p>
-          )}
+          {prescribedLabel ? (
+            <p className="text-caption text-muted">{prescribedLabel}</p>
+          ) : null}
           <p className="text-xs text-muted">{target}</p>
         </div>
         {badge}

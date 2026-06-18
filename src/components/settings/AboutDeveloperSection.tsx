@@ -40,16 +40,16 @@ export default function AboutDeveloperSection() {
       title="About the developer"
       hint="Who built this app"
       defaultOpen={false}
-      contentClassName="space-y-4 p-4"
+      contentClassName="flex flex-col gap-4 p-4"
     >
-      <div className="space-y-1">
+      <div className="flex flex-col gap-1">
         <p className="text-base font-semibold text-foreground">
           {DEVELOPER_NAME}
         </p>
         <p className="text-sm text-accent">{DEVELOPER_TAGLINE}</p>
       </div>
       <p className="text-sm leading-relaxed text-muted">{DEVELOPER_BIO}</p>
-      <ul className="space-y-2" aria-label="Developer links">
+      <ul className="flex flex-col gap-2" aria-label="Developer links">
         {DEVELOPER_LINKS.map((link) => (
           <li key={link.label}>
             <a

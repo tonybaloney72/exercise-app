@@ -165,7 +165,7 @@ export default function WorkoutSession({
   };
 
   return (
-    <div className="space-y-4 pb-4">
+    <div className="flex flex-col gap-4 pb-4">
       <WorkoutSessionStructurePick
         activeWorkout={activeWorkout}
         pickTarget={pickTarget}
@@ -239,7 +239,7 @@ export default function WorkoutSession({
         );
         if (!roundLog) return null;
         return (
-          <div key={round.roundNumber} className="space-y-2">
+          <div key={round.roundNumber} className="flex flex-col gap-2">
             <RoundCard
               round={round}
               roundLog={roundLog}

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function SettingsLegalLinks() {
   return (
-    <p className="text-center text-xs text-muted pt-1">
+    <p className="text-center text-xs text-muted py-1">
       <Link href="/privacy" className="hover:text-foreground">
         Privacy
       </Link>

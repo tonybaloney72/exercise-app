@@ -128,7 +128,7 @@ export default function StretchPlanSection({
           + Add
         </button>
       </div>
-      <div className="px-2 py-1 space-y-0.5">{body}</div>
+      <div className="flex flex-col px-2 py-1 gap-0.5">{body}</div>
     </SurfaceCard>
   );
 }

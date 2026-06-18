@@ -57,10 +57,6 @@ export class GpsTrackSession {
     return this.phase;
   }
 
-  get isWatching(): boolean {
-    return this.watchId != null;
-  }
-
   get isRecording(): boolean {
     return this.phase === "recording" && this.startedAtMs != null;
   }
@@ -136,11 +132,6 @@ export class GpsTrackSession {
     ) {
       this.points.push(point);
     }
-  }
-
-  snapshot(): GpsTrackSnapshot | null {
-    if (this.startedAtMs == null) return null;
-    return computeGpsTrackSnapshot(this.points, this.startedAtMs);
   }
 
   async stop(): Promise<GpsTrackSnapshot | null> {

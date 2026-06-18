@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant light (&:where(html[data-theme="light"] *));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

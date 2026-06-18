@@ -144,7 +144,7 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
           title: "Welcome",
           hint: "A quick setup helps us tailor your library and weekly plan. Takes about a minute.",
           body: (
-            <div className="space-y-4 text-sm text-foreground leading-relaxed">
+            <div className="flex flex-col gap-4 text-sm text-foreground leading-relaxed">
               <p>
                 You&apos;ll pick your skill level by muscle group, the equipment
                 you have, and see how the main tabs work. The default week is a
@@ -178,7 +178,7 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
           title: "Around the app",
           hint: "Five tabs at the bottom-here’s what each one is for.",
           body: (
-            <ul className="space-y-3">
+            <ul className="flex flex-col gap-3">
               {ONBOARDING_TAB_TOUR.map((tab) => (
                 <li
                   key={tab.label}
@@ -200,7 +200,7 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
           title: "Your week",
           hint: "Default is 6-day push / pull / legs. Custom weeks let you guide or hand-pick exercises.",
           body: (
-            <div className="space-y-4 text-sm leading-relaxed">
+            <div className="flex flex-col gap-4 text-sm leading-relaxed">
               <div className="rounded-xl border border-accent/30 bg-accent/10 px-3 py-3">
                 <p className="font-semibold text-foreground">
                   6-day P/P/L (recommended)

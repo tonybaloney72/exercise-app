@@ -29,7 +29,7 @@ export default function PplWeekScheduleEditor({ value, onChange }: Props) {
   }
 
   return (
-    <section className="space-y-3">
+    <section className="flex flex-col gap-3">
       <p className="text-xs text-muted leading-snug">
         Assign each weekday for working rounds, or choose recovery / rest.
         Cardio settings below follow push and pull days automatically.
@@ -57,7 +57,7 @@ export default function PplWeekScheduleEditor({ value, onChange }: Props) {
           Custom schedule - weekdays don&apos;t match a preset.
         </p>
       ) : null}
-      <ul className="space-y-2">
+      <ul className="flex flex-col gap-2">
         {DAY_NAMES.map((shortName, dayOfWeek) => {
           const entry = value[dayOfWeek] ?? "full_rest";
           return (

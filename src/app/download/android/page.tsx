@@ -25,7 +25,7 @@ export default function AndroidDownloadPage() {
           </Link>
         </p>
 
-        <header className="mb-8 space-y-2 border-b border-border pb-6">
+        <header className="flex flex-col mb-8 gap-2 border-b border-border pb-6">
           <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
             Android app
           </h1>
@@ -34,8 +34,8 @@ export default function AndroidDownloadPage() {
           </p>
         </header>
 
-        <div className="space-y-6 text-sm leading-relaxed text-muted">
-          <section className="space-y-3">
+        <div className="flex flex-col gap-6 text-sm leading-relaxed text-muted">
+          <section className="flex flex-col gap-3">
             <p className="text-foreground">
               Download the MyExercise Android app (APK) and install it on your
               device.
@@ -64,7 +64,7 @@ export default function AndroidDownloadPage() {
             </p>
           </section>
 
-          <section className="space-y-3">
+          <section className="flex flex-col gap-3">
             <h2 className="text-lg font-semibold text-foreground">
               Build a new APK (developers)
             </h2>

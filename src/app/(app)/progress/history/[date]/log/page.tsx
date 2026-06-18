@@ -131,7 +131,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   const parsed = parseLocalDateKey(dateKey);
   if (!parsed) {
     return (
-      <div className="py-8 space-y-4 px-2 text-center">
+      <div className="flex flex-col py-8 gap-4 px-2 text-center">
         <p className="text-sm text-muted">Invalid date in URL.</p>
         <ProgressBackLink />
       </div>
@@ -140,7 +140,7 @@ export default function WorkoutHistoryBackfillLogPage() {
 
   if (!canAccessLogPage) {
     return (
-      <div className="py-8 space-y-4">
+      <div className="flex flex-col py-8 gap-4">
         <ProgressBackLink />
         <SurfaceCard className="px-4 py-6 text-center">
           <p className="text-sm text-foreground">
@@ -157,7 +157,7 @@ export default function WorkoutHistoryBackfillLogPage() {
 
   if (planLoading || mode === "loading") {
     return (
-      <div className="py-8 space-y-4">
+      <div className="flex flex-col py-8 gap-4">
         <ProgressBackLink />
         <p className="text-sm text-muted text-center">Loading plan…</p>
       </div>
@@ -166,7 +166,7 @@ export default function WorkoutHistoryBackfillLogPage() {
 
   if (planError || !plan) {
     return (
-      <div className="py-8 space-y-4">
+      <div className="flex flex-col py-8 gap-4">
         <ProgressBackLink />
         <SurfaceCard className="px-4 py-6 text-center">
           <p className="text-sm text-red-400">
@@ -183,7 +183,7 @@ export default function WorkoutHistoryBackfillLogPage() {
     activeWorkout.date !== dateKey
   ) {
     return (
-      <div className="py-8 space-y-4">
+      <div className="flex flex-col py-8 gap-4">
         <ProgressBackLink />
         <SurfaceCard className="px-4 py-6 text-center">
           <p className="text-sm text-foreground">
@@ -202,7 +202,7 @@ export default function WorkoutHistoryBackfillLogPage() {
 
   if (!sessionForThisDay) {
     return (
-      <div className="py-8 space-y-5">
+      <div className="flex flex-col py-8 gap-5">
         <ProgressBackLink />
         <h1 className="text-2xl font-bold text-foreground">
           Log workout · {formatPageTitle(dateKey)}
@@ -230,7 +230,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   }
 
   return (
-    <div className="py-6 space-y-5">
+    <div className="flex flex-col py-6 gap-5">
       <ProgressBackLink />
       <h1 className="text-2xl font-bold text-foreground">
         {formatPageTitle(dateKey)}

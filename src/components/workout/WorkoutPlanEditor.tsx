@@ -373,7 +373,7 @@ export default function WorkoutPlanEditor({
   };
 
   return (
-    <AnimatedSection className="space-y-4" delay={0}>
+    <AnimatedSection className="flex flex-col gap-4" delay={0}>
       <DayPlanCardioEditor plan={draft} onChange={setDraft} />
 
       <div className="flex flex-wrap items-center justify-between gap-2 px-1">
@@ -526,13 +526,13 @@ export default function WorkoutPlanEditor({
         </button>
       </div>
 
-      <div className="rounded-xl border border-border bg-surface px-4 py-3 space-y-2">
+      <div className="flex flex-col rounded-xl border border-border bg-surface px-4 py-3 gap-2">
         <p className="text-xs text-muted">
           Discard unsaved edits and restore this day&apos;s auto-generated
           workout.
         </p>
         {resetConfirm ? (
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-2 py-1">
             <button
               type="button"
               disabled={saving}

@@ -79,12 +79,12 @@ function ChartShell({
   children: ReactNode;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       <div>
         <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         <p className="text-xs text-muted mt-0.5">{subtitle}</p>
       </div>
-      <div className="w-full rounded-xl border border-border bg-surface p-2 pt-3">
+      <div className="w-full rounded-xl border border-border bg-surface p-2 py-3">
         {children}
       </div>
     </div>

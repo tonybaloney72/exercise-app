@@ -324,11 +324,11 @@ export default function ExerciseRow({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-10 pb-3 space-y-3">
+            <div className="flex flex-col px-10 pb-3 gap-3">
               <CategoryBadge category={effectiveExercise.category} size="sm" />
               <p className="text-xs text-muted">{effectiveExercise.notes}</p>
 
-              <div className="space-y-1.5">
+              <div className="flex flex-col gap-1.5">
                 <p className="text-caption font-medium uppercase tracking-wide text-muted">
                   This set
                 </p>
@@ -396,7 +396,7 @@ export default function ExerciseRow({
               )}
 
               {mode === "timer" && (
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                   <TimerTargetControls
                     effectiveSeconds={effectiveTargetSec}
                     storedTargetSeconds={log.targetDurationSeconds}

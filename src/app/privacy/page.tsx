@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <LegalDocumentLayout title="Privacy Policy">
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <p>
           {LEGAL_APP_NAME} ({LEGAL_DOMAIN}) is a personal fitness app built and
           operated by {LEGAL_OPERATOR} as a solo developer project. This policy
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           What we collect
         </h2>
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
           your information, run advertising trackers, or build marketing
           profiles.
         </p>
-        <ul className="list-disc space-y-2 pl-5 text-muted">
+        <ul className="flex flex-col list-disc gap-2 pl-5 text-muted">
           <li>
             <strong className="text-foreground">Account email</strong> - used
             only to sign you in and identify your account. If you use Google
@@ -64,12 +64,12 @@ export default function PrivacyPage() {
         </ul>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           How we use information
         </h2>
         <p>Information is used only to operate {LEGAL_APP_NAME}:</p>
-        <ul className="list-disc space-y-2 pl-5 text-muted">
+        <ul className="flex flex-col list-disc gap-2 pl-5 text-muted">
           <li>Authenticate you and keep you signed in</li>
           <li>Save and sync workouts and settings you choose to store</li>
           <li>Respond to exercise content reports you voluntarily submit</li>
@@ -78,7 +78,7 @@ export default function PrivacyPage() {
         <p>We do not use your data for targeted advertising.</p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           Where data is stored
         </h2>
@@ -107,7 +107,7 @@ export default function PrivacyPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           Google sign-in
         </h2>
@@ -129,7 +129,7 @@ export default function PrivacyPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           Sharing with third parties
         </h2>
@@ -141,7 +141,7 @@ export default function PrivacyPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">
           Retention and deletion
         </h2>
@@ -155,7 +155,7 @@ export default function PrivacyPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">Contact</h2>
         <p>
           Questions about this policy or your data? Email{" "}
@@ -169,7 +169,7 @@ export default function PrivacyPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">Changes</h2>
         <p>
           This policy may be updated as the app evolves. The &quot;Last

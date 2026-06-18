@@ -157,7 +157,7 @@ export default function DefaultStretchesModal({
         hint="These are merged first into each day's lists. Disliked exercises are hidden here and removed when you save."
         ariaLabel="Default stretches"
         maxWidth="lg"
-        bodyClassName="overflow-y-auto px-4 py-4 space-y-4"
+        bodyClassName="flex flex-col overflow-y-auto px-4 py-4 gap-4"
         footer={
           <div className="flex gap-2">
             <button

@@ -70,8 +70,8 @@ function SignupForm() {
       : "/login";
 
   return (
-    <div className="space-y-3 sm:space-y-5">
-      <div className="space-y-0.5 sm:space-y-1">
+    <div className="flex flex-col gap-3 sm:gap-5">
+      <div className="flex flex-col gap-0.5 sm:gap-1">
         <h1 className="text-xl font-bold text-foreground sm:text-2xl">Create account</h1>
         <p className="text-xs text-muted sm:text-sm">
           Sync your workouts across devices.
@@ -93,7 +93,7 @@ function SignupForm() {
 
       <AuthOrDivider />
 
-      <form method="post" onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
+      <form method="post" onSubmit={handleSubmit} className="flex flex-col gap-2 sm:gap-3">
         <AuthField
           id="email"
           label="Email"
@@ -138,7 +138,7 @@ function SignupForm() {
         </button>
       </form>
 
-      <div className="space-y-1 text-center text-sm text-muted sm:space-y-2 sm:text-xs">
+      <div className="flex flex-col gap-1 text-center text-sm text-muted sm:gap-2 sm:text-xs">
         <p>
           Already have an account?{" "}
           <Link href={loginHref} className="text-accent hover:underline">

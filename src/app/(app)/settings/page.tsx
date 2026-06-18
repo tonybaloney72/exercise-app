@@ -33,6 +33,7 @@ import { createClient } from "@/lib/supabase/client";
 import { resolveApiUrl } from "@/lib/apiBaseUrl";
 import { isCapacitorBundledBuild, isNativePlatform } from "@/lib/capacitorRuntime";
 import { clearGuestCookie } from "@/lib/auth/guestCookieClient";
+import { useDiagnosticLogUnlock } from "@/hooks/useDiagnosticLogUnlock";
 export default function SettingsPage() {
   const router = useRouter();
   const settings = useSettingsStore();
@@ -40,6 +41,12 @@ export default function SettingsPage() {
   const user = useAuthStore((s) => s.user);
   const setGuest = useAuthStore((s) => s.setGuest);
   const [stretchModalOpen, setStretchModalOpen] = useState(false);
+  const {
+    unlocked: diagnosticLogUnlocked,
+    onUnlockHeaderTap,
+    onUnlockHeaderPressStart,
+    onUnlockHeaderPressEnd,
+  } = useDiagnosticLogUnlock();
 
   const exercisePrefs = useExercisePreferencesStore((s) => s.byExerciseId);
 
@@ -77,8 +84,15 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="py-6 space-y-5">
-      <div>
+    <div className="flex flex-col py-6 gap-5">
+      <div
+        className="select-none"
+        onClick={onUnlockHeaderTap}
+        onPointerDown={onUnlockHeaderPressStart}
+        onPointerUp={onUnlockHeaderPressEnd}
+        onPointerLeave={onUnlockHeaderPressEnd}
+        onPointerCancel={onUnlockHeaderPressEnd}
+      >
         <h1 className="text-2xl font-bold text-foreground">Settings</h1>
         <p className="text-sm text-muted mt-1">Customize your experience</p>
       </div>
@@ -88,7 +102,7 @@ export default function SettingsPage() {
         <CollapsibleSection
           title="Account"
           defaultOpen
-          contentClassName="space-y-3 p-4"
+          contentClassName="flex flex-col gap-3 p-4"
         >
           {mode === "authenticated" && user && (
             <>
@@ -193,7 +207,7 @@ export default function SettingsPage() {
           title="Timers & device"
           hint="Rest timers, sounds, vibration, and screen wake"
           defaultOpen={false}
-          contentClassName="space-y-4 p-4"
+          contentClassName="flex flex-col gap-4 p-4"
         >
           <div>
             <p className="text-xs font-semibold text-foreground">
@@ -274,7 +288,7 @@ export default function SettingsPage() {
           title="Your equipment"
           hint="Library and weekly plan only show exercises you can do with gear you have"
           defaultOpen={false}
-          contentClassName="space-y-3 p-4"
+          contentClassName="flex flex-col gap-3 p-4"
         >
           <p className="text-xs text-muted">
             {mode === "guest" && (
@@ -300,7 +314,7 @@ export default function SettingsPage() {
           title="Exercise difficulty"
           hint="Skill caps for generated plans and swap suggestions"
           defaultOpen={false}
-          contentClassName="space-y-3 p-4"
+          contentClassName="flex flex-col gap-3 p-4"
         >
           <ExpertiseByGroupEditor
             byGroup={settings.expertiseByGroup}
@@ -318,7 +332,7 @@ export default function SettingsPage() {
             title="Your week"
             hint="How your week is built."
             defaultOpen={false}
-            contentClassName="space-y-4 p-4"
+            contentClassName="flex flex-col gap-4 p-4"
           >
             {!settings.weekBuilderMigrationAcknowledged ? (
               <WeekBuilderMigrationBanner
@@ -441,7 +455,7 @@ export default function SettingsPage() {
                   defaultOpen={false}
                 >
                   <div
-                    className="space-y-2"
+                    className="flex flex-col gap-2"
                     role="radiogroup"
                     aria-label="Round density"
                   >
@@ -517,23 +531,25 @@ export default function SettingsPage() {
         <AndroidAppDownloadSection />
       </AnimatedSection>
 
-      <AnimatedSection delay={0.05}>
-        <CollapsibleSection
-          title="Diagnostic log"
-          hint="Debug GPS, Health Connect, and save issues"
-          defaultOpen={false}
-          contentClassName="space-y-3 p-4"
-        >
-          <DiagnosticLogSection />
-        </CollapsibleSection>
-      </AnimatedSection>
+      {diagnosticLogUnlocked ? (
+        <AnimatedSection delay={0.05}>
+          <CollapsibleSection
+            title="Diagnostic log"
+            hint="Debug GPS, Health Connect, and save issues"
+            defaultOpen={false}
+            contentClassName="flex flex-col gap-3 p-4"
+          >
+            <DiagnosticLogSection />
+          </CollapsibleSection>
+        </AnimatedSection>
+      ) : null}
 
       <AnimatedSection delay={0.05}>
         <CollapsibleSection
           title="Feedback"
           hint="Bugs, ideas, and confusing UX"
           defaultOpen={false}
-          contentClassName="space-y-3 p-4"
+          contentClassName="flex flex-col gap-3 p-4"
         >
           <p className="text-xs text-muted">
             Send a message to the developer and help us improve MyExercise.
@@ -674,7 +690,7 @@ function ChangePasswordSection({ email }: { email: string }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-2 border-t border-border pt-3"
+      className="flex flex-col gap-2 border-t border-border py-3"
     >
       <PasswordField
         id="current-password"
@@ -749,7 +765,7 @@ function PasswordField({
   hint?: string;
 }) {
   return (
-    <div className="space-y-1">
+    <div className="flex flex-col gap-1">
       <label htmlFor={id} className="text-sm font-medium text-muted">
         {label}
       </label>

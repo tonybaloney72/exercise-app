@@ -178,7 +178,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
 
   return (
     <>
-      <SurfaceCard className="p-4 space-y-3">
+      <SurfaceCard className="flex flex-col p-4 gap-3">
         <div>
           <h2 className="text-sm font-semibold text-foreground">
             Log activity
@@ -262,7 +262,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
           </div>
         }
       >
-        <div className="space-y-3 px-4 py-1">
+        <div className="flex flex-col gap-3 px-4 py-1">
           {pendingKind && GPS_KINDS.includes(pendingKind) ? (
             <CardioGpsTracker onComplete={applyGpsTrack} />
           ) : null}

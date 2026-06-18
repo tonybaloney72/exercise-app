@@ -77,9 +77,9 @@ export default function GuidedDayBlueprintEditor({
   }, [dayOfWeek]);
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {dayWarnings.length > 0 ? (
-        <ul className="space-y-1">
+        <ul className="flex flex-col gap-1">
           {dayWarnings.map((w) => (
             <li
               key={w.id}
@@ -91,7 +91,7 @@ export default function GuidedDayBlueprintEditor({
         </ul>
       ) : null}
 
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-1.5">
         <p className="text-xs font-medium text-muted">Copy from another day</p>
         <div className="flex flex-wrap gap-1.5">
           {WEEK_DAY_ABBRS.map((label, sourceDow) => {
@@ -112,7 +112,7 @@ export default function GuidedDayBlueprintEditor({
         </div>
 
         {pendingCopySourceDow != null ? (
-          <SurfaceCard className="border-amber-500/40 bg-amber-500/10 p-3 space-y-2.5">
+          <SurfaceCard className="flex flex-col border-amber-500/40 bg-amber-500/10 p-3 gap-2.5">
             <p className="text-sm text-foreground leading-snug">
               Copy {WEEK_DAY_ABBRS[pendingCopySourceDow]}&apos;s plan onto{" "}
               {WEEK_DAY_ABBRS[dayOfWeek]}? This replaces{" "}
@@ -151,7 +151,7 @@ export default function GuidedDayBlueprintEditor({
         ) : null}
       </div>
 
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-1.5">
         <p className="text-xs font-medium text-muted">Day type</p>
         <div className="flex flex-wrap gap-1.5" role="radiogroup">
           {DAY_KINDS.map((kind) => (
@@ -173,11 +173,11 @@ export default function GuidedDayBlueprintEditor({
 
       {hasRounds ? (
         <>
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             {day.rounds.map((round, roundIndex) => (
               <SurfaceCard
                 key={roundIndex}
-                className="p-3 space-y-2 bg-surface-hover/30"
+                className="flex flex-col p-3 gap-2 bg-surface-hover/30"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
@@ -237,7 +237,7 @@ export default function GuidedDayBlueprintEditor({
                   })}
                 </div>
 
-                <div className="space-y-1.5 pt-1">
+                <div className="flex flex-col gap-1.5 py-1">
                   <label
                     htmlFor={`round-${dayOfWeek}-${roundIndex}-count`}
                     className="block text-xs font-medium text-foreground"
@@ -273,7 +273,7 @@ export default function GuidedDayBlueprintEditor({
                 </div>
 
                 {roundIndex > 0 ? (
-                  <div className="flex flex-wrap gap-2 pt-1">
+                  <div className="flex flex-wrap gap-2 py-1">
                     <button
                       type="button"
                       onClick={() =>

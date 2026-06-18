@@ -138,7 +138,7 @@ export default function StretchSection({
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="border-t border-border px-2 py-1 space-y-0.5">
+            <div className="flex flex-col border-t border-border px-2 py-1 gap-0.5">
               {stretches.map((stretch) => {
                 const log = exerciseLogs.find(
                   (e) => e.exerciseId === stretch.exerciseId,
@@ -365,7 +365,7 @@ function StretchRow({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <motion.div className="px-10 pb-3 space-y-3">
+            <motion.div className="flex flex-col px-10 pb-3 gap-3">
               <p className="text-xs text-muted">{exercise.notes}</p>
 
               {mode === "timer" && (

@@ -7,6 +7,7 @@ import TabEnterMotion from "@/components/common/TabEnterMotion";
 import TodayPageSkeleton from "@/components/common/TodayPageSkeleton";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
+import PlanMetaPill from "@/components/common/PlanMetaPill";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import PostWorkoutSummary from "@/components/workout/PostWorkoutSummary";
 import StaleWorkoutSessionsBanner from "@/components/workout/StaleWorkoutSessionsBanner";
@@ -15,6 +16,7 @@ import TodayWorkoutPanel, {
 } from "@/components/workout/TodayWorkoutPanel";
 import { isUserCustomizedWeekSource } from "@/lib/planGenerator";
 import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
+import { cardioBadgesForPlan, restBadgeForPlan } from "@/lib/planCardioDisplay";
 import { bumpTrainingWeekPlansAfterCustomSave } from "@/adapters/bumpTrainingWeekPlansAfterCustomSave";
 import { resetTrainingDayToGenerated } from "@/lib/trainingWeekRefresh";
 import { saveCustomDayPlan } from "@/lib/trainingWeekCustomize";
@@ -42,6 +44,11 @@ function formatSessionHeaderDate(dateKey: string): string {
     month: "short",
     day: "numeric",
   });
+}
+
+function formatTodayWeekdayName(dateKey: string): string {
+  const d = parseLocalDateKey(dateKey);
+  return d?.toLocaleDateString(undefined, { weekday: "long" }) ?? "Today";
 }
 
 function TodayPageInner() {
@@ -156,7 +163,7 @@ function TodayPageInner() {
 
   if (planError || !plan) {
     return (
-      <div className="py-8 space-y-3 text-center px-2">
+      <div className="flex flex-col gap-3 px-2 py-8 text-center">
         <p className="text-sm text-foreground">
           {planError ?? "Could not load today&apos;s plan."}
         </p>
@@ -166,7 +173,7 @@ function TodayPageInner() {
 
   if (activePastSession) {
     return (
-      <div className="py-12 text-center space-y-2 px-2">
+      <div className="flex flex-col gap-2 px-2 py-12 text-center">
         <p className="text-sm text-muted">Opening session for</p>
         <p className="text-sm font-medium text-foreground">
           {formatSessionHeaderDate(sessionDateKey)}
@@ -176,6 +183,8 @@ function TodayPageInner() {
   }
 
   const allCategories = categoriesPresentInPlan(plan);
+  const restBadge = restBadgeForPlan(plan);
+  const cardioBadges = cardioBadgesForPlan(plan);
   const isCustomWeek = isUserCustomizedWeekSource(weekSource);
   const editingCompletedSession =
     Boolean(activeWorkout?.endTime) && activeWorkout?.date === todayKey;
@@ -269,7 +278,7 @@ function TodayPageInner() {
   }
 
   return (
-    <div className="py-6 space-y-5">
+    <div className="flex flex-col gap-5 py-6">
       {devForcePreWorkout && (
         <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
           Dev: pre-workout view forced (
@@ -279,8 +288,25 @@ function TodayPageInner() {
       )}
 
       {/* Header */}
-      <TabEnterMotion y={-10} className="space-y-1">
-        <h1 className="text-2xl font-bold text-foreground">{plan.name}</h1>
+      <TabEnterMotion y={-10}>
+        {showTodaysCompletedReview ? (
+          <h1 className="flex min-w-0 flex-nowrap items-baseline gap-x-2 leading-tight">
+            <span className="truncate text-2xl font-bold text-foreground">
+              {formatTodayWeekdayName(todayKey)}
+            </span>
+            <span
+              className="shrink-0 text-muted font-normal text-xl"
+              aria-hidden
+            >
+              –
+            </span>
+            <span className="shrink-0 text-[11px] font-medium uppercase tracking-wider text-green-400">
+              Workout complete
+            </span>
+          </h1>
+        ) : (
+          <h1 className="text-2xl font-bold text-foreground">{plan.name}</h1>
+        )}
       </TabEnterMotion>
 
       {/* Category chips on today's plan (collapsed or expanded) */}
@@ -289,11 +315,14 @@ function TodayPageInner() {
           {allCategories.map((cat) => (
             <CategoryBadge key={cat} category={cat} size="md" />
           ))}
-          {plan.hasJog && (
-            <span className="inline-flex items-center rounded-full bg-sky-500/20 px-2.5 py-1 text-xs font-medium text-sky-400">
-              🏃 Jog
-            </span>
-          )}
+          {restBadge ? (
+            <PlanMetaPill variant="rest">{restBadge}</PlanMetaPill>
+          ) : null}
+          {cardioBadges.map((label) => (
+            <PlanMetaPill key={label} variant="cardio">
+              {label}
+            </PlanMetaPill>
+          ))}
         </TabEnterMotion>
       )}
 
@@ -321,8 +350,8 @@ function TodayPageInner() {
       )}
 
       {hasPausedDraftToday && (
-        <AnimatedSection className="space-y-3" delay={0.15}>
-          <SurfaceCard className="p-4 space-y-2">
+        <AnimatedSection className="flex flex-col gap-3" delay={0.15}>
+          <SurfaceCard className="flex flex-col gap-2 p-4">
             <p className="text-sm font-medium text-foreground">
               Workout in progress
             </p>
@@ -382,7 +411,7 @@ function TodayPageInner() {
       ) : null}
 
       {showQuickLogsBeforeReview ? (
-        <AnimatedSection className="space-y-3" delay={0.12}>
+        <AnimatedSection className="flex flex-col gap-3" delay={0.12}>
           <QuickActivityLog plan={plan} dateKey={todayKey} />
           <WeightLogCard dateKey={todayKey} />
         </AnimatedSection>
@@ -397,12 +426,11 @@ function TodayPageInner() {
             setShowWorkoutDetails(true);
             scrollTodayToTop();
           }}
-          onEditWorkout={handleEditCompletedWorkout}
         />
       )}
 
       {isTodaySession && showTodaysCompletedReview && showWorkoutDetails && (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <button
             type="button"
             onClick={() => {
@@ -428,7 +456,7 @@ function TodayPageInner() {
       <StaleWorkoutSessionsBanner hidden={hideStaleBanner} />
 
       {showQuickLogsAfterReview ? (
-        <AnimatedSection className="space-y-3" delay={0.12}>
+        <AnimatedSection className="flex flex-col gap-3" delay={0.12}>
           <QuickActivityLog plan={plan} dateKey={todayKey} />
           <WeightLogCard dateKey={todayKey} />
         </AnimatedSection>

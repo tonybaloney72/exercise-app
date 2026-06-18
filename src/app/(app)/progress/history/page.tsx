@@ -59,8 +59,8 @@ function WorkoutHistoryPageInner() {
   );
 
   return (
-    <div className="py-6 space-y-5">
-      <div className="space-y-3">
+    <div className="flex flex-col py-6 gap-5">
+      <div className="flex flex-col gap-3">
         <ProgressBackLink />
         <div>
           <h1 className="text-2xl font-bold text-foreground">
