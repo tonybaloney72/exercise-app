@@ -25,6 +25,23 @@ describe("aggregateDailyHealthSampleTotal", () => {
     ).toBe(4520);
   });
 
+  it("dedupes similar totals from separate HC sources", () => {
+    expect(
+      aggregateDailyHealthSampleTotal([
+        {
+          value: 1498,
+          sourceName: "Samsung Health",
+          endDate: "2026-05-18T12:00:00.000Z",
+        },
+        {
+          value: 1500,
+          sourceName: "Anthony's S23+",
+          endDate: "2026-05-18T12:00:00.000Z",
+        },
+      ]),
+    ).toBe(1500);
+  });
+
   it("sums interval buckets when values are clearly incremental", () => {
     expect(
       aggregateDailyHealthSampleTotal([
@@ -37,6 +54,26 @@ describe("aggregateDailyHealthSampleTotal", () => {
 });
 
 describe("resolveDailyHealthMetricTotal", () => {
+  it("prefers aggregate when it matches HC deduped multi-source total", () => {
+    expect(
+      resolveDailyHealthMetricTotal(
+        1498,
+        [
+          {
+            value: 1498,
+            sourceName: "Samsung Health",
+            endDate: "2026-05-18T10:00:00.000Z",
+          },
+          {
+            value: 1500,
+            sourceName: "Anthony's S23+",
+            endDate: "2026-05-18T18:00:00.000Z",
+          },
+        ],
+      ),
+    ).toBe(1498);
+  });
+
   it("prefers sample rollup when aggregate lags", () => {
     expect(
       resolveDailyHealthMetricTotal(
@@ -55,9 +92,15 @@ describe("resolveDailyHealthMetricTotal", () => {
 });
 
 describe("aggregatedBucketTotal", () => {
-  it("sums HC day buckets", () => {
+  it("sums distinct HC day buckets", () => {
     expect(
       aggregatedBucketTotal([{ value: 4200 }, { value: 0 }, { value: 300 }]),
     ).toBe(4500);
+  });
+
+  it("dedupes similar buckets from multiple sources", () => {
+    expect(
+      aggregatedBucketTotal([{ value: 1498 }, { value: 1500 }]),
+    ).toBe(1500);
   });
 });
