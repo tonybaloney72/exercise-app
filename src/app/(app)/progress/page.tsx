@@ -50,7 +50,7 @@ import {
   formatWorkoutHistoryDayLabel,
   workoutHistoryRowMeta,
 } from "@/lib/workoutHistoryGroups";
-import { filterCompletedWorkouts } from "@/utils/workoutLogLookup";
+import { filterCompletedWorkouts, workoutsForCardioProgressCharts } from "@/utils/workoutLogLookup";
 
 const ProgressChartsBlock = dynamic(
   () => import("@/components/progress/ProgressChartsBlock"),
@@ -69,12 +69,17 @@ function formatDailyHealthStatValue(
 
 export default function ProgressPage() {
   const historyReady = useHistoryReady();
-  const { workoutHistory } = useWorkoutStore();
+  const { workoutHistory, activeWorkout } = useWorkoutStore();
   const dailyHealth = useDailyHealthFromHealth();
 
   const completedHistory = useMemo(
     () => filterCompletedWorkouts(workoutHistory),
     [workoutHistory],
+  );
+
+  const cardioChartHistory = useMemo(
+    () => workoutsForCardioProgressCharts(workoutHistory, activeWorkout),
+    [workoutHistory, activeWorkout],
   );
 
   const stats = useMemo(() => {
@@ -223,7 +228,7 @@ export default function ProgressPage() {
       {completedHistory.length > 0 && <ProgressHistoryLink />}
 
       <ProgressChartsBlock
-        history={completedHistory}
+        history={cardioChartHistory}
         dailyStepsSeries={dailyHealth.chartSeries}
         dailyStepsLoading={dailyHealth.loading && dailyHealth.available}
         dailyStepsUnavailableReason={dailyHealth.unavailableReason}

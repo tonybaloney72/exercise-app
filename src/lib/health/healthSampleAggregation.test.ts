@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   aggregateDailyHealthSampleTotal,
   aggregatedBucketTotal,
+  resolveDailyHealthMetricTotal,
   sumHealthSampleValues,
 } from "@/lib/health/healthSampleAggregation";
 
@@ -32,6 +33,24 @@ describe("aggregateDailyHealthSampleTotal", () => {
         { value: 1200, endDate: "2026-05-18T18:00:00.000Z" },
       ]),
     ).toBe(2500);
+  });
+});
+
+describe("resolveDailyHealthMetricTotal", () => {
+  it("prefers sample rollup when aggregate lags", () => {
+    expect(
+      resolveDailyHealthMetricTotal(
+        608,
+        [
+          { value: 1498, endDate: "2026-05-18T10:00:00.000Z" },
+          { value: 1498, endDate: "2026-05-18T18:00:00.000Z" },
+        ],
+      ),
+    ).toBe(1498);
+  });
+
+  it("uses aggregate when samples are empty", () => {
+    expect(resolveDailyHealthMetricTotal(4200, [])).toBe(4200);
   });
 });
 

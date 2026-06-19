@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { refreshAppData } from "@/lib/refreshAppData";
+import { dispatchHealthMetricsRefresh } from "@/lib/health/healthMetricsRefresh";
 import { shouldEnablePullToRefresh } from "@/lib/pullToRefresh";
 
 const THRESHOLD_PX = 72;
@@ -46,6 +47,7 @@ export default function PullToRefresh() {
     pullPxRef.current = THRESHOLD_PX;
     try {
       await refreshAppData();
+      dispatchHealthMetricsRefresh({ force: true });
       router.refresh();
     } catch (err) {
       console.error("[PullToRefresh]", err);

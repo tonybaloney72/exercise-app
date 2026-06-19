@@ -1,9 +1,51 @@
 import type { WorkoutLog } from "@/types";
+import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /** Logs with `endTime` set (excludes in-progress cloud drafts). */
 export function filterCompletedWorkouts(history: WorkoutLog[]): WorkoutLog[] {
   return history.filter((w) => w.endTime != null);
+}
+
+function hasLoggedCardioSession(workout: WorkoutLog): boolean {
+  return resolveWorkoutCardioExercises(workout).some(
+    (row) =>
+      row.completed &&
+      !row.skipped &&
+      ((row.actualDistanceMi != null && row.actualDistanceMi > 0) ||
+        (row.actualDuration != null && row.actualDuration > 0) ||
+        (row.stepCount != null && row.stepCount > 0) ||
+        (row.activeCaloriesKcal != null && row.activeCaloriesKcal > 0)),
+  );
+}
+
+/**
+ * Workouts that should appear on Progress cardio charts — includes finished
+ * workouts and in-progress days with at least one completed quick-log cardio row.
+ */
+export function filterWorkoutsForCardioProgress(
+  history: WorkoutLog[],
+): WorkoutLog[] {
+  return history.filter(
+    (workout) => workout.endTime != null || hasLoggedCardioSession(workout),
+  );
+}
+
+/** Cardio chart history plus today's active session when it is not yet in history. */
+export function workoutsForCardioProgressCharts(
+  history: WorkoutLog[],
+  activeWorkout: WorkoutLog | null,
+): WorkoutLog[] {
+  const base = filterWorkoutsForCardioProgress(history);
+  if (
+    activeWorkout &&
+    !activeWorkout.endTime &&
+    hasLoggedCardioSession(activeWorkout) &&
+    !base.some((workout) => workout.id === activeWorkout.id)
+  ) {
+    return [...base, activeWorkout];
+  }
+  return base;
 }
 
 /** Finished workout for a calendar day (`endTime` set). */

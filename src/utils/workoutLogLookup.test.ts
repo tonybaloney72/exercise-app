@@ -1,77 +1,53 @@
 import { describe, expect, it } from "vitest";
 import type { WorkoutLog } from "@/types";
 import {
-  findCompletedWorkoutForDate,
-  findInProgressWorkoutForDate,
-  getPausedWorkoutDateFromHistory,
-  shouldAutoRestoreInProgressFromHistory,
+  filterWorkoutsForCardioProgress,
+  workoutsForCardioProgressCharts,
 } from "@/utils/workoutLogLookup";
 
-function emptyLog(overrides: Partial<WorkoutLog> = {}): WorkoutLog {
+function inProgressWalkLog(): WorkoutLog {
   return {
     id: "w1",
     date: "2026-05-18",
     dayOfWeek: 1,
-    cardioExercises: [],
+    cardioExercises: [
+      {
+        exerciseId: "END-WALK",
+        completed: true,
+        skipped: false,
+        actualDistanceMi: 0.71,
+        actualDuration: 632,
+        stepCount: 1350,
+        activeCaloriesKcal: 55,
+      },
+    ],
     warmUpCompleted: false,
     warmUpExercises: [],
     coolDownCompleted: false,
     coolDownExercises: [],
     rounds: [],
-    ...overrides,
+    startTime: "2026-05-18T12:00:00.000Z",
   };
 }
 
-describe("workoutLogLookup", () => {
-  it("findCompletedWorkoutForDate requires endTime", () => {
-    const history = [
-      emptyLog({ id: "a", endTime: undefined }),
-      emptyLog({ id: "b", endTime: "2026-05-18T12:00:00Z" }),
-    ];
-    expect(findCompletedWorkoutForDate(history, "2026-05-18")?.id).toBe("b");
-    expect(findInProgressWorkoutForDate(history, "2026-05-18")?.id).toBe("a");
+describe("filterWorkoutsForCardioProgress", () => {
+  it("includes in-progress workouts with completed quick-log cardio", () => {
+    const rows = filterWorkoutsForCardioProgress([inProgressWalkLog()]);
+    expect(rows).toHaveLength(1);
   });
 
-  it("findCompletedWorkoutForDate uses log.date, not completion timestamp", () => {
-    const backfilled = emptyLog({
-      id: "past",
-      date: "2026-05-15",
-      endTime: "2026-05-18T22:00:00Z",
-    });
-    expect(findCompletedWorkoutForDate([backfilled], "2026-05-15")?.id).toBe(
-      "past",
-    );
-    expect(findCompletedWorkoutForDate([backfilled], "2026-05-18")).toBeNull();
+  it("excludes in-progress workouts without logged cardio", () => {
+    const log = inProgressWalkLog();
+    log.cardioExercises = [];
+    expect(filterWorkoutsForCardioProgress([log])).toHaveLength(0);
   });
+});
 
-  it("getPausedWorkoutDateFromHistory returns paused in-progress date", () => {
-    const history = [
-      emptyLog({ date: "2026-05-17", paused: true }),
-      emptyLog({ date: "2026-05-18", paused: false }),
-    ];
-    expect(getPausedWorkoutDateFromHistory(history)).toBe("2026-05-17");
-  });
-
-  it("shouldAutoRestoreInProgressFromHistory skips paused and completed days", () => {
-    const today = "2026-05-18";
-    expect(
-      shouldAutoRestoreInProgressFromHistory(
-        [emptyLog({ paused: true })],
-        today,
-      ),
-    ).toBeNull();
-    expect(
-      shouldAutoRestoreInProgressFromHistory(
-        [
-          emptyLog({ endTime: "2026-05-18T10:00:00Z" }),
-          emptyLog({ paused: false }),
-        ],
-        today,
-      ),
-    ).toBeNull();
-    const open = emptyLog({ paused: false, startTime: "2026-05-18T09:00:00Z" });
-    expect(
-      shouldAutoRestoreInProgressFromHistory([open], today),
-    ).toEqual(open);
+describe("workoutsForCardioProgressCharts", () => {
+  it("appends active workout when missing from history", () => {
+    const active = inProgressWalkLog();
+    const rows = workoutsForCardioProgressCharts([], active);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.id).toBe("w1");
   });
 });

@@ -57,3 +57,17 @@ export function aggregatedBucketTotal(
   if (values.length === 0) return 0;
   return Math.round(values.reduce((sum, value) => sum + value, 0));
 }
+
+/**
+ * Pick the best daily total when HC aggregate and raw samples disagree.
+ * Aggregate often lags Samsung Health sync; samples can duplicate daily totals.
+ */
+export function resolveDailyHealthMetricTotal(
+  aggregatedTotal: number,
+  samples: ReadonlyArray<{ value: number; endDate?: string }>,
+): number {
+  const fromSamples = aggregateDailyHealthSampleTotal(samples);
+  if (aggregatedTotal <= 0) return fromSamples;
+  if (fromSamples <= 0) return aggregatedTotal;
+  return Math.max(aggregatedTotal, fromSamples);
+}

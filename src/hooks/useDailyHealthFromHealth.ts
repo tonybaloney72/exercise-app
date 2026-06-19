@@ -16,6 +16,7 @@ import {
   DAILY_HEALTH_CHART_DAYS,
   syncDailyHealthMetricsToRepo,
 } from "@/lib/health/dailyHealthSync";
+import { HEALTH_METRICS_REFRESH_EVENT } from "@/lib/health/healthMetricsRefresh";
 import type { DailyStepsChartPoint } from "@/lib/health/dailyStepsChart";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { getDailyHealthMetricRepo } from "@/lib/repos";
@@ -59,7 +60,7 @@ export function useDailyHealthFromHealth(): DailyHealthState {
     [],
   );
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (options?: { force?: boolean }) => {
     if (authMode === "loading") return;
 
     setLoading(true);
@@ -88,6 +89,7 @@ export function useDailyHealthFromHealth(): DailyHealthState {
               repo,
               todayKey,
               metricsByDate,
+              force: options?.force,
             });
             records = await repo.listSince(sinceKey);
             view = buildDailyHealthProgressFromRecords(
@@ -131,11 +133,27 @@ export function useDailyHealthFromHealth(): DailyHealthState {
     function refreshOnVisible() {
       if (document.visibilityState === "visible") void load();
     }
-    window.addEventListener("focus", load);
+    function refreshOnHealthEvent(event: Event) {
+      const force =
+        event instanceof CustomEvent &&
+        typeof event.detail?.force === "boolean"
+          ? event.detail.force
+          : true;
+      void load({ force });
+    }
+    function refreshOnFocus() {
+      void load();
+    }
+    window.addEventListener("focus", refreshOnFocus);
     document.addEventListener("visibilitychange", refreshOnVisible);
+    window.addEventListener(HEALTH_METRICS_REFRESH_EVENT, refreshOnHealthEvent);
     return () => {
-      window.removeEventListener("focus", load);
+      window.removeEventListener("focus", refreshOnFocus);
       document.removeEventListener("visibilitychange", refreshOnVisible);
+      window.removeEventListener(
+        HEALTH_METRICS_REFRESH_EVENT,
+        refreshOnHealthEvent,
+      );
     };
   }, [load]);
 
@@ -146,7 +164,7 @@ export function useDailyHealthFromHealth(): DailyHealthState {
     todayActiveKcal,
     todayAvgHeartRateBpm,
     chartSeries,
-    refresh: load,
+    refresh: () => load({ force: true }),
     unavailableReason,
   };
 }

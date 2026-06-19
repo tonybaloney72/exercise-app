@@ -18,9 +18,11 @@ import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { rankCardioSessionsForImport } from "@/lib/health/cardioSessionMatch";
+import type { HealthDataType } from "@capgo/capacitor-health";
 import {
   aggregateDailyHealthSampleTotal,
   aggregatedBucketTotal,
+  resolveDailyHealthMetricTotal,
   sumHealthSampleValues,
 } from "@/lib/health/healthSampleAggregation";
 
@@ -51,6 +53,7 @@ export interface ImportedCardioSession {
 
 export {
   aggregateDailyHealthSampleTotal,
+  resolveDailyHealthMetricTotal,
   sumHealthSampleValues,
 } from "@/lib/health/healthSampleAggregation";
 
@@ -370,6 +373,33 @@ function averageHealthSampleValues(
   return Math.round(total / values.length);
 }
 
+async function readDailyHealthMetricTotal(
+  isoStart: string,
+  isoEnd: string,
+  dataType: HealthDataType,
+): Promise<number> {
+  const [buckets, samples] = await Promise.all([
+    queryNativeHealthAggregated({
+      dataType,
+      startDate: isoStart,
+      endDate: isoEnd,
+      bucket: "day",
+      aggregation: "sum",
+    }),
+    readNativeHealthSamples({
+      dataType,
+      startDate: isoStart,
+      endDate: isoEnd,
+      limit: 500,
+    }),
+  ]);
+
+  return resolveDailyHealthMetricTotal(
+    aggregatedBucketTotal(buckets),
+    samples,
+  );
+}
+
 /** Health Connect totals for one local calendar day (midnight → now if today). */
 export async function fetchDailyHealthMetrics(
   dateKey: string,
@@ -382,51 +412,21 @@ export async function fetchDailyHealthMetrics(
   const isoStart = start.toISOString();
   const isoEnd = end.toISOString();
 
-  const [stepBuckets, calorieBuckets, heartRateSamples] = await Promise.all([
-    queryNativeHealthAggregated({
-      dataType: "steps",
-      startDate: isoStart,
-      endDate: isoEnd,
-      bucket: "day",
-      aggregation: "sum",
-    }),
-    queryNativeHealthAggregated({
-      dataType: "calories",
-      startDate: isoStart,
-      endDate: isoEnd,
-      bucket: "day",
-      aggregation: "sum",
-    }),
-    readNativeHealthSamples({
-      dataType: "heartRate",
-      startDate: isoStart,
-      endDate: isoEnd,
-      limit: 500,
-    }),
-  ]);
+  const [steps, caloriesFromActive, caloriesFromTotal, heartRateSamples] =
+    await Promise.all([
+      readDailyHealthMetricTotal(isoStart, isoEnd, "steps"),
+      readDailyHealthMetricTotal(isoStart, isoEnd, "calories"),
+      readDailyHealthMetricTotal(isoStart, isoEnd, "totalCalories"),
+      readNativeHealthSamples({
+        dataType: "heartRate",
+        startDate: isoStart,
+        endDate: isoEnd,
+        limit: 500,
+      }),
+    ]);
 
-  let steps = aggregatedBucketTotal(stepBuckets);
-  let activeKcal = aggregatedBucketTotal(calorieBuckets);
-
-  if (steps <= 0) {
-    const stepSamples = await readNativeHealthSamples({
-      dataType: "steps",
-      startDate: isoStart,
-      endDate: isoEnd,
-      limit: 500,
-    });
-    steps = aggregateDailyHealthSampleTotal(stepSamples);
-  }
-
-  if (activeKcal <= 0) {
-    const calorieSamples = await readNativeHealthSamples({
-      dataType: "calories",
-      startDate: isoStart,
-      endDate: isoEnd,
-      limit: 500,
-    });
-    activeKcal = aggregateDailyHealthSampleTotal(calorieSamples);
-  }
+  const activeKcal =
+    caloriesFromActive > 0 ? caloriesFromActive : caloriesFromTotal;
 
   const avgHeartRateBpm = averageHealthSampleValues(heartRateSamples);
 
