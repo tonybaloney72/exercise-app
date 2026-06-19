@@ -378,26 +378,48 @@ async function readDailyHealthMetricTotal(
   isoEnd: string,
   dataType: HealthDataType,
 ): Promise<number> {
+  const samplesPromise = readNativeHealthSamples({
+    dataType,
+    startDate: isoStart,
+    endDate: isoEnd,
+    limit: 500,
+  });
+
   const [buckets, samples] = await Promise.all([
-    queryNativeHealthAggregated({
-      dataType,
-      startDate: isoStart,
-      endDate: isoEnd,
-      bucket: "day",
-      aggregation: "sum",
-    }),
-    readNativeHealthSamples({
-      dataType,
-      startDate: isoStart,
-      endDate: isoEnd,
-      limit: 500,
-    }),
+    dataType === "totalCalories"
+      ? Promise.resolve([])
+      : queryNativeHealthAggregated({
+          dataType,
+          startDate: isoStart,
+          endDate: isoEnd,
+          bucket: "day",
+          aggregation: "sum",
+        }),
+    samplesPromise,
   ]);
 
-  return resolveDailyHealthMetricTotal(
-    aggregatedBucketTotal(buckets),
-    samples,
-  );
+  const aggregate = aggregatedBucketTotal(buckets);
+  const fromSamples = aggregateDailyHealthSampleTotal(samples);
+  const resolved = resolveDailyHealthMetricTotal(aggregate, samples);
+
+  clientTrace("health-cardio", "daily_metric_resolve", {
+    dataType,
+    startDate: isoStart,
+    endDate: isoEnd,
+    aggregate,
+    sampleCount: samples.length,
+    fromSamples,
+    resolved,
+    sourceNames: [
+      ...new Set(
+        samples
+          .map((sample) => sample.sourceName?.trim())
+          .filter((name): name is string => Boolean(name)),
+      ),
+    ],
+  });
+
+  return resolved;
 }
 
 /** Health Connect totals for one local calendar day (midnight → now if today). */

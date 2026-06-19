@@ -89,6 +89,38 @@ describe("resolveDailyHealthMetricTotal", () => {
   it("uses aggregate when samples are empty", () => {
     expect(resolveDailyHealthMetricTotal(4200, [])).toBe(4200);
   });
+
+  it("prefers deduped samples when aggregate doubles multi-source totals", () => {
+    expect(
+      resolveDailyHealthMetricTotal(
+        2998,
+        [
+          {
+            value: 1498,
+            sourceName: "Samsung Health",
+            endDate: "2026-06-19T10:00:00.000Z",
+          },
+          {
+            value: 1500,
+            sourceName: "Anthony's S23+",
+            endDate: "2026-06-19T18:00:00.000Z",
+          },
+        ],
+      ),
+    ).toBe(1500);
+  });
+
+  it("prefers deduped samples when aggregate doubles duplicate snapshots", () => {
+    expect(
+      resolveDailyHealthMetricTotal(
+        2998,
+        [
+          { value: 1498, endDate: "2026-06-19T10:00:00.000Z" },
+          { value: 1498, endDate: "2026-06-19T18:00:00.000Z" },
+        ],
+      ),
+    ).toBe(1498);
+  });
 });
 
 describe("aggregatedBucketTotal", () => {

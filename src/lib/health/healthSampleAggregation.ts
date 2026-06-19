@@ -111,8 +111,9 @@ export function aggregatedBucketTotal(
 
 /**
  * Pick the best daily total when HC aggregate and raw samples disagree.
- * Prefer HC aggregate when present — it dedupes multi-source totals (Samsung + device).
- * Override only when aggregate is clearly stale vs sample peak.
+ * Prefer HC aggregate when it aligns with deduped samples.
+ * Override when aggregate is stale vs sample peak, or when Capgo sums per-source
+ * totals (~2× the HC UI deduped value).
  */
 export function resolveDailyHealthMetricTotal(
   aggregatedTotal: number,
@@ -125,6 +126,10 @@ export function resolveDailyHealthMetricTotal(
 
   if (peak > 0 && aggregatedTotal < peak * 0.85) {
     return Math.max(fromSamples, Math.round(peak));
+  }
+
+  if (fromSamples > 0 && aggregatedTotal > fromSamples * 1.15) {
+    return fromSamples;
   }
 
   return aggregatedTotal;
