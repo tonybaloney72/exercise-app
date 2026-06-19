@@ -225,6 +225,9 @@ export interface ExerciseLog {
   healthSourceName?: string;
   /** GPS route captured during ME Start/End tracking (when available). */
   gpsTrackPoints?: GpsTrackPoint[];
+  /** ME Start/End window (ISO) for HC enrich + writes; independent of workout log times. */
+  activityStartTime?: string;
+  activityEndTime?: string;
   /**
    * Unique row id for cardio/endurance logs (multiple walks per day, etc.).
    * When omitted, legacy rows are keyed by `exerciseId` only.

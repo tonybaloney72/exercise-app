@@ -11,6 +11,9 @@ export {
   lastNLocalDateKeys,
   localDayHealthWindow,
   writeCardioSessionToHealth,
+  writeAppTrackedCardioToHealth,
+  writeWeightToHealth,
+  refreshAppTrackedCardioHealthEnrich,
   type CardioHealthMeta,
   type ImportedCardioSession,
 } from "@/lib/health/cardioHealth";

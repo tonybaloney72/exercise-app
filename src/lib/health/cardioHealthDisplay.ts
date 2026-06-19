@@ -1,4 +1,5 @@
 import type { CardioActivitySource, ExerciseLog } from "@/types";
+import { formatCardioPaceSummary } from "@/lib/health/cardioPaceMetrics";
 
 const SOURCE_LABELS: Record<CardioActivitySource, string> = {
   manual: "Manual",
@@ -13,6 +14,8 @@ export type CardioHealthDisplayFields = Pick<
   | "avgHeartRateBpm"
   | "activitySource"
   | "healthSourceName"
+  | "actualDistanceMi"
+  | "actualDuration"
 >;
 
 export function formatCardioHealthSummary(
@@ -33,6 +36,13 @@ export function formatCardioHealthSummary(
   }
   if (log.healthSourceName?.trim()) {
     parts.push(log.healthSourceName.trim());
+  }
+  if (log.activitySource === "gps") {
+    const pace = formatCardioPaceSummary(
+      log.actualDistanceMi,
+      log.actualDuration,
+    );
+    if (pace) parts.push(pace);
   }
   return parts.length > 0 ? parts.join(" · ") : undefined;
 }

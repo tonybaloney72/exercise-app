@@ -8,6 +8,7 @@ import {
   type WeightRangePresetId,
 } from "@/lib/weightRangePresets";
 import { upsertWeightEntry } from "@/lib/weightLog";
+import { writeWeightToHealth } from "@/lib/health/appTrackedHealthWrite";
 import { useAuthStore } from "@/stores/useAuthStore";
 import type { WeightLogEntry } from "@/types";
 
@@ -64,6 +65,9 @@ export const useWeightStore = create<WeightState>((set, get) => ({
     set((state) => ({
       entries: upsertWeightEntry(state.entries, dateKey, weightLb),
     }));
+    void writeWeightToHealth({ weightLb }).catch(() => {
+      // Optional mirror to Health Connect.
+    });
   },
 
   setRangePreset: (preset) => {

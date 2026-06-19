@@ -38,6 +38,7 @@ import {
 } from "@/lib/cardioActivities";
 import { workoutLogForPersistence } from "@/lib/workoutCardioPersistence";
 import type { CardioHealthMeta } from "@/lib/health/cardioHealth";
+import { refreshAppTrackedCardioHealthEnrich } from "@/lib/health/refreshCardioHealthEnrich";
 import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { getCardioLog, patchCardioLog } from "@/lib/cardioWorkoutLog";
@@ -394,6 +395,8 @@ interface WorkoutState {
       durationSeconds?: number;
       health?: CardioHealthMeta;
       gpsTrackPoints?: readonly GpsTrackPoint[];
+      activityStartTime?: string;
+      activityEndTime?: string;
     },
   ) => Promise<boolean>;
 
@@ -1279,6 +1282,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       durationSeconds: hasDuration ? input.durationSeconds : undefined,
       health: input.health,
       gpsTrackPoints: input.gpsTrackPoints,
+      activityStartTime: input.activityStartTime,
+      activityEndTime: input.activityEndTime,
     });
 
     const persistCompletedWorkout = async (log: WorkoutLog): Promise<boolean> => {
@@ -1374,6 +1379,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     const dayOfWeek =
       parseLocalDateKey(dateKey)?.getDay() ?? plan.dayOfWeek;
     const nowIso = new Date().toISOString();
+    const startIso = input.activityStartTime ?? nowIso;
+    const endIso = input.activityEndTime ?? nowIso;
     const fresh: WorkoutLog = {
       id: uuidv4(),
       date: dateKey,
@@ -1384,8 +1391,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       coolDownCompleted: false,
       coolDownExercises: [],
       rounds: [],
-      startTime: nowIso,
-      endTime: nowIso,
+      startTime: startIso,
+      endTime: endIso,
       paused: false,
     };
     return persistCompletedWorkout(fresh);
@@ -2009,6 +2016,23 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     workoutHistory = cardioOnlyFinalized.history;
     if (mode === "authenticated" && cardioOnlyFinalized.changed.length > 0) {
       for (const row of cardioOnlyFinalized.changed) {
+        try {
+          await workoutRepo().saveWorkout(
+            hydrateWorkoutLog(workoutLogForPersistence(row)),
+          );
+        } catch (err) {
+          toastSaveError("activity log", err);
+        }
+      }
+    }
+
+    const enriched = await refreshAppTrackedCardioHealthEnrich(
+      workoutHistory,
+      todayKey,
+    );
+    workoutHistory = enriched.history;
+    if (mode === "authenticated" && enriched.changed.length > 0) {
+      for (const row of enriched.changed) {
         try {
           await workoutRepo().saveWorkout(
             hydrateWorkoutLog(workoutLogForPersistence(row)),

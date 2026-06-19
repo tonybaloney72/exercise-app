@@ -111,11 +111,16 @@ export function buildCompletedQuickCardioRow(
     durationSeconds?: number;
     health?: CardioHealthMeta;
     gpsTrackPoints?: readonly GpsTrackPoint[];
+    activityStartTime?: string;
+    activityEndTime?: string;
   },
 ): ExerciseLog {
   const exerciseId = CARDIO_KIND_TO_EXERCISE_ID[kind];
   const hasGpsTrack =
     input.gpsTrackPoints != null && input.gpsTrackPoints.length >= 2;
+  const isAppTracked =
+    hasGpsTrack ||
+    Boolean(input.activityStartTime && input.activityEndTime);
   const healthFields = applyCardioHealthMeta(input.health);
   return buildNewCardioRow(exerciseId, {
     completed: true,
@@ -125,12 +130,14 @@ export function buildCompletedQuickCardioRow(
     targetPrescription: formatQuickCardioPrescription(input),
     loggingMode: "timer",
     ...healthFields,
+    ...(isAppTracked ? { activitySource: "gps" as const } : {}),
     ...(hasGpsTrack
       ? {
-          activitySource: "gps" as const,
           gpsTrackPoints: [...input.gpsTrackPoints!],
         }
       : {}),
+    ...(input.activityStartTime ? { activityStartTime: input.activityStartTime } : {}),
+    ...(input.activityEndTime ? { activityEndTime: input.activityEndTime } : {}),
   });
 }
 

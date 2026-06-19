@@ -112,6 +112,8 @@ interface ExerciseRow {
   activity_source: string | null;
   health_source_name: string | null;
   gps_track_points?: unknown;
+  activity_start_time?: string | null;
+  activity_end_time?: string | null;
 }
 
 function parseGpsTrackPoints(raw: unknown): GpsTrackPoint[] | undefined {
@@ -196,6 +198,8 @@ function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
         : undefined,
     healthSourceName: r.health_source_name ?? undefined,
     gpsTrackPoints: parseGpsTrackPoints(r.gps_track_points),
+    activityStartTime: r.activity_start_time ?? undefined,
+    activityEndTime: r.activity_end_time ?? undefined,
   };
 }
 
@@ -275,6 +279,8 @@ type ExerciseLogSaveRow = {
   activity_source: string | null;
   health_source_name: string | null;
   gps_track_points: GpsTrackPoint[] | null;
+  activity_start_time: string | null;
+  activity_end_time: string | null;
 };
 
 function exerciseLogToSaveRow(
@@ -305,6 +311,8 @@ function exerciseLogToSaveRow(
       ex.gpsTrackPoints != null && ex.gpsTrackPoints.length > 0
         ? ex.gpsTrackPoints
         : null,
+    activity_start_time: ex.activityStartTime ?? null,
+    activity_end_time: ex.activityEndTime ?? null,
   };
 }
 

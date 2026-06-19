@@ -16,15 +16,18 @@ import CardioActivityRecorder from "@/components/workout/CardioActivityRecorder"
 import CardioHealthImport from "@/components/workout/CardioHealthImport";
 import {
   formatCardioHealthSummary,
-  writeCardioSessionToHealth,
+  writeAppTrackedCardioToHealth,
   type CardioHealthMeta,
   type ImportedCardioSession,
 } from "@/lib/health";
+import { formatCardioPaceSummary } from "@/lib/health/cardioPaceMetrics";
+import { getWeightForDate } from "@/lib/weightLog";
 import type { ResolvedCardioQuickLog } from "@/lib/health/resolveCardioQuickLog";
 import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { useWeightStore } from "@/stores/useWeightStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import type { CardioActivityKind, DayPlan } from "@/types";
 
@@ -40,6 +43,7 @@ const tileClass =
 
 export default function QuickActivityLog({ plan, dateKey }: Props) {
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const weightEntries = useWeightStore((s) => s.entries);
   const quickLogCardio = useWorkoutStore((s) => s.quickLogCardio);
   const [pendingKind, setPendingKind] = useState<CardioActivityKind | null>(
     null,
@@ -156,21 +160,20 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
         durationSeconds: hasDuration ? durationSeconds : undefined,
         health: resolvedHealth,
         gpsTrackPoints: gpsTrack,
+        activityStartTime: activityWindow?.startDate.toISOString(),
+        activityEndTime: activityWindow?.endDate.toISOString(),
       });
       clientTrace("cardio-save", ok ? "quickLog_ok" : "quickLog_failed");
-      if (
-        ok &&
-        isNativePlatform() &&
-        activityWindow &&
-        gpsTrack &&
-        gpsTrack.length >= 2
-      ) {
-        void writeCardioSessionToHealth({
+      if (ok && isNativePlatform() && activityWindow) {
+        const weightLb = getWeightForDate(weightEntries, dateKey)?.weightLb;
+        void writeAppTrackedCardioToHealth({
+          kind: pendingKind,
           distanceMi: hasDistance ? distanceMi : undefined,
           durationSeconds: hasDuration ? durationSeconds! : 0,
           activeCaloriesKcal: resolvedHealth?.activeCaloriesKcal,
           startDate: activityWindow.startDate,
           endDate: activityWindow.endDate,
+          weightLb,
         }).catch(() => {
           // Optional mirror to Health Connect; logging in-app already succeeded.
         });
@@ -189,6 +192,24 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     : "";
 
   const healthPreview = formatCardioHealthSummary(healthMeta ?? {});
+  const pacePreview = useMemo(() => {
+    const distanceMi = distanceInput.trim()
+      ? parseFloat(distanceInput.trim())
+      : undefined;
+    const durationSeconds = timeInput.trim()
+      ? parseTimeInput(timeInput.trim())
+      : undefined;
+    if (
+      distanceMi == null ||
+      Number.isNaN(distanceMi) ||
+      distanceMi <= 0 ||
+      durationSeconds == null ||
+      durationSeconds <= 0
+    ) {
+      return undefined;
+    }
+    return formatCardioPaceSummary(distanceMi, durationSeconds);
+  }, [distanceInput, timeInput]);
 
   return (
     <>
@@ -343,6 +364,9 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
               className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
             />
           </label>
+          {pacePreview ? (
+            <p className="text-xs text-muted">ME pace: {pacePreview}</p>
+          ) : null}
           {healthPreview ? (
             <p className="text-xs text-muted">{healthPreview}</p>
           ) : null}

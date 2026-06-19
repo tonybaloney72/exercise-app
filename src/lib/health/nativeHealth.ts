@@ -30,6 +30,7 @@ export const CARDIO_HEALTH_READ_TYPES: HealthDataType[] = [
 export const CARDIO_HEALTH_WRITE_TYPES: HealthDataType[] = [
   "distance",
   "calories",
+  "weight",
 ];
 
 export type HealthBridgeTestResult = {

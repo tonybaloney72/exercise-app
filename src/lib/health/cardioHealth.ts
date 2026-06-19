@@ -4,14 +4,12 @@ import { metersToMiles } from "@/lib/geo/haversine";
 import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
 import {
   CARDIO_HEALTH_READ_TYPES,
-  CARDIO_HEALTH_WRITE_TYPES,
   checkNativeHealthAuthorization,
   isNativeHealthAvailable,
   queryNativeWorkouts,
   readNativeHealthSamples,
   queryNativeHealthAggregated,
   requestNativeHealthAuthorization,
-  writeNativeHealthSample,
 } from "@/lib/health/nativeHealth";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { withTimeout } from "@/lib/async/withTimeout";
@@ -508,38 +506,10 @@ export async function checkCardioHealthReadAccess(): Promise<boolean> {
   return hasCardioHealthReadAccess();
 }
 
-export async function writeCardioSessionToHealth(options: {
-  distanceMi?: number;
-  durationSeconds: number;
-  activeCaloriesKcal?: number;
-  startDate: Date;
-  endDate: Date;
-}): Promise<void> {
-  if (!(await isNativeHealthAvailable())) return;
+export {
+  writeAppTrackedCardioToHealth,
+  writeCardioSessionToHealth,
+  writeWeightToHealth,
+} from "@/lib/health/appTrackedHealthWrite";
+export { refreshAppTrackedCardioHealthEnrich } from "@/lib/health/refreshCardioHealthEnrich";
 
-  await requestNativeHealthAuthorization({
-    read: [],
-    write: CARDIO_HEALTH_WRITE_TYPES,
-  });
-
-  const startDate = options.startDate.toISOString();
-  const endDate = options.endDate.toISOString();
-
-  if (options.distanceMi != null && options.distanceMi > 0) {
-    await writeNativeHealthSample({
-      dataType: "distance",
-      value: options.distanceMi * 1609.344,
-      startDate,
-      endDate,
-    });
-  }
-
-  if (options.activeCaloriesKcal != null && options.activeCaloriesKcal > 0) {
-    await writeNativeHealthSample({
-      dataType: "calories",
-      value: options.activeCaloriesKcal,
-      startDate,
-      endDate,
-    });
-  }
-}
