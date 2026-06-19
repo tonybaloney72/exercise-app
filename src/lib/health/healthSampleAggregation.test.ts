@@ -42,6 +42,20 @@ describe("aggregateDailyHealthSampleTotal", () => {
     ).toBe(1500);
   });
 
+  it("dedupes per-source interval sums from two HC sources", () => {
+    const samsung = [100, 200, 400, 300, 498].map((value, index) => ({
+      value,
+      sourceName: "com.sec.android.app.shealth",
+      endDate: `2026-06-19T${10 + index}:00:00.000Z`,
+    }));
+    const phone = [100, 200, 400, 300, 500].map((value, index) => ({
+      value,
+      sourceName: "samsung SM-S916U1",
+      endDate: `2026-06-19T${10 + index}:00:00.000Z`,
+    }));
+    expect(aggregateDailyHealthSampleTotal([...samsung, ...phone])).toBe(1500);
+  });
+
   it("sums interval buckets when values are clearly incremental", () => {
     expect(
       aggregateDailyHealthSampleTotal([
@@ -120,6 +134,22 @@ describe("resolveDailyHealthMetricTotal", () => {
         ],
       ),
     ).toBe(1498);
+  });
+
+  it("prefers deduped samples when aggregate is partial", () => {
+    const samples = [
+      ...[100, 200, 400, 300, 498].map((value, index) => ({
+        value,
+        sourceName: "com.sec.android.app.shealth",
+        endDate: `2026-06-19T${10 + index}:00:00.000Z`,
+      })),
+      ...[100, 200, 400, 300, 500].map((value, index) => ({
+        value,
+        sourceName: "samsung SM-S916U1",
+        endDate: `2026-06-19T${10 + index}:00:00.000Z`,
+      })),
+    ];
+    expect(resolveDailyHealthMetricTotal(657, samples)).toBe(1500);
   });
 });
 

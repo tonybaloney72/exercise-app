@@ -23,41 +23,24 @@ function peakSampleValue(
   return values.length === 0 ? 0 : Math.max(...values);
 }
 
-/**
- * When multiple HC data sources each report a full-day total (Samsung Health + device),
- * take the max per source then the max across sources — matching HC's deduped UI total.
- */
-function dedupeMultiSourceDailyTotals(
+function groupSamplesBySource(
   samples: ReadonlyArray<DailyHealthSampleLike>,
-): number | null {
-  const bySource = new Map<string, number>();
+): Map<string, DailyHealthSampleLike[]> {
+  const bySource = new Map<string, DailyHealthSampleLike[]>();
   for (const sample of samples) {
     if (!Number.isFinite(sample.value) || sample.value <= 0) continue;
     const key = sample.sourceName?.trim() || "unknown";
-    bySource.set(key, Math.max(bySource.get(key) ?? 0, sample.value));
+    const list = bySource.get(key) ?? [];
+    list.push(sample);
+    bySource.set(key, list);
   }
-  if (bySource.size < 2) return null;
-
-  const perSource = [...bySource.values()];
-  const maxVal = Math.max(...perSource);
-  const minVal = Math.min(...perSource);
-  if (minVal / maxVal >= 0.85) {
-    return Math.round(maxVal);
-  }
-  return null;
+  return bySource;
 }
 
-/**
- * Roll up raw HC samples for a full calendar day.
- * Samsung/HC sometimes returns multiple records that each contain the daily total;
- * summing those inflates the chart. Prefer {@link queryNativeHealthAggregated} when available.
- */
-export function aggregateDailyHealthSampleTotal(
+/** Roll up one HC source's samples for a calendar day (intervals or duplicate snapshots). */
+function aggregateSingleSourceDailySampleTotal(
   samples: ReadonlyArray<DailyHealthSampleLike>,
 ): number {
-  const multiSource = dedupeMultiSourceDailyTotals(samples);
-  if (multiSource != null) return multiSource;
-
   const values = samples
     .map((sample) => sample.value)
     .filter((value) => Number.isFinite(value) && value > 0);
@@ -90,6 +73,46 @@ export function aggregateDailyHealthSampleTotal(
   return Math.round(sum);
 }
 
+function dedupePerSourceDailyTotals(perSourceTotals: number[]): number {
+  if (perSourceTotals.length === 0) return 0;
+  if (perSourceTotals.length === 1) return perSourceTotals[0]!;
+
+  const maxVal = Math.max(...perSourceTotals);
+  const minVal = Math.min(...perSourceTotals);
+  // Samsung Health + phone pedometer track the same steps — match HC UI dedupe.
+  if (minVal / maxVal >= 0.85) {
+    return Math.round(maxVal);
+  }
+
+  return Math.round(maxVal);
+}
+
+export function perSourceDailySampleTotals(
+  samples: ReadonlyArray<DailyHealthSampleLike>,
+): Record<string, number> {
+  const totals: Record<string, number> = {};
+  for (const [source, sourceSamples] of groupSamplesBySource(samples)) {
+    totals[source] = aggregateSingleSourceDailySampleTotal(sourceSamples);
+  }
+  return totals;
+}
+
+/**
+ * Roll up raw HC samples for a full calendar day.
+ * Sum interval buckets per source, then dedupe across sources (not additive).
+ */
+export function aggregateDailyHealthSampleTotal(
+  samples: ReadonlyArray<DailyHealthSampleLike>,
+): number {
+  const bySource = groupSamplesBySource(samples);
+  if (bySource.size === 0) return 0;
+
+  const perSourceTotals = [...bySource.values()].map(
+    aggregateSingleSourceDailySampleTotal,
+  );
+  return dedupePerSourceDailyTotals(perSourceTotals);
+}
+
 export function aggregatedBucketTotal(
   buckets: ReadonlyArray<{ value: number }>,
 ): number {
@@ -111,9 +134,8 @@ export function aggregatedBucketTotal(
 
 /**
  * Pick the best daily total when HC aggregate and raw samples disagree.
- * Prefer HC aggregate when it aligns with deduped samples.
- * Override when aggregate is stale vs sample peak, or when Capgo sums per-source
- * totals (~2× the HC UI deduped value).
+ * Sample rollup is per-source then deduped. Prefer samples when aggregate
+ * is stale/partial or sums duplicate sources (~2× HC UI).
  */
 export function resolveDailyHealthMetricTotal(
   aggregatedTotal: number,
@@ -123,13 +145,15 @@ export function resolveDailyHealthMetricTotal(
   const peak = peakSampleValue(samples);
 
   if (aggregatedTotal <= 0) return fromSamples;
+  if (fromSamples <= 0) return aggregatedTotal;
+
+  const ratio = aggregatedTotal / fromSamples;
+  if (ratio > 1.15 || ratio < 1 / 1.15) {
+    return fromSamples;
+  }
 
   if (peak > 0 && aggregatedTotal < peak * 0.85) {
     return Math.max(fromSamples, Math.round(peak));
-  }
-
-  if (fromSamples > 0 && aggregatedTotal > fromSamples * 1.15) {
-    return fromSamples;
   }
 
   return aggregatedTotal;

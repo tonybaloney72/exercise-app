@@ -22,6 +22,7 @@ import type { HealthDataType } from "@capgo/capacitor-health";
 import {
   aggregateDailyHealthSampleTotal,
   aggregatedBucketTotal,
+  perSourceDailySampleTotals,
   resolveDailyHealthMetricTotal,
   sumHealthSampleValues,
 } from "@/lib/health/healthSampleAggregation";
@@ -410,6 +411,7 @@ async function readDailyHealthMetricTotal(
     sampleCount: samples.length,
     fromSamples,
     resolved,
+    perSourceTotals: perSourceDailySampleTotals(samples),
     sourceNames: [
       ...new Set(
         samples
