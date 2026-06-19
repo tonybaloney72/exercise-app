@@ -2,6 +2,8 @@ import { Health } from "@capgo/capacitor-health";
 import type {
   AuthorizationOptions,
   AuthorizationStatus,
+  AggregationType,
+  BucketType,
   HealthDataType,
   QueryWorkoutsOptions,
   Workout,
@@ -229,6 +231,40 @@ export async function readNativeHealthSamples(options: {
         startDate: options.startDate,
         endDate: options.endDate,
         limit: options.limit,
+      },
+    );
+    return samples;
+  } catch {
+    return [];
+  }
+}
+
+export async function queryNativeHealthAggregated(options: {
+  dataType: HealthDataType;
+  startDate: string;
+  endDate: string;
+  bucket?: BucketType;
+  aggregation?: AggregationType;
+}) {
+  if (!isNativePlatform()) return [];
+  try {
+    const { samples } = await runTimedNativeCall(
+      "queryAggregated",
+      () =>
+        Health.queryAggregated({
+          dataType: options.dataType,
+          startDate: options.startDate,
+          endDate: options.endDate,
+          bucket: options.bucket ?? "day",
+          aggregation: options.aggregation ?? "sum",
+        }),
+      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
+      {
+        dataType: options.dataType,
+        startDate: options.startDate,
+        endDate: options.endDate,
+        bucket: options.bucket ?? "day",
+        aggregation: options.aggregation ?? "sum",
       },
     );
     return samples;

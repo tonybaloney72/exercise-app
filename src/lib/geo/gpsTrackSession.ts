@@ -1,5 +1,11 @@
 import { haversineDistanceMeters, metersToMiles } from "@/lib/geo/haversine";
+import {
+  GpsTracking,
+  isForegroundGpsTrackingAvailable,
+  type GpsTrackingLocationUpdate,
+} from "@/lib/geo/gpsTrackingPlugin";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
+import type { PluginListenerHandle } from "@capacitor/core";
 
 export interface GpsTrackPoint {
   lat: number;
@@ -47,11 +53,15 @@ type WatchCallback = (
   error?: unknown,
 ) => void;
 
+type TrackingBackend = "foreground" | "geolocation";
+
 export class GpsTrackSession {
   private watchId: string | null = null;
   private points: GpsTrackPoint[] = [];
   private startedAtMs: number | null = null;
   private phase: GpsTrackPhase = "idle";
+  private backend: TrackingBackend | null = null;
+  private locationListener: PluginListenerHandle | null = null;
 
   getPhase(): GpsTrackPhase {
     return this.phase;
@@ -74,31 +84,18 @@ export class GpsTrackSession {
     if (!isNativePlatform()) {
       throw new Error("GPS tracking is only available in the Android app.");
     }
-    if (this.watchId) return;
-
-    const { Geolocation } = await import("@capacitor/geolocation");
-    const status = await Geolocation.requestPermissions();
-    if (status.location !== "granted" && status.coarseLocation !== "granted") {
-      throw new Error("Location permission is required to track distance.");
-    }
+    if (this.backend) return;
 
     this.points = [];
     this.startedAtMs = Date.now();
     this.phase = "recording";
 
-    this.watchId = await Geolocation.watchPosition(
-      {
-        enableHighAccuracy: true,
-        timeout: 20_000,
-        maximumAge: 2_000,
-      },
-      (position, error) => {
-        if (error || !position) return;
-        if (this.phase === "recording") {
-          this.appendPoint(position);
-        }
-      },
-    );
+    if (isForegroundGpsTrackingAvailable()) {
+      await this.startForegroundTracking();
+      return;
+    }
+
+    await this.startGeolocationWatch();
   }
 
   /** Request location permission and wait for GPS (timer does not start yet). */
@@ -106,18 +103,60 @@ export class GpsTrackSession {
     if (!isNativePlatform()) {
       throw new Error("GPS tracking is only available in the Android app.");
     }
-    if (this.watchId) return;
+    if (this.backend) return;
 
+    this.points = [];
+    this.startedAtMs = null;
+    this.phase = "watching";
+
+    if (isForegroundGpsTrackingAvailable()) {
+      await this.startForegroundTracking(onUpdate);
+      return;
+    }
+
+    await this.startGeolocationWatch(onUpdate);
+  }
+
+  /** Start the walk timer and distance tally (call after GPS is acquired). */
+  beginRecording(): void {
+    if (this.phase !== "watching" || !this.backend) {
+      throw new Error("GPS must be ready before starting the walk.");
+    }
+    this.points = [];
+    this.startedAtMs = Date.now();
+    this.phase = "recording";
+  }
+
+  private async startForegroundTracking(onUpdate?: WatchCallback): Promise<void> {
+    this.backend = "foreground";
+    this.locationListener = await GpsTracking.addListener(
+      "locationUpdate",
+      (event: GpsTrackingLocationUpdate) => {
+        const position = {
+          coords: { latitude: event.latitude, longitude: event.longitude },
+          timestamp: event.timestamp,
+        };
+        if (this.phase === "recording") {
+          this.appendPoint(position);
+        }
+        onUpdate?.(position, undefined);
+      },
+    );
+
+    await GpsTracking.startTracking({
+      title: "Tracking activity",
+      body: "MyExercise is recording your route.",
+    });
+  }
+
+  private async startGeolocationWatch(onUpdate?: WatchCallback): Promise<void> {
     const { Geolocation } = await import("@capacitor/geolocation");
     const status = await Geolocation.requestPermissions();
     if (status.location !== "granted" && status.coarseLocation !== "granted") {
       throw new Error("Location permission is required to track distance.");
     }
 
-    this.points = [];
-    this.startedAtMs = null;
-    this.phase = "watching";
-
+    this.backend = "geolocation";
     this.watchId = await Geolocation.watchPosition(
       {
         enableHighAccuracy: true,
@@ -137,16 +176,6 @@ export class GpsTrackSession {
     );
   }
 
-  /** Start the walk timer and distance tally (call after GPS is acquired). */
-  beginRecording(): void {
-    if (this.phase !== "watching" || !this.watchId) {
-      throw new Error("GPS must be ready before starting the walk.");
-    }
-    this.points = [];
-    this.startedAtMs = Date.now();
-    this.phase = "recording";
-  }
-
   private appendPoint(position: {
     coords: { latitude: number; longitude: number };
     timestamp: number;
@@ -159,8 +188,8 @@ export class GpsTrackSession {
     const last = this.points[this.points.length - 1];
     if (
       !last ||
-      haversineDistanceMeters(last, point) >= 3 ||
-      point.timestamp - last.timestamp >= 5_000
+      haversineDistanceMeters(last, point) >= 2 ||
+      point.timestamp - last.timestamp >= 4_000
     ) {
       this.points.push(point);
     }
@@ -183,9 +212,19 @@ export class GpsTrackSession {
   }
 
   private async clearWatch(): Promise<void> {
-    if (!this.watchId) return;
-    const { Geolocation } = await import("@capacitor/geolocation");
-    await Geolocation.clearWatch({ id: this.watchId });
-    this.watchId = null;
+    if (this.backend === "foreground") {
+      try {
+        await GpsTracking.stopTracking();
+      } catch {
+        // Service may already be stopped.
+      }
+      await this.locationListener?.remove();
+      this.locationListener = null;
+    } else if (this.watchId) {
+      const { Geolocation } = await import("@capacitor/geolocation");
+      await Geolocation.clearWatch({ id: this.watchId });
+      this.watchId = null;
+    }
+    this.backend = null;
   }
 }

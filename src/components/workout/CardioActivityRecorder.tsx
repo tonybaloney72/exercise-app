@@ -236,7 +236,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
           <p className="text-sm font-medium text-foreground">Track activity</p>
           <p className="text-xs text-muted mt-0.5">
             {phase === "idle"
-              ? "Start records time and GPS. End matches Health Connect and fills distance."
+              ? "Start records time and GPS. A notification keeps tracking when the screen is off."
               : phase === "pick_session"
                 ? "Pick the Health Connect session that matches this activity."
                 : "Timer runs until you tap End."}

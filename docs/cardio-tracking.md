@@ -80,6 +80,14 @@ queryWorkouts_ok (workoutType: running) → import_sessions count: 0
 
 ---
 
+## Foreground GPS service (shipped)
+
+Active walk/jog tracking uses a native Android foreground service (`GpsTrackingService`) with `FusedLocationProviderClient`. A persistent notification keeps location updates flowing when the screen is off. **No `ACCESS_BACKGROUND_LOCATION` ("Allow all the time")** is required — that permission is for location without an active foreground service.
+
+TypeScript entry: `GpsTrackSession` → `GpsTracking` Capacitor plugin on Android; falls back to `@capacitor/geolocation` elsewhere.
+
+---
+
 ## Timed cardio log + Health Connect window (shipped)
 
 Quick log uses a unified **Start / End** flow (`CardioActivityRecorder` → `resolveCardioQuickLog`):

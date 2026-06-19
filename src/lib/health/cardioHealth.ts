@@ -9,6 +9,7 @@ import {
   isNativeHealthAvailable,
   queryNativeWorkouts,
   readNativeHealthSamples,
+  queryNativeHealthAggregated,
   requestNativeHealthAuthorization,
   writeNativeHealthSample,
 } from "@/lib/health/nativeHealth";
@@ -17,6 +18,11 @@ import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { rankCardioSessionsForImport } from "@/lib/health/cardioSessionMatch";
+import {
+  aggregateDailyHealthSampleTotal,
+  aggregatedBucketTotal,
+  sumHealthSampleValues,
+} from "@/lib/health/healthSampleAggregation";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
@@ -43,14 +49,10 @@ export interface ImportedCardioSession {
   workoutType?: string;
 }
 
-export function sumHealthSampleValues(
-  samples: ReadonlyArray<{ value: number }>,
-): number {
-  return samples
-    .map((sample) => sample.value)
-    .filter((value) => Number.isFinite(value) && value > 0)
-    .reduce((sum, value) => sum + value, 0);
-}
+export {
+  aggregateDailyHealthSampleTotal,
+  sumHealthSampleValues,
+} from "@/lib/health/healthSampleAggregation";
 
 export function dominantHealthSampleSource(
   samples: ReadonlyArray<{ sourceName?: string }>,
@@ -380,18 +382,20 @@ export async function fetchDailyHealthMetrics(
   const isoStart = start.toISOString();
   const isoEnd = end.toISOString();
 
-  const [stepSamples, calorieSamples, heartRateSamples] = await Promise.all([
-    readNativeHealthSamples({
+  const [stepBuckets, calorieBuckets, heartRateSamples] = await Promise.all([
+    queryNativeHealthAggregated({
       dataType: "steps",
       startDate: isoStart,
       endDate: isoEnd,
-      limit: 500,
+      bucket: "day",
+      aggregation: "sum",
     }),
-    readNativeHealthSamples({
+    queryNativeHealthAggregated({
       dataType: "calories",
       startDate: isoStart,
       endDate: isoEnd,
-      limit: 500,
+      bucket: "day",
+      aggregation: "sum",
     }),
     readNativeHealthSamples({
       dataType: "heartRate",
@@ -401,8 +405,29 @@ export async function fetchDailyHealthMetrics(
     }),
   ]);
 
-  const steps = Math.round(sumHealthSampleValues(stepSamples));
-  const activeKcal = Math.round(sumHealthSampleValues(calorieSamples));
+  let steps = aggregatedBucketTotal(stepBuckets);
+  let activeKcal = aggregatedBucketTotal(calorieBuckets);
+
+  if (steps <= 0) {
+    const stepSamples = await readNativeHealthSamples({
+      dataType: "steps",
+      startDate: isoStart,
+      endDate: isoEnd,
+      limit: 500,
+    });
+    steps = aggregateDailyHealthSampleTotal(stepSamples);
+  }
+
+  if (activeKcal <= 0) {
+    const calorieSamples = await readNativeHealthSamples({
+      dataType: "calories",
+      startDate: isoStart,
+      endDate: isoEnd,
+      limit: 500,
+    });
+    activeKcal = aggregateDailyHealthSampleTotal(calorieSamples);
+  }
+
   const avgHeartRateBpm = averageHealthSampleValues(heartRateSamples);
 
   return {
