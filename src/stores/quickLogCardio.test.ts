@@ -5,6 +5,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import {
   findCompletedWorkoutForDate,
   findInProgressWorkoutForDate,
+  isCardioOnlyQuickLogWorkout,
 } from "@/utils/workoutLogLookup";
 import { isWorkoutStartedFromState } from "@/lib/workoutSessionGuard";
 
@@ -20,13 +21,6 @@ vi.mock("@/lib/repos", async (importOriginal) => {
 
 vi.mock("@/utils/saveErrorToast", () => ({
   toastSaveError: vi.fn(),
-}));
-
-vi.mock("@/lib/workoutStretchStart", () => ({
-  resolveStretchesForWorkoutStart: vi.fn().mockResolvedValue({
-    warmUp: [],
-    coolDown: [],
-  }),
 }));
 
 const plan: DayPlan = {
@@ -61,28 +55,45 @@ describe("quickLogCardio", () => {
     });
   });
 
-  it("starts an in-progress workout (not completed) when no session exists", async () => {
+  it("saves a completed cardio-only log without starting a workout session", async () => {
     const ok = await useWorkoutStore
       .getState()
       .quickLogCardio(plan, "2026-05-18", "jog", { distanceMi: 2 });
     expect(ok).toBe(true);
 
     const state = useWorkoutStore.getState();
-    expect(state.activeWorkout?.endTime).toBeUndefined();
-    expect(state.activeWorkout?.startTime).toBeTruthy();
-    const cardioRows = state.activeWorkout?.cardioExercises;
-    expect(cardioRows).toHaveLength(1);
-    expect(cardioRows?.[0]?.completed).toBe(true);
-    expect(state.activeWorkout?.warmUpCompleted).toBe(false);
-    expect(state.activeWorkout?.coolDownCompleted).toBe(false);
-    expect(state.activeWorkout?.rounds).toHaveLength(1);
+    expect(state.activeWorkout).toBeNull();
 
-    expect(findCompletedWorkoutForDate(state.workoutHistory, "2026-05-18")).toBeNull();
-    expect(findInProgressWorkoutForDate(state.workoutHistory, "2026-05-18")).not.toBeNull();
-    expect(isWorkoutStartedFromState("2026-05-18", state)).toBe(true);
+    const completed = findCompletedWorkoutForDate(state.workoutHistory, "2026-05-18");
+    expect(completed).not.toBeNull();
+    expect(completed?.endTime).toBeTruthy();
+    expect(completed?.cardioExercises).toHaveLength(1);
+    expect(completed?.cardioExercises?.[0]?.completed).toBe(true);
+    expect(isCardioOnlyQuickLogWorkout(completed!)).toBe(true);
+    expect(completed?.rounds).toHaveLength(0);
+
+    expect(findInProgressWorkoutForDate(state.workoutHistory, "2026-05-18")).toBeNull();
+    expect(isWorkoutStartedFromState("2026-05-18", state)).toBe(false);
+    expect(saveWorkout).toHaveBeenCalledTimes(1);
   });
 
-  it("appends to an in-progress history log and activates the session", async () => {
+  it("appends another quick log to the same completed cardio-only day", async () => {
+    await useWorkoutStore
+      .getState()
+      .quickLogCardio(plan, "2026-05-18", "walk", { distanceMi: 1.2 });
+
+    const ok = await useWorkoutStore
+      .getState()
+      .quickLogCardio(plan, "2026-05-18", "jog", { distanceMi: 2 });
+    expect(ok).toBe(true);
+
+    const state = useWorkoutStore.getState();
+    expect(state.activeWorkout).toBeNull();
+    expect(state.workoutHistory[0]?.cardioExercises).toHaveLength(2);
+    expect(saveWorkout).toHaveBeenCalledTimes(2);
+  });
+
+  it("still resumes a real in-progress strength workout", async () => {
     useWorkoutStore.setState({
       workoutHistory: [
         {
@@ -94,7 +105,19 @@ describe("quickLogCardio", () => {
           warmUpExercises: [],
           coolDownCompleted: false,
           coolDownExercises: [],
-          rounds: [],
+          rounds: [
+            {
+              roundNumber: 1,
+              exercises: [
+                {
+                  exerciseId: "UP-1",
+                  completed: true,
+                  skipped: false,
+                  actualReps: 10,
+                },
+              ],
+            },
+          ],
           startTime: "2026-05-18T10:00:00.000Z",
         },
       ],

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { WorkoutLog } from "@/types";
 import {
   filterWorkoutsForCardioProgress,
+  isCardioOnlyQuickLogWorkout,
   workoutsForCardioProgressCharts,
 } from "@/utils/workoutLogLookup";
 
@@ -29,6 +30,35 @@ function inProgressWalkLog(): WorkoutLog {
     startTime: "2026-05-18T12:00:00.000Z",
   };
 }
+
+describe("isCardioOnlyQuickLogWorkout", () => {
+  it("detects completed cardio-only quick logs", () => {
+    expect(
+      isCardioOnlyQuickLogWorkout({
+        ...inProgressWalkLog(),
+        endTime: "2026-05-18T13:00:00.000Z",
+      }),
+    ).toBe(true);
+  });
+
+  it("returns false when strength work exists", () => {
+    const log = inProgressWalkLog();
+    log.rounds = [
+      {
+        roundNumber: 1,
+        exercises: [
+          {
+            exerciseId: "UP-1",
+            completed: true,
+            skipped: false,
+            actualReps: 10,
+          },
+        ],
+      },
+    ];
+    expect(isCardioOnlyQuickLogWorkout(log)).toBe(false);
+  });
+});
 
 describe("filterWorkoutsForCardioProgress", () => {
   it("includes in-progress workouts with completed quick-log cardio", () => {

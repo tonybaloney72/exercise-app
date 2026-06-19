@@ -52,6 +52,28 @@ describe("workoutSessionGuard", () => {
     expect(isPrescribedPlanFrozenFromState("2026-05-11", state)).toBe(true);
   });
 
+  it("does not freeze today when only a cardio-only quick log exists", () => {
+    useWorkoutStore.setState({
+      workoutHistory: [
+        {
+          ...emptyLog("2026-05-11"),
+          endTime: "2026-05-11T11:00:00Z",
+          cardioExercises: [
+            {
+              exerciseId: "END-WALK",
+              completed: true,
+              skipped: false,
+              actualDistanceMi: 0.71,
+            },
+          ],
+        },
+      ],
+    });
+    const state = useWorkoutStore.getState();
+    expect(isWorkoutStartedFromState("2026-05-11", state)).toBe(false);
+    expect(isPrescribedPlanFrozenFromState("2026-05-11", state)).toBe(false);
+  });
+
   it("does not freeze today with no log for that date", () => {
     expect(
       isPrescribedPlanFrozenFromState("2026-05-11", useWorkoutStore.getState()),

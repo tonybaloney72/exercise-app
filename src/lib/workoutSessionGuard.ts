@@ -1,6 +1,6 @@
 import type { WorkoutLog } from "@/types";
 import {
-  findCompletedWorkoutForDate,
+  findCompletedStrengthWorkoutForDate,
   findInProgressWorkoutForDate,
 } from "@/utils/workoutLogLookup";
 
@@ -31,5 +31,9 @@ export function isPrescribedPlanFrozenFromState(
   state: PrescribedPlanFreezeState,
 ): boolean {
   if (isWorkoutStartedFromState(dateKey, state)) return true;
-  return findCompletedWorkoutForDate(state.workoutHistory, dateKey) != null;
+  const completed = findCompletedStrengthWorkoutForDate(
+    state.workoutHistory,
+    dateKey,
+  );
+  return completed != null;
 }

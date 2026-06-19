@@ -26,7 +26,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { toastSaveError } from "@/utils/saveErrorToast";
 import {
-  findCompletedWorkoutForDate,
+  findCompletedStrengthWorkoutForDate,
   getPausedWorkoutDateForToday,
 } from "@/utils/workoutLogLookup";
 import { parseLocalDateKey } from "@/utils/weekCalendar";
@@ -105,7 +105,7 @@ function TodayPageInner() {
   }, [activePastSession, activeWorkout, router]);
 
   const todaysCompletedLog = useMemo(
-    () => findCompletedWorkoutForDate(workoutHistory, todayKey),
+    () => findCompletedStrengthWorkoutForDate(workoutHistory, todayKey),
     [workoutHistory, todayKey],
   );
 

@@ -98,7 +98,10 @@ import {
 import {
   findCompletedWorkoutForDate,
   findInProgressWorkoutForDate,
+  finalizeCardioOnlyQuickLogWorkout,
+  finalizeCardioOnlyQuickLogsInHistory,
   getPausedWorkoutDateForToday,
+  isCardioOnlyQuickLogWorkout,
   shouldAutoRestoreInProgressFromHistory,
 } from "@/utils/workoutLogLookup";
 import {
@@ -491,6 +494,39 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       state.pausedWorkoutDate && state.pausedWorkoutDate !== dateKey
         ? state.pausedWorkoutDate
         : null;
+
+    const completedCardioOnly = findCompletedWorkoutForDate(
+      state.workoutHistory,
+      dateKey,
+    );
+    if (
+      completedCardioOnly &&
+      isCardioOnlyQuickLogWorkout(completedCardioOnly)
+    ) {
+      const log = hydrateWorkoutLog({
+        ...completedCardioOnly,
+        endTime: undefined,
+        paused: false,
+        startTime: startTimeIso,
+        warmUpExercises: warmUp.map(buildStretchExerciseLog),
+        coolDownExercises: coolDown.map(buildStretchExerciseLog),
+        rounds: buildEmptyRoundLogs(plan),
+        warmUpCompleted: false,
+        coolDownCompleted: false,
+      });
+      const mode = useAuthStore.getState().mode;
+      set({
+        pausedWorkoutDate: preservePausedDate,
+        activeWorkout: log,
+        ...(mode === "authenticated"
+          ? { workoutHistory: upsertWorkoutInHistory(state.workoutHistory, log) }
+          : {}),
+      });
+      if (mode === "authenticated") {
+        void flushPersistInProgressWorkout(log, { paused: false });
+      }
+      return;
+    }
 
     const existing = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
     if (existing) {
@@ -1298,6 +1334,13 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     const active = state.activeWorkout;
 
     if (active && !active.endTime && active.date === dateKey) {
+      if (isCardioOnlyQuickLogWorkout(active)) {
+        clientTrace("quickLogCardio", "branch_active_cardio_only_finalize");
+        set({ activeWorkout: null });
+        return persistCompletedWorkout(
+          appendCardioRow(finalizeCardioOnlyQuickLogWorkout(active), row),
+        );
+      }
       clientTrace("quickLogCardio", "branch_active_today");
       commitInProgressQuickCardio(appendCardioRow(active, row));
       return true;
@@ -1316,48 +1359,36 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
 
     const inProgress = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
     if (inProgress) {
+      if (isCardioOnlyQuickLogWorkout(inProgress)) {
+        clientTrace("quickLogCardio", "branch_in_progress_cardio_only_finalize");
+        return persistCompletedWorkout(
+          appendCardioRow(finalizeCardioOnlyQuickLogWorkout(inProgress), row),
+        );
+      }
       clientTrace("quickLogCardio", "branch_in_progress_history");
       commitInProgressQuickCardio(appendCardioRow(inProgress, row));
       return true;
     }
 
-    clientTrace("quickLogCardio", "branch_new_workout");
+    clientTrace("quickLogCardio", "branch_cardio_only_completed");
     const dayOfWeek =
       parseLocalDateKey(dateKey)?.getDay() ?? plan.dayOfWeek;
     const nowIso = new Date().toISOString();
-    const weekAnchor = weekKeyFromDateKey(dateKey) ?? undefined;
-    const authMode = useAuthStore.getState().mode;
-    const { warmUp, coolDown } = await clientTraceAsync(
-      "quickLogCardio",
-      "resolveStretches",
-      () =>
-        resolveStretchesForWorkoutStart(
-          plan,
-          stretchContextForWorkoutStart(weekAnchor),
-          {
-            weekAnchorDateKey: weekAnchor,
-            authMode,
-            loadWeek: loadTrainingWeekForStretches,
-          },
-        ),
-      { dateKey, authMode },
-    );
     const fresh: WorkoutLog = {
       id: uuidv4(),
       date: dateKey,
       dayOfWeek,
       cardioExercises: [row],
       warmUpCompleted: false,
-      warmUpExercises: warmUp.map(buildStretchExerciseLog),
+      warmUpExercises: [],
       coolDownCompleted: false,
-      coolDownExercises: coolDown.map(buildStretchExerciseLog),
-      rounds: buildEmptyRoundLogs(plan),
+      coolDownExercises: [],
+      rounds: [],
       startTime: nowIso,
+      endTime: nowIso,
       paused: false,
     };
-    commitInProgressQuickCardio(fresh);
-    clientTrace("quickLogCardio", "new_workout_committed", { workoutId: fresh.id });
-    return true;
+    return persistCompletedWorkout(fresh);
   },
 
   skipExercise: (roundNumber, exerciseId) =>
@@ -1974,8 +2005,40 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       }
     }
 
+    const cardioOnlyFinalized = finalizeCardioOnlyQuickLogsInHistory(workoutHistory);
+    workoutHistory = cardioOnlyFinalized.history;
+    if (mode === "authenticated" && cardioOnlyFinalized.changed.length > 0) {
+      for (const row of cardioOnlyFinalized.changed) {
+        try {
+          await workoutRepo().saveWorkout(
+            hydrateWorkoutLog(workoutLogForPersistence(row)),
+          );
+        } catch (err) {
+          toastSaveError("activity log", err);
+        }
+      }
+    }
+
     const current = get();
     let activeWorkout = current.activeWorkout;
+    if (
+      activeWorkout &&
+      !activeWorkout.endTime &&
+      isCardioOnlyQuickLogWorkout(activeWorkout)
+    ) {
+      const finalized = finalizeCardioOnlyQuickLogWorkout(activeWorkout);
+      workoutHistory = upsertWorkoutInHistory(workoutHistory, finalized);
+      if (mode === "authenticated") {
+        try {
+          await workoutRepo().saveWorkout(
+            hydrateWorkoutLog(workoutLogForPersistence(finalized)),
+          );
+        } catch (err) {
+          toastSaveError("activity log", err);
+        }
+      }
+      activeWorkout = null;
+    }
     if (
       activeWorkout &&
       !activeWorkout.endTime &&

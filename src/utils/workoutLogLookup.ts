@@ -19,6 +19,61 @@ function hasLoggedCardioSession(workout: WorkoutLog): boolean {
   );
 }
 
+function hasStrengthOrStretchProgress(workout: WorkoutLog): boolean {
+  if (workout.warmUpCompleted || workout.coolDownCompleted) return true;
+  if (workout.warmUpExercises.some((e) => e.completed || e.skipped)) {
+    return true;
+  }
+  if (workout.coolDownExercises.some((e) => e.completed || e.skipped)) {
+    return true;
+  }
+  return workout.rounds.some((round) =>
+    round.exercises.some(
+      (e) =>
+        e.completed ||
+        e.skipped ||
+        (e.actualReps != null && e.actualReps > 0) ||
+        (e.actualDuration != null && e.actualDuration > 0),
+    ),
+  );
+}
+
+/** Quick-log cardio saved without starting warm-up, rounds, or cool-down. */
+export function isCardioOnlyQuickLogWorkout(workout: WorkoutLog): boolean {
+  return hasLoggedCardioSession(workout) && !hasStrengthOrStretchProgress(workout);
+}
+
+export function finalizeCardioOnlyQuickLogWorkout(
+  workout: WorkoutLog,
+  endTime: string = new Date().toISOString(),
+): WorkoutLog {
+  return {
+    ...workout,
+    endTime: workout.endTime ?? endTime,
+    paused: false,
+  };
+}
+
+/** Finished workout for a calendar day (`endTime` set). */
+export function findCompletedWorkoutForDate(
+  workoutHistory: WorkoutLog[],
+  dateKey: string,
+): WorkoutLog | null {
+  return (
+    workoutHistory.find((w) => w.endTime != null && w.date === dateKey) ?? null
+  );
+}
+
+/** Completed strength/stretch session — excludes cardio-only quick logs. */
+export function findCompletedStrengthWorkoutForDate(
+  workoutHistory: WorkoutLog[],
+  dateKey: string,
+): WorkoutLog | null {
+  const completed = findCompletedWorkoutForDate(workoutHistory, dateKey);
+  if (!completed || isCardioOnlyQuickLogWorkout(completed)) return null;
+  return completed;
+}
+
 /**
  * Workouts that should appear on Progress cardio charts — includes finished
  * workouts and in-progress days with at least one completed quick-log cardio row.
@@ -46,16 +101,6 @@ export function workoutsForCardioProgressCharts(
     return [...base, activeWorkout];
   }
   return base;
-}
-
-/** Finished workout for a calendar day (`endTime` set). */
-export function findCompletedWorkoutForDate(
-  workoutHistory: WorkoutLog[],
-  dateKey: string,
-): WorkoutLog | null {
-  return (
-    workoutHistory.find((w) => w.endTime != null && w.date === dateKey) ?? null
-  );
 }
 
 /** In-progress workout for a calendar day (`endTime` unset, same `date`). */
@@ -87,14 +132,30 @@ export function getPausedWorkoutDateForToday(
   return paused?.date ?? null;
 }
 
+/** Finalize legacy in-progress cardio-only quick logs so they do not block Today. */
+export function finalizeCardioOnlyQuickLogsInHistory(
+  workoutHistory: WorkoutLog[],
+): { history: WorkoutLog[]; changed: WorkoutLog[] } {
+  const changed: WorkoutLog[] = [];
+  const history = workoutHistory.map((log) => {
+    if (log.endTime != null || !isCardioOnlyQuickLogWorkout(log)) return log;
+    const finalized = finalizeCardioOnlyQuickLogWorkout(log);
+    changed.push(finalized);
+    return finalized;
+  });
+  return { history, changed };
+}
+
 /** Non-paused in-progress log for today - auto-resume on load (authenticated). */
 export function shouldAutoRestoreInProgressFromHistory(
   workoutHistory: WorkoutLog[],
   todayKey: string,
 ): WorkoutLog | null {
-  if (findCompletedWorkoutForDate(workoutHistory, todayKey)) return null;
+  if (findCompletedStrengthWorkoutForDate(workoutHistory, todayKey)) return null;
   const inProgress = findInProgressWorkoutForDate(workoutHistory, todayKey);
-  if (!inProgress || inProgress.paused) return null;
+  if (!inProgress || inProgress.paused || isCardioOnlyQuickLogWorkout(inProgress)) {
+    return null;
+  }
   return inProgress;
 }
 
