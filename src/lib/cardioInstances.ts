@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { exerciseMap } from "@/core/catalog";
 import { CARDIO_KIND_TO_EXERCISE_ID } from "@/lib/cardioKinds";
+import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
 import { hydrateCardioFromNotes } from "@/lib/workoutCardioPersistence";
 import { type CardioHealthMeta } from "@/lib/health/cardioHealth";
 import { applyCardioHealthMeta } from "@/lib/health/cardioHealthFields";
@@ -109,9 +110,13 @@ export function buildCompletedQuickCardioRow(
     distanceMi?: number;
     durationSeconds?: number;
     health?: CardioHealthMeta;
+    gpsTrackPoints?: readonly GpsTrackPoint[];
   },
 ): ExerciseLog {
   const exerciseId = CARDIO_KIND_TO_EXERCISE_ID[kind];
+  const hasGpsTrack =
+    input.gpsTrackPoints != null && input.gpsTrackPoints.length >= 2;
+  const healthFields = applyCardioHealthMeta(input.health);
   return buildNewCardioRow(exerciseId, {
     completed: true,
     skipped: false,
@@ -119,7 +124,13 @@ export function buildCompletedQuickCardioRow(
     actualDuration: input.durationSeconds,
     targetPrescription: formatQuickCardioPrescription(input),
     loggingMode: "timer",
-    ...applyCardioHealthMeta(input.health),
+    ...healthFields,
+    ...(hasGpsTrack
+      ? {
+          activitySource: "gps" as const,
+          gpsTrackPoints: [...input.gpsTrackPoints!],
+        }
+      : {}),
   });
 }
 

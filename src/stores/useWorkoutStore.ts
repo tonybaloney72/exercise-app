@@ -38,6 +38,7 @@ import {
 } from "@/lib/cardioActivities";
 import { workoutLogForPersistence } from "@/lib/workoutCardioPersistence";
 import type { CardioHealthMeta } from "@/lib/health/cardioHealth";
+import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { getCardioLog, patchCardioLog } from "@/lib/cardioWorkoutLog";
 import { formatLocalDateKey } from "@/utils/localDateKey";
@@ -389,6 +390,7 @@ interface WorkoutState {
       distanceMi?: number;
       durationSeconds?: number;
       health?: CardioHealthMeta;
+      gpsTrackPoints?: readonly GpsTrackPoint[];
     },
   ) => Promise<boolean>;
 
@@ -1240,6 +1242,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       distanceMi: hasDistance ? input.distanceMi : undefined,
       durationSeconds: hasDuration ? input.durationSeconds : undefined,
       health: input.health,
+      gpsTrackPoints: input.gpsTrackPoints,
     });
 
     const persistCompletedWorkout = async (log: WorkoutLog): Promise<boolean> => {

@@ -1,3 +1,5 @@
+import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
+
 export type ExerciseCategory =
   | "CF" // Core Front/Flexion
   | "CL" // Core Lower Abs
@@ -221,6 +223,8 @@ export interface ExerciseLog {
   activitySource?: CardioActivitySource;
   /** Health Connect recorder name (e.g. Samsung Health, Pixel). */
   healthSourceName?: string;
+  /** GPS route captured during ME Start/End tracking (when available). */
+  gpsTrackPoints?: GpsTrackPoint[];
   /**
    * Unique row id for cardio/endurance logs (multiple walks per day, etc.).
    * When omitted, legacy rows are keyed by `exerciseId` only.

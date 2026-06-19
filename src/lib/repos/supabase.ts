@@ -73,6 +73,7 @@ import {
   userFacingWorkoutNotes,
   workoutLogForPersistence,
 } from "@/lib/workoutCardioPersistence";
+import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
 
 type Section = "warm_up" | "round" | "cool_down" | "cardio";
 
@@ -110,6 +111,28 @@ interface ExerciseRow {
   avg_heart_rate_bpm: number | null;
   activity_source: string | null;
   health_source_name: string | null;
+  gps_track_points?: unknown;
+}
+
+function parseGpsTrackPoints(raw: unknown): GpsTrackPoint[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const points = raw
+    .map((entry): GpsTrackPoint | null => {
+      if (typeof entry !== "object" || entry == null) return null;
+      const lat = (entry as { lat?: unknown }).lat;
+      const lng = (entry as { lng?: unknown }).lng;
+      const timestamp = (entry as { timestamp?: unknown }).timestamp;
+      if (
+        typeof lat !== "number" ||
+        typeof lng !== "number" ||
+        typeof timestamp !== "number"
+      ) {
+        return null;
+      }
+      return { lat, lng, timestamp };
+    })
+    .filter((point): point is GpsTrackPoint => point != null);
+  return points.length > 0 ? points : undefined;
 }
 
 interface SettingsRow {
@@ -172,6 +195,7 @@ function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
         ? r.activity_source
         : undefined,
     healthSourceName: r.health_source_name ?? undefined,
+    gpsTrackPoints: parseGpsTrackPoints(r.gps_track_points),
   };
 }
 
@@ -250,6 +274,7 @@ type ExerciseLogSaveRow = {
   avg_heart_rate_bpm: number | null;
   activity_source: string | null;
   health_source_name: string | null;
+  gps_track_points: GpsTrackPoint[] | null;
 };
 
 function exerciseLogToSaveRow(
@@ -276,6 +301,10 @@ function exerciseLogToSaveRow(
     avg_heart_rate_bpm: ex.avgHeartRateBpm ?? null,
     activity_source: ex.activitySource ?? null,
     health_source_name: ex.healthSourceName ?? null,
+    gps_track_points:
+      ex.gpsTrackPoints != null && ex.gpsTrackPoints.length > 0
+        ? ex.gpsTrackPoints
+        : null,
   };
 }
 

@@ -19,6 +19,7 @@ export interface GpsTrackSnapshot {
   startDate: Date;
   endDate: Date;
   pointCount: number;
+  points: readonly GpsTrackPoint[];
 }
 
 export type GpsTrackPhase = "idle" | "watching" | "recording";
@@ -39,6 +40,7 @@ export function computeGpsTrackSnapshot(
     startDate: new Date(startedAtMs),
     endDate: new Date(endedAtMs),
     pointCount: points.length,
+    points: [...points],
   };
 }
 

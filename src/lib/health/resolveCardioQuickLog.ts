@@ -1,4 +1,7 @@
-import type { GpsTrackSnapshot } from "@/lib/geo/gpsTrackSession";
+import type {
+  GpsTrackPoint,
+  GpsTrackSnapshot,
+} from "@/lib/geo/gpsTrackSession";
 import type { CardioActivityKind } from "@/types";
 import {
   fetchCardioHealthMetricsForWindow,
@@ -28,6 +31,8 @@ export type ResolvedCardioQuickLog = {
   endDate: Date;
   health?: CardioHealthMeta;
   resolution: CardioQuickLogResolution;
+  /** ME GPS route when Start/End tracking captured enough points. */
+  gpsTrack?: readonly GpsTrackPoint[];
   /** When auto-pick is ambiguous, UI should ask the user to choose. */
   ambiguousSessions?: ScoredCardioSession[];
 };
@@ -43,21 +48,41 @@ function gpsDistanceMi(snapshot?: GpsTrackSnapshot | null): number | undefined {
   return snapshot.distanceMi;
 }
 
+/** ME GPS wins when recorded; HC session/sample distance is fallback. */
 function pickDistanceMi(options: {
   sessionDistanceMi?: number;
   sampleDistanceMi?: number;
   gpsMi?: number;
 }): number | undefined {
+  if (options.gpsMi != null && options.gpsMi > 0) {
+    return options.gpsMi;
+  }
   if (options.sessionDistanceMi != null && options.sessionDistanceMi > 0) {
     return options.sessionDistanceMi;
   }
   if (options.sampleDistanceMi != null && options.sampleDistanceMi > 0) {
     return options.sampleDistanceMi;
   }
-  if (options.gpsMi != null && options.gpsMi > 0) {
-    return options.gpsMi;
-  }
   return undefined;
+}
+
+function enrichWithGpsTrack(
+  result: ResolvedCardioQuickLog,
+  gpsSnapshot?: GpsTrackSnapshot | null,
+): ResolvedCardioQuickLog {
+  const points = gpsSnapshot?.points;
+  if (!points || points.length < 2) return result;
+
+  const gpsMi = gpsDistanceMi(gpsSnapshot);
+  const usedGpsDistance = gpsMi != null && result.distanceMi === gpsMi;
+
+  return {
+    ...result,
+    gpsTrack: points,
+    health: usedGpsDistance
+      ? { ...result.health, source: "gps" as const }
+      : result.health,
+  };
 }
 
 async function resolveFromSession(
@@ -78,25 +103,28 @@ async function resolveFromSession(
 
   const gpsMi = gpsDistanceMi(gpsSnapshot);
 
-  return {
-    startDate,
-    endDate,
-    durationSeconds: durationSecondsBetween(startDate, endDate),
-    distanceMi: pickDistanceMi({
-      sessionDistanceMi: session.distanceMi,
-      sampleDistanceMi: windowMetrics.distanceMi,
-      gpsMi,
-    }),
-    health: {
-      stepCount: windowMetrics.stepCount,
-      activeCaloriesKcal:
-        windowMetrics.activeCaloriesKcal ?? session.activeCaloriesKcal,
-      avgHeartRateBpm: windowMetrics.avgHeartRateBpm,
-      source: "health_connect",
-      healthSourceName: session.sourceName ?? windowMetrics.healthSourceName,
+  return enrichWithGpsTrack(
+    {
+      startDate,
+      endDate,
+      durationSeconds: durationSecondsBetween(startDate, endDate),
+      distanceMi: pickDistanceMi({
+        sessionDistanceMi: session.distanceMi,
+        sampleDistanceMi: windowMetrics.distanceMi,
+        gpsMi,
+      }),
+      health: {
+        stepCount: windowMetrics.stepCount,
+        activeCaloriesKcal:
+          windowMetrics.activeCaloriesKcal ?? session.activeCaloriesKcal,
+        avgHeartRateBpm: windowMetrics.avgHeartRateBpm,
+        source: "health_connect",
+        healthSourceName: session.sourceName ?? windowMetrics.healthSourceName,
+      },
+      resolution: "health_connect_session",
     },
-    resolution: "health_connect_session",
-  };
+    gpsSnapshot,
+  );
 }
 
 async function resolveFromSamples(
@@ -110,20 +138,23 @@ async function resolveFromSamples(
   );
   const gpsMi = gpsDistanceMi(gpsSnapshot);
 
-  return {
-    startDate,
-    endDate,
-    durationSeconds: durationSecondsBetween(startDate, endDate),
-    distanceMi: pickDistanceMi({
-      sampleDistanceMi: windowMetrics.distanceMi,
-      gpsMi,
-    }),
-    health: {
-      ...windowMetrics,
-      source: "health_connect",
+  return enrichWithGpsTrack(
+    {
+      startDate,
+      endDate,
+      durationSeconds: durationSecondsBetween(startDate, endDate),
+      distanceMi: pickDistanceMi({
+        sampleDistanceMi: windowMetrics.distanceMi,
+        gpsMi,
+      }),
+      health: {
+        ...windowMetrics,
+        source: "health_connect",
+      },
+      resolution: "health_connect_samples",
     },
-    resolution: "health_connect_samples",
-  };
+    gpsSnapshot,
+  );
 }
 
 function resolveFromGps(
@@ -131,14 +162,17 @@ function resolveFromGps(
   endDate: Date,
   gpsSnapshot: GpsTrackSnapshot,
 ): ResolvedCardioQuickLog {
-  return {
-    startDate,
-    endDate,
-    durationSeconds: durationSecondsBetween(startDate, endDate),
-    distanceMi: gpsDistanceMi(gpsSnapshot),
-    health: { source: "gps" },
-    resolution: "gps",
-  };
+  return enrichWithGpsTrack(
+    {
+      startDate,
+      endDate,
+      durationSeconds: durationSecondsBetween(startDate, endDate),
+      distanceMi: gpsDistanceMi(gpsSnapshot),
+      health: { source: "gps" },
+      resolution: "gps",
+    },
+    gpsSnapshot,
+  );
 }
 
 function resolveTimerOnly(startDate: Date, endDate: Date): ResolvedCardioQuickLog {
@@ -197,6 +231,7 @@ export async function resolveCardioQuickLog(input: {
         score: autoPick.score,
         workoutType: autoPick.session.workoutType,
         distanceMi: autoPick.session.distanceMi,
+        gpsDistanceMi: gpsMi,
       });
       return resolveFromSession(
         kind,
@@ -230,6 +265,7 @@ export async function resolveCardioQuickLog(input: {
     clientTrace("cardio-resolve", "samples", {
       distanceMi: sampleMetrics.distanceMi,
       steps: sampleMetrics.stepCount,
+      gpsDistanceMi: gpsMi,
     });
     return resolveFromSamples(startDate, endDate, gpsSnapshot);
   }
@@ -238,13 +274,16 @@ export async function resolveCardioQuickLog(input: {
     clientTrace("cardio-resolve", "gps_only", { distanceMi: gpsMi });
     const base = resolveFromGps(startDate, endDate, gpsSnapshot);
     const enriched = await fetchCardioHealthMetricsForWindow(startDate, endDate);
-    return {
-      ...base,
-      health: {
-        ...enriched,
-        source: "gps",
+    return enrichWithGpsTrack(
+      {
+        ...base,
+        health: {
+          ...enriched,
+          source: "gps",
+        },
       },
-    };
+      gpsSnapshot,
+    );
   }
 
   clientTrace("cardio-resolve", "timer_only");

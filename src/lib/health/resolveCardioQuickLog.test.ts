@@ -89,12 +89,47 @@ describe("resolveCardioQuickLog", () => {
         durationSeconds: 1800,
         startDate,
         endDate,
+        points: [
+          { lat: 40.0, lng: -105.0, timestamp: startDate.getTime() },
+          { lat: 40.02, lng: -105.0, timestamp: endDate.getTime() },
+        ],
       },
     });
 
     expect(result.resolution).toBe("health_connect_session");
-    expect(result.distanceMi).toBe(3.2);
+    expect(result.distanceMi).toBe(3.1);
+    expect(result.gpsTrack).toHaveLength(2);
     expect(result.health?.stepCount).toBe(4000);
+    expect(result.health?.source).toBe("gps");
+  });
+
+  it("prefers ME GPS over HC sample distance", async () => {
+    queryWorkoutsOverlappingWindow.mockResolvedValue([]);
+    fetchCardioHealthMetricsForWindow.mockResolvedValue({
+      distanceMi: 0.66,
+      stepCount: 1384,
+    });
+
+    const result = await resolveCardioQuickLog({
+      kind: "walk",
+      startDate,
+      endDate,
+      gpsSnapshot: {
+        distanceMi: 0.71,
+        pointCount: 80,
+        durationSeconds: 1800,
+        startDate,
+        endDate,
+        points: [
+          { lat: 40.0, lng: -105.0, timestamp: startDate.getTime() },
+          { lat: 40.01, lng: -105.0, timestamp: endDate.getTime() },
+        ],
+      },
+    });
+
+    expect(result.resolution).toBe("health_connect_samples");
+    expect(result.distanceMi).toBe(0.71);
+    expect(result.health?.source).toBe("gps");
   });
 
   it("returns ambiguous sessions when ranking is inconclusive", async () => {

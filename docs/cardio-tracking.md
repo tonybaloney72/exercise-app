@@ -105,7 +105,9 @@ Quick log uses a unified **Start / End** flow (`CardioActivityRecorder` → `res
 
 **Resolution types:** `health_connect_session` | `health_connect_samples` | `gps` | `timer_only`
 
-**Distance authority:** session distance → sample distance → GPS distance (`pickDistanceMi` in `resolveCardioQuickLog.ts`).
+**Distance authority:** ME GPS distance when Start/End tracking captured a route (≥2 points); else HC session → sample distance (`pickDistanceMi` in `resolveCardioQuickLog.ts`).
+
+**GPS persistence (Part 2):** Route points saved on cardio `exercise_logs` rows as `gps_track_points` (local JSON + Supabase jsonb). HC session matching still uses GPS for ranking; distance saved from ME track when available.
 
 **Open product questions:**
 

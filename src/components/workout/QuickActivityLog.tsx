@@ -21,6 +21,7 @@ import {
   type ImportedCardioSession,
 } from "@/lib/health";
 import type { ResolvedCardioQuickLog } from "@/lib/health/resolveCardioQuickLog";
+import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -55,6 +56,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
   const [resolution, setResolution] = useState<
     ResolvedCardioQuickLog["resolution"] | null
   >(null);
+  const [gpsTrack, setGpsTrack] = useState<readonly GpsTrackPoint[] | undefined>();
   const [saving, setSaving] = useState(false);
 
   const moreKinds = useMemo(
@@ -75,6 +77,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     setHealthMeta(undefined);
     setActivityWindow(null);
     setResolution(null);
+    setGpsTrack(undefined);
   }, []);
 
   function openLogForm(kind: CardioActivityKind) {
@@ -94,6 +97,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
       endDate: result.endDate,
     });
     setResolution(result.resolution);
+    setGpsTrack(result.gpsTrack);
   }
 
   function applyImportedSession(session: ImportedCardioSession) {
@@ -151,9 +155,16 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
         distanceMi: hasDistance ? distanceMi : undefined,
         durationSeconds: hasDuration ? durationSeconds : undefined,
         health: resolvedHealth,
+        gpsTrackPoints: gpsTrack,
       });
       clientTrace("cardio-save", ok ? "quickLog_ok" : "quickLog_failed");
-      if (ok && isNativePlatform() && activityWindow && resolution === "gps") {
+      if (
+        ok &&
+        isNativePlatform() &&
+        activityWindow &&
+        gpsTrack &&
+        gpsTrack.length >= 2
+      ) {
         void writeCardioSessionToHealth({
           distanceMi: hasDistance ? distanceMi : undefined,
           durationSeconds: hasDuration ? durationSeconds! : 0,

@@ -37,6 +37,7 @@ describe("gps track snapshot", () => {
     expect(snapshot.durationSeconds).toBe(600);
     expect(snapshot.distanceMi).toBeGreaterThan(0);
     expect(snapshot.pointCount).toBe(3);
+    expect(snapshot.points).toHaveLength(3);
   });
 });
 
