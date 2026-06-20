@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { haversineDistanceMeters, metersToMiles } from "@/lib/geo/haversine";
-import { computeGpsTrackSnapshot } from "@/lib/geo/gpsTrackSession";
+import {
+  computeGpsTrackSnapshot,
+  shouldAppendGpsTrackPoint,
+} from "@/lib/geo/gpsTrackSession";
 import {
   dominantHealthSampleSource,
   mapWorkoutToImportedSession,
@@ -38,6 +41,33 @@ describe("gps track snapshot", () => {
     expect(snapshot.distanceMi).toBeGreaterThan(0);
     expect(snapshot.pointCount).toBe(3);
     expect(snapshot.points).toHaveLength(3);
+  });
+});
+
+describe("gps track point filtering", () => {
+  const base = { lat: 40.0, lng: -105.0, timestamp: 1_000 };
+
+  it("accepts the first fix when accuracy is good", () => {
+    expect(shouldAppendGpsTrackPoint(undefined, base, 8)).toBe(true);
+  });
+
+  it("rejects fixes worse than the accuracy ceiling", () => {
+    expect(shouldAppendGpsTrackPoint(undefined, base, 30)).toBe(false);
+  });
+
+  it("rejects jitter smaller than half the reported accuracy", () => {
+    const jitter = { lat: 40.00001, lng: -105.0, timestamp: 2_000 };
+    expect(shouldAppendGpsTrackPoint(base, jitter, 10)).toBe(false);
+  });
+
+  it("accepts movement above the accuracy-adjusted threshold", () => {
+    const moved = { lat: 40.00008, lng: -105.0, timestamp: 2_000 };
+    expect(shouldAppendGpsTrackPoint(base, moved, 10)).toBe(true);
+  });
+
+  it("requires some movement even on the time fallback", () => {
+    const barelyMoved = { lat: 40.000005, lng: -105.0, timestamp: 6_000 };
+    expect(shouldAppendGpsTrackPoint(base, barelyMoved, 8)).toBe(false);
   });
 });
 
