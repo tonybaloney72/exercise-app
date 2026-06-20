@@ -16,7 +16,7 @@ export interface HealthMetricDefinition {
   syncEnabled: boolean;
 }
 
-export const HEALTH_METRIC_DEFINITIONS: Record<
+const HEALTH_METRIC_DEFINITIONS: Record<
   HealthDailyMetricKey,
   HealthMetricDefinition
 > = {

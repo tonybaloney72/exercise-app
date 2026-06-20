@@ -65,3 +65,41 @@ export function MenuIconRemove() {
     </svg>
   );
 }
+
+export function MenuIconSkip() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={18}
+      height={18}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <polygon points="5 4 15 12 5 20 5 4" />
+      <line x1="19" y1="5" x2="19" y2="19" />
+    </svg>
+  );
+}
+
+export function MenuIconUndoSkip() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={18}
+      height={18}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M3 7v6h6" />
+      <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6.36 2.64L3 13" />
+    </svg>
+  );
+}

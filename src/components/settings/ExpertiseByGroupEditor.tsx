@@ -33,9 +33,7 @@ export default function ExpertiseByGroupEditor({
       {variant === "settings" ? (
         <p className="text-sm text-muted leading-relaxed">
           Plans and swaps only use exercises at or below each group&apos;s
-          level. Turn off &ldquo;Avoid easy regressions&rdquo; above to allow
-          easier steps in a progression (e.g. incline push-ups) regardless of
-          cap.
+          level.
         </p>
       ) : (
         <p className="text-sm text-muted leading-relaxed">

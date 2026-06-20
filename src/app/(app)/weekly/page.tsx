@@ -22,7 +22,10 @@ import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 import { categoriesPresentInPlan } from "@/lib/planDisplayCategories";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
-import { findCompletedWorkoutForDate, filterCompletedWorkouts } from "@/utils/workoutLogLookup";
+import {
+  findCompletedWorkoutForDate,
+  filterCompletedWorkouts,
+} from "@/utils/workoutLogLookup";
 import { countRoundExerciseSlots } from "@/utils/workoutLogCounts";
 import { weekToDatePlanAdherence } from "@/utils/progressStats";
 
@@ -114,15 +117,12 @@ export default function WeeklyPage() {
     <div className="flex flex-col py-6 gap-5">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Weekly Overview</h1>
-        <p className="text-sm text-muted mt-1">
-          Your training week at a glance
-        </p>
         {!weekLoading && weekAdherence.planned > 0 ? (
           <p className="text-xs text-muted mt-2 tabular-nums">
             <span className="font-medium text-foreground">
               {weekAdherence.completed} / {weekAdherence.planned}
             </span>{" "}
-            main-round exercises completed ({weekAdherence.spanShort})
+            main-round exercises completed
           </p>
         ) : null}
       </div>

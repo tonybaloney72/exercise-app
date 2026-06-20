@@ -30,7 +30,7 @@ import SwapExerciseModal from "./SwapExerciseModal";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
 import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
-import { MenuIconDislike, MenuIconRemove, MenuIconReport, MenuIconStar, MenuIconSwap } from "./WorkoutRowMenuIcons";
+import { MenuIconDislike, MenuIconRemove, MenuIconReport, MenuIconSkip, MenuIconStar, MenuIconSwap, MenuIconUndoSkip } from "./WorkoutRowMenuIcons";
 import ExerciseReportSheet from "@/components/feedback/ExerciseReportSheet";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 
@@ -224,12 +224,14 @@ export default function ExerciseRow({
   if (!log.completed && !log.skipped) {
     overflowItems.push({
       label: "Skip",
+      icon: <MenuIconSkip />,
       onClick: () => skipExercise(roundNumber, plannedId),
     });
   }
   if (log.skipped) {
     overflowItems.push({
       label: "Undo skip",
+      icon: <MenuIconUndoSkip />,
       onClick: () => unskipExercise(roundNumber, plannedId),
     });
   }

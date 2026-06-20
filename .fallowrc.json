@@ -38,7 +38,7 @@
   "rules": {
     "unused-dependencies": "warn"
   },
-  "usedClassMembers": ["dispose"],
+  "usedClassMembers": ["dispose", "getPoints"],
   "ignoreExports": [
     {
       "file": "src/lib/exerciseSwap.ts",

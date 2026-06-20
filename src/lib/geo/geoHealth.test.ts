@@ -4,8 +4,8 @@ import { computeGpsTrackSnapshot } from "@/lib/geo/gpsTrackSession";
 import {
   dominantHealthSampleSource,
   mapWorkoutToImportedSession,
-  sumHealthSampleValues,
 } from "@/lib/health/cardioHealth";
+import { sumHealthSampleValues } from "@/lib/health/healthSampleAggregation";
 import { withTimeout } from "@/lib/async/withTimeout";
 import { applyCardioHealthMeta } from "@/lib/health/cardioHealthFields";
 import { formatCardioHealthSummary } from "@/lib/health/cardioHealthDisplay";

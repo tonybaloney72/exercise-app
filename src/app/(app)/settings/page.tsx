@@ -31,7 +31,10 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { createClient } from "@/lib/supabase/client";
 import { resolveApiUrl } from "@/lib/apiBaseUrl";
-import { isCapacitorBundledBuild, isNativePlatform } from "@/lib/capacitorRuntime";
+import {
+  isCapacitorBundledBuild,
+  isNativePlatform,
+} from "@/lib/capacitorRuntime";
 import CardioPermissionsSection from "@/components/settings/CardioPermissionsSection";
 import { clearGuestCookie } from "@/lib/auth/guestCookieClient";
 import { useDiagnosticLogUnlock } from "@/hooks/useDiagnosticLogUnlock";
@@ -272,7 +275,7 @@ export default function SettingsPage() {
           />
           <SettingsSwitch
             title="Keep screen on"
-            description="Try to prevent the screen from dimming while this app is open. Rest and set timers also keep the screen awake while running."
+            description="Prevent the screen from dimming while this app is open."
             checked={settings.keepScreenAwake}
             onChange={() =>
               settings.updateSettings({
@@ -286,8 +289,8 @@ export default function SettingsPage() {
       {isNativePlatform() ? (
         <AnimatedSection delay={0.046}>
           <CollapsibleSection
-            title="Cardio & sensors"
-            hint="Health Connect and GPS permissions for walk/jog logging"
+            title="Permissions and Connections"
+            hint="3rd party apps and services you can connect to"
             defaultOpen={false}
             contentClassName="p-4"
           >

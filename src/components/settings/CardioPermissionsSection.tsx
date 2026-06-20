@@ -7,9 +7,7 @@ import {
   checkNativeHealthAuthorization,
   openNativeHealthSettings,
 } from "@/lib/health/nativeHealth";
-import {
-  ensureCardioHealthReadAccess,
-} from "@/lib/health";
+import { ensureCardioHealthReadAccess } from "@/lib/health";
 import {
   openNativeLocationSettings,
   requestNativeLocationPermission,
@@ -18,7 +16,8 @@ import {
 type HealthAccessState = "unknown" | "granted" | "denied";
 
 export default function CardioPermissionsSection() {
-  const [healthAccess, setHealthAccess] = useState<HealthAccessState>("unknown");
+  const [healthAccess, setHealthAccess] =
+    useState<HealthAccessState>("unknown");
   const [locationGranted, setLocationGranted] = useState<boolean | null>(null);
   const [healthBusy, setHealthBusy] = useState(false);
   const [locationBusy, setLocationBusy] = useState(false);
@@ -91,19 +90,14 @@ export default function CardioPermissionsSection() {
   return (
     <div className="flex flex-col gap-4">
       <p className="text-xs text-muted leading-relaxed">
-        Walk, jog, and other cardio can pull steps, calories, and heart rate
-        from Health Connect, or track distance with GPS. Grant access once here
-        so quick log and import work without hunting through Android settings
-        mid-workout.
+        Pull steps, calories, heart rate, and other data from Health Connect.
       </p>
 
       <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface-hover/40 p-3">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-sm font-medium text-foreground">Health Connect</p>
-            <p className="text-xs text-muted mt-0.5">
-              Import sessions and enrich logs with steps, active calories, and
-              average heart rate.
+            <p className="text-sm font-medium text-foreground">
+              Health Connect
             </p>
           </div>
           <HealthStatusBadge state={healthAccess} />
@@ -127,10 +121,11 @@ export default function CardioPermissionsSection() {
       <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface-hover/40 p-3">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-sm font-medium text-foreground">Location (GPS)</p>
+            <p className="text-sm font-medium text-foreground">
+              Location (GPS)
+            </p>
             <p className="text-xs text-muted mt-0.5">
-              Track distance while the app is open. For best accuracy, keep
-              location on and allow MyExercise to use it.
+              Track distance while the app is open.
             </p>
           </div>
           {locationGranted != null ? (

@@ -6,6 +6,7 @@ import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
 import WorkoutRowOverflowMenu, {
   type WorkoutRowMenuItem,
 } from "./WorkoutRowOverflowMenu";
+import { MenuIconRemove, MenuIconSkip, MenuIconUndoSkip } from "./WorkoutRowMenuIcons";
 import { formatCardioHealthSummary } from "@/lib/health";
 import type { ExerciseLog } from "@/types";
 
@@ -39,14 +40,23 @@ export default function CardioSessionBlock({
 
   const overflowItems: WorkoutRowMenuItem[] = [];
   if (!log.completed && !log.skipped) {
-    overflowItems.push({ label: "Skip", onClick: onSkip });
+    overflowItems.push({
+      label: "Skip",
+      icon: <MenuIconSkip />,
+      onClick: onSkip,
+    });
   }
   if (log.skipped) {
-    overflowItems.push({ label: "Undo skip", onClick: onUnskip });
+    overflowItems.push({
+      label: "Undo skip",
+      icon: <MenuIconUndoSkip />,
+      onClick: onUnskip,
+    });
   }
   if (onRemove) {
     overflowItems.push({
       label: "Remove from workout",
+      icon: <MenuIconRemove />,
       onClick: onRemove,
     });
   }

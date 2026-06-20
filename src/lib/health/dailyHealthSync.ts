@@ -6,10 +6,10 @@ import {
 import type { DailyHealthMetricRepo } from "@/lib/repos/types";
 import type { HealthDailyMetricKey, HealthDailyMetricUpsert } from "@/types/healthDailyMetrics";
 
-export const DAILY_HEALTH_SYNC_STORAGE_KEY = "exercise-app-health-daily-sync-v1";
+const DAILY_HEALTH_SYNC_STORAGE_KEY = "exercise-app-health-daily-sync-v1";
 export const DAILY_HEALTH_CHART_DAYS = 14;
-export const DAILY_HEALTH_TODAY_SYNC_MIN_INTERVAL_MS = 30 * 60 * 1000;
-export const DAILY_HEALTH_TODAY_STEP_DELTA = 100;
+const DAILY_HEALTH_TODAY_SYNC_MIN_INTERVAL_MS = 30 * 60 * 1000;
+const DAILY_HEALTH_TODAY_STEP_DELTA = 100;
 
 type SyncSnapshot = {
   version: 1;
@@ -22,7 +22,7 @@ function emptySnapshot(): SyncSnapshot {
   return { version: 1, lastTodaySyncAtMs: 0, byDate: {} };
 }
 
-export function loadDailyHealthSyncSnapshot(): SyncSnapshot {
+function loadDailyHealthSyncSnapshot(): SyncSnapshot {
   if (typeof window === "undefined") return emptySnapshot();
   try {
     const raw = localStorage.getItem(DAILY_HEALTH_SYNC_STORAGE_KEY);
@@ -41,7 +41,7 @@ export function loadDailyHealthSyncSnapshot(): SyncSnapshot {
   }
 }
 
-export function saveDailyHealthSyncSnapshot(snapshot: SyncSnapshot): void {
+function saveDailyHealthSyncSnapshot(snapshot: SyncSnapshot): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(DAILY_HEALTH_SYNC_STORAGE_KEY, JSON.stringify(snapshot));
 }
@@ -166,9 +166,3 @@ export async function syncDailyHealthMetricsToRepo(options: {
   saveDailyHealthSyncSnapshot(nextSnapshot);
   return true;
 }
-
-export type ApplyDailyHealthSourcesResult = {
-  view: DailyHealthProgressView;
-  available: boolean;
-  unavailableReason: "web" | "no_access" | null;
-};

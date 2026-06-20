@@ -50,12 +50,6 @@ export interface ImportedCardioSession {
   workoutType?: string;
 }
 
-export {
-  aggregateDailyHealthSampleTotal,
-  resolveDailyHealthMetricTotal,
-  sumHealthSampleValues,
-} from "@/lib/health/healthSampleAggregation";
-
 export function dominantHealthSampleSource(
   samples: ReadonlyArray<{ sourceName?: string }>,
 ): string | undefined {
@@ -480,36 +474,8 @@ export async function fetchDailyHealthMetricsForKeys(
   return out;
 }
 
-/** Steps from Health Connect for one local calendar day (midnight → now if today). */
-export async function fetchDailyStepCount(
-  dateKey: string,
-  now: Date = new Date(),
-): Promise<number | undefined> {
-  const metrics = await fetchDailyHealthMetrics(dateKey, now);
-  return metrics?.steps;
-}
-
-export async function fetchDailyStepCountsForKeys(
-  dateKeys: readonly string[],
-  now: Date = new Date(),
-): Promise<Record<string, number>> {
-  const byDate = await fetchDailyHealthMetricsForKeys(dateKeys, now);
-  const out: Record<string, number> = {};
-  for (const [dateKey, metrics] of Object.entries(byDate)) {
-    out[dateKey] = metrics.steps;
-  }
-  return out;
-}
-
 /** Read-only check — does not open the Health Connect permission UI. */
 export async function checkCardioHealthReadAccess(): Promise<boolean> {
   return hasCardioHealthReadAccess();
 }
-
-export {
-  writeAppTrackedCardioToHealth,
-  writeCardioSessionToHealth,
-  writeWeightToHealth,
-} from "@/lib/health/appTrackedHealthWrite";
-export { refreshAppTrackedCardioHealthEnrich } from "@/lib/health/refreshCardioHealthEnrich";
 

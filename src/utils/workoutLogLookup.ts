@@ -113,15 +113,7 @@ export function findInProgressWorkoutForDate(
   );
 }
 
-/** Calendar date of the paused in-progress workout, if any. */
-export function getPausedWorkoutDateFromHistory(
-  workoutHistory: WorkoutLog[],
-): string | null {
-  const paused = workoutHistory.find((w) => w.endTime == null && w.paused);
-  return paused?.date ?? null;
-}
-
-/** Paused in-progress draft for today only (excludes stale prior-day sessions). */
+/** Calendar date of the paused in-progress workout for today only (excludes stale prior-day sessions). */
 export function getPausedWorkoutDateForToday(
   workoutHistory: WorkoutLog[],
   todayKey: string = formatLocalDateKey(),

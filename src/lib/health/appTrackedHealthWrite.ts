@@ -104,21 +104,3 @@ export async function writeWeightToHealth(options: {
 
   clientTrace("health-write", "weight_ok", { weightLb: options.weightLb });
 }
-
-/** @deprecated Use {@link writeAppTrackedCardioToHealth}. */
-export async function writeCardioSessionToHealth(options: {
-  distanceMi?: number;
-  durationSeconds: number;
-  activeCaloriesKcal?: number;
-  startDate: Date;
-  endDate: Date;
-}): Promise<void> {
-  await writeAppTrackedCardioToHealth({
-    kind: "walk",
-    distanceMi: options.distanceMi,
-    durationSeconds: options.durationSeconds,
-    startDate: options.startDate,
-    endDate: options.endDate,
-    activeCaloriesKcal: options.activeCaloriesKcal,
-  });
-}

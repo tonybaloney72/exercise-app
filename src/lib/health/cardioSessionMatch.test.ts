@@ -5,6 +5,7 @@ import {
   cardioDistanceAgreementScore,
   cardioSessionTypeMatchScore,
   pickBestCardioSession,
+  rankCardioSessionsForImport,
   rankCardioSessionsForWindow,
   sessionOverlapFraction,
 } from "@/lib/health/cardioSessionMatch";
@@ -112,6 +113,30 @@ describe("rankCardioSessionsForWindow", () => {
 
     const pick = pickBestCardioSession(ranked);
     expect(pick?.session.workoutType).toBe("running");
+  });
+});
+
+describe("rankCardioSessionsForImport", () => {
+  it("lists matching sessions most recent first", () => {
+    const older = session({
+      startDate: new Date(2026, 5, 17, 8, 0, 0),
+      endDate: new Date(2026, 5, 17, 8, 45, 0),
+      workoutType: "walking",
+      distanceMi: 2.5,
+    });
+    const newer = session({
+      startDate: new Date(2026, 5, 18, 9, 0, 0),
+      endDate: new Date(2026, 5, 18, 9, 30, 0),
+      workoutType: "walking",
+      distanceMi: 1.2,
+    });
+
+    const ranked = rankCardioSessionsForImport("walk", [older, newer]);
+
+    expect(ranked.map((row) => row.session.startDate)).toEqual([
+      newer.startDate,
+      older.startDate,
+    ]);
   });
 });
 

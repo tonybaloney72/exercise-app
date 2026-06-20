@@ -12,8 +12,19 @@ import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
 import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
+import {
+  MenuIconDislike,
+  MenuIconRemove,
+  MenuIconReport,
+  MenuIconSkip,
+  MenuIconStar,
+  MenuIconSwap,
+  MenuIconUndoSkip,
+} from "./WorkoutRowMenuIcons";
+import ExerciseReportSheet from "@/components/feedback/ExerciseReportSheet";
 import SwapExerciseModal from "./SwapExerciseModal";
 import type { ExerciseLog, ExerciseSetMode, StretchEntry } from "@/types";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { exerciseVideoLinkLabel } from "@/lib/exerciseVideoLink";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
@@ -217,10 +228,14 @@ function StretchRow({
   const [expanded, setExpanded] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
   const [swapModalKey, setSwapModalKey] = useState(0);
+  const [reportOpen, setReportOpen] = useState(false);
   const exercise = exerciseMap[exerciseId];
   const stored = useExerciseSettingsStore((s) => s.byExerciseId[exerciseId]);
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const authMode = useAuthStore((s) => s.mode);
   const preferenceMap = useExercisePreferencesStore((s) => s.byExerciseId);
+  const setPreference = useExercisePreferencesStore((s) => s.setPreference);
+  const exercisePreference = preferenceMap[exerciseId];
   const swapCandidates = useMemo(
     () =>
       onSwap
@@ -277,9 +292,35 @@ function StretchRow({
   if (!exercise) return null;
 
   const overflowItems: WorkoutRowMenuItem[] = [];
+  if (authMode === "authenticated") {
+    const isFavorite = exercisePreference === "favorite";
+    const isDisliked = exercisePreference === "disliked";
+    overflowItems.push({
+      label: isFavorite ? "Remove favorite" : "Favorite",
+      icon: <MenuIconStar filled={isFavorite} />,
+      onClick: () =>
+        void setPreference(exerciseId, isFavorite ? null : "favorite", {
+          refreshGeneratedWeek: false,
+        }),
+    });
+    overflowItems.push({
+      label: isDisliked ? "Remove dislike" : "Dislike",
+      icon: <MenuIconDislike active={isDisliked} />,
+      onClick: () =>
+        void setPreference(exerciseId, isDisliked ? null : "disliked", {
+          refreshGeneratedWeek: false,
+        }),
+    });
+  }
+  overflowItems.push({
+    label: "Report an issue",
+    icon: <MenuIconReport />,
+    onClick: () => setReportOpen(true),
+  });
   if (onSwap && !log.skipped) {
     overflowItems.push({
       label: "Swap stretch",
+      icon: <MenuIconSwap />,
       onClick: () => {
         setSwapModalKey((k) => k + 1);
         setSwapOpen(true);
@@ -289,18 +330,21 @@ function StretchRow({
   if (!log.completed && !log.skipped) {
     overflowItems.push({
       label: "Skip",
+      icon: <MenuIconSkip />,
       onClick: onSkip,
     });
   }
   if (log.skipped) {
     overflowItems.push({
       label: "Undo skip",
+      icon: <MenuIconUndoSkip />,
       onClick: onUnskip,
     });
   }
   if (onRemoveFromWorkout) {
     overflowItems.push({
       label: "Remove from workout",
+      icon: <MenuIconRemove />,
       onClick: onRemoveFromWorkout,
     });
   }
@@ -313,6 +357,16 @@ function StretchRow({
 
   return (
     <div className={`transition-colors ${log.skipped ? "opacity-40" : ""}`}>
+      <ExerciseReportSheet
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        exercise={exercise}
+        source="exercise_row"
+        contextExtra={{
+          stretchCategory,
+          exerciseId,
+        }}
+      />
       {onSwap ? (
         <SwapExerciseModal
           key={swapModalKey}

@@ -56,7 +56,7 @@ export function dailyHealthDayMetricsToUpserts(
   return upserts;
 }
 
-export function indexDailyMetricRecords(
+function indexDailyMetricRecords(
   records: readonly HealthDailyMetricRecord[],
 ): Map<string, Map<HealthDailyMetricKey, HealthDailyMetricRecord>> {
   const byDate = new Map<string, Map<HealthDailyMetricKey, HealthDailyMetricRecord>>();

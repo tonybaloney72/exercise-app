@@ -74,7 +74,7 @@ export type ScoredCardioSession = {
   overlap: number;
 };
 
-export function scoreCardioSessionForWindow(options: {
+function scoreCardioSessionForWindow(options: {
   kind: CardioActivityKind;
   userStartMs: number;
   userEndMs: number;
@@ -132,8 +132,8 @@ export function rankCardioSessionsForWindow(options: {
   return scored;
 }
 
-export const CARDIO_SESSION_AUTO_PICK_MIN_SCORE = 55;
-export const CARDIO_SESSION_AUTO_PICK_MIN_GAP = 12;
+const CARDIO_SESSION_AUTO_PICK_MIN_SCORE = 55;
+const CARDIO_SESSION_AUTO_PICK_MIN_GAP = 12;
 
 export function pickBestCardioSession(
   ranked: readonly ScoredCardioSession[],
@@ -169,6 +169,11 @@ export function rankCardioSessionsForImport(
       } satisfies ScoredCardioSession;
     })
     .filter((row): row is ScoredCardioSession => row != null);
-  scored.sort((a, b) => b.score - a.score);
+  scored.sort((a, b) => {
+    const byDate =
+      b.session.startDate.getTime() - a.session.startDate.getTime();
+    if (byDate !== 0) return byDate;
+    return b.score - a.score;
+  });
   return scored;
 }
