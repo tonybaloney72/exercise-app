@@ -40,7 +40,13 @@ interface Props {
   title?: string;
 }
 
-function CardioTooltipBody({ point }: { point: CardioChartPoint }) {
+function CardioTooltipBody({
+  point,
+  exerciseLabel,
+}: {
+  point: CardioChartPoint;
+  exerciseLabel: string;
+}) {
   const dist =
     point.distanceMi != null && point.distanceMi > 0
       ? `${point.distanceMi} mi`
@@ -71,7 +77,9 @@ function CardioTooltipBody({ point }: { point: CardioChartPoint }) {
     >
       <p className="font-semibold text-foreground">
         {point.date}
-        {point.sessionIndex != null ? ` · Run ${point.sessionIndex}` : ""}
+        {point.sessionIndex != null
+          ? ` · ${exerciseLabel} ${point.sessionIndex}`
+          : ""}
       </p>
       {dist && <p className="mt-1 text-muted">Distance: {dist}</p>}
       {time && <p className="text-muted">Time: {time}</p>}
@@ -114,6 +122,7 @@ export default function CardioProgressChart({
   title,
 }: Props) {
   const activityTitle = title ?? cardioExerciseTitle(exerciseId);
+  const exerciseLabel = cardioExerciseTitle(exerciseId);
   const series = useMemo(
     () => buildCardioChartSeries(history, exerciseId),
     [history, exerciseId],
@@ -149,7 +158,7 @@ export default function CardioProgressChart({
         if (!active || !payload?.length) return null;
         const p = payload[0]?.payload as CardioChartPoint | undefined;
         if (!p) return null;
-        return <CardioTooltipBody point={p} />;
+        return <CardioTooltipBody point={p} exerciseLabel={exerciseLabel} />;
       }}
     />
   );

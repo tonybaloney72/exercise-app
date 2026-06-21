@@ -52,22 +52,22 @@ export function formatGpsTrackDuration(seconds: number): string {
 }
 
 /** Reject fixes worse than this (meters). */
-export const GPS_MAX_ACCURACY_M = 25;
+const GPS_MAX_ACCURACY_M = 25;
 
 /** Minimum horizontal movement between stored points (meters). */
-export const GPS_MIN_MOVEMENT_M = 2;
+const GPS_MIN_MOVEMENT_M = 2;
 
 /** Movement must exceed accuracy × this ratio to count as real travel. */
-export const GPS_ACCURACY_MOVEMENT_RATIO = 0.5;
+const GPS_ACCURACY_MOVEMENT_RATIO = 0.5;
 
 /** Time-based fallback when fixes are sparse (ms). */
-export const GPS_MAX_POINT_GAP_MS = 4_000;
+const GPS_MAX_POINT_GAP_MS = 4_000;
 
 /** On time fallback, still require this fraction of accuracy as movement. */
-export const GPS_TIME_FALLBACK_ACCURACY_RATIO = 0.25;
+const GPS_TIME_FALLBACK_ACCURACY_RATIO = 0.25;
 
 /** Default accuracy when the platform omits it (conservative). */
-export const GPS_UNKNOWN_ACCURACY_M = GPS_MAX_ACCURACY_M;
+const GPS_UNKNOWN_ACCURACY_M = GPS_MAX_ACCURACY_M;
 
 export function shouldAppendGpsTrackPoint(
   last: GpsTrackPoint | undefined,
@@ -75,7 +75,11 @@ export function shouldAppendGpsTrackPoint(
   accuracyM: number | undefined,
 ): boolean {
   const accuracy = accuracyM ?? GPS_UNKNOWN_ACCURACY_M;
-  if (!Number.isFinite(accuracy) || accuracy <= 0 || accuracy > GPS_MAX_ACCURACY_M) {
+  if (
+    !Number.isFinite(accuracy) ||
+    accuracy <= 0 ||
+    accuracy > GPS_MAX_ACCURACY_M
+  ) {
     return false;
   }
 
@@ -193,9 +197,7 @@ export class GpsTrackSession {
       timestamp: position.timestamp,
     };
     const last = this.points[this.points.length - 1];
-    if (
-      !shouldAppendGpsTrackPoint(last, point, position.coords.accuracy)
-    ) {
+    if (!shouldAppendGpsTrackPoint(last, point, position.coords.accuracy)) {
       return;
     }
     this.points.push(point);
