@@ -68,7 +68,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
       CARDIO_ACTIVITY_ORDER.filter(
         (kind) =>
           !PRIMARY_KINDS.includes(kind) &&
-          (kind !== "cycle" || cardioKindAllowed("cycle", availableEquipment)),
+          cardioKindAllowed(kind, availableEquipment),
       ),
     [availableEquipment],
   );

@@ -16,6 +16,7 @@ import type { ScoredCardioSession } from "@/lib/health/cardioSessionMatch";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import { formatSecondsToMMSS } from "@/utils/time";
+import { cardioKindUsesGps } from "@/lib/cardioKinds";
 import type { CardioActivityKind } from "@/types";
 
 type RecorderPhase = "idle" | "recording" | "resolving" | "pick_session";
@@ -38,6 +39,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
   >(null);
 
   const native = isNativePlatform();
+  const usesGps = cardioKindUsesGps(kind);
 
   useEffect(() => {
     if (phase !== "recording") return;
@@ -56,9 +58,18 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
     const startedAt = startDateRef.current?.getTime();
     const session = sessionRef.current;
     if (phase !== "recording" || startedAt == null) return null;
+    if (!usesGps) {
+      return {
+        durationSeconds: Math.max(
+          1,
+          Math.round((Date.now() - startedAt) / 1000),
+        ),
+        distanceMi: 0,
+      };
+    }
     const points = session?.getPoints() ?? [];
     return computeGpsTrackSnapshot(points, startedAt);
-  }, [phase, tick]);
+  }, [phase, tick, usesGps]);
 
   const finishResolve = useCallback(
     (result: ResolvedCardioQuickLog) => {
@@ -79,7 +90,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
     startDateRef.current = startedAt;
     clientTrace("cardio-recorder", "start", { kind });
 
-    if (native) {
+    if (native && usesGps) {
       const gps = new GpsTrackSession();
       sessionRef.current = gps;
       try {
@@ -221,9 +232,11 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
   const statusLine =
     phase === "recording" && liveSnapshot
       ? `${formatGpsTrackDuration(liveSnapshot.durationSeconds)}${
-          liveSnapshot.distanceMi > 0
-            ? ` · ${liveSnapshot.distanceMi} mi`
-            : " · GPS tracking…"
+          usesGps
+            ? liveSnapshot.distanceMi > 0
+              ? ` · ${liveSnapshot.distanceMi} mi`
+              : " · GPS tracking…"
+            : ""
         }`
       : phase === "resolving"
         ? "Pulling activity from Health Connect…"
@@ -236,7 +249,9 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
           <p className="text-sm font-medium text-foreground">Track activity</p>
           <p className="text-xs text-muted mt-0.5">
             {phase === "idle"
-              ? "Start records time and GPS. A notification keeps tracking when the screen is off."
+              ? usesGps
+                ? "Start records time and GPS. A notification keeps tracking when the screen is off."
+                : "Start records time. Distance comes from Health Connect or your manual entry."
               : phase === "pick_session"
                 ? "Pick the Health Connect session that matches this activity."
                 : "Timer runs until you tap End."}

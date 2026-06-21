@@ -7,6 +7,11 @@ const CARDIO_TO_WORKOUT_TYPE: Partial<Record<CardioActivityKind, WorkoutType>> =
   hike: "hiking",
   cycle: "cycling",
   swim: "swimming",
+  treadmill: "runningTreadmill",
+  elliptical: "elliptical",
+  indoor_bike: "bikingStationary",
+  row: "rowing",
+  stairs: "stairClimbing",
 };
 
 export function cardioKindToWorkoutType(

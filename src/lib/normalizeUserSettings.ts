@@ -1,4 +1,5 @@
 import { DEFAULT_SETTINGS } from "@/lib/repos/types";
+import { migrateAvailableEquipment } from "@/data/equipment";
 import {
   sanitizeTrainingPriorityPreset,
   sanitizeTrainingPriorityScores,
@@ -187,6 +188,9 @@ export function normalizeUserSettings(
   return {
     ...DEFAULT_SETTINGS,
     ...rest,
+    availableEquipment: migrateAvailableEquipment(
+      partial.availableEquipment ?? rest.availableEquipment,
+    ),
     expertiseByGroup,
     equipmentOnboardingCompleted:
       partial.equipmentOnboardingCompleted ?? DEFAULT_SETTINGS.equipmentOnboardingCompleted,

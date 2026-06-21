@@ -24,8 +24,13 @@ const KIND_COMPATIBLE_TYPES: Partial<
   walk: ["walking", "hiking", "stairClimbing", "mixedCardio", "other"],
   jog: ["running", "runningTreadmill", "mixedCardio", "other"],
   hike: ["hiking", "walking", "climbing", "other"],
-  cycle: ["cycling", "bikingStationary", "handCycling", "other"],
+  cycle: ["cycling", "handCycling", "other"],
   swim: ["swimming", "swimmingPool", "swimmingOpenWater", "waterFitness", "other"],
+  treadmill: ["runningTreadmill", "walking", "mixedCardio", "other"],
+  elliptical: ["elliptical", "mixedCardio", "other"],
+  indoor_bike: ["bikingStationary", "cycling", "handCycling", "other"],
+  row: ["rowing", "rowingMachine", "other"],
+  stairs: ["stairClimbing", "walking", "mixedCardio", "other"],
 };
 
 const STRENGTH_TYPES: ReadonlySet<WorkoutType> = new Set([

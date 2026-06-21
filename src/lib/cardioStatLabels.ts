@@ -14,9 +14,11 @@ export function totalMilesCardioStatLabel(kind: CardioActivityKind): string {
       return "Total Miles Hiked";
     case "swim":
       return "Total Miles Swum";
-    default: {
-      const _exhaustive: never = kind;
-      return `Total Miles ${CARDIO_ACTIVITY_LABELS[_exhaustive]}`;
-    }
+    case "treadmill":
+    case "elliptical":
+    case "indoor_bike":
+    case "row":
+    case "stairs":
+      return `Total Miles ${CARDIO_ACTIVITY_LABELS[kind]}`;
   }
 }

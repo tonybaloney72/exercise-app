@@ -28,6 +28,11 @@ const KIND_EQUIPMENT: Record<CardioActivityKind, ExerciseEquipment[]> = {
   hike: ["bodyweight"],
   swim: ["bodyweight"],
   cycle: ["bicycle"],
+  treadmill: ["treadmill"],
+  elliptical: ["elliptical"],
+  indoor_bike: ["indoor_bike"],
+  row: ["rowing_machine"],
+  stairs: ["stair_climber"],
 };
 
 export function cardioKindAllowed(

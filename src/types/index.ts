@@ -38,7 +38,12 @@ export type ExerciseEquipment =
   | "plyo_box"
   | "stability_ball"
   | "pull_up_bar"
-  | "bicycle";
+  | "bicycle"
+  | "indoor_bike"
+  | "treadmill"
+  | "elliptical"
+  | "rowing_machine"
+  | "stair_climber";
 
 /** Planned: ExRx-style plyometric intensity (low → high). Not used in UI yet. */
 export type PlyometricIntensity =
@@ -115,7 +120,17 @@ export interface Round {
   exercises: RoundExercise[];
 }
 
-export type CardioActivityKind = "jog" | "walk" | "cycle" | "hike" | "swim";
+export type CardioActivityKind =
+  | "jog"
+  | "walk"
+  | "hike"
+  | "cycle"
+  | "treadmill"
+  | "elliptical"
+  | "indoor_bike"
+  | "row"
+  | "stairs"
+  | "swim";
 
 export interface CardioActivity {
   kind: CardioActivityKind;

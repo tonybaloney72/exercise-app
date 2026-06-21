@@ -36,7 +36,10 @@ describe("cardioActivities", () => {
       ...DEFAULT_SETTINGS,
       weeklyCardioCustomized: true,
       weeklyCardioByDay: { ...suggestWeeklyCardioFromCatalog(), 2: ["walk", "cycle"] },
-      availableEquipment: [...DEFAULT_SETTINGS.availableEquipment, "bicycle"],
+      availableEquipment: [
+        ...DEFAULT_SETTINGS.availableEquipment,
+        "bicycle",
+      ],
     };
     const out = prepareCatalogDayForUser(tue, settings, settings.availableEquipment);
     expect(resolveCardioActivities(out).map((a) => a.kind)).toEqual(["walk", "cycle"]);

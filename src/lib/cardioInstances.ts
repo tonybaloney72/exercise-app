@@ -81,9 +81,14 @@ function defaultPrescriptionForKind(kind: CardioActivityKind): string {
   const defaults: Record<CardioActivityKind, string> = {
     jog: "20 min",
     walk: "30 min",
-    cycle: "30 min",
     hike: "45 min",
+    cycle: "30 min",
     swim: "20 min",
+    treadmill: "30 min",
+    elliptical: "30 min",
+    indoor_bike: "30 min",
+    row: "20 min",
+    stairs: "20 min",
   };
   return defaults[kind];
 }
@@ -118,9 +123,6 @@ export function buildCompletedQuickCardioRow(
   const exerciseId = CARDIO_KIND_TO_EXERCISE_ID[kind];
   const hasGpsTrack =
     input.gpsTrackPoints != null && input.gpsTrackPoints.length >= 2;
-  const isAppTracked =
-    hasGpsTrack ||
-    Boolean(input.activityStartTime && input.activityEndTime);
   const healthFields = applyCardioHealthMeta(input.health);
   return buildNewCardioRow(exerciseId, {
     completed: true,
@@ -130,7 +132,7 @@ export function buildCompletedQuickCardioRow(
     targetPrescription: formatQuickCardioPrescription(input),
     loggingMode: "timer",
     ...healthFields,
-    ...(isAppTracked ? { activitySource: "gps" as const } : {}),
+    ...(hasGpsTrack ? { activitySource: "gps" as const } : {}),
     ...(hasGpsTrack
       ? {
           gpsTrackPoints: [...input.gpsTrackPoints!],

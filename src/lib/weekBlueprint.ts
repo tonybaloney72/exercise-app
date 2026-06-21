@@ -1,5 +1,6 @@
 import { getCatalogPlanForDay } from "@/data/trainingWeekCatalog";
 import { applyWeeklyCardioToDay } from "@/lib/cardioActivities";
+import { isCardioActivityKind } from "@/lib/cardioKinds";
 import { MAX_DAY_ROUNDS } from "@/lib/dayRoundLimits";
 import {
   buildLayoutRoundSpecs,
@@ -208,8 +209,7 @@ function sanitizeDayBlueprint(
   const cardio: CardioActivityKind[] = Array.isArray(cardioRaw)
     ? cardioRaw.filter(
         (c): c is CardioActivityKind =>
-          typeof c === "string" &&
-          ["jog", "walk", "cycle", "hike", "swim"].includes(c),
+          typeof c === "string" && isCardioActivityKind(c),
       )
     : (fb.cardio ?? []);
 

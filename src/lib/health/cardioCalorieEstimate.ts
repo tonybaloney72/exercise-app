@@ -8,6 +8,11 @@ const MET_BY_KIND: Partial<Record<CardioActivityKind, number>> = {
   hike: 6,
   cycle: 7.5,
   swim: 8,
+  treadmill: 8,
+  elliptical: 5,
+  indoor_bike: 6.8,
+  row: 7,
+  stairs: 9,
 };
 
 /** Rough active kcal from MET when HC has no sample in the ME window. */
