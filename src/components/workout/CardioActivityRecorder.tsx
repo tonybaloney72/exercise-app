@@ -34,9 +34,9 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
   const [candidates, setCandidates] = useState<ScoredCardioSession[]>([]);
-  const [gpsSnapshot, setGpsSnapshot] = useState<
-    ReturnType<typeof computeGpsTrackSnapshot> | null
-  >(null);
+  const [gpsSnapshot, setGpsSnapshot] = useState<ReturnType<
+    typeof computeGpsTrackSnapshot
+  > | null>(null);
 
   const native = isNativePlatform();
   const usesGps = cardioKindUsesGps(kind);
@@ -376,7 +376,7 @@ function SimpleTimerRecorder({
         <div>
           <p className="text-sm font-medium text-foreground">Track time</p>
           <p className="text-xs text-muted mt-0.5">
-            Start and end your activity. Add distance manually on web.
+            Start and end your activity.
           </p>
         </div>
         {recording ? (

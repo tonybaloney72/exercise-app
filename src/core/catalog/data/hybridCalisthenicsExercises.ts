@@ -1659,8 +1659,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     expertiseLevel: "novice",
     muscleGroups: ["Lateral Deltoids"],
     defaultReps: "10",
-    notes:
-      "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
+    notes: "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
     source: "Bradley Bowden",
     videoUrl: "https://www.youtube.com/watch?v=Zy0M8JMLnD0",
     isTimeBased: false,
@@ -2291,8 +2290,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     expertiseLevel: "intermediate",
     muscleGroups: ["Lateral Deltoids", "Traps"],
     defaultReps: "10",
-    notes:
-      "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
+    notes: "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
     source: "Jeremy Daniels",
     videoUrl: "https://www.youtube.com/watch?v=9hI-RFziBz8",
     isTimeBased: false,
@@ -2898,7 +2896,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   },
   {
     id: "HC-221",
-    name: "Plank",
+    name: "High Plank",
     category: "CS",
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
@@ -2912,7 +2910,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   },
   {
     id: "HC-222",
-    name: "Plank To Dolphin Pose",
+    name: "High Plank To Dolphin Pose",
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
@@ -3129,8 +3127,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     expertiseLevel: "advanced",
     muscleGroups: ["Lateral Deltoids", "Traps"],
     defaultReps: "10",
-    notes:
-      "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
+    notes: "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
     source: "Team Training Day",
     videoUrl: "https://www.youtube.com/watch?v=WVczdS3d9nE",
     isTimeBased: false,

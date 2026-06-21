@@ -1130,7 +1130,7 @@ const catalogExercises: Exercise[] = [
   },
   {
     id: "CS-19",
-    name: "Plank Plus",
+    name: "Forearm Plank Plus",
     category: "CS",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
@@ -1216,7 +1216,7 @@ const catalogExercises: Exercise[] = [
   },
   {
     id: "CS-25",
-    name: "Plank Shoulder Taps",
+    name: "High Plank Shoulder Taps",
     category: "CS",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
@@ -1927,8 +1927,7 @@ const catalogExercises: Exercise[] = [
     expertiseLevel: "beginner",
     muscleGroups: ["Glutes", "Quadriceps"],
     defaultReps: "5",
-    notes:
-      "Squat, jump back to plank, push-up (knee), jump forward, stand. START LOW",
+    notes: "Squat, jump back to plank, push-up, jump forward, stand. START LOW",
     source: "Well+Good",
     videoUrl: "https://www.youtube.com/watch?v=qLBImHhCXSw",
     isTimeBased: false,
