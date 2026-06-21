@@ -7,8 +7,7 @@ import AnimatedSection from "@/components/common/AnimatedSection";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import AboutDeveloperSection from "@/components/settings/AboutDeveloperSection";
-import AndroidAppDownloadSection from "@/components/settings/AndroidAppDownloadSection";
-import NativeAppUpdateSection from "@/components/settings/NativeAppUpdateSection";
+import AppPlatformSettingsSections from "@/components/settings/AppPlatformSettingsSections";
 import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
 import SettingsFeedbackSection from "@/components/settings/SettingsFeedbackSection";
 import DiagnosticLogSection from "@/components/settings/DiagnosticLogSection";
@@ -543,10 +542,7 @@ export default function SettingsPage() {
         </AnimatedSection>
       )}
 
-      <AnimatedSection delay={0.05}>
-        <NativeAppUpdateSection />
-        <AndroidAppDownloadSection />
-      </AnimatedSection>
+      <AppPlatformSettingsSections />
 
       {diagnosticLogUnlocked ? (
         <AnimatedSection delay={0.05}>
