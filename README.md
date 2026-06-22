@@ -142,10 +142,6 @@ Android details: [docs/capacitor-android.md](docs/capacitor-android.md).
 
 Guest vs account: [docs/guest-vs-account.md](docs/guest-vs-account.md).
 
-## What's next
-
-See [ROADMAP.md](ROADMAP.md). **Backlog:** bundled offline Capacitor export, native version channel, catalog demo media, share workout via Web Share API.
-
 ## Project layout
 
 ```
@@ -175,7 +171,6 @@ public/          # PWA assets, downloads/myexercise.apk
 | [guest-vs-account.md](docs/guest-vs-account.md)       | Guest cookie vs signed-in sync              |
 | [catalog-maintenance.md](docs/catalog-maintenance.md) | Exercise catalog tooling                    |
 | [week-plan-regen.md](docs/week-plan-regen.md)         | When generated week plans refresh           |
-| [ROADMAP.md](ROADMAP.md)                              | Open work and shipped features              |
 
 ## Deploy
 
