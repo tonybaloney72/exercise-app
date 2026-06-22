@@ -17,6 +17,12 @@ describe("equipment migration", () => {
     ).toEqual(["bodyweight", "bicycle"]);
   });
 
+  it("expands legacy plyo_box to bench and sturdy chair", () => {
+    expect(
+      migrateAvailableEquipment(["bodyweight", "plyo_box"]),
+    ).toEqual(expect.arrayContaining(["bodyweight", "plyo_box", "bench", "sturdy_chair"]));
+  });
+
   it("drops unknown legacy equipment ids", () => {
     expect(
       migrateAvailableEquipment(["bodyweight", "foo" as never]),

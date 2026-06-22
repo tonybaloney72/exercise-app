@@ -9,7 +9,7 @@ import {
 import { migrateExerciseId } from "@/lib/cpToPcMigration";
 
 describe("exerciseIdConsolidation", () => {
-  it("maps deprecated ids to canonical targets", () => {
+    it("maps deprecated ids to canonical targets", () => {
     expect(migrateConsolidatedExerciseId("HC-241")).toBe("CR-4");
     expect(migrateConsolidatedExerciseId("SW-15")).toBe("CS-5");
     expect(migrateConsolidatedExerciseId("SW-20")).toBe("LB-1");
@@ -26,6 +26,7 @@ describe("exerciseIdConsolidation", () => {
     expect(migrateConsolidatedExerciseId("HC-216")).toBe("SW-23");
     expect(migrateConsolidatedExerciseId("HC-186")).toBe("SW-48");
     expect(migrateConsolidatedExerciseId("PC-12")).toBe("PC-31");
+    expect(migrateConsolidatedExerciseId("HC-139")).toBe("UP-5");
   });
 
   it("chains CP rename then consolidation", () => {

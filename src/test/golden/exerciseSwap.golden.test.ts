@@ -20,7 +20,21 @@ describe("exerciseSwap golden contract", () => {
     const ids = candidates.map((e) => e.id).sort();
     expect(ids).toMatchInlineSnapshot(`
       [
+        "HC-010",
+        "HC-014",
+        "HC-022",
+        "HC-024",
+        "HC-025",
+        "HC-027",
+        "HC-048",
+        "HC-049",
+        "HC-054",
+        "HC-055",
+        "HC-057",
         "HC-125",
+        "HC-126",
+        "HC-135",
+        "HC-138",
         "HC-184",
         "HC-220",
         "HC-222",

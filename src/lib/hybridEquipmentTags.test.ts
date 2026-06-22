@@ -10,13 +10,13 @@ describe("hybrid equipment tags", () => {
       "HC-127",
       "HC-135",
       "HC-138",
-      "HC-139",
       "HC-213",
       "HC-217",
       "HC-231",
       "HC-239",
       "HC-249",
       "HC-269",
+      "UP-5",
     ]) {
       const ex = exerciseMap[id];
       expect(ex, id).toBeDefined();
@@ -46,18 +46,26 @@ describe("hybrid equipment tags", () => {
     expect(exerciseMap["HC-217"]!.equipment).toEqual(["rings"]);
   });
 
-  it("tags dips as pull-up bar or bench/chair", () => {
+  it("tags parallel-bar dip as pull-up bar or rings", () => {
     expect(exerciseMap["HC-138"]!.equipment).toEqual([
       "pull_up_bar",
-      "plyo_box",
+      "rings",
     ]);
   });
 
-  it("tags upside down shrug as hang or bench/chair, not bodyweight-only", () => {
+  it("tags tricep dips as bench or sturdy chair", () => {
+    expect(exerciseMap["UP-5"]!.name).toBe("Tricep Dips");
+    expect(exerciseMap["UP-5"]!.equipment).toEqual([
+      "sturdy_chair",
+      "bench",
+    ]);
+  });
+
+  it("tags upside down shrug as hang or bench, not bodyweight-only", () => {
     expect(exerciseMap["HC-269"]!.equipment).toEqual([
       "pull_up_bar",
       "rings",
-      "plyo_box",
+      "bench",
     ]);
   });
 

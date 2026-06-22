@@ -15,9 +15,9 @@ import type { WeightLogEntry } from "@/types";
 const RANGE_PRESET_KEY = "exercise-app-weight-range-preset";
 
 function readStoredRangePreset(): WeightRangePresetId {
-  if (typeof window === "undefined") return "6mo";
+  if (typeof window === "undefined") return "3mo";
   const stored = localStorage.getItem(RANGE_PRESET_KEY);
-  return stored && isWeightRangePresetId(stored) ? stored : "6mo";
+  return stored && isWeightRangePresetId(stored) ? stored : "3mo";
 }
 
 interface WeightState {

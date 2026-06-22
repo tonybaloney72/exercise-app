@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
-import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+import { migrateAvailableEquipment } from "@/data/equipment";
 import { materializeTrainingWeek } from "@/lib/planGenerator";
 import { buildProgramProfileInputFromSettings } from "@/lib/programProfile";
 import type { WeekBlueprint } from "@/lib/weekBlueprint";
@@ -70,7 +70,12 @@ describe("guided week materialization (user layout)", () => {
   const week = materializeTrainingWeek(
     buildCatalogWeek(),
     {},
-    [...DEFAULT_AVAILABLE_EQUIPMENT],
+    migrateAvailableEquipment([
+      "bodyweight",
+      "plyo_box",
+      "pull_up_bar",
+      "resistance_band",
+    ]),
     "balanced",
     "standard",
     undefined,
@@ -134,7 +139,12 @@ describe("guided week materialization (user layout)", () => {
     const week = materializeTrainingWeek(
       buildCatalogWeek(),
       {},
-      [...DEFAULT_AVAILABLE_EQUIPMENT],
+      migrateAvailableEquipment([
+        "bodyweight",
+        "plyo_box",
+        "pull_up_bar",
+        "resistance_band",
+      ]),
       "balanced",
       "standard",
       undefined,

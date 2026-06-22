@@ -10,7 +10,9 @@ export const ALL_EXERCISE_EQUIPMENT: ExerciseEquipment[] = [
   "machine",
   "cable",
   "medicine_ball",
+  "bench",
   "plyo_box",
+  "sturdy_chair",
   "stability_ball",
   "pull_up_bar",
   "bicycle",
@@ -31,7 +33,9 @@ export const EQUIPMENT_LABELS: Record<ExerciseEquipment, string> = {
   machine: "Machines",
   cable: "Cables",
   medicine_ball: "Medicine ball",
-  plyo_box: "Bench / box / sturdy chair or couch",
+  bench: "Bench",
+  plyo_box: "Plyo box",
+  sturdy_chair: "Sturdy chair",
   stability_ball: "Stability ball / Bosu",
   pull_up_bar: "Pull-up bar",
   bicycle: "Bicycle",
@@ -49,6 +53,19 @@ const LEGACY_EQUIPMENT_ALIASES: Record<string, ExerciseEquipment[]> = {
   outdoor_bicycle: ["bicycle"],
 };
 
+/**
+ * The old settings checkbox stored one `plyo_box` value for bench, box, and chair.
+ * Expand on load so existing users keep the same exercise availability.
+ */
+function expandLegacyPlyoBoxSelection(
+  equipment: Set<ExerciseEquipment>,
+): void {
+  if (equipment.has("plyo_box")) {
+    equipment.add("bench");
+    equipment.add("sturdy_chair");
+  }
+}
+
 export function migrateAvailableEquipment(
   raw: ExerciseEquipment[] | undefined,
 ): ExerciseEquipment[] {
@@ -63,6 +80,7 @@ export function migrateAvailableEquipment(
     }
     if (ALL_EXERCISE_EQUIPMENT.includes(item)) out.add(item);
   }
+  expandLegacyPlyoBoxSelection(out);
   return [...out];
 }
 

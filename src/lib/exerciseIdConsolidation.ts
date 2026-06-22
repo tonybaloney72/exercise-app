@@ -58,6 +58,7 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   // P3 - stretch/workout duplicates (May 2026)
   "HC-216": "SW-23",
   "HC-186": "SW-48",
+  "HC-139": "UP-5",
   "PC-12": "PC-31",
 };
 
@@ -98,6 +99,7 @@ export const REMOVED_HYBRID_EXERCISE_IDS = new Set<string>([
   "HC-137",
   "HC-216",
   "HC-186",
+  "HC-139",
 ]);
 
 /** Catalog stretch ids removed (workout id kept). */

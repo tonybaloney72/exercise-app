@@ -88,10 +88,10 @@ describe("equipment-heuristic", () => {
   it("maps jefferson curl variants and face pull bands/cable", () => {
     expect(
       expectedEquipmentForExercise({ name: "Jefferson Curl", notes: "" }),
-    ).toEqual(["plyo_box"]);
+    ).toEqual(["bench", "plyo_box"]);
     expect(
       expectedEquipmentForExercise({ name: "Weighted Jefferson Curl", notes: "" }),
-    ).toEqual(["barbell", "dumbbell", "kettlebell", "plyo_box"]);
+    ).toEqual(["barbell", "bench", "dumbbell", "kettlebell", "plyo_box"]);
     expect(
       expectedEquipmentForExercise({ name: "Face Pull", notes: "" }),
     ).toEqual(["cable", "resistance_band"]);

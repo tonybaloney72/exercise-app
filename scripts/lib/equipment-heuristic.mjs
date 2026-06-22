@@ -53,10 +53,10 @@ function equipmentFromNamedMove(name) {
     return ["dumbbell", "kettlebell"];
   }
   if (/\bweighted\s+(jefferson|zercher)\s+curl\b/i.test(n)) {
-    return ["barbell", "dumbbell", "kettlebell", "plyo_box"];
+    return ["barbell", "dumbbell", "kettlebell", "bench", "plyo_box"];
   }
   if (/\b(jefferson|zercher)\s+curl\b/i.test(n)) {
-    return ["bodyweight", "plyo_box"];
+    return ["bodyweight", "bench", "plyo_box"];
   }
   if (/\bface\s+pull\b/i.test(n)) return ["cable", "resistance_band"];
   if (/\b(jefferson|zercher)\s+squat\b/i.test(n)) return ["barbell"];
@@ -82,6 +82,8 @@ const NOTE_EQUIPMENT_PATTERNS = [
   [/\bmedicine\s+balls?\b/i, "medicine_ball"],
   [/\bmed\s+balls?\b/i, "medicine_ball"],
   [/\bplyo(?:metric)?\s+box\b/i, "plyo_box"],
+  [/\bsturdy\s+chair\b/i, "sturdy_chair"],
+  [/\b(?:flat\s+)?bench\b/i, "bench"],
   [/\bstability\s+balls?\b/i, "stability_ball"],
   [/\bswiss\s+balls?\b/i, "stability_ball"],
   [/\b(?:gymnastic\s+)?rings?\b/i, "rings"],
@@ -97,7 +99,10 @@ function inferEquipmentFromNotes(notes) {
   if (!notes) return [];
   const found = new Set();
   for (const [re, tag] of NOTE_EQUIPMENT_PATTERNS) {
-    if (re.test(notes)) found.add(tag);
+    if (re.test(notes)) {
+      if (tag === "bench" && /\broman\s+chair\b/i.test(notes)) continue;
+      found.add(tag);
+    }
   }
   return [...found].sort();
 }

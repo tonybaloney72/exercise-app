@@ -1,5 +1,5 @@
 import { buildCatalogWeek } from "@/data/trainingWeekCatalog";
-import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+import { migrateAvailableEquipment } from "@/data/equipment";
 import { materializeTrainingWeek } from "@/lib/planGenerator";
 import type { ExercisePreferenceMap, TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan, WorkoutLog } from "@/types";
@@ -7,7 +7,13 @@ import type { DayPlan, WorkoutLog } from "@/types";
 /** Fixed variety seed for Phase 4 behavior-contract goldens. Bump intentionally when catalog changes. */
 export const GOLDEN_VARIETY_SEED = "golden-phase4-v1";
 
-export const GOLDEN_EQUIPMENT = [...DEFAULT_AVAILABLE_EQUIPMENT];
+/** Typical home setup for golden contracts (legacy plyo_box expands to bench + chair). */
+export const GOLDEN_EQUIPMENT = migrateAvailableEquipment([
+  "bodyweight",
+  "plyo_box",
+  "pull_up_bar",
+  "resistance_band",
+]);
 export const GOLDEN_EMPTY_PREFS: ExercisePreferenceMap = {};
 
 export function materializeGoldenBalancedWeek(): TrainingWeekDays {

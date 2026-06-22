@@ -518,14 +518,17 @@ const PULL_UP_BAR_MULTI = {
 
 /** Bench, box, or sturdy chair/couch for anchoring or elevation. */
 const PLYO_BOX_NAMES = new Set([
-  "Copenhagen Plank",
   "Decline Pushup",
-  "Nordic Curl",
-  "Reverse Nordic",
   "Sissy Squat",
 ]);
 
-const DIP_NAMES = new Set(["Dip", "Dips"]);
+const BENCH_NAMES = new Set([
+  "Copenhagen Plank",
+  "Nordic Curl",
+  "Reverse Nordic",
+]);
+
+const DIP_NAMES = new Set(["Dip"]);
 
 /** Inverted hang or box/chair shrug - not floor-only bodyweight. */
 const INVERTED_SHRUG_NAMES = new Set(["Upside Down Shrug"]);
@@ -536,10 +539,13 @@ const RINGS_BODYWEIGHT_NAMES = new Set(["Pelican Curl"]);
 function inferEquipmentList(name, baseEquip) {
   if (PULL_UP_BAR_MULTI[name]) return PULL_UP_BAR_MULTI[name];
   if (baseEquip === "bodyweight" && DIP_NAMES.has(name)) {
-    return ["pull_up_bar", "plyo_box"];
+    return ["pull_up_bar", "rings"];
+  }
+  if (baseEquip === "bodyweight" && BENCH_NAMES.has(name)) {
+    return ["bench"];
   }
   if (baseEquip === "bodyweight" && PLYO_BOX_NAMES.has(name)) {
-    return ["plyo_box"];
+    return ["bench", "plyo_box"];
   }
   if (baseEquip === "bodyweight" && RINGS_BODYWEIGHT_NAMES.has(name)) {
     return ["rings"];
@@ -551,7 +557,7 @@ function inferEquipmentList(name, baseEquip) {
     return ["pull_up_bar"];
   }
   if (baseEquip === "bodyweight" && INVERTED_SHRUG_NAMES.has(name)) {
-    return ["pull_up_bar", "rings", "plyo_box"];
+    return ["pull_up_bar", "rings", "bench"];
   }
   return [baseEquip];
 }

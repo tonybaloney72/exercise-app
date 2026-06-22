@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+import { DEFAULT_AVAILABLE_EQUIPMENT, migrateAvailableEquipment } from "@/data/equipment";
 import { getReplacementCandidates } from "@/lib/exerciseCandidates";
 
 describe("getReplacementCandidates", () => {
@@ -34,7 +34,7 @@ describe("getReplacementCandidates", () => {
     const candidates = getReplacementCandidates({
       category: "CS",
       excludeExerciseIds: new Set(),
-      availableEquipment: ["bodyweight", "plyo_box"],
+      availableEquipment: migrateAvailableEquipment(["bodyweight", "plyo_box"]),
     });
     expect(candidates.some((e) => e.id === "HC-229")).toBe(true);
   });
