@@ -351,6 +351,14 @@ interface WorkoutState {
     exerciseId: string,
     seconds: number | undefined,
   ) => void;
+  setWarmUpStretchActualReps: (
+    exerciseId: string,
+    reps: number | undefined,
+  ) => void;
+  setCoolDownStretchActualReps: (
+    exerciseId: string,
+    reps: number | undefined,
+  ) => void;
   setWorkoutNotes: (notes: string) => void;
   completeWorkout: () => Promise<WorkoutLog | null>;
   discardWorkout: () => void;
@@ -1570,6 +1578,28 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         state.activeWorkout.coolDownExercises,
         exerciseId,
         (ex) => ({ ...ex, actualDuration: seconds ?? undefined }),
+      );
+      return { activeWorkout: { ...state.activeWorkout, coolDownExercises } };
+    }),
+
+  setWarmUpStretchActualReps: (exerciseId, reps) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const warmUpExercises = mapStretchLogs(
+        state.activeWorkout.warmUpExercises,
+        exerciseId,
+        (ex) => ({ ...ex, actualReps: reps ?? undefined }),
+      );
+      return { activeWorkout: { ...state.activeWorkout, warmUpExercises } };
+    }),
+
+  setCoolDownStretchActualReps: (exerciseId, reps) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const coolDownExercises = mapStretchLogs(
+        state.activeWorkout.coolDownExercises,
+        exerciseId,
+        (ex) => ({ ...ex, actualReps: reps ?? undefined }),
       );
       return { activeWorkout: { ...state.activeWorkout, coolDownExercises } };
     }),

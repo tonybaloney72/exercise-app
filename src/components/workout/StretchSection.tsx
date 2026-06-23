@@ -11,6 +11,7 @@ import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStor
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
+import SetTimerPill from "./SetTimerPill";
 import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
 import {
   MenuIconDislike,
@@ -28,6 +29,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { exerciseVideoLinkLabel } from "@/lib/exerciseVideoLink";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
+  parseRepTargetHint,
   resolveExerciseSettings,
   resolveStretchTimerTargetSeconds,
 } from "@/utils/effectiveExerciseSettings";
@@ -48,6 +50,10 @@ interface StretchSectionProps {
     exerciseId: string,
     seconds: number | undefined,
   ) => void;
+  onSetActualReps: (
+    exerciseId: string,
+    reps: number | undefined,
+  ) => void;
   onAddStretch?: () => void;
   onRemoveStretch?: (exerciseId: string) => void;
 }
@@ -63,6 +69,7 @@ export default function StretchSection({
   onSwap,
   onSetTargetDuration,
   onSetActualDuration,
+  onSetActualReps,
   onAddStretch,
   onRemoveStretch,
 }: StretchSectionProps) {
@@ -180,6 +187,9 @@ export default function StretchSection({
                     onSetActualDuration={(sec) =>
                       onSetActualDuration(stretch.exerciseId, sec)
                     }
+                    onSetActualReps={(reps) =>
+                      onSetActualReps(stretch.exerciseId, reps)
+                    }
                     onRemoveFromWorkout={
                       onRemoveStretch
                         ? () => onRemoveStretch(stretch.exerciseId)
@@ -208,6 +218,7 @@ interface StretchRowProps {
   onSwap?: (fromExerciseId: string, toExerciseId: string) => void;
   onSetTargetDuration: (seconds: number) => void;
   onSetActualDuration: (seconds: number | undefined) => void;
+  onSetActualReps: (reps: number | undefined) => void;
   onRemoveFromWorkout?: () => void;
 }
 
@@ -223,6 +234,7 @@ function StretchRow({
   onSwap,
   onSetTargetDuration,
   onSetActualDuration,
+  onSetActualReps,
   onRemoveFromWorkout,
 }: StretchRowProps) {
   const [expanded, setExpanded] = useState(false);
@@ -285,9 +297,19 @@ function StretchRow({
   }, [exercise, mode, targetReps, effectiveTargetSec, stored]);
 
   const didLine =
-    mode === "timer" && log.actualDuration != null
-      ? ` → did ${formatLoggedDuration(log.actualDuration)}`
-      : "";
+    mode === "reps" && log.actualReps != null
+      ? ` → did ${log.actualReps}`
+      : mode === "timer" && log.actualDuration != null
+        ? ` → did ${formatLoggedDuration(log.actualDuration)}`
+        : "";
+
+  const repsPlaceholder = useMemo(() => {
+    if (!exercise || mode !== "reps") return "-";
+    const r = resolveExerciseSettings(exercise, stored);
+    if (r.defaultTargetReps != null) return String(r.defaultTargetReps);
+    const hint = parseRepTargetHint(targetReps);
+    return hint != null ? String(hint) : "-";
+  }, [exercise, mode, stored, targetReps]);
 
   if (!exercise) return null;
 
@@ -349,11 +371,95 @@ function StretchRow({
     });
   }
 
-  const showTimerPill =
-    mode === "timer" && !log.completed && !log.skipped;
-  const detailText = showTimerPill
-    ? didLine.replace(/^\s*→\s*/, "").trim() || null
-    : `${prescriptionLine}${didLine}`.trim() || null;
+  const showInlineCompleted =
+    !log.skipped && (mode === "reps" || mode === "timer");
+
+  const detailText =
+    showInlineCompleted && mode === "reps"
+      ? prescriptionLine.trim() || null
+      : !showInlineCompleted
+        ? `${prescriptionLine}${didLine}`.trim() || null
+        : null;
+
+  const detailLeading =
+    showInlineCompleted && mode === "timer" ? (
+      !log.completed ? (
+        <SetTimerPill
+          seconds={effectiveTargetSec}
+          title={`Start stretch timer (${effectiveTargetSec}s)`}
+        />
+      ) : (
+        <p className="text-xs leading-snug text-muted tabular-nums">
+          {effectiveTargetSec}s
+        </p>
+      )
+    ) : null;
+
+  const completedFieldId = `completed-stretch-${exerciseId}`;
+
+  const inlineCompletedInput = showInlineCompleted ? (
+    <div className="flex items-center gap-1.5">
+      <label htmlFor={completedFieldId} className="text-xs text-muted">
+        Did
+      </label>
+      <input
+        id={completedFieldId}
+        type="text"
+        inputMode="numeric"
+        value={
+          mode === "reps"
+            ? log.actualReps != null
+              ? String(log.actualReps)
+              : ""
+            : log.actualDuration != null
+              ? String(log.actualDuration)
+              : ""
+        }
+        onChange={(e) => {
+          const val = e.target.value.trim();
+          if (val === "") {
+            if (mode === "reps") {
+              onSetActualReps(undefined);
+            } else {
+              onSetActualDuration(undefined);
+            }
+            return;
+          }
+          if (!/^\d+$/.test(val)) return;
+          const num = parseInt(val, 10);
+          if (Number.isNaN(num)) return;
+          if (mode === "reps") {
+            onSetActualReps(num);
+          } else {
+            onSetActualDuration(num);
+          }
+        }}
+        className={`w-14 rounded-md border border-border bg-background px-2 py-0.5 text-right text-sm text-foreground outline-none focus:border-accent ${
+          mode === "timer" ? "font-mono" : ""
+        }`}
+        placeholder={
+          mode === "reps" ? repsPlaceholder : String(effectiveTargetSec)
+        }
+        aria-label={
+          mode === "reps" ? "Completed reps" : "Completed duration in seconds"
+        }
+      />
+    </div>
+  ) : null;
+
+  const completionCheckbox = (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
+      style={{
+        borderColor: log.completed ? "var(--accent)" : "var(--border-color)",
+        backgroundColor: log.completed ? "var(--accent)" : "transparent",
+      }}
+    >
+      {log.completed ? <CompletionCheckmark /> : null}
+    </button>
+  );
 
   return (
     <div className={`transition-colors ${log.skipped ? "opacity-40" : ""}`}>
@@ -379,20 +485,9 @@ function StretchRow({
           onClearSwap={() => {}}
         />
       ) : null}
-      <div className="flex items-start gap-2 px-1">
-        <button
-          type="button"
-          onClick={onToggle}
-          className="mt-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
-          style={{
-            borderColor: log.completed ? "var(--accent)" : "var(--border-color)",
-            backgroundColor: log.completed ? "var(--accent)" : "transparent",
-          }}
-        >
-          {log.completed ? <CompletionCheckmark /> : null}
-        </button>
-
+      <div className="px-1">
         <WorkoutRowMetaLine
+          leading={completionCheckbox}
           name={exercise.name}
           nameClassName={
             log.completed || log.skipped
@@ -404,9 +499,8 @@ function StretchRow({
           onToggleExpand={() => setExpanded(!expanded)}
           menuItems={overflowItems}
           detailText={detailText}
-          showTimerPill={showTimerPill}
-          timerSeconds={effectiveTargetSec}
-          timerTitle={`Start stretch timer (${effectiveTargetSec}s)`}
+          detailLeading={detailLeading}
+          detailTrailing={inlineCompletedInput}
         />
       </div>
 
@@ -429,37 +523,6 @@ function StretchRow({
                   onPreset={onSetTargetDuration}
                   onCommitCustom={onSetTargetDuration}
                 />
-              )}
-
-              {mode === "timer" && (
-                <div className="flex items-center gap-2">
-                  <label className="text-xs text-muted shrink-0">
-                    Actual duration (optional)
-                  </label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={
-                      log.actualDuration != null
-                        ? String(log.actualDuration)
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const v = e.target.value.trim();
-                      if (v === "") {
-                        onSetActualDuration(undefined);
-                        return;
-                      }
-                      if (!/^\d+$/.test(v)) return;
-                      const n = parseInt(v, 10);
-                      if (!Number.isNaN(n)) {
-                        onSetActualDuration(n);
-                      }
-                    }}
-                    placeholder={String(effectiveTargetSec)}
-                    className="w-20 rounded-md border border-border bg-background px-2 py-1 font-mono text-sm text-foreground outline-none focus:border-accent"
-                  />
-                </div>
               )}
 
               {exercise.videoUrl && (

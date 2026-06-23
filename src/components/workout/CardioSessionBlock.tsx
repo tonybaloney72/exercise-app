@@ -6,7 +6,11 @@ import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
 import WorkoutRowOverflowMenu, {
   type WorkoutRowMenuItem,
 } from "./WorkoutRowOverflowMenu";
-import { MenuIconRemove, MenuIconSkip, MenuIconUndoSkip } from "./WorkoutRowMenuIcons";
+import {
+  MenuIconRemove,
+  MenuIconSkip,
+  MenuIconUndoSkip,
+} from "./WorkoutRowMenuIcons";
 import { formatCardioHealthSummary } from "@/lib/health";
 import type { ExerciseLog } from "@/types";
 
@@ -62,9 +66,7 @@ export default function CardioSessionBlock({
   }
 
   return (
-    <section
-      className={`rounded-lg border border-border/60 bg-background/40 ${log.skipped ? "opacity-40" : ""}`}
-    >
+    <section>
       <span className="flex items-center gap-2 px-2 py-2">
         <button
           type="button"
@@ -91,7 +93,6 @@ export default function CardioSessionBlock({
           >
             {title}
           </p>
-          <p className="text-xs text-muted">Distance + time</p>
         </span>
         {overflowItems.length > 0 ? (
           <WorkoutRowOverflowMenu items={overflowItems} />
@@ -111,7 +112,9 @@ export default function CardioSessionBlock({
             }
             onFocus={() =>
               setDistanceInput(
-                log.actualDistanceMi != null ? String(log.actualDistanceMi) : "",
+                log.actualDistanceMi != null
+                  ? String(log.actualDistanceMi)
+                  : "",
               )
             }
             onChange={(e) => setDistanceInput(e.target.value)}

@@ -57,6 +57,8 @@ export default function WorkoutSession({
     setCoolDownStretchTargetDuration,
     setWarmUpStretchActualDuration,
     setCoolDownStretchActualDuration,
+    setWarmUpStretchActualReps,
+    setCoolDownStretchActualReps,
     syncStretchTargetsFromLibrary,
     setWorkoutNotes,
     completeWorkout,
@@ -217,6 +219,7 @@ export default function WorkoutSession({
           onSwap={isEditing ? undefined : swapWarmUpStretch}
           onSetTargetDuration={setWarmUpStretchTargetDuration}
           onSetActualDuration={setWarmUpStretchActualDuration}
+          onSetActualReps={setWarmUpStretchActualReps}
           onAddStretch={() => setPickTarget({ kind: "addWarmUp" })}
           onRemoveStretch={removeWarmUpStretchFromWorkout}
         />
@@ -296,6 +299,7 @@ export default function WorkoutSession({
           onSwap={isEditing ? undefined : swapCoolDownStretch}
           onSetTargetDuration={setCoolDownStretchTargetDuration}
           onSetActualDuration={setCoolDownStretchActualDuration}
+          onSetActualReps={setCoolDownStretchActualReps}
           onAddStretch={() => setPickTarget({ kind: "addCoolDown" })}
           onRemoveStretch={removeCoolDownStretchFromWorkout}
         />

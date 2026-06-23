@@ -29,8 +29,17 @@ import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import SwapExerciseModal from "./SwapExerciseModal";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
+import SetTimerPill from "./SetTimerPill";
 import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
-import { MenuIconDislike, MenuIconRemove, MenuIconReport, MenuIconSkip, MenuIconStar, MenuIconSwap, MenuIconUndoSkip } from "./WorkoutRowMenuIcons";
+import {
+  MenuIconDislike,
+  MenuIconRemove,
+  MenuIconReport,
+  MenuIconSkip,
+  MenuIconStar,
+  MenuIconSwap,
+  MenuIconUndoSkip,
+} from "./WorkoutRowMenuIcons";
 import ExerciseReportSheet from "@/components/feedback/ExerciseReportSheet";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 
@@ -243,32 +252,104 @@ export default function ExerciseRow({
     });
   }
 
-  const showTimerPill = mode === "timer" && !log.completed && !log.skipped;
-  const detailText = showTimerPill
-    ? didLine.replace(/^\s*→\s*/, "").trim() || null
-    : `${prescriptionLine}${didLine}`.trim() || null;
+  const showInlineCompleted =
+    !log.skipped && (mode === "reps" || mode === "timer");
+
+  const detailText =
+    showInlineCompleted && mode === "reps"
+      ? prescriptionLine.trim() || null
+      : !showInlineCompleted
+        ? `${prescriptionLine}${didLine}`.trim() || null
+        : null;
+
+  const detailLeading =
+    showInlineCompleted && mode === "timer" ? (
+      !log.completed ? (
+        <SetTimerPill
+          seconds={effectiveTargetSec}
+          title={`Start set timer (${effectiveTargetSec}s)`}
+        />
+      ) : (
+        <p className="text-xs leading-snug text-muted tabular-nums">
+          {effectiveTargetSec}s
+        </p>
+      )
+    ) : null;
+
+  const completedFieldId = `completed-${roundNumber}-${plannedId}`;
+
+  const inlineCompletedInput = showInlineCompleted ? (
+    <div className="flex items-center gap-1.5">
+      <label htmlFor={completedFieldId} className="text-xs text-muted">
+        Did
+      </label>
+      <input
+        id={completedFieldId}
+        type="text"
+        inputMode="numeric"
+        value={
+          mode === "reps"
+            ? log.actualReps != null
+              ? String(log.actualReps)
+              : ""
+            : log.actualDuration != null
+              ? String(log.actualDuration)
+              : ""
+        }
+        onChange={(e) => {
+          const val = e.target.value.trim();
+          if (val === "") {
+            if (mode === "reps") {
+              setActualReps(roundNumber, plannedId, undefined);
+            } else {
+              setActualDuration(roundNumber, plannedId, undefined);
+            }
+            return;
+          }
+          if (!/^\d+$/.test(val)) return;
+          const num = parseInt(val, 10);
+          if (Number.isNaN(num)) return;
+          if (mode === "reps") {
+            setActualReps(roundNumber, plannedId, num);
+          } else {
+            setActualDuration(roundNumber, plannedId, num);
+          }
+        }}
+        className={`w-14 rounded-md border border-border bg-background px-2 py-0.5 text-right text-sm text-foreground outline-none focus:border-accent ${
+          mode === "timer" ? "font-mono" : ""
+        }`}
+        placeholder={
+          mode === "reps" ? actualRepsPlaceholder : String(effectiveTargetSec)
+        }
+        aria-label={
+          mode === "reps" ? "Completed reps" : "Completed duration in seconds"
+        }
+      />
+    </div>
+  ) : null;
+
+  const completionCheckbox = (
+    <button
+      type="button"
+      onClick={() => {
+        if (!log.completed && !log.skipped) vibrateOnExerciseComplete();
+        toggleExercise(roundNumber, plannedId);
+      }}
+      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
+      style={{
+        borderColor: log.completed ? "var(--accent)" : "var(--border-color)",
+        backgroundColor: log.completed ? "var(--accent)" : "transparent",
+      }}
+    >
+      {log.completed ? <CompletionCheckmark /> : null}
+    </button>
+  );
 
   return (
     <div className={`transition-colors ${log.skipped ? "opacity-40" : ""}`}>
-      <div className="flex items-start gap-2 px-1">
-        <button
-          type="button"
-          onClick={() => {
-            if (!log.completed && !log.skipped) vibrateOnExerciseComplete();
-            toggleExercise(roundNumber, plannedId);
-          }}
-          className="mt-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
-          style={{
-            borderColor: log.completed
-              ? "var(--accent)"
-              : "var(--border-color)",
-            backgroundColor: log.completed ? "var(--accent)" : "transparent",
-          }}
-        >
-          {log.completed ? <CompletionCheckmark /> : null}
-        </button>
-
+      <div className="px-1">
         <WorkoutRowMetaLine
+          leading={completionCheckbox}
           name={effectiveExercise.name}
           nameClassName={
             log.completed ? "text-muted line-through" : "text-foreground"
@@ -285,8 +366,8 @@ export default function ExerciseRow({
           onToggleExpand={() => setExpanded(!expanded)}
           menuItems={overflowItems}
           detailText={detailText}
-          showTimerPill={showTimerPill}
-          timerSeconds={effectiveTargetSec}
+          detailLeading={detailLeading}
+          detailTrailing={inlineCompletedInput}
         />
       </div>
 
@@ -372,73 +453,17 @@ export default function ExerciseRow({
                 </div>
               </div>
 
-              {mode === "reps" && (
-                <div className="flex items-center gap-2">
-                  <label className="text-xs text-muted">Actual reps:</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={log.actualReps != null ? String(log.actualReps) : ""}
-                    onChange={(e) => {
-                      const val = e.target.value.trim();
-                      if (val === "") {
-                        setActualReps(roundNumber, plannedId, undefined);
-                        return;
-                      }
-                      if (!/^\d+$/.test(val)) return;
-                      const num = parseInt(val, 10);
-                      if (!isNaN(num)) {
-                        setActualReps(roundNumber, plannedId, num);
-                      }
-                    }}
-                    className="w-16 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground outline-none focus:border-accent"
-                    placeholder={actualRepsPlaceholder}
-                  />
-                </div>
-              )}
-
               {mode === "timer" && (
-                <div className="flex flex-col gap-3">
-                  <TimerTargetControls
-                    effectiveSeconds={effectiveTargetSec}
-                    storedTargetSeconds={log.targetDurationSeconds}
-                    onPreset={(sec) =>
-                      setTargetDuration(roundNumber, plannedId, sec)
-                    }
-                    onCommitCustom={(sec) =>
-                      setTargetDuration(roundNumber, plannedId, sec)
-                    }
-                  />
-
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs text-muted shrink-0">
-                      Actual duration (optional)
-                    </label>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={
-                        log.actualDuration != null
-                          ? String(log.actualDuration)
-                          : ""
-                      }
-                      onChange={(e) => {
-                        const v = e.target.value.trim();
-                        if (v === "") {
-                          setActualDuration(roundNumber, plannedId, undefined);
-                          return;
-                        }
-                        if (!/^\d+$/.test(v)) return;
-                        const n = parseInt(v, 10);
-                        if (!Number.isNaN(n)) {
-                          setActualDuration(roundNumber, plannedId, n);
-                        }
-                      }}
-                      className="w-20 rounded-md border border-border bg-background px-2 py-1 font-mono text-sm text-foreground outline-none focus:border-accent"
-                      placeholder={String(effectiveTargetSec)}
-                    />
-                  </div>
-                </div>
+                <TimerTargetControls
+                  effectiveSeconds={effectiveTargetSec}
+                  storedTargetSeconds={log.targetDurationSeconds}
+                  onPreset={(sec) =>
+                    setTargetDuration(roundNumber, plannedId, sec)
+                  }
+                  onCommitCustom={(sec) =>
+                    setTargetDuration(roundNumber, plannedId, sec)
+                  }
+                />
               )}
 
               {effectiveExercise.videoUrl && (
