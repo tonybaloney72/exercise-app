@@ -113,6 +113,22 @@ export function findInProgressWorkoutForDate(
   );
 }
 
+/** In-progress log for a day from history or the live session (not yet upserted). */
+export function findInProgressWorkoutForDateIncludingActive(
+  workoutHistory: WorkoutLog[],
+  dateKey: string,
+  activeWorkout: WorkoutLog | null,
+): WorkoutLog | null {
+  if (
+    activeWorkout &&
+    activeWorkout.endTime == null &&
+    activeWorkout.date === dateKey
+  ) {
+    return activeWorkout;
+  }
+  return findInProgressWorkoutForDate(workoutHistory, dateKey);
+}
+
 /** Calendar date of the paused in-progress workout for today only (excludes stale prior-day sessions). */
 export function getPausedWorkoutDateForToday(
   workoutHistory: WorkoutLog[],

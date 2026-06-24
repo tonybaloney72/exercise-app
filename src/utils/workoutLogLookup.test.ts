@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { WorkoutLog } from "@/types";
 import {
   filterWorkoutsForCardioProgress,
+  findInProgressWorkoutForDateIncludingActive,
   isCardioOnlyQuickLogWorkout,
   workoutsForCardioProgressCharts,
 } from "@/utils/workoutLogLookup";
@@ -30,6 +31,15 @@ function inProgressWalkLog(): WorkoutLog {
     startTime: "2026-05-18T12:00:00.000Z",
   };
 }
+
+describe("findInProgressWorkoutForDateIncludingActive", () => {
+  it("prefers the live session when history has not caught up yet", () => {
+    const active = inProgressWalkLog();
+    expect(
+      findInProgressWorkoutForDateIncludingActive([], "2026-05-18", active),
+    ).toBe(active);
+  });
+});
 
 describe("isCardioOnlyQuickLogWorkout", () => {
   it("detects completed cardio-only quick logs", () => {

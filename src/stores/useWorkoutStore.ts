@@ -96,9 +96,11 @@ import {
   pauseStaleInProgressLogs,
   isStaleSessionDate,
 } from "@/lib/workoutSessionStale";
+import { withWorkoutSessionStartLock } from "@/lib/workoutSessionStartLock";
 import {
   findCompletedWorkoutForDate,
   findInProgressWorkoutForDate,
+  findInProgressWorkoutForDateIncludingActive,
   finalizeCardioOnlyQuickLogWorkout,
   finalizeCardioOnlyQuickLogsInHistory,
   getPausedWorkoutDateForToday,
@@ -489,71 +491,107 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     dayOfWeek: number,
     weekAnchorDateKey?: string,
   ) => {
-    const state = get();
-    const authMode = useAuthStore.getState().mode;
-    const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(
-      plan,
-      stretchContextForWorkoutStart(weekAnchorDateKey),
-      {
-        weekAnchorDateKey,
-        authMode,
-        loadWeek: loadTrainingWeekForStretches,
-      },
-    );
+    await withWorkoutSessionStartLock(dateKey, async () => {
+      const authMode = useAuthStore.getState().mode;
+      const { warmUp, coolDown } = await resolveStretchesForWorkoutStart(
+        plan,
+        stretchContextForWorkoutStart(weekAnchorDateKey),
+        {
+          weekAnchorDateKey,
+          authMode,
+          loadWeek: loadTrainingWeekForStretches,
+        },
+      );
 
-    const preservePausedDate =
-      state.pausedWorkoutDate && state.pausedWorkoutDate !== dateKey
-        ? state.pausedWorkoutDate
-        : null;
+      const state = get();
+      const preservePausedDate =
+        state.pausedWorkoutDate && state.pausedWorkoutDate !== dateKey
+          ? state.pausedWorkoutDate
+          : null;
 
-    const completedCardioOnly = findCompletedWorkoutForDate(
-      state.workoutHistory,
-      dateKey,
-    );
-    if (
-      completedCardioOnly &&
-      isCardioOnlyQuickLogWorkout(completedCardioOnly)
-    ) {
-      const log = hydrateWorkoutLog({
-        ...completedCardioOnly,
-        endTime: undefined,
-        paused: false,
-        startTime: startTimeIso,
-        warmUpExercises: warmUp.map(buildStretchExerciseLog),
-        coolDownExercises: coolDown.map(buildStretchExerciseLog),
-        rounds: buildEmptyRoundLogs(plan),
-        warmUpCompleted: false,
-        coolDownCompleted: false,
-      });
-      const mode = useAuthStore.getState().mode;
-      set({
-        pausedWorkoutDate: preservePausedDate,
-        activeWorkout: log,
-        ...(mode === "authenticated"
-          ? { workoutHistory: upsertWorkoutInHistory(state.workoutHistory, log) }
-          : {}),
-      });
-      if (mode === "authenticated") {
-        void flushPersistInProgressWorkout(log, { paused: false });
-      }
-      return;
-    }
-
-    const existing = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
-    if (existing) {
-      let log = hydrateWorkoutLog({ ...existing, paused: false });
-      if (log.warmUpExercises.length === 0 && warmUp.length > 0) {
-        log = hydrateWorkoutLog({
-          ...log,
+      const completedCardioOnly = findCompletedWorkoutForDate(
+        state.workoutHistory,
+        dateKey,
+      );
+      if (
+        completedCardioOnly &&
+        isCardioOnlyQuickLogWorkout(completedCardioOnly)
+      ) {
+        const log = hydrateWorkoutLog({
+          ...completedCardioOnly,
+          endTime: undefined,
+          paused: false,
+          startTime: startTimeIso,
           warmUpExercises: warmUp.map(buildStretchExerciseLog),
-        });
-      }
-      if (log.coolDownExercises.length === 0 && coolDown.length > 0) {
-        log = hydrateWorkoutLog({
-          ...log,
           coolDownExercises: coolDown.map(buildStretchExerciseLog),
+          rounds: buildEmptyRoundLogs(plan),
+          warmUpCompleted: false,
+          coolDownCompleted: false,
         });
+        const mode = useAuthStore.getState().mode;
+        set({
+          pausedWorkoutDate: preservePausedDate,
+          activeWorkout: log,
+          ...(mode === "authenticated"
+            ? { workoutHistory: upsertWorkoutInHistory(state.workoutHistory, log) }
+            : {}),
+        });
+        if (mode === "authenticated") {
+          void flushPersistInProgressWorkout(log, { paused: false });
+        }
+        return;
       }
+
+      const existing = findInProgressWorkoutForDateIncludingActive(
+        state.workoutHistory,
+        dateKey,
+        state.activeWorkout,
+      );
+      if (existing) {
+        let log = hydrateWorkoutLog({ ...existing, paused: false });
+        if (log.warmUpExercises.length === 0 && warmUp.length > 0) {
+          log = hydrateWorkoutLog({
+            ...log,
+            warmUpExercises: warmUp.map(buildStretchExerciseLog),
+          });
+        }
+        if (log.coolDownExercises.length === 0 && coolDown.length > 0) {
+          log = hydrateWorkoutLog({
+            ...log,
+            coolDownExercises: coolDown.map(buildStretchExerciseLog),
+          });
+        }
+        const mode = useAuthStore.getState().mode;
+        set({
+          pausedWorkoutDate: preservePausedDate,
+          activeWorkout: log,
+          ...(mode === "authenticated"
+            ? { workoutHistory: upsertWorkoutInHistory(state.workoutHistory, log) }
+            : {}),
+        });
+        if (mode === "authenticated") {
+          void flushPersistInProgressWorkout(log, { paused: false });
+        }
+        return;
+      }
+      const warmUpExercises: ExerciseLog[] = warmUp.map(buildStretchExerciseLog);
+      const coolDownExercises: ExerciseLog[] = coolDown.map(
+        buildStretchExerciseLog,
+      );
+      const cardioExercises = buildEmptyCardioLogs(resolveCardioActivities(plan));
+      const log: WorkoutLog = {
+        id: uuidv4(),
+        date: dateKey,
+        dayOfWeek,
+        cardioExercises,
+        warmUpCompleted: false,
+        warmUpExercises,
+        coolDownCompleted: false,
+        coolDownExercises,
+        rounds: buildEmptyRoundLogs(plan),
+        startTime: startTimeIso,
+        paused: false,
+      };
       const mode = useAuthStore.getState().mode;
       set({
         pausedWorkoutDate: preservePausedDate,
@@ -565,37 +603,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       if (mode === "authenticated") {
         void flushPersistInProgressWorkout(log, { paused: false });
       }
-      return;
-    }
-    const warmUpExercises: ExerciseLog[] = warmUp.map(buildStretchExerciseLog);
-    const coolDownExercises: ExerciseLog[] = coolDown.map(
-      buildStretchExerciseLog,
-    );
-    const cardioExercises = buildEmptyCardioLogs(resolveCardioActivities(plan));
-    const log: WorkoutLog = {
-      id: uuidv4(),
-      date: dateKey,
-      dayOfWeek,
-      cardioExercises,
-      warmUpCompleted: false,
-      warmUpExercises,
-      coolDownCompleted: false,
-      coolDownExercises,
-      rounds: buildEmptyRoundLogs(plan),
-      startTime: startTimeIso,
-      paused: false,
-    };
-    const mode = useAuthStore.getState().mode;
-    set({
-      pausedWorkoutDate: preservePausedDate,
-      activeWorkout: log,
-      ...(mode === "authenticated"
-        ? { workoutHistory: upsertWorkoutInHistory(state.workoutHistory, log) }
-        : {}),
     });
-    if (mode === "authenticated") {
-      void flushPersistInProgressWorkout(log, { paused: false });
-    }
   };
 
   return {
