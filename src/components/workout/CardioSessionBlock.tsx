@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { exerciseMap } from "@/core/catalog";
 import { parseTimeInput, formatSecondsToMMSS } from "@/utils/time";
+import WorkoutCompletionCheckbox from "@/components/workout/WorkoutCompletionCheckbox";
 import WorkoutRowOverflowMenu, {
   type WorkoutRowMenuItem,
 } from "./WorkoutRowOverflowMenu";
@@ -68,23 +69,10 @@ export default function CardioSessionBlock({
   return (
     <section>
       <span className="flex items-center gap-2 px-2 py-2">
-        <button
-          type="button"
+        <WorkoutCompletionCheckbox
+          completed={log.completed}
           onClick={onToggle}
-          aria-pressed={log.completed}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 border-border"
-          style={
-            log.completed
-              ? {
-                  borderColor: "var(--accent)",
-                  backgroundColor: "var(--accent)",
-                  color: "white",
-                }
-              : undefined
-          }
-        >
-          {log.completed ? "✓" : ""}
-        </button>
+        />
         <span className="flex-1 min-w-0">
           <p
             className={`text-sm font-medium ${
@@ -98,7 +86,7 @@ export default function CardioSessionBlock({
           <WorkoutRowOverflowMenu items={overflowItems} />
         ) : null}
       </span>
-      <span className="flex gap-3 pl-11 pr-2 pb-3">
+      <span className="flex gap-3 pl-9 pr-2 pb-3 md:pl-11">
         <label className="flex-1 block">
           <span className="text-caption text-muted uppercase tracking-wider">
             Distance (mi)
@@ -157,7 +145,7 @@ export default function CardioSessionBlock({
         </label>
       </span>
       {healthSummary ? (
-        <p className="px-11 pb-3 text-xs text-muted">{healthSummary}</p>
+        <p className="px-9 pb-3 text-xs text-muted md:px-11">{healthSummary}</p>
       ) : null}
     </section>
   );

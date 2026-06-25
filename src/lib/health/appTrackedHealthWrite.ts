@@ -1,12 +1,16 @@
 import { resolveActiveCaloriesForWrite } from "@/lib/health/cardioCalorieEstimate";
+import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
+import {
+  ensureExerciseSessionWriteAccess,
+  saveExerciseSessionToHealth,
+} from "@/lib/health/healthExerciseWrite";
+import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import {
   isNativeHealthAvailable,
   requestNativeHealthAuthorization,
   writeNativeHealthSample,
   CARDIO_HEALTH_WRITE_TYPES,
 } from "@/lib/health/nativeHealth";
-import { saveExerciseSessionToHealth } from "@/lib/health/healthExerciseWrite";
-import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import type { CardioActivityKind } from "@/types";
 
 const LB_TO_KG = 0.45359237;
@@ -27,10 +31,14 @@ export async function writeAppTrackedCardioToHealth(
 ): Promise<void> {
   if (!(await isNativeHealthAvailable())) return;
 
+  const workoutType = cardioKindToWorkoutType(input.kind);
+  if (!workoutType) return;
+
   await requestNativeHealthAuthorization({
     read: [],
     write: [...CARDIO_HEALTH_WRITE_TYPES, "weight"],
   });
+  await ensureExerciseSessionWriteAccess();
 
   const isoStart = input.startDate.toISOString();
   const isoEnd = input.endDate.toISOString();
@@ -60,7 +68,7 @@ export async function writeAppTrackedCardioToHealth(
   }
 
   await saveExerciseSessionToHealth({
-    kind: input.kind,
+    workoutType,
     startDate: isoStart,
     endDate: isoEnd,
     ...(input.distanceMi != null && input.distanceMi > 0

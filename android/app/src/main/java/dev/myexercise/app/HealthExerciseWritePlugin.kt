@@ -12,6 +12,7 @@ import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import app.capgo.plugin.health.WorkoutType
+import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
@@ -41,10 +42,24 @@ class HealthExerciseWritePlugin : Plugin() {
   )
 
   private var pendingSave: PendingSave? = null
+  private var pendingPermissionCheck: PluginCall? = null
 
   override fun handleOnDestroy() {
     super.handleOnDestroy()
     pluginScope.cancel()
+  }
+
+  @PluginMethod
+  fun ensureWritePermission(call: PluginCall) {
+    pluginScope.launch {
+      val client = getClientOrReject(call) ?: return@launch
+      if (hasExerciseWritePermission(client)) {
+        call.resolve(JSObject().put("granted", true))
+        return@launch
+      }
+      pendingPermissionCheck = call
+      launchPermissionRequest(call)
+    }
   }
 
   @PluginMethod
@@ -85,10 +100,7 @@ class HealthExerciseWritePlugin : Plugin() {
 
     pluginScope.launch {
       val client = getClientOrReject(call) ?: return@launch
-      val writePermission =
-        HealthPermission.getWritePermission(ExerciseSessionRecord::class)
-      val granted = client.permissionController.getGrantedPermissions()
-      if (!granted.contains(writePermission)) {
+      if (!hasExerciseWritePermission(client)) {
         pendingSave =
           PendingSave(
             call,
@@ -98,13 +110,7 @@ class HealthExerciseWritePlugin : Plugin() {
             distanceMeters,
             activeCaloriesKcal,
           )
-        val intent = permissionContract.createIntent(context, setOf(writePermission))
-        try {
-          startActivityForResult(call, intent, "permissionsCallback")
-        } catch (e: Exception) {
-          pendingSave = null
-          call.reject("Failed to launch Health Connect permission request.", null, e)
-        }
+        launchPermissionRequest(call)
         return@launch
       }
       insertSession(
@@ -121,8 +127,20 @@ class HealthExerciseWritePlugin : Plugin() {
 
   @ActivityCallback
   private fun permissionsCallback(call: PluginCall?, result: ActivityResult) {
+    val permissionCheck = pendingPermissionCheck
+    pendingPermissionCheck = null
     val pending = pendingSave
     pendingSave = null
+
+    if (permissionCheck != null) {
+      pluginScope.launch {
+        val granted =
+          result.resultCode == Activity.RESULT_OK && permissionGrantedAfterResult()
+        permissionCheck.resolve(JSObject().put("granted", granted))
+      }
+      return
+    }
+
     if (pending == null) {
       call?.reject("Permission request cancelled")
       return
@@ -134,10 +152,7 @@ class HealthExerciseWritePlugin : Plugin() {
 
     pluginScope.launch {
       val client = getClientOrReject(pending.call) ?: return@launch
-      val writePermission =
-        HealthPermission.getWritePermission(ExerciseSessionRecord::class)
-      val granted = client.permissionController.getGrantedPermissions()
-      if (!granted.contains(writePermission)) {
+      if (!hasExerciseWritePermission(client)) {
         pending.call.reject("Exercise session write permission not granted")
         return@launch
       }
@@ -151,6 +166,32 @@ class HealthExerciseWritePlugin : Plugin() {
         pending.activeCaloriesKcal,
       )
     }
+  }
+
+  private fun launchPermissionRequest(call: PluginCall) {
+    val writePermission =
+      HealthPermission.getWritePermission(ExerciseSessionRecord::class)
+    val intent = permissionContract.createIntent(context, setOf(writePermission))
+    try {
+      startActivityForResult(call, intent, "permissionsCallback")
+    } catch (e: Exception) {
+      pendingSave = null
+      pendingPermissionCheck = null
+      call.reject("Failed to launch Health Connect permission request.", null, e)
+    }
+  }
+
+  private suspend fun permissionGrantedAfterResult(): Boolean {
+    val client = getClientOrReject(null) ?: return false
+    return hasExerciseWritePermission(client)
+  }
+
+  private suspend fun hasExerciseWritePermission(
+    client: HealthConnectClient,
+  ): Boolean {
+    val writePermission =
+      HealthPermission.getWritePermission(ExerciseSessionRecord::class)
+    return client.permissionController.getGrantedPermissions().contains(writePermission)
   }
 
   private suspend fun insertSession(
@@ -215,10 +256,10 @@ class HealthExerciseWritePlugin : Plugin() {
   private fun zoneOffset(instant: Instant): ZoneOffset =
     ZoneOffset.systemDefault().rules.getOffset(instant)
 
-  private fun getClientOrReject(call: PluginCall): HealthConnectClient? {
+  private fun getClientOrReject(call: PluginCall?): HealthConnectClient? {
     val status = HealthConnectClient.getSdkStatus(context)
     if (status != HealthConnectClient.SDK_AVAILABLE) {
-      call.reject("Health Connect is not available")
+      call?.reject("Health Connect is not available")
       return null
     }
     return HealthConnectClient.getOrCreate(context)

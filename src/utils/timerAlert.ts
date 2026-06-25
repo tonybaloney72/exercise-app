@@ -4,11 +4,19 @@
  * so mobile browsers are more likely to allow sound when it fires later.
  */
 
+import {
+  beginTimerAudioDuck,
+  endTimerAudioDuck,
+} from "@/lib/audio/timerAudioDuck";
+import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { vibrateTimerDone } from "@/utils/hapticFeedback";
 
 /** Peak gain for timer chime (Web Audio; ~0.12 was hard to hear on phone speakers). */
 const TIMER_CHIME_PEAK_GAIN = 0.38;
+
+/** Second beep ends ~400ms after the chime starts; keep ducking briefly after. */
+export const TIMER_CHIME_DURATION_MS = 450;
 
 let sharedCtx: AudioContext | null = null;
 
@@ -61,19 +69,43 @@ function beep(
   osc.stop(startAt + durationSec + 0.02);
 }
 
-function playTimerDoneChime(): void {
+function scheduleTimerDoneChime(ctx: AudioContext): void {
+  const t = ctx.currentTime;
+  beep(ctx, 880, t, 0.14);
+  beep(ctx, 1174, t + 0.2, 0.18);
+}
+
+async function playTimerDoneChime(): Promise<void> {
   const { timerSoundsEnabled } = useSettingsStore.getState();
   if (!timerSoundsEnabled) return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
-  void ctx.resume().then(() => {
-    const t = ctx.currentTime;
-    beep(ctx, 880, t, 0.14);
-    beep(ctx, 1174, t + 0.2, 0.18);
-  }).catch(() => {});
+
+  const shouldDuck = isNativePlatform();
+  let ducked = false;
+  if (shouldDuck) {
+    ducked = await beginTimerAudioDuck();
+  }
+
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    await ctx.resume();
+    scheduleTimerDoneChime(ctx);
+    if (ducked) {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, TIMER_CHIME_DURATION_MS);
+      });
+    }
+  } catch {
+    // Ignore audio playback errors.
+  } finally {
+    if (ducked) {
+      await endTimerAudioDuck();
+    }
+  }
 }
 
 export function playTimerDoneAlert(): void {
   vibrateTimerDone();
-  playTimerDoneChime();
+  void playTimerDoneChime();
 }

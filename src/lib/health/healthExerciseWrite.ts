@@ -2,11 +2,9 @@ import { registerPlugin } from "@capacitor/core";
 import type { WorkoutType } from "@capgo/capacitor-health";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
-import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
-import type { CardioActivityKind } from "@/types";
 
 export type SaveExerciseSessionOptions = {
-  kind: CardioActivityKind;
+  workoutType: WorkoutType;
   startDate: string;
   endDate: string;
   distanceMeters?: number;
@@ -14,6 +12,7 @@ export type SaveExerciseSessionOptions = {
 };
 
 type HealthExerciseWritePlugin = {
+  ensureWritePermission(): Promise<{ granted: boolean }>;
   saveExerciseSession(options: {
     workoutType: WorkoutType;
     startDate: string;
@@ -27,23 +26,31 @@ const HealthExerciseWrite = registerPlugin<HealthExerciseWritePlugin>(
   "HealthExerciseWrite",
 );
 
+export async function ensureExerciseSessionWriteAccess(): Promise<boolean> {
+  if (!isNativePlatform()) return false;
+  try {
+    const { granted } = await HealthExerciseWrite.ensureWritePermission();
+    clientTrace("health-write", "exercise_write_permission", { granted });
+    return granted;
+  } catch (err) {
+    clientTrace(
+      "health-write",
+      "exercise_write_permission_error",
+      { message: err instanceof Error ? err.message : String(err) },
+      "warn",
+    );
+    return false;
+  }
+}
+
 export async function saveExerciseSessionToHealth(
   options: SaveExerciseSessionOptions,
 ): Promise<void> {
   if (!isNativePlatform()) return;
 
-  const workoutType = cardioKindToWorkoutType(options.kind);
-  if (!workoutType) {
-    clientTrace("health-write", "exercise_session_skip", {
-      reason: "unsupported_kind",
-      kind: options.kind,
-    });
-    return;
-  }
-
   try {
     await HealthExerciseWrite.saveExerciseSession({
-      workoutType,
+      workoutType: options.workoutType,
       startDate: options.startDate,
       endDate: options.endDate,
       ...(options.distanceMeters != null && options.distanceMeters > 0
@@ -54,8 +61,7 @@ export async function saveExerciseSessionToHealth(
         : {}),
     });
     clientTrace("health-write", "exercise_session_ok", {
-      kind: options.kind,
-      workoutType,
+      workoutType: options.workoutType,
     });
   } catch (err) {
     clientTrace(

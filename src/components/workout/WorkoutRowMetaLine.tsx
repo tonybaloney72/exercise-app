@@ -6,6 +6,7 @@ import WorkoutRowOverflowMenu, {
   type WorkoutRowMenuItem,
 } from "./WorkoutRowOverflowMenu";
 import ExpandChevron from "./ExpandChevron";
+import { WORKOUT_COMPLETION_CHECKBOX_WIDTH_CLASS } from "./WorkoutCompletionCheckbox";
 
 interface WorkoutRowMetaLineProps {
   /** Leading control (e.g. completion checkbox) — row 1 only, vertically centered. */
@@ -100,12 +101,12 @@ export default function WorkoutRowMetaLine({
   timerTitle,
 }: WorkoutRowMetaLineProps) {
   const trimmedDetail = detailText?.trim() ?? "";
-  const inlineDetail = trimmedDetail.length > 0 && !showTimerPill && !detailLeading;
+  const inlineDetail =
+    trimmedDetail.length > 0 && !showTimerPill && !detailLeading;
   const splitDetailRow = detailTrailing != null;
   const showDetailRow =
     splitDetailRow && (detailLeading != null || inlineDetail);
-  const showTimerPillRow =
-    showTimerPill && timerSeconds > 0 && !splitDetailRow;
+  const showTimerPillRow = showTimerPill && timerSeconds > 0 && !splitDetailRow;
 
   const toggleExpand = onToggleExpand ?? onNameClick;
   const rowAlign = titleAlign === "center" ? "items-center" : "items-start";
@@ -129,29 +130,28 @@ export default function WorkoutRowMetaLine({
       <div className={`min-w-0 flex-1 ${dense ? "" : "py-1"}`}>
         <div className="flex min-w-0 flex-col">
           <div className="flex min-w-0 items-center justify-between">
-            <div className="flex min-w-0 items-center gap-2">
-              {leading ? <div className="shrink-0">{leading}</div> : null}
-              <NameBlock
-                name={name}
-                nameClassName={nameClassName}
-                subName={subName}
-                readOnly={readOnly}
-                onNameClick={onNameClick}
-              />
-            </div>
-            <div className="flex min-w-0 items-center gap-1">
-              {chevronButton ? (
-                <div className="shrink-0 flex items-center">
-                  {chevronButton}
-                </div>
-              ) : null}
-              <div className="shrink-0">{overflowMenu}</div>
-            </div>
+            {leading ? <div className="mr-2">{leading}</div> : null}
+            <NameBlock
+              name={name}
+              nameClassName={nameClassName}
+              subName={subName}
+              readOnly={readOnly}
+              onNameClick={onNameClick}
+            />
+            {chevronButton ? (
+              <div className="shrink-0 flex items-center">{chevronButton}</div>
+            ) : null}
+            <div className="shrink-0">{overflowMenu}</div>
           </div>
           {showDetailRow ? (
             <div className="flex min-w-0 items-center justify-between">
               <div className="flex min-w-0 items-center gap-2">
-                {leading ? <div className="w-7 shrink-0" aria-hidden /> : null}
+                {leading ? (
+                  <div
+                    className={`${WORKOUT_COMPLETION_CHECKBOX_WIDTH_CLASS} shrink-0`}
+                    aria-hidden
+                  />
+                ) : null}
                 <div className="flex min-w-0 flex-1 items-center">
                   {detailLeading ??
                     (inlineDetail ? (
@@ -165,7 +165,7 @@ export default function WorkoutRowMetaLine({
             </div>
           ) : null}
           {showTimerPillRow ? (
-            <div className="mt-0.5 flex flex-wrap items-center gap-1.5 pl-7">
+            <div className="mt-0.5 flex flex-wrap items-center gap-1.5 pl-5 md:pl-7">
               <SetTimerPill seconds={timerSeconds} title={timerTitle} />
               {trimmedDetail ? (
                 <p className="min-w-0 text-xs leading-snug text-muted">

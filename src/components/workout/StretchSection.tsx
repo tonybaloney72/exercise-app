@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import CompletionCheckmark from "@/components/common/CompletionCheckmark";
+import WorkoutCompletionCheckbox from "@/components/workout/WorkoutCompletionCheckbox";
 import { exerciseMap } from "@/core/catalog";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getStretchSwapCandidates } from "@/lib/stretchSwap";
@@ -448,17 +448,7 @@ function StretchRow({
   ) : null;
 
   const completionCheckbox = (
-    <button
-      type="button"
-      onClick={onToggle}
-      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
-      style={{
-        borderColor: log.completed ? "var(--accent)" : "var(--border-color)",
-        backgroundColor: log.completed ? "var(--accent)" : "transparent",
-      }}
-    >
-      {log.completed ? <CompletionCheckmark /> : null}
-    </button>
+    <WorkoutCompletionCheckbox completed={log.completed} onClick={onToggle} />
   );
 
   return (

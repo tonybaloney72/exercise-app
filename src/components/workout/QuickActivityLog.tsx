@@ -164,15 +164,26 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
         activityEndTime: activityWindow?.endDate.toISOString(),
       });
       clientTrace("cardio-save", ok ? "quickLog_ok" : "quickLog_failed");
-      if (ok && isNativePlatform() && activityWindow) {
+      if (ok && isNativePlatform()) {
+        const endDate = activityWindow?.endDate ?? new Date();
+        const durationForWindow =
+          hasDuration && durationSeconds! > 0
+            ? durationSeconds!
+            : Math.max(
+                60,
+                Math.round((endDate.getTime() - (activityWindow?.startDate.getTime() ?? endDate.getTime())) / 1000),
+              );
+        const startDate =
+          activityWindow?.startDate ??
+          new Date(endDate.getTime() - durationForWindow * 1000);
         const weightLb = getWeightForDate(weightEntries, dateKey)?.weightLb;
         void writeAppTrackedCardioToHealth({
           kind: pendingKind,
           distanceMi: hasDistance ? distanceMi : undefined,
-          durationSeconds: hasDuration ? durationSeconds! : 0,
+          durationSeconds: hasDuration ? durationSeconds! : durationForWindow,
           activeCaloriesKcal: resolvedHealth?.activeCaloriesKcal,
-          startDate: activityWindow.startDate,
-          endDate: activityWindow.endDate,
+          startDate,
+          endDate,
           weightLb,
         }).catch(() => {
           // Optional mirror to Health Connect; logging in-app already succeeded.

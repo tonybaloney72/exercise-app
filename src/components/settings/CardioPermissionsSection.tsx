@@ -91,6 +91,8 @@ export default function CardioPermissionsSection() {
     <div className="flex flex-col gap-4">
       <p className="text-xs text-muted leading-relaxed">
         Pull steps, calories, heart rate, and other data from Health Connect.
+        Finished workouts and logged activities can be saved back as exercise
+        sessions.
       </p>
 
       <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface-hover/40 p-3">

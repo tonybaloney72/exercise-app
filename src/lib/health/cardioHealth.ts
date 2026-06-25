@@ -2,6 +2,7 @@ import type { Workout } from "@capgo/capacitor-health";
 import type { CardioActivityKind, CardioActivitySource } from "@/types";
 import { metersToMiles } from "@/lib/geo/haversine";
 import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
+import { ensureExerciseSessionWriteAccess } from "@/lib/health/healthExerciseWrite";
 import {
   CARDIO_HEALTH_READ_TYPES,
   checkNativeHealthAuthorization,
@@ -118,13 +119,19 @@ async function hasCardioHealthReadAccess(): Promise<boolean> {
 /** Prompts for Health Connect read access (use Import / explicit health flows only). */
 export async function ensureCardioHealthReadAccess(): Promise<boolean> {
   if (!isNativePlatform()) return false;
-  if (await hasCardioHealthReadAccess()) return true;
+  if (await hasCardioHealthReadAccess()) {
+    await ensureExerciseSessionWriteAccess();
+    return true;
+  }
   // Skip isAvailable() — it can hang on some devices; requestAuthorization opens HC directly.
   const status = await requestNativeHealthAuthorization({
     read: CARDIO_HEALTH_READ_TYPES,
     write: [],
   });
   const granted = (status?.readAuthorized.length ?? 0) > 0;
+  if (granted) {
+    await ensureExerciseSessionWriteAccess();
+  }
   clientTrace("health-cardio", "ensureReadAccess", { granted });
   return granted;
 }

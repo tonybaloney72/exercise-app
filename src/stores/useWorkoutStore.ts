@@ -74,6 +74,7 @@ import {
 } from "@/utils/effectiveExerciseSettings";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { toastSaveError } from "@/utils/saveErrorToast";
+import { writeCompletedWorkoutToHealth } from "@/lib/health/completedWorkoutHealthWrite";
 import {
   cancelScheduledPersistActiveWorkoutDraft,
   clearActiveWorkoutDraft,
@@ -1652,6 +1653,9 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
 
     if (result.ok) {
       clearWorkoutCompleting(inProgress.id);
+      void writeCompletedWorkoutToHealth(result.completed).catch(() => {
+        // Optional mirror to Health Connect; in-app completion already succeeded.
+      });
       return result.completed;
     }
 

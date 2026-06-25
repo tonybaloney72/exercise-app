@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import CompletionCheckmark from "@/components/common/CompletionCheckmark";
+import WorkoutCompletionCheckbox from "@/components/workout/WorkoutCompletionCheckbox";
 import { exerciseMap } from "@/core/catalog";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
@@ -329,20 +329,13 @@ export default function ExerciseRow({
   ) : null;
 
   const completionCheckbox = (
-    <button
-      type="button"
+    <WorkoutCompletionCheckbox
+      completed={log.completed}
       onClick={() => {
         if (!log.completed && !log.skipped) vibrateOnExerciseComplete();
         toggleExercise(roundNumber, plannedId);
       }}
-      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95"
-      style={{
-        borderColor: log.completed ? "var(--accent)" : "var(--border-color)",
-        backgroundColor: log.completed ? "var(--accent)" : "transparent",
-      }}
-    >
-      {log.completed ? <CompletionCheckmark /> : null}
-    </button>
+    />
   );
 
   return (
