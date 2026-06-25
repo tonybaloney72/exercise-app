@@ -16,7 +16,7 @@ import { vibrateTimerDone } from "@/utils/hapticFeedback";
 const TIMER_CHIME_PEAK_GAIN = 0.38;
 
 /** Second beep ends ~400ms after the chime starts; keep ducking briefly after. */
-export const TIMER_CHIME_DURATION_MS = 450;
+const TIMER_CHIME_DURATION_MS = 450;
 
 let sharedCtx: AudioContext | null = null;
 
@@ -59,10 +59,7 @@ function beep(
     TIMER_CHIME_PEAK_GAIN,
     startAt + 0.012,
   );
-  gain.gain.exponentialRampToValueAtTime(
-    0.001,
-    startAt + durationSec,
-  );
+  gain.gain.exponentialRampToValueAtTime(0.001, startAt + durationSec);
   osc.connect(gain);
   gain.connect(ctx.destination);
   osc.start(startAt);
