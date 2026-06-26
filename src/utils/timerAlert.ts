@@ -15,8 +15,17 @@ import { vibrateTimerDone } from "@/utils/hapticFeedback";
 /** Peak gain for timer chime (Web Audio; ~0.12 was hard to hear on phone speakers). */
 const TIMER_CHIME_PEAK_GAIN = 0.38;
 
-/** Second beep ends ~400ms after the chime starts; keep ducking briefly after. */
-const TIMER_CHIME_DURATION_MS = 450;
+/** Let music duck before the chime so the alert sits on a quieter bed. */
+const TIMER_CHIME_PRE_DUCK_MS = 200;
+
+/** Two-tone pattern length (second tone ends ~this many ms after the first starts). */
+const TIMER_CHIME_PLAYBACK_MS = 450;
+
+/** Hold duck briefly after the chime so music does not rush back over the tail. */
+const TIMER_CHIME_POST_DUCK_MS = 200;
+
+export const TIMER_ALERT_DUCK_HOLD_MS =
+  TIMER_CHIME_PRE_DUCK_MS + TIMER_CHIME_PLAYBACK_MS + TIMER_CHIME_POST_DUCK_MS;
 
 let sharedCtx: AudioContext | null = null;
 
@@ -36,6 +45,10 @@ function getAudioContext(): AudioContext | null {
   } catch {
     return null;
   }
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /** Run on the tap that starts a countdown (unlocks audio on many mobile browsers). */
@@ -83,15 +96,18 @@ async function playTimerDoneChime(): Promise<void> {
   }
 
   try {
+    if (ducked) {
+      await delay(TIMER_CHIME_PRE_DUCK_MS);
+    }
+
     const ctx = getAudioContext();
     if (!ctx) return;
 
     await ctx.resume();
     scheduleTimerDoneChime(ctx);
+
     if (ducked) {
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, TIMER_CHIME_DURATION_MS);
-      });
+      await delay(TIMER_CHIME_PLAYBACK_MS + TIMER_CHIME_POST_DUCK_MS);
     }
   } catch {
     // Ignore audio playback errors.

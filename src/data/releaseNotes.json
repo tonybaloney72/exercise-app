@@ -1,0 +1,11 @@
+[
+  {
+    "version": "0.20.0",
+    "date": "2026-06-20",
+    "highlights": [
+      "Finished workouts and logged activities can be saved to Health Connect as exercise sessions.",
+      "To enable this, open Health Connect → App permissions → MyExercise and allow Exercises write access.",
+      "Timer sounds on Android briefly lower music volume when a set or rest timer finishes."
+    ]
+  }
+]

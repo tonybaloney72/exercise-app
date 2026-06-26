@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import AppVersionSync from "@/components/layout/AppVersionSync";
+import WhatsNewSync from "@/components/layout/WhatsNewSync";
 import CapacitorShellSync from "@/components/layout/CapacitorShellSync";
 import NativeOAuthSync from "@/components/auth/NativeOAuthSync";
 import "./globals.css";
@@ -73,6 +74,7 @@ export default function RootLayout({
         <CapacitorShellSync />
         <NativeOAuthSync />
         <AppVersionSync />
+        <WhatsNewSync />
         {children}
       </body>
     </html>

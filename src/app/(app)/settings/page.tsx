@@ -7,6 +7,7 @@ import AnimatedSection from "@/components/common/AnimatedSection";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import AboutDeveloperSection from "@/components/settings/AboutDeveloperSection";
+import WhatsNewSection from "@/components/settings/WhatsNewSection";
 import AppPlatformSettingsSections from "@/components/settings/AppPlatformSettingsSections";
 import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
 import SettingsFeedbackSection from "@/components/settings/SettingsFeedbackSection";
@@ -569,6 +570,10 @@ export default function SettingsPage() {
           </p>
           <SettingsFeedbackSection />
         </CollapsibleSection>
+      </AnimatedSection>
+
+      <AnimatedSection delay={0.052}>
+        <WhatsNewSection />
       </AnimatedSection>
 
       <AnimatedSection delay={0.055}>

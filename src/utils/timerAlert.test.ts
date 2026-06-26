@@ -34,6 +34,7 @@ class MockAudioContext {
     return {
       gain: {
         setValueAtTime: vi.fn(),
+        linearRampToValueAtTime: vi.fn(),
         exponentialRampToValueAtTime: vi.fn(),
       },
       connect: vi.fn(),
@@ -43,6 +44,7 @@ class MockAudioContext {
 
 describe("playTimerDoneAlert", () => {
   beforeEach(() => {
+    vi.useRealTimers();
     beginTimerAudioDuck.mockClear();
     endTimerAudioDuck.mockClear();
     useSettingsStore.setState({ timerSoundsEnabled: true });
@@ -51,14 +53,16 @@ describe("playTimerDoneAlert", () => {
 
   it("requests transient audio ducking around the timer chime on native", async () => {
     vi.useFakeTimers();
-    const { playTimerDoneAlert } = await import("@/utils/timerAlert");
+    const { playTimerDoneAlert, TIMER_ALERT_DUCK_HOLD_MS } = await import(
+      "@/utils/timerAlert"
+    );
     playTimerDoneAlert();
 
     await vi.waitFor(() => {
       expect(beginTimerAudioDuck).toHaveBeenCalledTimes(1);
     });
 
-    await vi.advanceTimersByTimeAsync(450);
+    await vi.advanceTimersByTimeAsync(TIMER_ALERT_DUCK_HOLD_MS);
 
     await vi.waitFor(() => {
       expect(endTimerAudioDuck).toHaveBeenCalledTimes(1);
