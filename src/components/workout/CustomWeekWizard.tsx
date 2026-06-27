@@ -31,12 +31,12 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { DayPlan } from "@/types";
 import type { TrainingWeekDays } from "@/lib/repos";
 import { getWeekDateKeys } from "@/utils/weekCalendar";
-import { formatLocalDateKey } from "@/utils/localDateKey";
+import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 
 function weekDatesFromKeys(dateKeys: string[]): Date[] {
-  return dateKeys.map((key) => {
-    const [y, m, d] = key.split("-").map(Number);
-    return new Date(y!, m! - 1, d!);
+  return dateKeys.flatMap((key) => {
+    const parsed = parseLocalDateKey(key);
+    return parsed ? [parsed] : [];
   });
 }
 

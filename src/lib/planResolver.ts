@@ -22,7 +22,7 @@ import { isPrescribedPlanFrozenFromState } from "@/lib/workoutSessionGuard";
 import type { RefreshTrainingWeekScope } from "@/lib/trainingWeekRefreshScope";
 
 export type { RefreshTrainingWeekScope } from "@/lib/trainingWeekRefreshScope";
-import { formatLocalDateKey } from "@/utils/localDateKey";
+import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import {
   getTrainingWeekRepo,
   type ExercisePreferenceMap,
@@ -45,11 +45,7 @@ import {
 import { buildVarietySeed, varietySeedForCurrentWeek } from "@/lib/planVariety";
 import { shouldPreserveStoredCustomWeekOnPrefsRefresh } from "@/lib/weekPlanPreferences";
 import { isGuidedCustomSettings } from "@/lib/weekBlueprintPolicy";
-import {
-  parseLocalDateKey,
-  weekAnchorFromDateKey,
-  weekKeyFromDateKey,
-} from "@/utils/weekCalendar";
+import { weekAnchorFromDateKey, weekKeyFromDateKey } from "@/utils/weekCalendar";
 
 function normalizeWeekDays(days: TrainingWeekDays): TrainingWeekDays {
   const out: TrainingWeekDays = {};

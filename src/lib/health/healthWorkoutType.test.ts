@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { WorkoutLog } from "@/types";
 import {
   exerciseWorkoutTypeForLog,
+  completedCardioSpeedMetersPerSecond,
   totalCompletedCardioDistanceMeters,
 } from "@/lib/health/healthWorkoutType";
 
@@ -84,5 +85,36 @@ describe("totalCompletedCardioDistanceMeters", () => {
       ],
     });
     expect(totalCompletedCardioDistanceMeters(log)).toBeCloseTo(1.5 * 1609.344, 1);
+  });
+});
+
+describe("completedCardioSpeedMetersPerSecond", () => {
+  it("derives average speed from completed cardio distance and duration", () => {
+    const log = baseLog({
+      cardioExercises: [
+        {
+          exerciseId: "END-JOG",
+          completed: true,
+          skipped: false,
+          actualDistanceMi: 1,
+          actualDuration: 600,
+        },
+      ],
+    });
+    expect(completedCardioSpeedMetersPerSecond(log)).toBeCloseTo(1609.344 / 600, 3);
+  });
+
+  it("returns undefined when duration is missing", () => {
+    const log = baseLog({
+      cardioExercises: [
+        {
+          exerciseId: "END-JOG",
+          completed: true,
+          skipped: false,
+          actualDistanceMi: 1,
+        },
+      ],
+    });
+    expect(completedCardioSpeedMetersPerSecond(log)).toBeUndefined();
   });
 });

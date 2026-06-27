@@ -1,31 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_SETTINGS } from "@/lib/repos/types";
 import type { WorkoutLog } from "@/types";
+import { createMemoryStorageMock } from "@/test/memoryStorageMock";
 import {
   clearLocalData,
   localSettingsRepo,
   localWorkoutRepo,
 } from "./local";
 
-function createLocalStorageMock() {
-  const store = new Map<string, string>();
-  return {
-    getItem: (key: string) => store.get(key) ?? null,
-    setItem: (key: string, value: string) => {
-      store.set(key, value);
-    },
-    removeItem: (key: string) => {
-      store.delete(key);
-    },
-    clear: () => {
-      store.clear();
-    },
-  };
-}
-
 describe("local repos", () => {
   beforeEach(() => {
-    vi.stubGlobal("localStorage", createLocalStorageMock());
+    vi.stubGlobal("localStorage", createMemoryStorageMock());
     vi.stubGlobal("window", {});
   });
 

@@ -6,6 +6,7 @@ import {
 } from "@/lib/health/healthExerciseWrite";
 import {
   exerciseWorkoutTypeForLog,
+  completedCardioSpeedMetersPerSecond,
   totalCompletedCardioDistanceMeters,
 } from "@/lib/health/healthWorkoutType";
 import { isCardioOnlyQuickLogWorkout } from "@/utils/workoutLogLookup";
@@ -45,12 +46,14 @@ export async function writeCompletedWorkoutToHealth(
 
   const workoutType = exerciseWorkoutTypeForLog(log);
   const distanceMeters = totalCompletedCardioDistanceMeters(log);
+  const speedMetersPerSecond = completedCardioSpeedMetersPerSecond(log);
 
   await saveExerciseSessionToHealth({
     workoutType,
     startDate: log.startTime,
     endDate: log.endTime,
     ...(distanceMeters != null ? { distanceMeters } : {}),
+    ...(speedMetersPerSecond != null ? { speedMetersPerSecond } : {}),
   });
 
   clientTrace("health-write", "completed_workout_ok", {
@@ -58,5 +61,6 @@ export async function writeCompletedWorkoutToHealth(
     workoutType,
     cardioOnly: isCardioOnlyQuickLogWorkout(log),
     hasDistance: distanceMeters != null,
+    hasSpeed: speedMetersPerSecond != null,
   });
 }

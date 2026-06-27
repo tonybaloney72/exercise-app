@@ -1,5 +1,4 @@
-import { formatLocalDateKey } from "@/utils/localDateKey";
-import { parseLocalDateKey } from "@/utils/weekCalendar";
+import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 
 /** Compare calendar keys (`YYYY-MM-DD`) to a reference day key. */
 export function compareDateKeyToRef(

@@ -1,6 +1,12 @@
 import { exerciseMap } from "@/core/catalog";
+import { computeCardioPaceMetrics } from "@/lib/health/cardioPaceMetrics";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import type { WorkoutLog } from "@/types";
+import {
+  buildChartSessionAxis,
+  sortByChartSortKey,
+} from "@/utils/localDateKey";
+import { positiveNumber } from "@/utils/optionalNumber";
 
 export interface CardioChartPoint {
   date: string;
@@ -12,20 +18,11 @@ export interface CardioChartPoint {
   durationSec?: number;
   durationMin?: number;
   paceSecondsPerMile?: number;
+  speedMph?: number;
   /** Health Connect metrics for this session window. */
   stepCount?: number;
   activeCaloriesKcal?: number;
   avgHeartRateBpm?: number;
-}
-
-function parseDateKeyMs(key: string): number {
-  const [y, m, d] = key.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, d ?? 1, 12, 0, 0, 0).getTime();
-}
-
-function shortLabel(dateKey: string): string {
-  const [, m, d] = dateKey.split("-").map(Number);
-  return `${m ?? 1}/${d ?? 1}`;
 }
 
 /** Completed sessions for one endurance exercise with distance and/or duration. */
@@ -44,37 +41,27 @@ export function buildCardioChartSeries(
     entries.forEach((entry, index) => {
       const dist = entry.actualDistanceMi;
       const dur = entry.actualDuration;
-      const steps =
-        entry.stepCount != null && entry.stepCount > 0
-          ? entry.stepCount
-          : undefined;
-      const kcal =
-        entry.activeCaloriesKcal != null && entry.activeCaloriesKcal > 0
-          ? entry.activeCaloriesKcal
-          : undefined;
-      const hr =
-        entry.avgHeartRateBpm != null && entry.avgHeartRateBpm > 0
-          ? entry.avgHeartRateBpm
-          : undefined;
+      const steps = positiveNumber(entry.stepCount);
+      const kcal = positiveNumber(entry.activeCaloriesKcal);
+      const hr = positiveNumber(entry.avgHeartRateBpm);
       if (dist == null && dur == null) return;
 
       let pace: number | undefined;
+      let speedMph: number | undefined;
       if (dist != null && dist > 0 && dur != null && dur > 0) {
         pace = dur / dist;
+        speedMph = computeCardioPaceMetrics(dist, dur)?.avgSpeedMph;
       }
 
       const sessionIndex = index + 1;
-      const baseLabel = shortLabel(w.date);
       rows.push({
         date: w.date,
-        xLabel:
-          sessionIndex > 1 ? `${baseLabel} · #${sessionIndex}` : baseLabel,
-        sortKey: parseDateKeyMs(w.date) + index * 0.0001,
-        sessionIndex: sessionIndex > 1 ? sessionIndex : undefined,
+        ...buildChartSessionAxis(w.date, sessionIndex),
         distanceMi: dist ?? undefined,
         durationSec: dur ?? undefined,
         durationMin: dur != null ? dur / 60 : undefined,
         paceSecondsPerMile: pace,
+        speedMph,
         stepCount: steps,
         activeCaloriesKcal: kcal,
         avgHeartRateBpm: hr,
@@ -82,8 +69,7 @@ export function buildCardioChartSeries(
     });
   }
 
-  rows.sort((a, b) => a.sortKey - b.sortKey);
-  return rows;
+  return sortByChartSortKey(rows);
 }
 
 export function cardioExerciseTitle(exerciseId: string): string {
@@ -105,4 +91,12 @@ export function formatPacePerMile(
   const mins = Math.floor(rounded / 60);
   const secs = rounded % 60;
   return `${mins}:${secs.toString().padStart(2, "0")}/mi`;
+}
+
+/** e.g. `6 mph` */
+export function formatSpeedMph(mph: number | null | undefined): string {
+  if (mph == null || !Number.isFinite(mph) || mph <= 0) {
+    return "-";
+  }
+  return `${mph} mph`;
 }

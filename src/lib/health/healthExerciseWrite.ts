@@ -9,6 +9,7 @@ export type SaveExerciseSessionOptions = {
   endDate: string;
   distanceMeters?: number;
   activeCaloriesKcal?: number;
+  speedMetersPerSecond?: number;
 };
 
 type HealthExerciseWritePlugin = {
@@ -19,6 +20,7 @@ type HealthExerciseWritePlugin = {
     endDate: string;
     distanceMeters?: number;
     activeCaloriesKcal?: number;
+    speedMetersPerSecond?: number;
   }): Promise<void>;
 };
 
@@ -59,9 +61,14 @@ export async function saveExerciseSessionToHealth(
       ...(options.activeCaloriesKcal != null && options.activeCaloriesKcal > 0
         ? { activeCaloriesKcal: options.activeCaloriesKcal }
         : {}),
+      ...(options.speedMetersPerSecond != null &&
+      options.speedMetersPerSecond > 0
+        ? { speedMetersPerSecond: options.speedMetersPerSecond }
+        : {}),
     });
     clientTrace("health-write", "exercise_session_ok", {
       workoutType: options.workoutType,
+      hasSpeed: (options.speedMetersPerSecond ?? 0) > 0,
     });
   } catch (err) {
     clientTrace(

@@ -1,7 +1,7 @@
 import { formatWorkoutDuration } from "@/lib/workoutLogSummary";
 import type { WorkoutLog } from "@/types";
 import { filterCompletedWorkouts } from "@/utils/workoutLogLookup";
-import { parseLocalDateKey } from "@/utils/weekCalendar";
+import { parseLocalDateKey } from "@/utils/localDateKey";
 
 export type WorkoutHistoryMonthGroup = {
   monthKey: string;

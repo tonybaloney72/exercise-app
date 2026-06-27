@@ -3,7 +3,8 @@ import { buildTrainingWeekDepsKey } from "@/lib/trainingWeekCacheKey";
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { AuthMode } from "@/core";
 import type { DayPlan } from "@/types";
-import { parseLocalDateKey, weekAnchorFromDateKey } from "@/utils/weekCalendar";
+import { parseLocalDateKey } from "@/utils/localDateKey";
+import { weekAnchorFromDateKey } from "@/utils/weekCalendar";
 
 export type WeekCacheEntry = {
   anchorKey: string;

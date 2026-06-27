@@ -2,6 +2,10 @@ import type { WorkoutLog } from "@/types";
 import { exerciseMap } from "@/core/catalog";
 import { resolveExerciseDisplayName } from "@/lib/exerciseDisplayName";
 import { effectiveExerciseId } from "@/utils/exerciseLogDefaults";
+import {
+  buildChartDayAxis,
+  sortByChartSortKey,
+} from "@/utils/localDateKey";
 
 export interface ExerciseProgressPoint {
   date: string;
@@ -17,16 +21,6 @@ export interface ExerciseProgressPoint {
   repsPerSet: number[];
   /** Per-set logged duration (seconds), in workout order. */
   durationPerSet: number[];
-}
-
-function parseDateKeyMs(key: string): number {
-  const [y, m, d] = key.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, d ?? 1, 12, 0, 0, 0).getTime();
-}
-
-function shortLabel(dateKey: string): string {
-  const [, m, d] = dateKey.split("-").map(Number);
-  return `${m ?? 1}/${d ?? 1}`;
 }
 
 /**
@@ -118,8 +112,7 @@ export function buildExerciseProgressSeries(
 
     points.push({
       date: w.date,
-      xLabel: shortLabel(w.date),
-      sortKey: parseDateKeyMs(w.date),
+      ...buildChartDayAxis(w.date),
       value,
       mode,
       reps,
@@ -130,7 +123,7 @@ export function buildExerciseProgressSeries(
     });
   }
 
-  points.sort((a, b) => a.sortKey - b.sortKey);
+  sortByChartSortKey(points);
 
   const wantsDuration =
     preferDuration && points.some((p) => p.mode === "duration");

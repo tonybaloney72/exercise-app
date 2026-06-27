@@ -25,7 +25,8 @@ import {
   getBackfillEligibility,
   localNoonIsoForDateKey,
 } from "@/lib/backfillWorkout";
-import { parseLocalDateKey, weekKeyFromDateKey } from "@/utils/weekCalendar";
+import { parseLocalDateKey } from "@/utils/localDateKey";
+import { weekKeyFromDateKey } from "@/utils/weekCalendar";
 import { getWorkoutRepo as resolveWorkoutRepo } from "@/lib/repos";
 import {
   persistCompletedWorkout,

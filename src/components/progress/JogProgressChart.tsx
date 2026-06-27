@@ -20,6 +20,7 @@ import {
   buildCardioChartSeries,
   cardioExerciseTitle,
   formatPacePerMile,
+  formatSpeedMph,
   type CardioChartPoint,
 } from "@/utils/cardioProgressStats";
 import { formatSecondsToMMSS } from "@/utils/time";
@@ -57,6 +58,8 @@ function CardioTooltipBody({
       : null;
   const pace = formatPacePerMile(point.paceSecondsPerMile);
   const paceLine = pace !== "-" ? `Pace: ${pace}` : null;
+  const speed = formatSpeedMph(point.speedMph);
+  const speedLine = speed !== "-" ? `Speed: ${speed}` : null;
   const steps =
     point.stepCount != null && point.stepCount > 0
       ? point.stepCount.toLocaleString()
@@ -84,6 +87,7 @@ function CardioTooltipBody({
       {dist && <p className="mt-1 text-muted">Distance: {dist}</p>}
       {time && <p className="text-muted">Time: {time}</p>}
       {paceLine && <p className="text-muted">{paceLine}</p>}
+      {speedLine && <p className="text-muted">{speedLine}</p>}
       {steps && <p className="text-muted">Steps: {steps}</p>}
       {kcal && <p className="text-muted">Active kcal: {kcal}</p>}
       {hr && <p className="text-muted">Avg HR: {hr} bpm</p>}
@@ -116,6 +120,103 @@ function ChartShell({
   );
 }
 
+function SpeedLineChart({
+  series,
+  activityTitle,
+  exerciseLabel,
+}: {
+  series: CardioChartPoint[];
+  activityTitle: string;
+  exerciseLabel: string;
+}) {
+  const speedSeries = useMemo(
+    () =>
+      series.filter(
+        (p) => p.speedMph != null && p.speedMph > 0,
+      ),
+    [series],
+  );
+
+  if (speedSeries.length === 0) return null;
+
+  return (
+    <ChartShell
+      title={`${activityTitle} · speed`}
+      subtitle="Average speed (mph) when distance and time were logged."
+    >
+      <ResponsiveContainer
+        width="100%"
+        height={PROGRESS_LINE_CHART_HEIGHT}
+        minWidth={0}
+      >
+        <LineChart
+          data={speedSeries}
+          margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
+        >
+          <CartesianGrid
+            stroke="var(--border-color)"
+            strokeDasharray="4 4"
+            vertical={false}
+          />
+          <XAxis
+            dataKey="xLabel"
+            tick={axisTick}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            width={44}
+            tick={axisTick}
+            tickLine={false}
+            axisLine={false}
+            allowDecimals
+            label={{
+              value: "mph",
+              angle: -90,
+              position: "insideLeft",
+              fill: "var(--muted)",
+              fontSize: 10,
+              offset: 4,
+            }}
+          />
+          <Tooltip
+            cursor={{ stroke: "var(--border-color)" }}
+            content={({ active, payload }) => {
+              if (!active || !payload?.length) return null;
+              const p = payload[0]?.payload as CardioChartPoint | undefined;
+              if (!p) return null;
+              return (
+                <CardioTooltipBody point={p} exerciseLabel={exerciseLabel} />
+              );
+            }}
+          />
+          <Legend
+            verticalAlign="top"
+            height={28}
+            formatter={() => (
+              <span className="text-xs text-muted">Speed (mph)</span>
+            )}
+          />
+          <Line
+            type="monotone"
+            dataKey="speedMph"
+            name="Speed"
+            stroke="var(--accent)"
+            strokeWidth={2}
+            dot={{
+              r: 3,
+              fill: "var(--accent)",
+              stroke: "var(--background)",
+              strokeWidth: 1,
+            }}
+            connectNulls={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </ChartShell>
+  );
+}
+
 export default function CardioProgressChart({
   history,
   exerciseId,
@@ -133,6 +234,11 @@ export default function CardioProgressChart({
   );
   const hasDuration = useMemo(
     () => series.some((p) => p.durationSec != null && p.durationSec > 0),
+    [series],
+  );
+
+  const hasSpeed = useMemo(
+    () => series.some((p) => p.speedMph != null && p.speedMph > 0),
     [series],
   );
 
@@ -165,10 +271,11 @@ export default function CardioProgressChart({
 
   if (hasDistance && hasDuration) {
     return (
-      <ChartShell
-        title={activityTitle}
-        subtitle="Distance (bars) and session time (line). Tap a session for pace and Health Connect metrics when logged."
-      >
+      <>
+        <ChartShell
+          title={activityTitle}
+          subtitle="Distance (bars) and session time (line). Tap a session for pace, speed, and Health Connect metrics when logged."
+        >
         <ResponsiveContainer
           width="100%"
           height={PROGRESS_LINE_CHART_HEIGHT}
@@ -272,6 +379,14 @@ export default function CardioProgressChart({
           </ComposedChart>
         </ResponsiveContainer>
       </ChartShell>
+        {hasSpeed ? (
+          <SpeedLineChart
+            series={series}
+            activityTitle={activityTitle}
+            exerciseLabel={exerciseLabel}
+          />
+        ) : null}
+      </>
     );
   }
 
@@ -279,7 +394,7 @@ export default function CardioProgressChart({
     return (
       <ChartShell
         title={activityTitle}
-        subtitle="Distance per completed session. Tap a session for pace and Health Connect metrics when logged."
+        subtitle="Distance per completed session. Tap a session for pace, speed, and Health Connect metrics when logged."
       >
         <ResponsiveContainer
           width="100%"

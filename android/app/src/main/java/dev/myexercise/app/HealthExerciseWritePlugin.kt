@@ -8,9 +8,11 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
+import androidx.health.connect.client.units.Velocity
 import app.capgo.plugin.health.WorkoutType
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
@@ -39,6 +41,7 @@ class HealthExerciseWritePlugin : Plugin() {
     val endInstant: Instant,
     val distanceMeters: Double?,
     val activeCaloriesKcal: Double?,
+    val speedMetersPerSecond: Double?,
   )
 
   private var pendingSave: PendingSave? = null
@@ -97,6 +100,7 @@ class HealthExerciseWritePlugin : Plugin() {
 
     val distanceMeters = call.getDouble("distanceMeters")
     val activeCaloriesKcal = call.getDouble("activeCaloriesKcal")
+    val speedMetersPerSecond = call.getDouble("speedMetersPerSecond")
 
     pluginScope.launch {
       val client = getClientOrReject(call) ?: return@launch
@@ -109,8 +113,27 @@ class HealthExerciseWritePlugin : Plugin() {
             endInstant,
             distanceMeters,
             activeCaloriesKcal,
+            speedMetersPerSecond,
           )
-        launchPermissionRequest(call)
+        launchPermissionRequest(call, speedMetersPerSecond != null && speedMetersPerSecond > 0)
+        return@launch
+      }
+      if (
+        speedMetersPerSecond != null &&
+          speedMetersPerSecond > 0 &&
+          !hasSpeedWritePermission(client)
+      ) {
+        pendingSave =
+          PendingSave(
+            call,
+            exerciseType,
+            startInstant,
+            endInstant,
+            distanceMeters,
+            activeCaloriesKcal,
+            speedMetersPerSecond,
+          )
+        launchPermissionRequest(call, includeSpeed = true)
         return@launch
       }
       insertSession(
@@ -121,6 +144,7 @@ class HealthExerciseWritePlugin : Plugin() {
         endInstant,
         distanceMeters,
         activeCaloriesKcal,
+        speedMetersPerSecond,
       )
     }
   }
@@ -164,14 +188,22 @@ class HealthExerciseWritePlugin : Plugin() {
         pending.endInstant,
         pending.distanceMeters,
         pending.activeCaloriesKcal,
+        pending.speedMetersPerSecond,
       )
     }
   }
 
-  private fun launchPermissionRequest(call: PluginCall) {
-    val writePermission =
-      HealthPermission.getWritePermission(ExerciseSessionRecord::class)
-    val intent = permissionContract.createIntent(context, setOf(writePermission))
+  private fun writePermissions(includeSpeed: Boolean): Set<String> {
+    val permissions =
+      mutableSetOf(HealthPermission.getWritePermission(ExerciseSessionRecord::class))
+    if (includeSpeed) {
+      permissions.add(HealthPermission.getWritePermission(SpeedRecord::class))
+    }
+    return permissions
+  }
+
+  private fun launchPermissionRequest(call: PluginCall, includeSpeed: Boolean = false) {
+    val intent = permissionContract.createIntent(context, writePermissions(includeSpeed))
     try {
       startActivityForResult(call, intent, "permissionsCallback")
     } catch (e: Exception) {
@@ -194,6 +226,13 @@ class HealthExerciseWritePlugin : Plugin() {
     return client.permissionController.getGrantedPermissions().contains(writePermission)
   }
 
+  private suspend fun hasSpeedWritePermission(
+    client: HealthConnectClient,
+  ): Boolean {
+    val writePermission = HealthPermission.getWritePermission(SpeedRecord::class)
+    return client.permissionController.getGrantedPermissions().contains(writePermission)
+  }
+
   private suspend fun insertSession(
     call: PluginCall,
     client: HealthConnectClient,
@@ -202,6 +241,7 @@ class HealthExerciseWritePlugin : Plugin() {
     endInstant: Instant,
     distanceMeters: Double?,
     activeCaloriesKcal: Double?,
+    speedMetersPerSecond: Double?,
   ) {
     try {
       val metadata = Metadata.manualEntry()
@@ -247,6 +287,36 @@ class HealthExerciseWritePlugin : Plugin() {
       }
 
       client.insertRecords(records)
+
+      if (speedMetersPerSecond != null && speedMetersPerSecond > 0) {
+        val speedPermission =
+          HealthPermission.getWritePermission(SpeedRecord::class)
+        if (client.permissionController.getGrantedPermissions().contains(speedPermission)) {
+          val sampleTime =
+            startInstant.plusSeconds(
+              java.time.Duration.between(startInstant, endInstant).seconds / 2,
+            )
+          client.insertRecords(
+            listOf(
+              SpeedRecord(
+                startTime = startInstant,
+                startZoneOffset = startOffset,
+                endTime = endInstant,
+                endZoneOffset = endOffset,
+                samples =
+                  listOf(
+                    SpeedRecord.Sample(
+                      time = sampleTime,
+                      speed = Velocity.metersPerSecond(speedMetersPerSecond),
+                    ),
+                  ),
+                metadata = metadata,
+              ),
+            ),
+          )
+        }
+      }
+
       call.resolve()
     } catch (e: Exception) {
       call.reject(e.message ?: "Failed to save exercise session", null, e)

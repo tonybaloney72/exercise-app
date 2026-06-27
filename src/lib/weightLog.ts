@@ -1,5 +1,5 @@
 import type { WeightLogEntry } from "@/types";
-import { parseLocalDateKey } from "@/utils/weekCalendar";
+import { parseLocalDateKey } from "@/utils/localDateKey";
 
 export interface WeightChartPoint {
   /** Stable ordinal for the chart x-axis (one slot per entry). */

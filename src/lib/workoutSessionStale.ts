@@ -1,6 +1,5 @@
 import { compareDateKeyToRef } from "@/lib/workoutHistoryCalendar";
-import { formatLocalDateKey } from "@/utils/localDateKey";
-import { parseLocalDateKey } from "@/utils/weekCalendar";
+import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import type { WorkoutLog } from "@/types";
 
 export function isInProgressWorkoutLog(log: WorkoutLog): boolean {

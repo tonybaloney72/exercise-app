@@ -18,15 +18,12 @@ import { formatCompletedBannerTitle } from "@/lib/workoutHistoryGroups";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { getBackfillEligibility } from "@/lib/backfillWorkout";
 import { compareDateKeyToRef } from "@/lib/workoutHistoryCalendar";
-import { formatLocalDateKey } from "@/utils/localDateKey";
+import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import {
   findCompletedWorkoutForDate,
   findInProgressWorkoutForDate,
 } from "@/utils/workoutLogLookup";
-import {
-  isDateKeyInCurrentCalendarWeek,
-  parseLocalDateKey,
-} from "@/utils/weekCalendar";
+import { isDateKeyInCurrentCalendarWeek } from "@/utils/weekCalendar";
 
 function formatPageTitle(dateKey: string): string {
   const d = parseLocalDateKey(dateKey);

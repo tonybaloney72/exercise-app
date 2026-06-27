@@ -35,6 +35,8 @@ describe("buildCardioChartSeries", () => {
     expect(series[1]?.distanceMi).toBe(1.5);
     expect(series[1]?.xLabel).toContain("#2");
     expect(series[1]?.sessionIndex).toBe(2);
+    expect(series[0]?.speedMph).toBe(6.2);
+    expect(series[1]?.speedMph).toBe(6);
   });
 
   it("includes session step counts from Health Connect", () => {

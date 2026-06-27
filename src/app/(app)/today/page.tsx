@@ -23,13 +23,12 @@ import { saveCustomDayPlan } from "@/lib/trainingWeekCustomize";
 import { useWeekSourceForDate } from "@/hooks/useWeekSourceForDate";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { formatLocalDateKey } from "@/utils/localDateKey";
+import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import { toastSaveError } from "@/utils/saveErrorToast";
 import {
   findCompletedStrengthWorkoutForDate,
   getPausedWorkoutDateForToday,
 } from "@/utils/workoutLogLookup";
-import { parseLocalDateKey } from "@/utils/weekCalendar";
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";

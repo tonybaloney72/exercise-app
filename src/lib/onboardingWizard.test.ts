@@ -5,6 +5,7 @@ import {
   ONBOARDING_DEFERRED_SESSION_KEY,
   onboardingStepIndex,
 } from "@/lib/onboardingWizard";
+import { createMemoryStorageMock } from "@/test/memoryStorageMock";
 
 describe("onboardingWizard", () => {
   it("tracks step order", () => {
@@ -13,20 +14,8 @@ describe("onboardingWizard", () => {
   });
 
   describe("session defer", () => {
-    const store = new Map<string, string>();
-
     beforeEach(() => {
-      store.clear();
-      vi.stubGlobal("sessionStorage", {
-        getItem: (key: string) => store.get(key) ?? null,
-        setItem: (key: string, value: string) => {
-          store.set(key, value);
-        },
-        removeItem: (key: string) => {
-          store.delete(key);
-        },
-        clear: () => store.clear(),
-      });
+      vi.stubGlobal("sessionStorage", createMemoryStorageMock());
     });
 
     afterEach(() => {
@@ -36,7 +25,7 @@ describe("onboardingWizard", () => {
     it("defers onboarding for the session", () => {
       expect(isOnboardingDeferredThisSession()).toBe(false);
       deferOnboardingThisSession();
-      expect(store.get(ONBOARDING_DEFERRED_SESSION_KEY)).toBe("1");
+      expect(sessionStorage.getItem(ONBOARDING_DEFERRED_SESSION_KEY)).toBe("1");
       expect(isOnboardingDeferredThisSession()).toBe(true);
     });
   });

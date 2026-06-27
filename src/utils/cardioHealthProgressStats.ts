@@ -1,5 +1,10 @@
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import type { WorkoutLog } from "@/types";
+import {
+  buildChartSessionAxis,
+  sortByChartSortKey,
+} from "@/utils/localDateKey";
+import { positiveNumber } from "@/utils/optionalNumber";
 
 export interface CardioHealthChartPoint {
   date: string;
@@ -17,16 +22,6 @@ export interface CardioHealthTotals {
   sessionsWithHeartRate: number;
 }
 
-function parseDateKeyMs(key: string): number {
-  const [y, m, d] = key.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, d ?? 1, 12, 0, 0, 0).getTime();
-}
-
-function shortLabel(dateKey: string): string {
-  const [, m, d] = dateKey.split("-").map(Number);
-  return `${m ?? 1}/${d ?? 1}`;
-}
-
 /** Per completed cardio session with steps, active kcal, and/or avg HR logged. */
 export function buildCardioHealthChartSeries(
   history: WorkoutLog[],
@@ -39,33 +34,22 @@ export function buildCardioHealthChartSeries(
     );
 
     entries.forEach((entry, index) => {
-      const kcal =
-        entry.activeCaloriesKcal != null && entry.activeCaloriesKcal > 0
-          ? entry.activeCaloriesKcal
-          : undefined;
-      const hr =
-        entry.avgHeartRateBpm != null && entry.avgHeartRateBpm > 0
-          ? entry.avgHeartRateBpm
-          : undefined;
+      const kcal = positiveNumber(entry.activeCaloriesKcal);
+      const hr = positiveNumber(entry.avgHeartRateBpm);
 
       if (kcal == null && hr == null) return;
 
       const sessionIndex = index + 1;
-      const baseLabel = shortLabel(workout.date);
       rows.push({
         date: workout.date,
-        xLabel:
-          sessionIndex > 1 ? `${baseLabel} · #${sessionIndex}` : baseLabel,
-        sortKey: parseDateKeyMs(workout.date) + index * 0.0001,
-        sessionIndex: sessionIndex > 1 ? sessionIndex : undefined,
+        ...buildChartSessionAxis(workout.date, sessionIndex),
         activeCaloriesKcal: kcal,
         avgHeartRateBpm: hr,
       });
     });
   }
 
-  rows.sort((a, b) => a.sortKey - b.sortKey);
-  return rows;
+  return sortByChartSortKey(rows);
 }
 
 export function buildCardioHealthTotals(
@@ -78,11 +62,13 @@ export function buildCardioHealthTotals(
   for (const workout of history) {
     for (const row of resolveWorkoutCardioExercises(workout)) {
       if (!row.completed || row.skipped) continue;
-      if (row.activeCaloriesKcal != null && row.activeCaloriesKcal > 0) {
-        totalActiveKcal += row.activeCaloriesKcal;
+      const kcal = positiveNumber(row.activeCaloriesKcal);
+      const hr = positiveNumber(row.avgHeartRateBpm);
+      if (kcal != null) {
+        totalActiveKcal += kcal;
         sessionsWithKcal += 1;
       }
-      if (row.avgHeartRateBpm != null && row.avgHeartRateBpm > 0) {
+      if (hr != null) {
         sessionsWithHeartRate += 1;
       }
     }

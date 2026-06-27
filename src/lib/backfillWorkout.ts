@@ -1,11 +1,10 @@
 import type { WorkoutLog } from "@/types";
 import { compareDateKeyToRef } from "@/lib/workoutHistoryCalendar";
-import { formatLocalDateKey } from "@/utils/localDateKey";
+import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import {
   findCompletedWorkoutForDate,
   findInProgressWorkoutForDate,
 } from "@/utils/workoutLogLookup";
-import { parseLocalDateKey } from "@/utils/weekCalendar";
 
 export type BackfillEligibility =
   | { ok: true }

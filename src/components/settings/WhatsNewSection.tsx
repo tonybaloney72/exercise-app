@@ -1,6 +1,5 @@
 "use client";
 
-import CollapsibleSection from "@/components/common/CollapsibleSection";
 import {
   formatReleaseNoteDate,
   getAllReleaseNotes,
@@ -46,21 +45,4 @@ export function WhatsNewNotesList({ notes }: { notes: ReleaseNote[] }) {
 
 export function useReleaseNotesForApp() {
   return getAllReleaseNotes();
-}
-
-export default function WhatsNewSection() {
-  const notes = useReleaseNotesForApp();
-
-  if (notes.length === 0) return null;
-
-  return (
-    <CollapsibleSection
-      title="What's new"
-      hint="Recent updates and improvements"
-      defaultOpen={false}
-      contentClassName="flex flex-col gap-5 p-4"
-    >
-      <WhatsNewNotesList notes={notes} />
-    </CollapsibleSection>
-  );
 }

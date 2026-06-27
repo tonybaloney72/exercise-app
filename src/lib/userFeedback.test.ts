@@ -6,26 +6,11 @@ import {
   validateExerciseFeedbackSubmit,
   validateGeneralFeedbackSubmit,
 } from "@/lib/userFeedback";
-
-function createLocalStorageMock() {
-  const store = new Map<string, string>();
-  return {
-    getItem: (key: string) => store.get(key) ?? null,
-    setItem: (key: string, value: string) => {
-      store.set(key, value);
-    },
-    removeItem: (key: string) => {
-      store.delete(key);
-    },
-    clear: () => {
-      store.clear();
-    },
-  };
-}
+import { createMemoryStorageMock } from "@/test/memoryStorageMock";
 
 describe("userFeedback", () => {
   beforeEach(() => {
-    vi.stubGlobal("localStorage", createLocalStorageMock());
+    vi.stubGlobal("localStorage", createMemoryStorageMock());
   });
 
   afterEach(() => {

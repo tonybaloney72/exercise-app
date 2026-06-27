@@ -2,11 +2,14 @@
   {
     "id": "2026-06-27",
     "date": "2026-06-27",
-    "title": "Settings & workout polish",
+    "title": "Settings, cardio & workout polish",
     "highlights": [
-      "Settings is reorganized into a simple hub with Training plan, Device & timers, and App & updates on their own pages.",
+      "Settings is reorganized into a hub with Training plan, Device & timers, and App & updates on their own pages.",
       "Warm-up and cool-down sections collapse automatically when every stretch is checked off.",
-      "Workout logging rows got a layout polish—menus, completion checkboxes, and timer/rep controls are easier to use while logging sets."
+      "Workout rows are easier to log—the actions menu sits on the left, with clearer checkboxes and timer/rep controls.",
+      "Many Hybrid Calisthenics leg and lunge exercises now have their own coaching notes instead of generic squat text.",
+      "Cardio progress charts show average speed (mph) when you log distance and time; tap a session for pace and speed.",
+      "Activities logged with distance and time also save average speed to Health Connect on Android (install the latest app build)."
     ]
   },
   {

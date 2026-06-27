@@ -36,7 +36,7 @@ export default function WorkoutRowOverflowMenu({
       const rect = el.getBoundingClientRect();
       const minWidth = 208;
       const left = Math.min(
-        Math.max(8, rect.right - minWidth),
+        Math.max(8, rect.left),
         window.innerWidth - minWidth - 8,
       );
       setMenuStyle({
@@ -82,7 +82,7 @@ export default function WorkoutRowOverflowMenu({
           <ul
             id={listId}
             role="menu"
-            className="fixed z-[200] overflow-hidden rounded-lg border border-border bg-surface py-1 shadow-lg"
+            className="fixed z-200 overflow-hidden rounded-lg border border-border bg-surface py-1 shadow-lg"
             style={{
               top: menuStyle.top,
               left: menuStyle.left,
@@ -120,7 +120,7 @@ export default function WorkoutRowOverflowMenu({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-9 w-9 items-center justify-center rounded-md text-muted transition-colors hover:bg-border/60 hover:text-foreground"
+        className="flex h-5 w-5 md:h-9 md:w-9 items-center justify-center rounded-md text-muted transition-colors hover:bg-border/60 hover:text-foreground mr-1"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={listId}

@@ -20,7 +20,7 @@ import {
   findInProgressWorkoutForDate,
   findCompletedWorkoutForDate,
 } from "@/utils/workoutLogLookup";
-import { parseLocalDateKey } from "@/utils/weekCalendar";
+import { parseLocalDateKey } from "@/utils/localDateKey";
 
 function formatPageTitle(dateKey: string): string {
   const d = parseLocalDateKey(dateKey);

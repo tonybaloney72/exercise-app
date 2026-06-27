@@ -14,7 +14,7 @@ import {
 import { useTrainingWeekStore } from "@/stores/useTrainingWeekStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { DayPlan } from "@/types";
-import { parseLocalDateKey } from "@/utils/weekCalendar";
+import { parseLocalDateKey } from "@/utils/localDateKey";
 
 export function useDayPlan(dateKey: string): {
   plan: DayPlan | null;

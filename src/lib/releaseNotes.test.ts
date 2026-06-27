@@ -6,6 +6,7 @@ import {
   markReleaseNotesSeen,
   releaseNoteHeading,
 } from "@/lib/releaseNotes";
+import { createMemoryStorageMock } from "@/test/memoryStorageMock";
 
 describe("getUnseenReleaseNotes", () => {
   it("returns bundled notes not in the seen set", () => {
@@ -39,22 +40,8 @@ describe("getAllReleaseNotes", () => {
 });
 
 describe("markReleaseNotesSeen", () => {
-  const storage = new Map<string, string>();
-
   beforeEach(() => {
-    storage.clear();
-    vi.stubGlobal("localStorage", {
-      getItem: (key: string) => storage.get(key) ?? null,
-      setItem: (key: string, value: string) => {
-        storage.set(key, value);
-      },
-      removeItem: (key: string) => {
-        storage.delete(key);
-      },
-      clear: () => {
-        storage.clear();
-      },
-    });
+    vi.stubGlobal("localStorage", createMemoryStorageMock());
   });
 
   afterEach(() => {
@@ -75,9 +62,9 @@ describe("markReleaseNotesSeen", () => {
   });
 
   it("migrates legacy semver dismissals to note ids", () => {
-    storage.set("release-notes-last-seen-version", "0.20.0");
+    localStorage.setItem("release-notes-last-seen-version", "0.20.0");
     expect(getUnseenReleaseNotes().map((n) => n.id)).toEqual(["2026-06-27"]);
-    expect(storage.has("release-notes-last-seen-version")).toBe(false);
+    expect(localStorage.getItem("release-notes-last-seen-version")).toBeNull();
   });
 });
 
@@ -87,10 +74,10 @@ describe("releaseNoteHeading", () => {
       releaseNoteHeading({
         id: "2026-06-27",
         date: "2026-06-27",
-        title: "Settings & workout polish",
+        title: "Settings, cardio & workout polish",
         highlights: [],
       }),
-    ).toBe("Settings & workout polish");
+    ).toBe("Settings, cardio & workout polish");
   });
 });
 

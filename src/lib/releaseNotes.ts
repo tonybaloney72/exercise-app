@@ -16,7 +16,7 @@ const LEGACY_SEEN_ID_MAP: Record<string, string[]> = {
   "0.20.0": ["2026-06-20-health-connect"],
 };
 
-export const RELEASE_NOTES: ReleaseNote[] = [...releaseNotesJson].sort(
+const RELEASE_NOTES: ReleaseNote[] = [...releaseNotesJson].sort(
   compareReleaseNotesByRecency,
 );
 
@@ -37,7 +37,7 @@ function parseSeenIds(raw: string | null): Set<string> {
   }
 }
 
-export function getSeenReleaseNoteIds(): Set<string> {
+function getSeenReleaseNoteIds(): Set<string> {
   if (typeof localStorage === "undefined") return new Set();
   try {
     const seen = parseSeenIds(localStorage.getItem(STORAGE_KEY));

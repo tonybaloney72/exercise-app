@@ -39,11 +39,11 @@ import { useDayPlan } from "@/hooks/useDayPlan";
 import { useTrainingWeekPlans } from "@/hooks/useTrainingWeekPlans";
 import type { DayPlan } from "@/types";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
+import { parseLocalDateKey } from "@/utils/localDateKey";
 import {
   compareDateKeyToToday,
   isDateKeyInCurrentCalendarWeek,
   getWeekDateKeys,
-  parseLocalDateKey,
 } from "@/utils/weekCalendar";
 
 function formatCompletedBannerTitle(dateKey: string): string {

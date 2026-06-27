@@ -1,4 +1,5 @@
 import { resolveActiveCaloriesForWrite } from "@/lib/health/cardioCalorieEstimate";
+import { computeCardioSpeedMetersPerSecond } from "@/lib/health/cardioPaceMetrics";
 import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
 import {
   ensureExerciseSessionWriteAccess,
@@ -48,6 +49,10 @@ export async function writeAppTrackedCardioToHealth(
     fromHealth: input.activeCaloriesKcal,
     weightLb: input.weightLb,
   });
+  const speedMetersPerSecond = computeCardioSpeedMetersPerSecond(
+    input.distanceMi,
+    input.durationSeconds,
+  );
 
   if (input.distanceMi != null && input.distanceMi > 0) {
     await writeNativeHealthSample({
@@ -77,6 +82,7 @@ export async function writeAppTrackedCardioToHealth(
     ...(activeKcal != null && activeKcal > 0
       ? { activeCaloriesKcal: activeKcal }
       : {}),
+    ...(speedMetersPerSecond != null ? { speedMetersPerSecond } : {}),
   });
 
   clientTrace("health-write", "app_tracked_cardio_ok", {
@@ -84,6 +90,7 @@ export async function writeAppTrackedCardioToHealth(
     distanceMi: input.distanceMi,
     activeKcal,
     durationSeconds: input.durationSeconds,
+    hasSpeed: speedMetersPerSecond != null,
   });
 }
 

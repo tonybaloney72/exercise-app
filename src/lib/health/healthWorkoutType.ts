@@ -38,3 +38,22 @@ export function totalCompletedCardioDistanceMeters(
   if (totalMi <= 0) return undefined;
   return totalMi * 1609.344;
 }
+
+/** Average completed-cardio speed (m/s) when distance and duration are both logged. */
+export function completedCardioSpeedMetersPerSecond(
+  log: WorkoutLog,
+): number | undefined {
+  let totalMi = 0;
+  let totalSec = 0;
+  for (const row of resolveWorkoutCardioExercises(log)) {
+    if (!row.completed || row.skipped) continue;
+    if (row.actualDistanceMi != null && row.actualDistanceMi > 0) {
+      totalMi += row.actualDistanceMi;
+    }
+    if (row.actualDuration != null && row.actualDuration > 0) {
+      totalSec += row.actualDuration;
+    }
+  }
+  if (totalMi <= 0 || totalSec <= 0) return undefined;
+  return (totalMi * 1609.344) / totalSec;
+}

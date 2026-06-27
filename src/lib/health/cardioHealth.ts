@@ -15,7 +15,7 @@ import {
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
-import { formatLocalDateKey } from "@/utils/localDateKey";
+import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import { rankCardioSessionsForImport } from "@/lib/health/cardioSessionMatch";
 import type { HealthDataType } from "@capgo/capacitor-health";
 import {
@@ -334,12 +334,19 @@ export function localDayHealthWindow(
   dateKey: string,
   now: Date = new Date(),
 ): { start: Date; end: Date } {
-  const [y, m, d] = dateKey.split("-").map(Number);
-  const start = new Date(y!, (m ?? 1) - 1, d ?? 1, 0, 0, 0, 0);
+  const day = parseLocalDateKey(dateKey);
+  if (!day) {
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    return { start, end: new Date(now) };
+  }
+  const start = new Date(day);
+  start.setHours(0, 0, 0, 0);
   if (dateKey === formatLocalDateKey(now)) {
     return { start, end: new Date(now) };
   }
-  const end = new Date(y!, (m ?? 1) - 1, d ?? 1, 23, 59, 59, 999);
+  const end = new Date(day);
+  end.setHours(23, 59, 59, 999);
   return { start, end };
 }
 

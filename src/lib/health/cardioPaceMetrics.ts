@@ -34,3 +34,19 @@ export function formatCardioPaceSummary(
   if (!metrics) return undefined;
   return `${metrics.paceLabel} · ${metrics.avgSpeedMph} mph`;
 }
+
+/** Average speed in m/s when distance and duration are both known. */
+export function computeCardioSpeedMetersPerSecond(
+  distanceMi?: number,
+  durationSeconds?: number,
+): number | undefined {
+  if (
+    distanceMi == null ||
+    distanceMi <= 0 ||
+    durationSeconds == null ||
+    durationSeconds <= 0
+  ) {
+    return undefined;
+  }
+  return (distanceMi * 1609.344) / durationSeconds;
+}

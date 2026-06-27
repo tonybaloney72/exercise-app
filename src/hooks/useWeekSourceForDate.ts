@@ -10,7 +10,7 @@ import {
   weekCacheEntryMatches,
 } from "@/use-cases/trainingWeek/weekCache";
 import { useTrainingWeekStore } from "@/stores/useTrainingWeekStore";
-import { parseLocalDateKey } from "@/utils/weekCalendar";
+import { parseLocalDateKey } from "@/utils/localDateKey";
 
 /** Week `source` from the session cache (null until the week row is loaded). */
 export function useWeekSourceForDate(dateKey: string): string | null {
