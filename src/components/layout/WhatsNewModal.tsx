@@ -3,6 +3,7 @@
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import {
   formatReleaseNoteDate,
+  releaseNoteHeading,
   type ReleaseNote,
 } from "@/lib/releaseNotes";
 
@@ -36,21 +37,27 @@ export default function WhatsNewModal({
         </button>
       }
     >
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col">
         {notes.map((note) => (
-          <section key={note.version} aria-labelledby={`whats-new-${note.version}`}>
-            <div className="mb-2">
+          <section
+            key={note.id}
+            aria-labelledby={`whats-new-${note.id}`}
+            className="flex flex-col gap-2 py-2"
+          >
+            <div className="flex flex-col gap-0.5 px-4">
               <h3
-                id={`whats-new-${note.version}`}
+                id={`whats-new-${note.id}`}
                 className="text-sm font-semibold text-foreground"
               >
-                Version {note.version}
+                {releaseNoteHeading(note)}
               </h3>
-              <p className="text-xs text-muted">
-                {formatReleaseNoteDate(note.date)}
-              </p>
+              {note.title ? (
+                <p className="text-xs text-muted">
+                  {formatReleaseNoteDate(note.date)}
+                </p>
+              ) : null}
             </div>
-            <ul className="flex list-disc flex-col gap-2 pl-5 text-sm leading-relaxed text-muted">
+            <ul className="flex list-disc flex-col gap-2 px-6 text-sm leading-relaxed text-muted">
               {note.highlights.map((line) => (
                 <li key={line}>{line}</li>
               ))}

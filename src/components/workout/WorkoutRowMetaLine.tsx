@@ -70,7 +70,7 @@ function NameBlock({
     <button
       type="button"
       onClick={onNameClick}
-      className="w-full min-w-0 text-left"
+      className="w-full min-w-0 text-left py-2"
     >
       {title}
       {subName}
@@ -128,9 +128,9 @@ export default function WorkoutRowMetaLine({
   if (splitDetailRow) {
     return (
       <div className={`min-w-0 flex-1 ${dense ? "" : "py-1"}`}>
-        <div className="flex min-w-0 flex-col">
+        <div className="flex min-w-0 flex-col gap-1">
           <div className="flex min-w-0 items-center justify-between">
-            {leading ? <div className="mr-2">{leading}</div> : null}
+            <div className="shrink-0">{overflowMenu}</div>
             <NameBlock
               name={name}
               nameClassName={nameClassName}
@@ -139,9 +139,11 @@ export default function WorkoutRowMetaLine({
               onNameClick={onNameClick}
             />
             {chevronButton ? (
-              <div className="shrink-0 flex items-center">{chevronButton}</div>
+              <div className="shrink-0 flex items-center mr-2">
+                {chevronButton}
+              </div>
             ) : null}
-            <div className="shrink-0">{overflowMenu}</div>
+            {leading ? <div>{leading}</div> : null}
           </div>
           {showDetailRow ? (
             <div className="flex min-w-0 items-center justify-between">
@@ -161,7 +163,7 @@ export default function WorkoutRowMetaLine({
                     ) : null)}
                 </div>
               </div>
-              <div className="shrink-0 pr-4">{detailTrailing}</div>
+              <div className="shrink-0">{detailTrailing}</div>
             </div>
           ) : null}
           {showTimerPillRow ? (

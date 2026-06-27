@@ -1,70 +1,81 @@
 import releaseNotesJson from "@/data/releaseNotes.json";
-import { isNativePlatform } from "@/lib/capacitorRuntime";
-import { getInstalledNativeApkBuildId } from "@/lib/nativeApkVersion";
-import { compareSemver } from "@/lib/semverVersionCode";
-import packageJson from "../../package.json";
 
 export type ReleaseNote = {
-  version: string;
+  id: string;
   date: string;
+  /** Optional heading in What's new UI; falls back to formatted date. */
+  title?: string;
   highlights: string[];
 };
 
-const STORAGE_KEY = "release-notes-last-seen-version";
+const STORAGE_KEY = "release-notes-seen-ids";
+const LEGACY_STORAGE_KEY = "release-notes-last-seen-version";
 
-export const RELEASE_NOTES: ReleaseNote[] = [...releaseNotesJson].sort((a, b) =>
-  compareSemver(b.version, a.version),
+/** Maps dismissed semver keys from the old release-notes flow. */
+const LEGACY_SEEN_ID_MAP: Record<string, string[]> = {
+  "0.20.0": ["2026-06-20-health-connect"],
+};
+
+export const RELEASE_NOTES: ReleaseNote[] = [...releaseNotesJson].sort(
+  compareReleaseNotesByRecency,
 );
 
-export async function resolveAppReleaseVersion(): Promise<string> {
-  if (isNativePlatform()) {
-    const native = await getInstalledNativeApkBuildId();
-    if (native) return native;
-  }
-  const env = process.env.NEXT_PUBLIC_APP_VERSION?.trim();
-  return env && env.length > 0 ? env : packageJson.version;
+function compareReleaseNotesByRecency(a: ReleaseNote, b: ReleaseNote): number {
+  const byDate = b.date.localeCompare(a.date);
+  if (byDate !== 0) return byDate;
+  return b.id.localeCompare(a.id);
 }
 
-export function getLastSeenReleaseNotesVersion(): string | null {
-  if (typeof localStorage === "undefined") return null;
+function parseSeenIds(raw: string | null): Set<string> {
+  if (!raw) return new Set();
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)?.trim();
-    return raw && raw.length > 0 ? raw : null;
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return new Set();
+    return new Set(parsed.filter((id): id is string => typeof id === "string"));
   } catch {
-    return null;
+    return new Set();
   }
 }
 
-export function markReleaseNotesSeen(version: string): void {
-  if (typeof localStorage === "undefined") return;
+export function getSeenReleaseNoteIds(): Set<string> {
+  if (typeof localStorage === "undefined") return new Set();
   try {
-    const current = getLastSeenReleaseNotesVersion();
-    const next =
-      current && compareSemver(current, version) > 0 ? current : version;
-    localStorage.setItem(STORAGE_KEY, next);
+    const seen = parseSeenIds(localStorage.getItem(STORAGE_KEY));
+    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY)?.trim();
+    if (legacy) {
+      for (const id of LEGACY_SEEN_ID_MAP[legacy] ?? []) {
+        seen.add(id);
+      }
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...seen]));
+    }
+    return seen;
+  } catch {
+    return new Set();
+  }
+}
+
+export function markReleaseNotesSeen(noteIds: string[]): void {
+  if (typeof localStorage === "undefined" || noteIds.length === 0) return;
+  try {
+    const seen = getSeenReleaseNoteIds();
+    for (const id of noteIds) seen.add(id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...seen]));
   } catch {
     // Ignore private browsing / quota errors.
   }
 }
 
-/** Release notes the user has not dismissed, for versions at or below the running app. */
+/** Release notes bundled in this web deploy that the user has not dismissed. */
 export function getUnseenReleaseNotes(
-  appVersion: string,
-  lastSeen: string | null = getLastSeenReleaseNotesVersion(),
+  seenIds: Set<string> = getSeenReleaseNoteIds(),
 ): ReleaseNote[] {
-  const baseline = lastSeen ?? "0.0.0";
-  return RELEASE_NOTES.filter(
-    (note) =>
-      compareSemver(note.version, baseline) > 0 &&
-      compareSemver(note.version, appVersion) <= 0,
-  ).sort((a, b) => compareSemver(b.version, a.version));
+  return RELEASE_NOTES.filter((note) => !seenIds.has(note.id));
 }
 
-/** All release notes shipped at or before the running app version (newest first). */
-export function getReleaseNotesForAppVersion(appVersion: string): ReleaseNote[] {
-  return RELEASE_NOTES.filter(
-    (note) => compareSemver(note.version, appVersion) <= 0,
-  ).sort((a, b) => compareSemver(b.version, a.version));
+/** All release notes in the current bundle (newest first). */
+export function getAllReleaseNotes(): ReleaseNote[] {
+  return RELEASE_NOTES;
 }
 
 export function formatReleaseNoteDate(dateKey: string): string {
@@ -78,4 +89,9 @@ export function formatReleaseNoteDate(dateKey: string): string {
     day: "numeric",
     year: "numeric",
   });
+}
+
+export function releaseNoteHeading(note: ReleaseNote): string {
+  const title = note.title?.trim();
+  return title && title.length > 0 ? title : formatReleaseNoteDate(note.date);
 }

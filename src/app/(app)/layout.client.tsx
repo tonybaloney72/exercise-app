@@ -9,6 +9,7 @@ import WakeLockSync from "@/components/layout/WakeLockSync";
 import AppToaster from "@/components/layout/AppToaster";
 import PullToRefresh from "@/components/layout/PullToRefresh";
 import AuthInitializer from "@/components/auth/AuthInitializer";
+import WhatsNewSync from "@/components/layout/WhatsNewSync";
 
 /**
  * Client-only app shell for Capacitor static export (`CAPACITOR_BUILD=1`).
@@ -27,6 +28,7 @@ export default function CapacitorAppLayout({
       <AppDataSync />
       <OnboardingGate />
       <WakeLockSync />
+      <WhatsNewSync />
       <AppToaster />
       <PullToRefresh />
       <main className="flex-1 pb-20">

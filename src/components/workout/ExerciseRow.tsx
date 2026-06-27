@@ -339,7 +339,9 @@ export default function ExerciseRow({
   );
 
   return (
-    <div className={`transition-colors ${log.skipped ? "opacity-40" : ""}`}>
+    <div
+      className={`transition-colors flex flex-col gap-2 ${log.skipped ? "opacity-40" : ""}`}
+    >
       <div className="px-1">
         <WorkoutRowMetaLine
           leading={completionCheckbox}
@@ -400,49 +402,52 @@ export default function ExerciseRow({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="flex flex-col px-10 pb-3 gap-3">
-              <CategoryBadge category={effectiveExercise.category} size="sm" />
-              <p className="text-xs text-muted">{effectiveExercise.notes}</p>
-
-              <div className="flex flex-col gap-1.5">
-                <p className="text-caption font-medium uppercase tracking-wide text-muted">
-                  This set
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setRoundExerciseLoggingMode(
-                        roundNumber,
-                        plannedId,
-                        "reps",
-                      )
-                    }
-                    className={`rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors ${
-                      mode === "reps"
-                        ? "border-accent bg-accent/15 text-accent"
-                        : "border-border bg-surface-hover text-muted hover:text-foreground"
-                    }`}
-                  >
-                    Reps
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setRoundExerciseLoggingMode(
-                        roundNumber,
-                        plannedId,
-                        "timer",
-                      )
-                    }
-                    className={`rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors ${
-                      mode === "timer"
-                        ? "border-accent bg-accent/15 text-accent"
-                        : "border-border bg-surface-hover text-muted hover:text-foreground"
-                    }`}
-                  >
-                    Timer
-                  </button>
+            <div className="flex flex-col pl-10 pr-2 pb-3 gap-3">
+              <div className="flex items-center justify-between">
+                <CategoryBadge
+                  category={effectiveExercise.category}
+                  size="sm"
+                />
+                <div className="flex items-center gap-1.5">
+                  <p className="text-caption font-medium tracking-wide text-muted">
+                    This set:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setRoundExerciseLoggingMode(
+                          roundNumber,
+                          plannedId,
+                          "reps",
+                        )
+                      }
+                      className={`rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors ${
+                        mode === "reps"
+                          ? "border-accent bg-accent/15 text-accent"
+                          : "border-border bg-surface-hover text-muted hover:text-foreground"
+                      }`}
+                    >
+                      Reps
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setRoundExerciseLoggingMode(
+                          roundNumber,
+                          plannedId,
+                          "timer",
+                        )
+                      }
+                      className={`rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors ${
+                        mode === "timer"
+                          ? "border-accent bg-accent/15 text-accent"
+                          : "border-border bg-surface-hover text-muted hover:text-foreground"
+                      }`}
+                    >
+                      Timer
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -458,7 +463,7 @@ export default function ExerciseRow({
                   }
                 />
               )}
-
+              <p className="text-xs text-muted">{effectiveExercise.notes}</p>
               {effectiveExercise.videoUrl && (
                 <a
                   href={effectiveExercise.videoUrl}

@@ -112,7 +112,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Bar on upper back; brace core, sit hips back and down, knees track toes, drive through mid-foot to stand.",
     source: "Squat University",
     videoUrl: "https://www.youtube.com/watch?v=my0tLDaWyDU",
     isTimeBased: false,
@@ -532,7 +532,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abductors"],
     defaultReps: "10 each leg",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Band adds tension at the top; split stance, lower until back knee nears floor, front shin stays vertical.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=5_F-smr-ez8",
     isTimeBased: false,
@@ -546,7 +546,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes", "Quadriceps"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Stand on the band or anchor it low; squat against increasing tension at the top—control the descent.",
     source: "Live Lean TV Daily Exercises",
     videoUrl: "https://www.youtube.com/watch?v=Eaqr79zvqIw",
     isTimeBased: false,
@@ -826,7 +826,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "High- or low-bar on back; break at hips and knees together, depth as mobility allows, stand by driving hips up.",
     source: "PureGym",
     videoUrl: "https://www.youtube.com/watch?v=rrJIyZGlK8c",
     isTimeBased: false,
@@ -1042,7 +1042,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abductors"],
     defaultReps: "10 each leg",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Bar on back; long split stance, lower straight down with most weight on the front leg, torso upright.",
     source: "Strength Conditioning",
     videoUrl: "https://www.youtube.com/watch?v=Jl1cxp0Iwv0",
     isTimeBased: false,
@@ -1744,7 +1744,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10 each side",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Wide stance; shift weight to one leg and squat deep to that side while the opposite leg stays straight—keep heel down if you can.",
     source: "Dr. Carl Baird",
     videoUrl: "https://www.youtube.com/watch?v=nLNqEQ4B6XI",
     isTimeBased: false,
@@ -2193,7 +2193,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abductors"],
     defaultReps: "10 each leg",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Hold dumbbells at your sides; split stance, lower until back knee nears floor, push through the front heel.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=Wcmg-3iHwjQ",
     isTimeBased: false,
@@ -2347,7 +2347,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Bar on front rack, elbows high; sit straight down between your hips, torso upright, drive up through mid-foot.",
     source: "CrossFit",
     videoUrl: "https://www.youtube.com/watch?v=uYumuL_G_V0",
     isTimeBased: false,
@@ -2376,7 +2376,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes", "Quadriceps"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Hold weight at chest; sit deep with elbows inside knees and an upright torso, then stand by driving through heels.",
     source: "SquatCouple",
     videoUrl: "https://www.youtube.com/watch?v=lRYBbchqxtI",
     isTimeBased: false,
@@ -2404,7 +2404,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors", "Quadriceps"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Shoulders on pads, feet forward on platform; lower until thighs are parallel, press through heels—back stays on pad.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=rYgNArpwE7E",
     isTimeBased: false,
@@ -2604,7 +2604,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors", "Glutes", "Quadriceps"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Feet shoulder-width on platform; lower until knees reach about 90°, press without locking out or lifting hips off the seat.",
     source: "Jeff Nippard",
     videoUrl: "https://www.youtube.com/watch?v=nDh_BlnLCGc",
     isTimeBased: false,
@@ -2621,20 +2621,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
     source: "Health",
     videoUrl: "https://www.youtube.com/watch?v=qvi8aM02_GY",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-202",
-    name: "Lunge",
-    category: "LB",
-    equipment: ["bodyweight"],
-    expertiseLevel: "novice",
-    muscleGroups: ["Glutes"],
-    defaultReps: "10 each leg",
-    notes:
-      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
-    source: "Fundamentals Physiotherapy & Wellness Clinic",
-    videoUrl: "https://www.youtube.com/watch?v=1cS-6KsJW9g",
     isTimeBased: false,
   },
   {
@@ -2847,7 +2833,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Follow the machine arc; feet slightly forward, lower with control, drive up through heels—keep hips in the pad.",
     source: "Julian Titanium",
     videoUrl: "https://www.youtube.com/watch?v=RE9k04SVWOo",
     isTimeBased: false,
@@ -3226,7 +3212,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Stay upright and lean back as knees travel forward over toes; use a bench for balance—only go as low as knees tolerate.",
     source: "IgnasFit",
     videoUrl: "https://www.youtube.com/watch?v=AYN-U5nZieY",
     isTimeBased: false,
@@ -3254,7 +3240,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Glutes"],
     defaultReps: "10 each leg",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Rear foot elevated on a bench; lower under the bar path, front knee over mid-foot, torso tall throughout.",
     source: "Madeline Snacks",
     videoUrl: "https://www.youtube.com/watch?v=LPhYdIg1cbg",
     isTimeBased: false,
@@ -3296,7 +3282,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abductors"],
     defaultReps: "10 each leg",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Split stance under the bar; lower straight down along the fixed path, most load on the front leg.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=j-TJxRRPu64",
     isTimeBased: false,
@@ -3310,7 +3296,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Feet slightly ahead of the bar line; sit back and down along the guided path, knees track toes.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=ZhO7ZOgEzuI",
     isTimeBased: false,
@@ -3338,23 +3324,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abductors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Static split stance; lower until back knee nears floor, front shin mostly vertical, push through front heel.",
     source: "Atomic Athlete",
     videoUrl: "https://www.youtube.com/watch?v=hXpGSa5HYqY",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-258",
-    name: "Squat",
-    category: "LB",
-    equipment: ["bodyweight"],
-    expertiseLevel: "novice",
-    muscleGroups: ["Glutes", "Quadriceps"],
-    defaultReps: "10",
-    notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
-    source: "Metro Physical Therapy",
-    videoUrl: "https://www.youtube.com/watch?v=CsPAsICeRsM",
     isTimeBased: false,
   },
   {
@@ -3578,7 +3550,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10 each side",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Hold weight at chest; shift into a deep side squat on one leg with the opposite leg extended—move slowly and stay controlled.",
     source: "BeginnersGuide",
     videoUrl: "https://www.youtube.com/watch?v=O2Ce-XhPLuA",
     isTimeBased: false,
@@ -3637,7 +3609,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Hold weight at chest; sit into maximal depth with heels down and a neutral spine—use a counterweight if needed.",
     source: "Elastaboy 😎",
     videoUrl: "https://www.youtube.com/watch?v=ujwHRJukl-M",
     isTimeBased: false,
@@ -3739,7 +3711,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Quadriceps"],
     defaultReps: "10 each leg",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Dumbbells at your sides; split stance, controlled lower, drive up through the front leg.",
     source: "ZAP Endurance",
     videoUrl: "https://www.youtube.com/watch?v=y_26ssEpBX4",
     isTimeBased: false,
@@ -3754,7 +3726,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Adductors"],
     defaultReps: "10",
     notes:
-      "Sit hips back and down; knees track toes, chest up, drive through mid-foot to stand.",
+      "Wide stance, toes out; hold the bar between legs, sit straight down, knees track over toes.",
     source: "ArielYu_Fit",
     videoUrl: "https://www.youtube.com/watch?v=sQ-lwJtpwUc",
     isTimeBased: false,

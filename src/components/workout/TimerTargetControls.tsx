@@ -48,8 +48,8 @@ export default function TimerTargetControls({
   }, [storedTargetSeconds]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-caption text-muted">Timer length (this set)</p>
+    <div className="flex items-center gap-2 py-1">
+      <p className="text-caption text-muted">Timer length:</p>
       <div className="flex flex-wrap gap-1.5">
         {TIMER_DURATION_PRESET_SECONDS.map((sec) => (
           <button
@@ -81,10 +81,7 @@ export default function TimerTargetControls({
         </button>
       </div>
       {showCustomInput && (
-        <div className="flex flex-col gap-1.5 py-0.5">
-          <label className="text-caption font-medium uppercase tracking-wide text-muted">
-            Custom seconds
-          </label>
+        <div className="flex items-center gap-1.5">
           <input
             key={`custom-target-${storedTargetSeconds ?? ""}-${customChipActive}`}
             type="number"
@@ -101,7 +98,7 @@ export default function TimerTargetControls({
               onCommitCustom(sec);
               setCustomChipActive(false);
             }}
-            className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
+            className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 font-mono text-sm text-foreground outline-none focus:border-accent"
           />
         </div>
       )}

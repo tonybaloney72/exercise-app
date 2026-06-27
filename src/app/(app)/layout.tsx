@@ -8,6 +8,7 @@ import AppToaster from "@/components/layout/AppToaster";
 import PullToRefresh from "@/components/layout/PullToRefresh";
 import AuthInitializer from "@/components/auth/AuthInitializer";
 import NativeHealthBridgeInit from "@/components/layout/NativeHealthBridgeInit";
+import WhatsNewSync from "@/components/layout/WhatsNewSync";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { GUEST_COOKIE_NAME } from "@/lib/auth/constants";
@@ -36,6 +37,7 @@ export default async function AppLayout({
       <OnboardingGate />
       <WakeLockSync />
       <NativeHealthBridgeInit />
+      <WhatsNewSync />
       <AppToaster />
       <PullToRefresh />
       <main className="flex-1 pb-20">

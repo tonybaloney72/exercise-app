@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import WorkoutCompletionCheckbox from "@/components/workout/WorkoutCompletionCheckbox";
 import { exerciseMap } from "@/core/catalog";
@@ -85,6 +85,14 @@ export default function StretchSection({
   ).length;
   const total = exerciseLogs.length;
   const allDone = completedCount === total && total > 0;
+
+  const wasDoneRef = useRef(allDone);
+  useEffect(() => {
+    if (allDone && !wasDoneRef.current) {
+      setIsOpen(false);
+    }
+    wasDoneRef.current = allDone;
+  }, [allDone]);
 
   return (
     <motion.div layout className="rounded-xl border border-border bg-surface overflow-hidden">

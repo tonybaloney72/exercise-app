@@ -1,32 +1,40 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   formatReleaseNoteDate,
-  getReleaseNotesForAppVersion,
+  getAllReleaseNotes,
   getUnseenReleaseNotes,
   markReleaseNotesSeen,
+  releaseNoteHeading,
 } from "@/lib/releaseNotes";
 
 describe("getUnseenReleaseNotes", () => {
-  it("returns notes newer than last seen and at or below app version", () => {
-    const unseen = getUnseenReleaseNotes("0.20.0", "0.18.0");
-    expect(unseen.map((n) => n.version)).toEqual(["0.20.0"]);
+  it("returns bundled notes not in the seen set", () => {
+    const unseen = getUnseenReleaseNotes(new Set(["2026-06-20-health-connect"]));
+    expect(unseen.map((n) => n.id)).toEqual(["2026-06-27"]);
   });
 
-  it("returns nothing when last seen matches app version", () => {
-    expect(getUnseenReleaseNotes("0.20.0", "0.20.0")).toEqual([]);
+  it("returns nothing when every bundled note was seen", () => {
+    expect(
+      getUnseenReleaseNotes(
+        new Set(["2026-06-27", "2026-06-20-health-connect"]),
+      ),
+    ).toEqual([]);
   });
 
-  it("skips notes above the running app version", () => {
-    expect(getUnseenReleaseNotes("0.19.0", null)).toEqual([]);
+  it("returns all notes when nothing was seen", () => {
+    expect(getUnseenReleaseNotes(new Set()).map((n) => n.id)).toEqual([
+      "2026-06-27",
+      "2026-06-20-health-connect",
+    ]);
   });
 });
 
-describe("getReleaseNotesForAppVersion", () => {
-  it("includes only notes at or below app version", () => {
-    expect(getReleaseNotesForAppVersion("0.20.0").map((n) => n.version)).toEqual([
-      "0.20.0",
+describe("getAllReleaseNotes", () => {
+  it("returns every bundled note newest first", () => {
+    expect(getAllReleaseNotes().map((n) => n.id)).toEqual([
+      "2026-06-27",
+      "2026-06-20-health-connect",
     ]);
-    expect(getReleaseNotesForAppVersion("0.19.0")).toEqual([]);
   });
 });
 
@@ -53,15 +61,36 @@ describe("markReleaseNotesSeen", () => {
     vi.unstubAllGlobals();
   });
 
-  it("stores the dismissed app version", () => {
-    markReleaseNotesSeen("0.20.0");
-    expect(getUnseenReleaseNotes("0.20.0")).toEqual([]);
+  it("stores dismissed note ids", () => {
+    markReleaseNotesSeen(["2026-06-27"]);
+    expect(getUnseenReleaseNotes().map((n) => n.id)).toEqual([
+      "2026-06-20-health-connect",
+    ]);
   });
 
-  it("keeps the higher stored version when called with an older one", () => {
-    markReleaseNotesSeen("0.20.0");
-    markReleaseNotesSeen("0.19.0");
-    expect(storage.get("release-notes-last-seen-version")).toBe("0.20.0");
+  it("accumulates seen ids across dismissals", () => {
+    markReleaseNotesSeen(["2026-06-27"]);
+    markReleaseNotesSeen(["2026-06-20-health-connect"]);
+    expect(getUnseenReleaseNotes()).toEqual([]);
+  });
+
+  it("migrates legacy semver dismissals to note ids", () => {
+    storage.set("release-notes-last-seen-version", "0.20.0");
+    expect(getUnseenReleaseNotes().map((n) => n.id)).toEqual(["2026-06-27"]);
+    expect(storage.has("release-notes-last-seen-version")).toBe(false);
+  });
+});
+
+describe("releaseNoteHeading", () => {
+  it("prefers title when present", () => {
+    expect(
+      releaseNoteHeading({
+        id: "2026-06-27",
+        date: "2026-06-27",
+        title: "Settings & workout polish",
+        highlights: [],
+      }),
+    ).toBe("Settings & workout polish");
   });
 });
 

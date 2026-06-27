@@ -1,7 +1,18 @@
 [
   {
-    "version": "0.20.0",
+    "id": "2026-06-27",
+    "date": "2026-06-27",
+    "title": "Settings & workout polish",
+    "highlights": [
+      "Settings is reorganized into a simple hub with Training plan, Device & timers, and App & updates on their own pages.",
+      "Warm-up and cool-down sections collapse automatically when every stretch is checked off.",
+      "Workout logging rows got a layout polish—menus, completion checkboxes, and timer/rep controls are easier to use while logging sets."
+    ]
+  },
+  {
+    "id": "2026-06-20-health-connect",
     "date": "2026-06-20",
+    "title": "Health Connect & timer audio",
     "highlights": [
       "Finished workouts and logged activities can be saved to Health Connect as exercise sessions.",
       "To enable this, open Health Connect → App permissions → MyExercise and allow Exercises write access.",

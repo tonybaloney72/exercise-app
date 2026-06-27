@@ -5,36 +5,37 @@ import WhatsNewModal from "@/components/layout/WhatsNewModal";
 import {
   getUnseenReleaseNotes,
   markReleaseNotesSeen,
-  resolveAppReleaseVersion,
   type ReleaseNote,
 } from "@/lib/releaseNotes";
+import { useAuthStore } from "@/stores/useAuthStore";
 
-/** Shows the What's new modal once per app version after launch. */
+function canShowWhatsNewModal(mode: ReturnType<typeof useAuthStore.getState>["mode"]) {
+  return mode === "authenticated";
+}
+
+/** Shows the What's new modal once per release note after entering the app shell. */
 export default function WhatsNewSync() {
+  const mode = useAuthStore((s) => s.mode);
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState<ReleaseNote[]>([]);
-  const [appVersion, setAppVersion] = useState<string | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
+    if (!canShowWhatsNewModal(mode)) {
+      setOpen(false);
+      return;
+    }
 
-    void (async () => {
-      const version = await resolveAppReleaseVersion();
-      if (cancelled) return;
-      setAppVersion(version);
-      const unseen = getUnseenReleaseNotes(version);
-      if (unseen.length === 0) return;
-      setNotes(unseen);
-      setOpen(true);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    const unseen = getUnseenReleaseNotes();
+    if (unseen.length === 0) {
+      setOpen(false);
+      return;
+    }
+    setNotes(unseen);
+    setOpen(true);
+  }, [mode]);
 
   function handleDismiss() {
-    if (appVersion) markReleaseNotesSeen(appVersion);
+    markReleaseNotesSeen(notes.map((note) => note.id));
     setOpen(false);
   }
 
