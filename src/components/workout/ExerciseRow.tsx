@@ -402,7 +402,7 @@ export default function ExerciseRow({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="flex flex-col pl-10 pr-2 pb-3 gap-3">
+            <div className="flex flex-col pl-5 pr-2 pb-3 gap-3">
               <div className="flex items-center justify-between">
                 <CategoryBadge
                   category={effectiveExercise.category}

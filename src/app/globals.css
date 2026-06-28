@@ -7,6 +7,9 @@
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-surface-hover: var(--surface-hover);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-checkbox-unchecked-border: var(--checkbox-unchecked-border);
+  --color-checkbox-unchecked-bg: var(--checkbox-unchecked-bg);
   --color-border: var(--border-color);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
@@ -22,6 +25,9 @@
   --foreground: #e4e4e7;
   --surface: #1a1d27;
   --surface-hover: #242836;
+  --surface-elevated: #2d3344;
+  --checkbox-unchecked-border: #565d72;
+  --checkbox-unchecked-bg: rgba(255, 255, 255, 0.06);
   --border-color: #2a2e3a;
   --muted: #71717a;
   --accent: #6366f1;
@@ -43,6 +49,9 @@
   --foreground: #18181b;
   --surface: #ffffff;
   --surface-hover: #f1f5f9;
+  --surface-elevated: #eef2f7;
+  --checkbox-unchecked-border: #64748b;
+  --checkbox-unchecked-bg: #f1f5f9;
   --border-color: #e2e8f0;
   --muted: #94a3b8;
   --accent: #6366f1;

@@ -28,8 +28,12 @@ export default function WorkoutCompletionCheckbox({
       }
       className={`flex h-5 w-5 md:h-7 md:w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95 ${className}`}
       style={{
-        borderColor: completed ? "var(--accent)" : "var(--border-color)",
-        backgroundColor: completed ? "var(--accent)" : "transparent",
+        borderColor: completed
+          ? "var(--accent)"
+          : "var(--checkbox-unchecked-border)",
+        backgroundColor: completed
+          ? "var(--accent)"
+          : "var(--checkbox-unchecked-bg)",
       }}
     >
       {completed ? <CompletionCheckmark /> : null}

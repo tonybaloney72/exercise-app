@@ -8,7 +8,11 @@ import {
   scaledDefaultTimerSeconds,
   type PlanPrescriptionOptions,
 } from "@/lib/prescriptionScaling";
-import type { Exercise, ExerciseSetMode, ExerciseSettingsValues } from "@/types";
+import type {
+  Exercise,
+  ExerciseSetMode,
+  ExerciseSettingsValues,
+} from "@/types";
 
 export type { PlanPrescriptionOptions } from "@/lib/prescriptionScaling";
 export {
@@ -17,7 +21,7 @@ export {
 } from "@/lib/exercisePrescriptionHints";
 
 /** Quick-select timer lengths (Library + future preset row in workout). */
-export const TIMER_DURATION_PRESET_SECONDS = [30, 45, 60] as const;
+export const TIMER_DURATION_PRESET_SECONDS = [30, 45] as const;
 
 export function isPresetTimerSeconds(sec: number): boolean {
   return (TIMER_DURATION_PRESET_SECONDS as readonly number[]).includes(sec);

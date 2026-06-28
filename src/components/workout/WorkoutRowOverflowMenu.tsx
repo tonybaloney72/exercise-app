@@ -82,7 +82,7 @@ export default function WorkoutRowOverflowMenu({
           <ul
             id={listId}
             role="menu"
-            className="fixed z-200 overflow-hidden rounded-lg border border-border bg-surface py-1 shadow-lg"
+            className="fixed z-200 overflow-hidden rounded-lg border border-accent/15 bg-surface-elevated py-1 shadow-xl shadow-black/25 ring-1 ring-black/10 light:shadow-black/10 light:ring-black/5"
             style={{
               top: menuStyle.top,
               left: menuStyle.left,
@@ -94,7 +94,7 @@ export default function WorkoutRowOverflowMenu({
                 <button
                   type="button"
                   role="menuitem"
-                  className="flex w-full items-center gap-2.5 whitespace-nowrap px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-border/50"
+                  className="flex w-full items-center gap-2.5 whitespace-nowrap px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-surface-hover"
                   onClick={() => {
                     setOpen(false);
                     item.onClick();
