@@ -368,6 +368,8 @@ export interface UserSettings {
   weeklyCardioCustomized: boolean;
   /** Per emphasis-group skill cap for generator / swap / library. */
   expertiseByGroup: ExpertiseByGroup;
+  /** Dismissed What's New release note ids (signed-in users; synced via Supabase). */
+  releaseNotesSeenIds: string[];
 }
 
 /** Body weight for a local calendar day (stored in pounds). */

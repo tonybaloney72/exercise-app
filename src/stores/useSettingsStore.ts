@@ -14,6 +14,7 @@ import {
   toastSaveError,
   toastSavePartialWarning,
 } from "@/utils/saveErrorToast";
+import { loadReleaseNotesSeenIds } from "@/lib/releaseNotesSeen";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import {
   weekBlueprintSettingsChanged,
@@ -137,6 +138,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     if (!options?.force && get().hydratedForAuthKey === authKey) return;
 
     const loaded = await getSettingsRepo(mode).load();
+    const releaseNotesSeenIds =
+      mode === "authenticated"
+        ? await loadReleaseNotesSeenIds(loaded.releaseNotesSeenIds ?? [])
+        : [];
     const disliked = collectDislikedIds(
       useExercisePreferencesStore.getState().byExerciseId,
     );
@@ -147,6 +152,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     );
     const merged: UserSettings = normalizeUserSettings({
       ...loaded,
+      releaseNotesSeenIds,
       defaultWarmUp,
       defaultCoolDown,
     });
@@ -211,6 +217,7 @@ function pickUserSettingsFields(
     weeklyCardioByDay: state.weeklyCardioByDay,
     weeklyCardioCustomized: state.weeklyCardioCustomized,
     expertiseByGroup: state.expertiseByGroup,
+    releaseNotesSeenIds: state.releaseNotesSeenIds,
   };
 }
 

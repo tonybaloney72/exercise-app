@@ -1,70 +1,64 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
+import releaseNotesJson from "@/data/releaseNotes.json";
 import {
-  formatReleaseNoteDate,
   getAllReleaseNotes,
-  getUnseenReleaseNotes,
-  markReleaseNotesSeen,
+  getLatestReleaseNote,
+  getLatestUnseenReleaseNote,
+  getRecentReleaseNotes,
+  MAX_BUNDLED_RELEASE_NOTES,
   releaseNoteHeading,
 } from "@/lib/releaseNotes";
-import { createMemoryStorageMock } from "@/test/memoryStorageMock";
 
-describe("getUnseenReleaseNotes", () => {
-  it("returns bundled notes not in the seen set", () => {
-    const unseen = getUnseenReleaseNotes(new Set(["2026-06-20-health-connect"]));
-    expect(unseen.map((n) => n.id)).toEqual(["2026-06-27"]);
+describe("bundled release notes", () => {
+  it("ships at most three entries", () => {
+    expect(releaseNotesJson.length).toBeLessThanOrEqual(MAX_BUNDLED_RELEASE_NOTES);
   });
+});
 
-  it("returns nothing when every bundled note was seen", () => {
-    expect(
-      getUnseenReleaseNotes(
-        new Set(["2026-06-27", "2026-06-20-health-connect"]),
-      ),
-    ).toEqual([]);
+describe("getLatestReleaseNote", () => {
+  it("returns the newest bundled note", () => {
+    expect(getLatestReleaseNote()?.id).toBe("2026-06-28-cardio-speed-hc");
   });
+});
 
-  it("returns all notes when nothing was seen", () => {
-    expect(getUnseenReleaseNotes(new Set()).map((n) => n.id)).toEqual([
-      "2026-06-27",
+describe("getRecentReleaseNotes", () => {
+  it("returns up to three newest notes for settings", () => {
+    expect(getRecentReleaseNotes(3).map((n) => n.id)).toEqual([
+      "2026-06-28-cardio-speed-hc",
+      "2026-06-27-settings-workout",
       "2026-06-20-health-connect",
     ]);
+  });
+});
+
+describe("getLatestUnseenReleaseNote", () => {
+  it("returns only the newest note when it was not dismissed", () => {
+    const note = getLatestUnseenReleaseNote(
+      new Set(["2026-06-27-settings-workout", "2026-06-20-health-connect"]),
+    );
+    expect(note?.id).toBe("2026-06-28-cardio-speed-hc");
+  });
+
+  it("returns nothing when the newest note was dismissed", () => {
+    expect(
+      getLatestUnseenReleaseNote(
+        new Set([
+          "2026-06-28-cardio-speed-hc",
+          "2026-06-27-settings-workout",
+          "2026-06-20-health-connect",
+        ]),
+      ),
+    ).toBeUndefined();
   });
 });
 
 describe("getAllReleaseNotes", () => {
   it("returns every bundled note newest first", () => {
     expect(getAllReleaseNotes().map((n) => n.id)).toEqual([
-      "2026-06-27",
+      "2026-06-28-cardio-speed-hc",
+      "2026-06-27-settings-workout",
       "2026-06-20-health-connect",
     ]);
-  });
-});
-
-describe("markReleaseNotesSeen", () => {
-  beforeEach(() => {
-    vi.stubGlobal("localStorage", createMemoryStorageMock());
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it("stores dismissed note ids", () => {
-    markReleaseNotesSeen(["2026-06-27"]);
-    expect(getUnseenReleaseNotes().map((n) => n.id)).toEqual([
-      "2026-06-20-health-connect",
-    ]);
-  });
-
-  it("accumulates seen ids across dismissals", () => {
-    markReleaseNotesSeen(["2026-06-27"]);
-    markReleaseNotesSeen(["2026-06-20-health-connect"]);
-    expect(getUnseenReleaseNotes()).toEqual([]);
-  });
-
-  it("migrates legacy semver dismissals to note ids", () => {
-    localStorage.setItem("release-notes-last-seen-version", "0.20.0");
-    expect(getUnseenReleaseNotes().map((n) => n.id)).toEqual(["2026-06-27"]);
-    expect(localStorage.getItem("release-notes-last-seen-version")).toBeNull();
   });
 });
 
@@ -72,23 +66,11 @@ describe("releaseNoteHeading", () => {
   it("prefers title when present", () => {
     expect(
       releaseNoteHeading({
-        id: "2026-06-27",
-        date: "2026-06-27",
-        title: "Settings, cardio & workout polish",
+        id: "2026-06-28-cardio-speed-hc",
+        date: "2026-06-28",
+        title: "Cardio speed & Health Connect",
         highlights: [],
       }),
-    ).toBe("Settings, cardio & workout polish");
-  });
-});
-
-describe("formatReleaseNoteDate", () => {
-  it("formats ISO date keys", () => {
-    expect(formatReleaseNoteDate("2026-06-20")).toMatch(/Jun/);
-    expect(formatReleaseNoteDate("2026-06-20")).toMatch(/20/);
-    expect(formatReleaseNoteDate("2026-06-20")).toMatch(/2026/);
-  });
-
-  it("returns the raw key when parsing fails", () => {
-    expect(formatReleaseNoteDate("not-a-date")).toBe("not-a-date");
+    ).toBe("Cardio speed & Health Connect");
   });
 });

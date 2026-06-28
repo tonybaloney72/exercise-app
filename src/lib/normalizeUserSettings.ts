@@ -212,5 +212,15 @@ export function normalizeUserSettings(
     weeklyPplScheduleCustomized,
     weeklyCardioByDay,
     weeklyCardioCustomized,
+    releaseNotesSeenIds: sanitizeReleaseNotesSeenIds(
+      partial.releaseNotesSeenIds,
+    ),
   };
+}
+
+function sanitizeReleaseNotesSeenIds(ids: unknown): string[] {
+  if (!Array.isArray(ids)) return [];
+  return ids.filter(
+    (id): id is string => typeof id === "string" && id.trim().length > 0,
+  );
 }

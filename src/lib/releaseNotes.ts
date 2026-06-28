@@ -8,13 +8,8 @@ export type ReleaseNote = {
   highlights: string[];
 };
 
-const STORAGE_KEY = "release-notes-seen-ids";
-const LEGACY_STORAGE_KEY = "release-notes-last-seen-version";
-
-/** Maps dismissed semver keys from the old release-notes flow. */
-const LEGACY_SEEN_ID_MAP: Record<string, string[]> = {
-  "0.20.0": ["2026-06-20-health-connect"],
-};
+/** Maximum release notes shipped in the app bundle. */
+export const MAX_BUNDLED_RELEASE_NOTES = 3;
 
 const RELEASE_NOTES: ReleaseNote[] = [...releaseNotesJson].sort(
   compareReleaseNotesByRecency,
@@ -26,54 +21,28 @@ function compareReleaseNotesByRecency(a: ReleaseNote, b: ReleaseNote): number {
   return b.id.localeCompare(a.id);
 }
 
-function parseSeenIds(raw: string | null): Set<string> {
-  if (!raw) return new Set();
-  try {
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return new Set();
-    return new Set(parsed.filter((id): id is string => typeof id === "string"));
-  } catch {
-    return new Set();
-  }
+/** Newest bundled release note, if any. */
+export function getLatestReleaseNote(): ReleaseNote | undefined {
+  return RELEASE_NOTES[0];
 }
 
-function getSeenReleaseNoteIds(): Set<string> {
-  if (typeof localStorage === "undefined") return new Set();
-  try {
-    const seen = parseSeenIds(localStorage.getItem(STORAGE_KEY));
-    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY)?.trim();
-    if (legacy) {
-      for (const id of LEGACY_SEEN_ID_MAP[legacy] ?? []) {
-        seen.add(id);
-      }
-      localStorage.removeItem(LEGACY_STORAGE_KEY);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...seen]));
-    }
-    return seen;
-  } catch {
-    return new Set();
-  }
-}
-
-export function markReleaseNotesSeen(noteIds: string[]): void {
-  if (typeof localStorage === "undefined" || noteIds.length === 0) return;
-  try {
-    const seen = getSeenReleaseNoteIds();
-    for (const id of noteIds) seen.add(id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...seen]));
-  } catch {
-    // Ignore private browsing / quota errors.
-  }
-}
-
-/** Release notes bundled in this web deploy that the user has not dismissed. */
-export function getUnseenReleaseNotes(
-  seenIds: Set<string> = getSeenReleaseNoteIds(),
+/** Up to `limit` newest bundled notes (Settings history). */
+export function getRecentReleaseNotes(
+  limit = MAX_BUNDLED_RELEASE_NOTES,
 ): ReleaseNote[] {
-  return RELEASE_NOTES.filter((note) => !seenIds.has(note.id));
+  return RELEASE_NOTES.slice(0, limit);
 }
 
-/** All release notes in the current bundle (newest first). */
+/** Newest note the user has not dismissed yet (What's New modal). */
+export function getLatestUnseenReleaseNote(
+  seenIds: Set<string>,
+): ReleaseNote | undefined {
+  const latest = getLatestReleaseNote();
+  if (!latest || seenIds.has(latest.id)) return undefined;
+  return latest;
+}
+
+/** All bundled notes in the current deploy (newest first). */
 export function getAllReleaseNotes(): ReleaseNote[] {
   return RELEASE_NOTES;
 }
@@ -95,3 +64,5 @@ export function releaseNoteHeading(note: ReleaseNote): string {
   const title = note.title?.trim();
   return title && title.length > 0 ? title : formatReleaseNoteDate(note.date);
 }
+
+export { markReleaseNotesSeen } from "@/lib/releaseNotesSeen";

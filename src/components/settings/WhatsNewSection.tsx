@@ -2,7 +2,7 @@
 
 import {
   formatReleaseNoteDate,
-  getAllReleaseNotes,
+  getRecentReleaseNotes,
   releaseNoteHeading,
   type ReleaseNote,
 } from "@/lib/releaseNotes";
@@ -44,5 +44,5 @@ export function WhatsNewNotesList({ notes }: { notes: ReleaseNote[] }) {
 }
 
 export function useReleaseNotesForApp() {
-  return getAllReleaseNotes();
+  return getRecentReleaseNotes(3);
 }

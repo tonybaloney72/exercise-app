@@ -172,6 +172,7 @@ interface SettingsRow {
   expertise_by_group?: unknown;
   expertise_by_group_customized?: boolean;
   progression_families_enabled?: boolean;
+  release_notes_seen_ids?: string[] | null;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -422,6 +423,11 @@ function rowToSettings(row: SettingsRow): UserSettings {
     weeklyCardioCustomized: row.weekly_cardio_customized ?? false,
     equipmentOnboardingCompleted: row.equipment_onboarding_completed ?? false,
     expertiseByGroup: sanitizeExpertiseByGroup(row.expertise_by_group),
+    releaseNotesSeenIds: Array.isArray(row.release_notes_seen_ids)
+      ? row.release_notes_seen_ids.filter(
+          (id): id is string => typeof id === "string" && id.length > 0,
+        )
+      : [],
   });
 }
 
@@ -461,6 +467,7 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     equipment_onboarding_completed: s.equipmentOnboardingCompleted,
     expertise_by_group: s.expertiseByGroup,
     expertise_by_group_customized: true,
+    release_notes_seen_ids: s.releaseNotesSeenIds,
   };
 }
 
