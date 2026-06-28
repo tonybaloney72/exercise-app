@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import WhatsNewModal from "@/components/layout/WhatsNewModal";
 import {
   getLatestUnseenReleaseNote,
@@ -20,12 +20,17 @@ export default function WhatsNewSync() {
   const userId = useAuthStore((s) => s.user?.id);
   const settingsHydrated = useSettingsStore((s) => s.hydrated);
   const releaseNotesSeenIds = useSettingsStore((s) => s.releaseNotesSeenIds);
+  const seenIdsKey = useMemo(
+    () => releaseNotesSeenIds.join("\0"),
+    [releaseNotesSeenIds],
+  );
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState<ReleaseNote[]>([]);
 
   useEffect(() => {
     if (!canShowWhatsNewModal(mode) || !settingsHydrated) {
       setOpen(false);
+      setNotes([]);
       return;
     }
 
@@ -36,14 +41,15 @@ export default function WhatsNewSync() {
       return;
     }
 
-    setNotes([latest]);
+    setNotes((prev) => (prev[0]?.id === latest.id ? prev : [latest]));
     setOpen(true);
-  }, [mode, userId, settingsHydrated, releaseNotesSeenIds]);
+  }, [mode, userId, settingsHydrated, seenIdsKey]);
 
   async function handleDismiss() {
     const seen = await markReleaseNotesSeen(notes.map((note) => note.id));
     useSettingsStore.setState({ releaseNotesSeenIds: seen });
     setOpen(false);
+    setNotes([]);
   }
 
   return (

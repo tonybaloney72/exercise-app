@@ -49,6 +49,8 @@ import {
 } from "@/lib/expertiseLevels";
 import type { UserSettings } from "@/types";
 
+const EMPTY_RELEASE_NOTES_SEEN: string[] = [];
+
 /** Merge partial settings and migrate legacy `programFocus` → `trainingPriorityPreset`. */
 export function normalizeUserSettings(
   partial: Partial<UserSettings> = {},
@@ -212,15 +214,20 @@ export function normalizeUserSettings(
     weeklyPplScheduleCustomized,
     weeklyCardioByDay,
     weeklyCardioCustomized,
-    releaseNotesSeenIds: sanitizeReleaseNotesSeenIds(
-      partial.releaseNotesSeenIds,
-    ),
+    ...(partial.releaseNotesSeenIds !== undefined
+      ? {
+          releaseNotesSeenIds: sanitizeReleaseNotesSeenIds(
+            partial.releaseNotesSeenIds,
+          ),
+        }
+      : {}),
   };
 }
 
 function sanitizeReleaseNotesSeenIds(ids: unknown): string[] {
-  if (!Array.isArray(ids)) return [];
-  return ids.filter(
+  if (!Array.isArray(ids)) return EMPTY_RELEASE_NOTES_SEEN;
+  const filtered = ids.filter(
     (id): id is string => typeof id === "string" && id.trim().length > 0,
   );
+  return filtered.length === 0 ? EMPTY_RELEASE_NOTES_SEEN : filtered;
 }

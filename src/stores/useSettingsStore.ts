@@ -14,7 +14,7 @@ import {
   toastSaveError,
   toastSavePartialWarning,
 } from "@/utils/saveErrorToast";
-import { loadReleaseNotesSeenIds } from "@/lib/releaseNotesSeen";
+import { loadReleaseNotesSeenIds, releaseNotesSeenIdsEqual } from "@/lib/releaseNotesSeen";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import {
   weekBlueprintSettingsChanged,
@@ -138,10 +138,16 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     if (!options?.force && get().hydratedForAuthKey === authKey) return;
 
     const loaded = await getSettingsRepo(mode).load();
-    const releaseNotesSeenIds =
+    const syncedSeenIds =
       mode === "authenticated"
         ? await loadReleaseNotesSeenIds(loaded.releaseNotesSeenIds ?? [])
         : [];
+    const releaseNotesSeenIds = releaseNotesSeenIdsEqual(
+      get().releaseNotesSeenIds,
+      syncedSeenIds,
+    )
+      ? get().releaseNotesSeenIds
+      : syncedSeenIds;
     const disliked = collectDislikedIds(
       useExercisePreferencesStore.getState().byExerciseId,
     );

@@ -19,6 +19,12 @@ function parseSeenIds(raw: string | null): Set<string> {
   }
 }
 
+function seenArraysEqual(a: readonly string[], b: readonly string[]): boolean {
+  if (a.length !== b.length) return false;
+  const setB = new Set(b);
+  return a.every((id) => setB.has(id));
+}
+
 /** Local dismissals (guests, cache, and pre-login dismissals). */
 export function getLocalReleaseNotesSeenIds(): Set<string> {
   if (typeof localStorage === "undefined") return new Set();
@@ -41,24 +47,17 @@ export function getLocalReleaseNotesSeenIds(): Set<string> {
   }
 }
 
-function saveLocalReleaseNotesSeenIds(ids: Iterable<string>): void {
+function saveLocalReleaseNotesSeenIds(ids: readonly string[]): void {
   if (typeof localStorage === "undefined") return;
   try {
-    localStorage.setItem(
-      RELEASE_NOTES_SEEN_STORAGE_KEY,
-      JSON.stringify([...new Set(ids)]),
-    );
+    const next = [...new Set(ids)];
+    const raw = localStorage.getItem(RELEASE_NOTES_SEEN_STORAGE_KEY);
+    const current = parseSeenIds(raw);
+    if (seenArraysEqual(next, [...current])) return;
+    localStorage.setItem(RELEASE_NOTES_SEEN_STORAGE_KEY, JSON.stringify(next));
   } catch {
     // Ignore private browsing / quota errors.
   }
-}
-
-function seenSetsEqual(a: Set<string>, b: Set<string>): boolean {
-  if (a.size !== b.size) return false;
-  for (const id of a) {
-    if (!b.has(id)) return false;
-  }
-  return true;
 }
 
 /** Merge local + remote seen ids; persist union to both when signed in. */
@@ -67,28 +66,32 @@ export async function loadReleaseNotesSeenIds(
 ): Promise<string[]> {
   const local = getLocalReleaseNotesSeenIds();
   const merged = new Set([...local, ...remoteIds]);
-  saveLocalReleaseNotesSeenIds(merged);
+  const result = [...merged];
+
+  if (seenArraysEqual(result, remoteIds)) {
+    saveLocalReleaseNotesSeenIds(result);
+    return result;
+  }
+
+  saveLocalReleaseNotesSeenIds(result);
 
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return [...merged];
+    return result;
   }
 
-  const remote = new Set(remoteIds);
-  if (!seenSetsEqual(merged, remote)) {
-    const { error } = await supabase
-      .from("user_settings")
-      .update({ release_notes_seen_ids: [...merged] })
-      .eq("user_id", user.id);
-    if (error) {
-      console.error("[loadReleaseNotesSeenIds.sync]", error);
-    }
+  const { error } = await supabase
+    .from("user_settings")
+    .update({ release_notes_seen_ids: result })
+    .eq("user_id", user.id);
+  if (error) {
+    console.error("[loadReleaseNotesSeenIds.sync]", error);
   }
 
-  return [...merged];
+  return result;
 }
 
 /** Record dismissals locally and in Supabase for signed-in users. */
@@ -97,7 +100,8 @@ export async function markReleaseNotesSeen(noteIds: string[]): Promise<string[]>
 
   const merged = new Set(getLocalReleaseNotesSeenIds());
   for (const id of noteIds) merged.add(id);
-  saveLocalReleaseNotesSeenIds(merged);
+  const result = [...merged];
+  saveLocalReleaseNotesSeenIds(result);
 
   const supabase = createClient();
   const {
@@ -106,12 +110,19 @@ export async function markReleaseNotesSeen(noteIds: string[]): Promise<string[]>
   if (user) {
     const { error } = await supabase
       .from("user_settings")
-      .update({ release_notes_seen_ids: [...merged] })
+      .update({ release_notes_seen_ids: result })
       .eq("user_id", user.id);
     if (error) {
       console.error("[markReleaseNotesSeen]", error);
     }
   }
 
-  return [...merged];
+  return result;
+}
+
+export function releaseNotesSeenIdsEqual(
+  a: readonly string[],
+  b: readonly string[],
+): boolean {
+  return seenArraysEqual(a, b);
 }
