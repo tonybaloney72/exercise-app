@@ -191,7 +191,7 @@ export default function WeeklyPage() {
         })}
       </div>
 
-      {!weekLoading && completedDates.size === 0 && (
+      {/* {!weekLoading && completedDates.size === 0 && (
         <SurfaceCard className="border-dashed bg-surface/50 py-8">
           <EmptyState
             icon="📅"
@@ -219,7 +219,7 @@ export default function WeeklyPage() {
             {weekBuilderLabel}
           </Link>
         </SurfaceCard>
-      )}
+      )} */}
 
       {/* Daily plans */}
       <div className="flex flex-col gap-3">

@@ -64,5 +64,3 @@ export function releaseNoteHeading(note: ReleaseNote): string {
   const title = note.title?.trim();
   return title && title.length > 0 ? title : formatReleaseNoteDate(note.date);
 }
-
-export { markReleaseNotesSeen } from "@/lib/releaseNotesSeen";

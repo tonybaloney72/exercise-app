@@ -24,9 +24,9 @@ import {
 } from "./WorkoutRowMenuIcons";
 import ExerciseReportSheet from "@/components/feedback/ExerciseReportSheet";
 import SwapExerciseModal from "./SwapExerciseModal";
+import ExerciseDetailSheet from "./ExerciseDetailSheet";
 import type { ExerciseLog, ExerciseSetMode, StretchEntry } from "@/types";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { exerciseVideoLinkLabel } from "@/lib/exerciseVideoLink";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   parseRepTargetHint,
@@ -34,7 +34,6 @@ import {
   resolveStretchTimerTargetSeconds,
 } from "@/utils/effectiveExerciseSettings";
 import { formatLoggedDuration } from "@/utils/time";
-import TimerTargetControls from "./TimerTargetControls";
 
 interface StretchSectionProps {
   title: string;
@@ -245,7 +244,7 @@ function StretchRow({
   onSetActualReps,
   onRemoveFromWorkout,
 }: StretchRowProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
   const [swapModalKey, setSwapModalKey] = useState(0);
   const [reportOpen, setReportOpen] = useState(false);
@@ -492,9 +491,8 @@ function StretchRow({
               ? "text-muted line-through"
               : "text-foreground"
           }
-          onNameClick={() => setExpanded(!expanded)}
-          expanded={expanded}
-          onToggleExpand={() => setExpanded(!expanded)}
+          onNameClick={() => setDetailOpen(true)}
+          opensDetailSheet
           menuItems={overflowItems}
           detailText={detailText}
           detailLeading={detailLeading}
@@ -502,62 +500,18 @@ function StretchRow({
         />
       </div>
 
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <motion.div className="flex flex-col px-10 pb-3 gap-3">
-              <p className="text-xs text-muted">{exercise.notes}</p>
-
-              {mode === "timer" && (
-                <TimerTargetControls
-                  effectiveSeconds={effectiveTargetSec}
-                  storedTargetSeconds={log.targetDurationSeconds}
-                  onPreset={onSetTargetDuration}
-                  onCommitCustom={onSetTargetDuration}
-                />
-              )}
-
-              {exercise.videoUrl && (
-                <a
-                  href={exercise.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
-                >
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden
-                  >
-                    {exerciseVideoLinkLabel(exercise.videoUrl) === "Watch video" ? (
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    ) : (
-                      <>
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                        <polyline points="15 3 21 3 21 9" />
-                        <line x1="10" y1="14" x2="21" y2="3" />
-                      </>
-                    )}
-                  </svg>
-                  {exerciseVideoLinkLabel(exercise.videoUrl)}
-                </a>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ExerciseDetailSheet
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        title={exercise.name}
+        notes={exercise.notes}
+        videoUrl={exercise.videoUrl}
+        mode={mode}
+        effectiveTargetSec={effectiveTargetSec}
+        storedTargetSeconds={log.targetDurationSeconds}
+        onTimerPreset={onSetTargetDuration}
+        onTimerCommitCustom={onSetTargetDuration}
+      />
     </div>
   );
 }

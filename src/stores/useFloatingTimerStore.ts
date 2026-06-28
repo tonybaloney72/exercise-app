@@ -184,7 +184,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
 
   adjustRest: (deltaSeconds) =>
     set((s) => {
-      if (s.mode !== "rest") return s;
+      if (s.mode !== "rest" && s.mode !== "setTimer") return s;
       const next = Math.max(0, s.seconds + deltaSeconds);
       const total = Math.max(s.restTotalSeconds, next);
       const nextEndsAt =

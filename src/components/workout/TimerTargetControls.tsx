@@ -48,8 +48,8 @@ export default function TimerTargetControls({
   }, [storedTargetSeconds]);
 
   return (
-    <div className="flex items-center gap-2">
-      <p className="text-caption text-muted">Timer length:</p>
+    <div className="flex flex-col gap-2">
+      <p className="text-caption font-medium text-muted">Timer length</p>
       <div className="flex flex-wrap gap-1.5">
         {TIMER_DURATION_PRESET_SECONDS.map((sec) => (
           <button

@@ -70,3 +70,4 @@ docs/*-slices.md
 docs/adr/
 .cursor/rules/no-script-file-edits.mdc
 .cursor/rules/typecheck-after-edits.mdc
+.cursor/rules/fallow-exports.mdc

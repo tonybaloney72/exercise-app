@@ -277,7 +277,7 @@ function TodayPageInner() {
   }
 
   return (
-    <div className="flex flex-col gap-5 py-6">
+    <div className="flex flex-col gap-3 py-6">
       {devForcePreWorkout && (
         <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
           Dev: pre-workout view forced (

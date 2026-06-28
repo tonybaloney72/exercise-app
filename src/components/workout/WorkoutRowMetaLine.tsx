@@ -20,6 +20,8 @@ interface WorkoutRowMetaLineProps {
   dense?: boolean;
   /** Vertical alignment of title row with overflow menu. */
   titleAlign?: "start" | "center";
+  /** When true, name tap opens a detail sheet (dialog semantics). */
+  opensDetailSheet?: boolean;
   onNameClick: () => void;
   /** When set, shows a chevron control that toggles expand/collapse (same as name tap). */
   expanded?: boolean;
@@ -41,12 +43,14 @@ function NameBlock({
   nameClassName,
   subName,
   readOnly,
+  opensDetailSheet = false,
   onNameClick,
 }: {
   name: ReactNode;
   nameClassName: string;
   subName?: ReactNode;
   readOnly: boolean;
+  opensDetailSheet?: boolean;
   onNameClick: () => void;
 }) {
   const title = (
@@ -70,6 +74,7 @@ function NameBlock({
     <button
       type="button"
       onClick={onNameClick}
+      aria-haspopup={opensDetailSheet ? "dialog" : undefined}
       className="w-full min-w-0 text-left py-2"
     >
       {title}
@@ -89,6 +94,7 @@ export default function WorkoutRowMetaLine({
   readOnly = false,
   dense = false,
   titleAlign = "start",
+  opensDetailSheet = false,
   onNameClick,
   expanded = false,
   onToggleExpand,
@@ -136,6 +142,7 @@ export default function WorkoutRowMetaLine({
               nameClassName={nameClassName}
               subName={subName}
               readOnly={readOnly}
+              opensDetailSheet={opensDetailSheet}
               onNameClick={onNameClick}
             />
             {chevronButton ? (
@@ -210,6 +217,7 @@ export default function WorkoutRowMetaLine({
             nameClassName={nameClassName}
             subName={subName}
             readOnly={readOnly}
+            opensDetailSheet={opensDetailSheet}
             onNameClick={onNameClick}
           />
           {detailRow}

@@ -273,27 +273,18 @@ export default function FullScreenTimerModal() {
         </span>
       </div>
 
-      {isRest && (
-        <div className="mb-6 flex items-center gap-3">
+      {isCountdown && (
+        <div className="mb-6 flex items-center justify-center gap-3">
           <AdjustButton onClick={() => adjustRest(-15)} label="-15s" />
-          <TimerControlButton
-            onClick={resetRest}
-            label="Reset"
-            variant="ghost"
-            icon={<ResetIcon />}
-          />
+          {!countdownComplete && (
+            <TimerControlButton
+              onClick={resetRest}
+              label="Reset"
+              variant="ghost"
+              icon={<ResetIcon />}
+            />
+          )}
           <AdjustButton onClick={() => adjustRest(15)} label="+15s" />
-        </div>
-      )}
-
-      {isSetTimer && (
-        <div className="mb-6 flex justify-center">
-          <TimerControlButton
-            onClick={resetRest}
-            label="Reset"
-            variant="ghost"
-            icon={<ResetIcon />}
-          />
         </div>
       )}
 

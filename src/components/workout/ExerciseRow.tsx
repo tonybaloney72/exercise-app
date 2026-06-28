@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import WorkoutCompletionCheckbox from "@/components/workout/WorkoutCompletionCheckbox";
 import { exerciseMap } from "@/core/catalog";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
@@ -13,7 +12,6 @@ import {
   getSwapCandidates,
   laterRoundOccurrencesByExerciseId,
 } from "@/lib/exerciseSwap";
-import { exerciseVideoLinkLabel } from "@/lib/exerciseVideoLink";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -23,12 +21,11 @@ import {
   parseRepTargetHint,
   resolveExerciseSettings,
 } from "@/utils/effectiveExerciseSettings";
-import TimerTargetControls from "./TimerTargetControls";
 import { formatLoggedDuration } from "@/utils/time";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import SwapExerciseModal from "./SwapExerciseModal";
-import CategoryBadge from "@/components/common/CategoryBadge";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
+import ExerciseDetailSheet from "./ExerciseDetailSheet";
 import SetTimerPill from "./SetTimerPill";
 import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
 import {
@@ -58,7 +55,7 @@ export default function ExerciseRow({
   slotIndex,
   onRemoveFromWorkout,
 }: ExerciseRowProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
   const [swapModalKey, setSwapModalKey] = useState(0);
   const [reportOpen, setReportOpen] = useState(false);
@@ -356,15 +353,38 @@ export default function ExerciseRow({
               </p>
             ) : undefined
           }
-          onNameClick={() => setExpanded(!expanded)}
-          expanded={expanded}
-          onToggleExpand={() => setExpanded(!expanded)}
+          onNameClick={() => setDetailOpen(true)}
+          opensDetailSheet
           menuItems={overflowItems}
           detailText={detailText}
           detailLeading={detailLeading}
           detailTrailing={inlineCompletedInput}
         />
       </div>
+
+      <ExerciseDetailSheet
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        title={effectiveExercise.name}
+        hint={
+          log.swappedWith ? `Instead of ${plannedExercise.name}` : undefined
+        }
+        notes={effectiveExercise.notes}
+        videoUrl={effectiveExercise.videoUrl}
+        category={effectiveExercise.category}
+        showCategory
+        showModeToggle
+        mode={mode}
+        onModeChange={(next) =>
+          setRoundExerciseLoggingMode(roundNumber, plannedId, next)
+        }
+        effectiveTargetSec={effectiveTargetSec}
+        storedTargetSeconds={log.targetDurationSeconds}
+        onTimerPreset={(sec) => setTargetDuration(roundNumber, plannedId, sec)}
+        onTimerCommitCustom={(sec) =>
+          setTargetDuration(roundNumber, plannedId, sec)
+        }
+      />
 
       <ExerciseReportSheet
         open={reportOpen}
@@ -392,114 +412,6 @@ export default function ExerciseRow({
         }
         onClearSwap={() => clearRoundExerciseSwap(roundNumber, slotIndex)}
       />
-
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="flex flex-col pl-5 pr-2 pb-3 gap-3">
-              <div className="flex items-center justify-between">
-                <CategoryBadge
-                  category={effectiveExercise.category}
-                  size="sm"
-                />
-                <div className="flex items-center gap-1.5">
-                  <p className="text-caption font-medium tracking-wide text-muted">
-                    This set:
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setRoundExerciseLoggingMode(
-                          roundNumber,
-                          plannedId,
-                          "reps",
-                        )
-                      }
-                      className={`rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors ${
-                        mode === "reps"
-                          ? "border-accent bg-accent/15 text-accent"
-                          : "border-border bg-surface-hover text-muted hover:text-foreground"
-                      }`}
-                    >
-                      Reps
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setRoundExerciseLoggingMode(
-                          roundNumber,
-                          plannedId,
-                          "timer",
-                        )
-                      }
-                      className={`rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors ${
-                        mode === "timer"
-                          ? "border-accent bg-accent/15 text-accent"
-                          : "border-border bg-surface-hover text-muted hover:text-foreground"
-                      }`}
-                    >
-                      Timer
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {mode === "timer" && (
-                <TimerTargetControls
-                  effectiveSeconds={effectiveTargetSec}
-                  storedTargetSeconds={log.targetDurationSeconds}
-                  onPreset={(sec) =>
-                    setTargetDuration(roundNumber, plannedId, sec)
-                  }
-                  onCommitCustom={(sec) =>
-                    setTargetDuration(roundNumber, plannedId, sec)
-                  }
-                />
-              )}
-              <p className="text-xs text-muted">{effectiveExercise.notes}</p>
-              {effectiveExercise.videoUrl && (
-                <a
-                  href={effectiveExercise.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
-                >
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden
-                  >
-                    {exerciseVideoLinkLabel(effectiveExercise.videoUrl) ===
-                    "Watch video" ? (
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    ) : (
-                      <>
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                        <polyline points="15 3 21 3 21 9" />
-                        <line x1="10" y1="14" x2="21" y2="3" />
-                      </>
-                    )}
-                  </svg>
-                  {exerciseVideoLinkLabel(effectiveExercise.videoUrl)}
-                </a>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
