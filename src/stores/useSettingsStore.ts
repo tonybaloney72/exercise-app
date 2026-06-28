@@ -14,7 +14,11 @@ import {
   toastSaveError,
   toastSavePartialWarning,
 } from "@/utils/saveErrorToast";
-import { loadReleaseNotesSeenIds, releaseNotesSeenIdsEqual } from "@/lib/releaseNotesSeen";
+import {
+  mergeReleaseNotesSeenIds,
+  releaseNotesSeenIdsEqual,
+  scheduleReleaseNotesSeenRemoteSync,
+} from "@/lib/releaseNotesSeen";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import {
   weekBlueprintSettingsChanged,
@@ -138,10 +142,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     if (!options?.force && get().hydratedForAuthKey === authKey) return;
 
     const loaded = await getSettingsRepo(mode).load();
+    const remoteSeenIds = loaded.releaseNotesSeenIds ?? [];
     const syncedSeenIds =
-      mode === "authenticated"
-        ? await loadReleaseNotesSeenIds(loaded.releaseNotesSeenIds ?? [])
-        : [];
+      mode === "authenticated" ? mergeReleaseNotesSeenIds(remoteSeenIds) : [];
+    if (mode === "authenticated") {
+      scheduleReleaseNotesSeenRemoteSync(remoteSeenIds, syncedSeenIds);
+    }
     const releaseNotesSeenIds = releaseNotesSeenIdsEqual(
       get().releaseNotesSeenIds,
       syncedSeenIds,

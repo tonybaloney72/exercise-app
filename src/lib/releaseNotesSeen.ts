@@ -60,38 +60,43 @@ function saveLocalReleaseNotesSeenIds(ids: readonly string[]): void {
   }
 }
 
-/** Merge local + remote seen ids; persist union to both when signed in. */
-export async function loadReleaseNotesSeenIds(
-  remoteIds: string[] = [],
-): Promise<string[]> {
+/** Merge local + remote ids synchronously (no network). */
+export function mergeReleaseNotesSeenIds(remoteIds: string[] = []): string[] {
   const local = getLocalReleaseNotesSeenIds();
-  const merged = new Set([...local, ...remoteIds]);
-  const result = [...merged];
-
-  if (seenArraysEqual(result, remoteIds)) {
-    saveLocalReleaseNotesSeenIds(result);
-    return result;
-  }
-
+  const result = [...new Set([...local, ...remoteIds])];
   saveLocalReleaseNotesSeenIds(result);
+  return result;
+}
 
+let remoteSyncPromise: Promise<void> | null = null;
+
+async function persistReleaseNotesSeenIdsToRemote(ids: string[]): Promise<void> {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) {
-    return result;
-  }
+  if (!user) return;
 
   const { error } = await supabase
     .from("user_settings")
-    .update({ release_notes_seen_ids: result })
+    .update({ release_notes_seen_ids: ids })
     .eq("user_id", user.id);
   if (error) {
-    console.error("[loadReleaseNotesSeenIds.sync]", error);
+    console.error("[releaseNotesSeen.persistRemote]", error);
   }
+}
 
-  return result;
+/** Best-effort one-at-a-time sync when local dismissals exceed remote. */
+export function scheduleReleaseNotesSeenRemoteSync(
+  remoteIds: string[],
+  mergedIds: string[],
+): void {
+  if (seenArraysEqual(remoteIds, mergedIds)) return;
+  if (remoteSyncPromise) return;
+
+  remoteSyncPromise = persistReleaseNotesSeenIdsToRemote(mergedIds).finally(() => {
+    remoteSyncPromise = null;
+  });
 }
 
 /** Record dismissals locally and in Supabase for signed-in users. */
@@ -102,21 +107,7 @@ export async function markReleaseNotesSeen(noteIds: string[]): Promise<string[]>
   for (const id of noteIds) merged.add(id);
   const result = [...merged];
   saveLocalReleaseNotesSeenIds(result);
-
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user) {
-    const { error } = await supabase
-      .from("user_settings")
-      .update({ release_notes_seen_ids: result })
-      .eq("user_id", user.id);
-    if (error) {
-      console.error("[markReleaseNotesSeen]", error);
-    }
-  }
-
+  await persistReleaseNotesSeenIdsToRemote(result);
   return result;
 }
 

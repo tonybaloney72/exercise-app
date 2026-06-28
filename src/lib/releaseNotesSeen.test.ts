@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getLocalReleaseNotesSeenIds,
   markReleaseNotesSeen,
+  mergeReleaseNotesSeenIds,
   RELEASE_NOTES_SEEN_STORAGE_KEY,
 } from "@/lib/releaseNotesSeen";
 import { createMemoryStorageMock } from "@/test/memoryStorageMock";
@@ -37,6 +38,28 @@ describe("getLocalReleaseNotesSeenIds", () => {
     expect(localStorage.getItem(RELEASE_NOTES_SEEN_STORAGE_KEY)).toContain(
       "2026-06-20-health-connect",
     );
+  });
+});
+
+describe("mergeReleaseNotesSeenIds", () => {
+  beforeEach(() => {
+    vi.stubGlobal("localStorage", createMemoryStorageMock());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("unions local and remote ids without network I/O", () => {
+    localStorage.setItem(
+      RELEASE_NOTES_SEEN_STORAGE_KEY,
+      JSON.stringify(["2026-06-27-settings-workout"]),
+    );
+    const merged = mergeReleaseNotesSeenIds(["2026-06-20-health-connect"]);
+    expect(merged.sort()).toEqual(
+      ["2026-06-20-health-connect", "2026-06-27-settings-workout"].sort(),
+    );
+    expect(updateMock).not.toHaveBeenCalled();
   });
 });
 

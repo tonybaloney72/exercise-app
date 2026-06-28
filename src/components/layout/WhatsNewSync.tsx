@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import WhatsNewModal from "@/components/layout/WhatsNewModal";
 import {
   getLatestUnseenReleaseNote,
@@ -17,36 +17,50 @@ function canShowWhatsNewModal(mode: ReturnType<typeof useAuthStore.getState>["mo
 /** Shows the What's new modal for the latest unseen release note after settings hydrate. */
 export default function WhatsNewSync() {
   const mode = useAuthStore((s) => s.mode);
-  const userId = useAuthStore((s) => s.user?.id);
   const settingsHydrated = useSettingsStore((s) => s.hydrated);
-  const releaseNotesSeenIds = useSettingsStore((s) => s.releaseNotesSeenIds);
-  const seenIdsKey = useMemo(
-    () => releaseNotesSeenIds.join("\0"),
-    [releaseNotesSeenIds],
-  );
+  const seenIdsKey = useSettingsStore((s) => s.releaseNotesSeenIds.join("\0"));
+  const latestUnseenId = useMemo(() => {
+    if (!canShowWhatsNewModal(mode) || !settingsHydrated) return null;
+    return (
+      getLatestUnseenReleaseNote(
+        new Set(useSettingsStore.getState().releaseNotesSeenIds),
+      )?.id ?? null
+    );
+  }, [mode, settingsHydrated, seenIdsKey]);
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState<ReleaseNote[]>([]);
+  const shownIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!canShowWhatsNewModal(mode) || !settingsHydrated) {
+    if (!latestUnseenId) {
+      shownIdRef.current = null;
       setOpen(false);
       setNotes([]);
       return;
     }
 
-    const latest = getLatestUnseenReleaseNote(new Set(releaseNotesSeenIds));
+    if (shownIdRef.current === latestUnseenId) {
+      return;
+    }
+
+    const latest = getLatestUnseenReleaseNote(
+      new Set(useSettingsStore.getState().releaseNotesSeenIds),
+    );
     if (!latest) {
+      shownIdRef.current = null;
       setOpen(false);
       setNotes([]);
       return;
     }
 
-    setNotes((prev) => (prev[0]?.id === latest.id ? prev : [latest]));
+    shownIdRef.current = latest.id;
+    setNotes([latest]);
     setOpen(true);
-  }, [mode, userId, settingsHydrated, seenIdsKey]);
+  }, [latestUnseenId]);
 
   async function handleDismiss() {
     const seen = await markReleaseNotesSeen(notes.map((note) => note.id));
+    shownIdRef.current = null;
     useSettingsStore.setState({ releaseNotesSeenIds: seen });
     setOpen(false);
     setNotes([]);
