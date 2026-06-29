@@ -1,5 +1,15 @@
 [
   {
+    "id": "2026-06-29-cardio-endurance",
+    "date": "2026-06-29",
+    "title": "Cardio & endurance logging",
+    "highlights": [
+      "Finishing a workout without logging cardio no longer leaves empty jog rows in your session summary.",
+      "In-workout cardio uses the same GPS timer, Health Connect import, and distance/time fields as quick log on Today.",
+      "Cardio rows match other workout sections—the actions menu is on the left and the checkbox on the right."
+    ]
+  },
+  {
     "id": "2026-06-28-cardio-speed-hc",
     "date": "2026-06-28",
     "title": "Cardio speed & Health Connect",
@@ -17,16 +27,6 @@
       "Warm-up and cool-down sections collapse automatically when every stretch is checked off.",
       "Workout rows are easier to log—the actions menu sits on the left, with clearer checkboxes and timer/rep controls.",
       "Many Hybrid Calisthenics leg and lunge exercises now have their own coaching notes instead of generic squat text."
-    ]
-  },
-  {
-    "id": "2026-06-20-health-connect",
-    "date": "2026-06-20",
-    "title": "Health Connect & timer audio",
-    "highlights": [
-      "Finished workouts and logged activities can be saved to Health Connect as exercise sessions.",
-      "To enable this, open Health Connect → App permissions → MyExercise and allow Exercises write access.",
-      "Timer sounds on Android briefly lower music volume when a set or rest timer finishes."
     ]
   }
 ]

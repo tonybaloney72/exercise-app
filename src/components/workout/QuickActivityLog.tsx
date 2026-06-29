@@ -11,20 +11,15 @@ import {
   CARDIO_ACTIVITY_ORDER,
   cardioKindAllowed,
 } from "@/lib/cardioActivities";
-import { formatSecondsToMMSS, parseTimeInput } from "@/utils/time";
-import CardioActivityRecorder from "@/components/workout/CardioActivityRecorder";
-import CardioHealthImport from "@/components/workout/CardioHealthImport";
-import {
-  formatCardioHealthSummary,
-  writeAppTrackedCardioToHealth,
-  type CardioHealthMeta,
-  type ImportedCardioSession,
-} from "@/lib/health";
-import { formatCardioPaceSummary } from "@/lib/health/cardioPaceMetrics";
+import { parseTimeInput } from "@/utils/time";
+import CardioActivityLogFields, {
+  applyResolvedCardioQuickLog,
+} from "@/components/workout/CardioActivityLogFields";
+import type { CardioHealthMeta } from "@/lib/health";
+import { mirrorCardioCaptureToHealth } from "@/lib/mirrorCardioToHealth";
 import { getWeightForDate } from "@/lib/weightLog";
 import type { ResolvedCardioQuickLog } from "@/lib/health/resolveCardioQuickLog";
 import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
-import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useWeightStore } from "@/stores/useWeightStore";
@@ -49,7 +44,6 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     null,
   );
   const [morePickerOpen, setMorePickerOpen] = useState(false);
-  const [showEarlierImport, setShowEarlierImport] = useState(false);
   const [distanceInput, setDistanceInput] = useState("");
   const [timeInput, setTimeInput] = useState("");
   const [healthMeta, setHealthMeta] = useState<CardioHealthMeta | undefined>();
@@ -75,7 +69,6 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
 
   const closeLogModal = useCallback(() => {
     setPendingKind(null);
-    setShowEarlierImport(false);
     setDistanceInput("");
     setTimeInput("");
     setHealthMeta(undefined);
@@ -87,40 +80,18 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
   function openLogForm(kind: CardioActivityKind) {
     setMorePickerOpen(false);
     setPendingKind(kind);
-    setShowEarlierImport(false);
   }
 
   function applyResolved(result: ResolvedCardioQuickLog) {
-    if (result.distanceMi != null) {
-      setDistanceInput(String(result.distanceMi));
-    }
-    setTimeInput(formatSecondsToMMSS(result.durationSeconds));
-    setHealthMeta(result.health);
-    setActivityWindow({
-      startDate: result.startDate,
-      endDate: result.endDate,
+    applyResolvedCardioQuickLog({
+      result,
+      setDistanceInput,
+      setTimeInput,
+      setHealthMeta,
+      setActivityWindow,
+      setResolution,
+      setGpsTrack,
     });
-    setResolution(result.resolution);
-    setGpsTrack(result.gpsTrack);
-  }
-
-  function applyImportedSession(session: ImportedCardioSession) {
-    if (session.distanceMi != null) {
-      setDistanceInput(String(session.distanceMi));
-    }
-    setTimeInput(formatSecondsToMMSS(session.durationSeconds));
-    setHealthMeta({
-      stepCount: session.stepCount,
-      activeCaloriesKcal: session.activeCaloriesKcal,
-      avgHeartRateBpm: session.avgHeartRateBpm,
-      source: "health_connect",
-      healthSourceName: session.sourceName,
-    });
-    setActivityWindow({
-      startDate: session.startDate,
-      endDate: session.endDate,
-    });
-    setResolution("health_connect_session");
   }
 
   async function handleSave() {
@@ -164,26 +135,15 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
         activityEndTime: activityWindow?.endDate.toISOString(),
       });
       clientTrace("cardio-save", ok ? "quickLog_ok" : "quickLog_failed");
-      if (ok && isNativePlatform()) {
-        const endDate = activityWindow?.endDate ?? new Date();
-        const durationForWindow =
-          hasDuration && durationSeconds! > 0
-            ? durationSeconds!
-            : Math.max(
-                60,
-                Math.round((endDate.getTime() - (activityWindow?.startDate.getTime() ?? endDate.getTime())) / 1000),
-              );
-        const startDate =
-          activityWindow?.startDate ??
-          new Date(endDate.getTime() - durationForWindow * 1000);
+      if (ok && pendingKind) {
         const weightLb = getWeightForDate(weightEntries, dateKey)?.weightLb;
-        void writeAppTrackedCardioToHealth({
+        void mirrorCardioCaptureToHealth({
           kind: pendingKind,
           distanceMi: hasDistance ? distanceMi : undefined,
-          durationSeconds: hasDuration ? durationSeconds! : durationForWindow,
-          activeCaloriesKcal: resolvedHealth?.activeCaloriesKcal,
-          startDate,
-          endDate,
+          durationSeconds: hasDuration ? durationSeconds : undefined,
+          activeCaloriesKcal: healthMeta?.activeCaloriesKcal,
+          activityStartTime: activityWindow?.startDate.toISOString(),
+          activityEndTime: activityWindow?.endDate.toISOString(),
           weightLb,
         }).catch(() => {
           // Optional mirror to Health Connect; logging in-app already succeeded.
@@ -201,26 +161,6 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
   const modalTitle = pendingKind
     ? `Log ${CARDIO_ACTIVITY_LABELS[pendingKind].toLowerCase()}`
     : "";
-
-  const healthPreview = formatCardioHealthSummary(healthMeta ?? {});
-  const pacePreview = useMemo(() => {
-    const distanceMi = distanceInput.trim()
-      ? parseFloat(distanceInput.trim())
-      : undefined;
-    const durationSeconds = timeInput.trim()
-      ? parseTimeInput(timeInput.trim())
-      : undefined;
-    if (
-      distanceMi == null ||
-      Number.isNaN(distanceMi) ||
-      distanceMi <= 0 ||
-      durationSeconds == null ||
-      durationSeconds <= 0
-    ) {
-      return undefined;
-    }
-    return formatCardioPaceSummary(distanceMi, durationSeconds);
-  }, [distanceInput, timeInput]);
 
   return (
     <>
@@ -312,74 +252,15 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
       >
         <div className="flex flex-col gap-3 p-4">
           {pendingKind ? (
-            <CardioActivityRecorder
+            <CardioActivityLogFields
               kind={pendingKind}
+              distanceInput={distanceInput}
+              timeInput={timeInput}
+              onDistanceInputChange={setDistanceInput}
+              onTimeInputChange={setTimeInput}
+              healthMeta={healthMeta}
               onResolved={applyResolved}
             />
-          ) : null}
-
-          {pendingKind && isNativePlatform() ? (
-            <div className="flex flex-col gap-2">
-              <button
-                type="button"
-                onClick={() => setShowEarlierImport((v) => !v)}
-                className="text-xs font-medium text-accent hover:underline text-left"
-              >
-                {showEarlierImport
-                  ? "Hide earlier Health Connect sessions"
-                  : "Import an earlier session instead"}
-              </button>
-              {showEarlierImport ? (
-                <CardioHealthImport
-                  kind={pendingKind}
-                  onImport={applyImportedSession}
-                />
-              ) : null}
-            </div>
-          ) : null}
-
-          <label className="block">
-            <span className="text-caption text-muted uppercase tracking-wider">
-              Distance (mi)
-            </span>
-            <input
-              type="text"
-              inputMode="decimal"
-              value={distanceInput}
-              onChange={(e) => setDistanceInput(e.target.value)}
-              onFocus={(e) =>
-                e.currentTarget.scrollIntoView({
-                  block: "nearest",
-                  behavior: "smooth",
-                })
-              }
-              placeholder="1.2"
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
-            />
-          </label>
-          <label className="block">
-            <span className="text-caption text-muted uppercase tracking-wider">
-              Time (MM:SS)
-            </span>
-            <input
-              type="text"
-              value={timeInput}
-              onChange={(e) => setTimeInput(e.target.value)}
-              onFocus={(e) =>
-                e.currentTarget.scrollIntoView({
-                  block: "nearest",
-                  behavior: "smooth",
-                })
-              }
-              placeholder="9:30 or 930"
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
-            />
-          </label>
-          {pacePreview ? (
-            <p className="text-xs text-muted">ME pace: {pacePreview}</p>
-          ) : null}
-          {healthPreview ? (
-            <p className="text-xs text-muted">{healthPreview}</p>
           ) : null}
         </div>
       </BottomSheetModal>

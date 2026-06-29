@@ -73,3 +73,12 @@ export function cardioKindUsesGps(kind: CardioActivityKind): boolean {
 export function isCardioActivityKind(value: string): value is CardioActivityKind {
   return (CARDIO_ACTIVITY_ORDER as readonly string[]).includes(value);
 }
+
+export function cardioKindForExerciseId(
+  exerciseId: string,
+): CardioActivityKind | undefined {
+  for (const kind of CARDIO_ACTIVITY_ORDER) {
+    if (CARDIO_KIND_TO_EXERCISE_ID[kind] === exerciseId) return kind;
+  }
+  return undefined;
+}

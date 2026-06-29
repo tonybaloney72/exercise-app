@@ -1,5 +1,6 @@
 import type { WorkoutLog } from "@/types";
 import { workoutLogForPersistence } from "@/lib/workoutCardioPersistence";
+import { stripMeaninglessCardioFromWorkout } from "@/lib/cardioRowMeaningful";
 import { upsertWorkoutInHistory } from "@/lib/inProgressWorkoutSync";
 import { hydrateWorkoutLog } from "@/utils/exerciseLogDefaults";
 import { getPausedWorkoutDateForToday } from "@/utils/workoutLogLookup";
@@ -36,11 +37,11 @@ export function prepareCompleteWorkout(
   input: CompleteWorkoutInput,
 ): PreparedCompleteWorkout {
   const authenticated = input.mode === "authenticated";
-  const finished: WorkoutLog = {
+  const finished: WorkoutLog = stripMeaninglessCardioFromWorkout({
     ...input.activeWorkout,
     endTime: new Date().toISOString(),
     paused: false,
-  };
+  });
   const completed = hydrateWorkoutLog(workoutLogForPersistence(finished));
   const workoutHistory = upsertWorkoutInHistory(input.workoutHistory, completed);
   const pausedWorkoutDate = authenticated

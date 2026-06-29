@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import type { WorkoutLog } from "@/types";
-import { completeWorkout } from "@/use-cases/workout/completeWorkout";
+import {
+  completeWorkout,
+  prepareCompleteWorkout,
+} from "@/use-cases/workout/completeWorkout";
 
 function log(partial: Partial<WorkoutLog> & { id: string; date: string }): WorkoutLog {
   return {
@@ -48,5 +51,41 @@ describe("completeWorkout", () => {
     });
 
     expect(result).toEqual({ ok: false, error: expect.any(Error) });
+  });
+
+  it("strips blank cardio placeholders before persisting", async () => {
+    const active = log({
+      id: "w3",
+      date: "2026-05-18",
+      cardioExercises: [
+        {
+          exerciseId: "END-JOG",
+          completed: false,
+          skipped: false,
+        },
+      ],
+    });
+    const saveWorkout = vi.fn().mockResolvedValue(undefined);
+
+    const prepared = prepareCompleteWorkout({
+      activeWorkout: active,
+      workoutHistory: [],
+      todayKey: "2026-05-18",
+      mode: "guest",
+    });
+    expect(prepared.completed.cardioExercises).toBeUndefined();
+
+    const result = await completeWorkout({
+      activeWorkout: active,
+      workoutHistory: [],
+      todayKey: "2026-05-18",
+      mode: "guest",
+      workoutRepo: { saveWorkout, loadHistory: vi.fn(), deleteWorkout: vi.fn() },
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const saved = saveWorkout.mock.calls[0]?.[0] as WorkoutLog;
+    expect(saved.cardioExercises).toBeUndefined();
   });
 });

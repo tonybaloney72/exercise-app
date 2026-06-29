@@ -1,5 +1,6 @@
 import type { WorkoutLog } from "@/types";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
+import { isMeaningfulCardioRow } from "@/lib/cardioRowMeaningful";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 /** Logs with `endTime` set (excludes in-progress cloud drafts). */
@@ -12,10 +13,7 @@ function hasLoggedCardioSession(workout: WorkoutLog): boolean {
     (row) =>
       row.completed &&
       !row.skipped &&
-      ((row.actualDistanceMi != null && row.actualDistanceMi > 0) ||
-        (row.actualDuration != null && row.actualDuration > 0) ||
-        (row.stepCount != null && row.stepCount > 0) ||
-        (row.activeCaloriesKcal != null && row.activeCaloriesKcal > 0)),
+      isMeaningfulCardioRow(row),
   );
 }
 

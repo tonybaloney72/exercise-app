@@ -45,6 +45,7 @@ export default function WorkoutSession({
     unskipCardio,
     setCardioDistance,
     setCardioDurationSeconds,
+    applyCardioSessionCapture,
     toggleWarmUpStretch,
     toggleCoolDownStretch,
     skipWarmUpStretch,
@@ -232,6 +233,7 @@ export default function WorkoutSession({
         onUnskip={unskipCardio}
         onSetDistance={setCardioDistance}
         onSetDurationSeconds={setCardioDurationSeconds}
+        onApplySessionCapture={applyCardioSessionCapture}
         onAddCardio={addCardioToWorkout}
         onRemoveCardio={removeCardioFromWorkout}
       />

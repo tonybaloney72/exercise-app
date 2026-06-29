@@ -8,12 +8,15 @@ export type ReleaseNote = {
   highlights: string[];
 };
 
-/** Maximum release notes shipped in the app bundle. */
+/** Maximum release notes shipped in the app bundle (modal: newest only; Settings: all bundled). */
 export const MAX_BUNDLED_RELEASE_NOTES = 3;
 
-const RELEASE_NOTES: ReleaseNote[] = [...releaseNotesJson].sort(
-  compareReleaseNotesByRecency,
-);
+// When adding an entry to releaseNotes.json, keep at most three (drop the oldest).
+// Runtime slice below is a safety net if the file temporarily has more.
+
+const RELEASE_NOTES: ReleaseNote[] = [...releaseNotesJson]
+  .sort(compareReleaseNotesByRecency)
+  .slice(0, MAX_BUNDLED_RELEASE_NOTES);
 
 function compareReleaseNotesByRecency(a: ReleaseNote, b: ReleaseNote): number {
   const byDate = b.date.localeCompare(a.date);

@@ -93,4 +93,19 @@ describe("summarizeWorkoutLog", () => {
     expect(summary.cardio[0]?.distanceMi).toBe(1.5);
     expect(summary.durationLabel).toBe("45m");
   });
+
+  it("omits blank cardio placeholders from summary", () => {
+    const logWithPlaceholder: WorkoutLog = {
+      ...minimalLog,
+      cardioExercises: [
+        {
+          exerciseId: "END-JOG",
+          completed: false,
+          skipped: false,
+        },
+      ],
+    };
+    const summary = summarizeWorkoutLog(logWithPlaceholder, minimalPlan);
+    expect(summary.cardio).toHaveLength(0);
+  });
 });

@@ -1,5 +1,6 @@
 import { exerciseMap } from "@/core/catalog";
 import { cardioLabelForRow, cardioRowKey } from "@/lib/cardioInstances";
+import { filterMeaningfulCardioRows } from "@/lib/cardioRowMeaningful";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
 
@@ -44,7 +45,7 @@ export function summarizeWorkoutLog(
 ): WorkoutLogSummary {
   const strengthLogs = log.rounds.flatMap((r) => r.exercises);
   const stretchLogs = [...log.warmUpExercises, ...log.coolDownExercises];
-  const logged = resolveWorkoutCardioExercises(log);
+  const logged = filterMeaningfulCardioRows(resolveWorkoutCardioExercises(log));
 
   const cardio: CardioSummaryLine[] = logged.map((row) => ({
     instanceKey: cardioRowKey(row),

@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import CardioActivityPickModal from "./CardioActivityPickModal";
 import CardioSessionBlock from "./CardioSessionBlock";
 import { cardioRowKey } from "@/lib/cardioInstances";
+import { cardioKindForExerciseId } from "@/lib/cardioKinds";
 import { ensureCardioExercises } from "@/lib/resolveWorkoutCardio";
 import type { CardioActivityKind, WorkoutLog } from "@/types";
+import type { CardioSessionCaptureInput } from "@/lib/cardioSessionLog";
 
 interface CardioSectionProps {
   activeWorkout: WorkoutLog;
@@ -15,6 +17,10 @@ interface CardioSectionProps {
   onUnskip: (instanceKey: string) => void;
   onSetDistance: (instanceKey: string, mi: number | undefined) => void;
   onSetDurationSeconds: (instanceKey: string, seconds: number | undefined) => void;
+  onApplySessionCapture: (
+    instanceKey: string,
+    input: CardioSessionCaptureInput,
+  ) => void;
   onAddCardio: (kind: CardioActivityKind) => void;
   onRemoveCardio: (instanceKey: string) => void;
 }
@@ -26,6 +32,7 @@ export default function CardioSection({
   onUnskip,
   onSetDistance,
   onSetDurationSeconds,
+  onApplySessionCapture,
   onAddCardio,
   onRemoveCardio,
 }: CardioSectionProps) {
@@ -136,12 +143,17 @@ export default function CardioSection({
                       <CardioSessionBlock
                         key={key}
                         log={log}
+                        kind={cardioKindForExerciseId(log.exerciseId)}
+                        dateKey={activeWorkout.date}
                         onToggle={() => onToggle(key)}
                         onSkip={() => onSkip(key)}
                         onUnskip={() => onUnskip(key)}
                         onSetDistance={(mi) => onSetDistance(key, mi)}
                         onSetDurationSeconds={(sec) =>
                           onSetDurationSeconds(key, sec)
+                        }
+                        onApplySessionCapture={(input) =>
+                          onApplySessionCapture(key, input)
                         }
                         onRemove={() => onRemoveCardio(key)}
                       />

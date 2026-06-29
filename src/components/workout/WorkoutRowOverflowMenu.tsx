@@ -120,7 +120,7 @@ export default function WorkoutRowOverflowMenu({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-5 w-5 md:h-9 md:w-9 items-center justify-center rounded-md text-muted transition-colors hover:bg-border/60 hover:text-foreground mr-1"
+        className="flex h-5 w-5 md:h-9 md:w-9 items-center justify-center rounded-md text-muted transition-colors hover:bg-border/60 hover:text-foreground"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={listId}

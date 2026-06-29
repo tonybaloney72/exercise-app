@@ -43,6 +43,11 @@ import { refreshAppTrackedCardioHealthEnrich } from "@/lib/health/refreshCardioH
 import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { getCardioLog, patchCardioLog } from "@/lib/cardioWorkoutLog";
+import { stripMeaninglessCardioFromWorkout } from "@/lib/cardioRowMeaningful";
+import {
+  buildCardioSessionCapturePatch,
+  type CardioSessionCaptureInput,
+} from "@/lib/cardioSessionLog";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import { settingsHydrationKey } from "@/lib/settingsHydration";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -299,6 +304,10 @@ interface WorkoutState {
   setCardioDurationSeconds: (
     instanceKey: string,
     seconds: number | undefined,
+  ) => void;
+  applyCardioSessionCapture: (
+    instanceKey: string,
+    input: CardioSessionCaptureInput,
   ) => void;
   toggleWarmUpStretch: (exerciseId: string) => void;
   toggleCoolDownStretch: (exerciseId: string) => void;
@@ -766,6 +775,20 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         activeWorkout: patchCardioLog(state.activeWorkout, instanceKey, {
           actualDuration: seconds,
         }),
+      };
+    }),
+
+  applyCardioSessionCapture: (instanceKey, input) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      return {
+        activeWorkout: hydrateWorkoutLog(
+          patchCardioLog(
+            state.activeWorkout,
+            instanceKey,
+            buildCardioSessionCapturePatch(input),
+          ),
+        ),
       };
     }),
 
@@ -1361,11 +1384,18 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         clientTrace("quickLogCardio", "branch_active_cardio_only_finalize");
         set({ activeWorkout: null });
         return persistCompletedWorkout(
-          appendCardioRow(finalizeCardioOnlyQuickLogWorkout(active), row),
+          appendCardioRow(
+            stripMeaninglessCardioFromWorkout(
+              finalizeCardioOnlyQuickLogWorkout(active),
+            ),
+            row,
+          ),
         );
       }
       clientTrace("quickLogCardio", "branch_active_today");
-      commitInProgressQuickCardio(appendCardioRow(active, row));
+      commitInProgressQuickCardio(
+        appendCardioRow(stripMeaninglessCardioFromWorkout(active), row),
+      );
       return true;
     }
 
@@ -1377,7 +1407,9 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     const completed = findCompletedWorkoutForDate(state.workoutHistory, dateKey);
     if (completed) {
       clientTrace("quickLogCardio", "branch_completed_day");
-      return persistCompletedWorkout(appendCardioRow(completed, row));
+      return persistCompletedWorkout(
+        appendCardioRow(stripMeaninglessCardioFromWorkout(completed), row),
+      );
     }
 
     const inProgress = findInProgressWorkoutForDate(state.workoutHistory, dateKey);
@@ -1385,11 +1417,18 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       if (isCardioOnlyQuickLogWorkout(inProgress)) {
         clientTrace("quickLogCardio", "branch_in_progress_cardio_only_finalize");
         return persistCompletedWorkout(
-          appendCardioRow(finalizeCardioOnlyQuickLogWorkout(inProgress), row),
+          appendCardioRow(
+            stripMeaninglessCardioFromWorkout(
+              finalizeCardioOnlyQuickLogWorkout(inProgress),
+            ),
+            row,
+          ),
         );
       }
       clientTrace("quickLogCardio", "branch_in_progress_history");
-      commitInProgressQuickCardio(appendCardioRow(inProgress, row));
+      commitInProgressQuickCardio(
+        appendCardioRow(stripMeaninglessCardioFromWorkout(inProgress), row),
+      );
       return true;
     }
 
@@ -1817,12 +1856,14 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     if (!current?.endTime) return null;
 
     const saved = hydrateWorkoutLog(
-      workoutLogForPersistence({
-        ...current,
-        paused: false,
-        endTime: current.endTime,
-        startTime: current.startTime,
-      }),
+      workoutLogForPersistence(
+        stripMeaninglessCardioFromWorkout({
+          ...current,
+          paused: false,
+          endTime: current.endTime,
+          startTime: current.startTime,
+        }),
+      ),
     );
     const historyBefore = state.workoutHistory;
 
