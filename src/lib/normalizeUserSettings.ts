@@ -47,6 +47,11 @@ import {
   DEFAULT_EXPERTISE_BY_GROUP,
   sanitizeExpertiseByGroup,
 } from "@/lib/expertiseLevels";
+import {
+  DEFAULT_COOL_DOWN_STRETCH_COUNT,
+  DEFAULT_WARM_UP_STRETCH_COUNT,
+  sanitizeStretchCount,
+} from "@/lib/stretchCounts";
 import type { UserSettings } from "@/types";
 
 const EMPTY_RELEASE_NOTES_SEEN: string[] = [];
@@ -187,6 +192,15 @@ export function normalizeUserSettings(
     partial.weekBuilderMigrationAcknowledged ??
     DEFAULT_SETTINGS.weekBuilderMigrationAcknowledged;
 
+  const warmUpStretchCount = sanitizeStretchCount(
+    partial.warmUpStretchCount,
+    DEFAULT_WARM_UP_STRETCH_COUNT,
+  );
+  const coolDownStretchCount = sanitizeStretchCount(
+    partial.coolDownStretchCount,
+    DEFAULT_COOL_DOWN_STRETCH_COUNT,
+  );
+
   return {
     ...DEFAULT_SETTINGS,
     ...rest,
@@ -204,6 +218,8 @@ export function normalizeUserSettings(
     weekBlueprint,
     weekBlueprintCustomized,
     weekBuilderMigrationAcknowledged,
+    warmUpStretchCount,
+    coolDownStretchCount,
     weeklyCategoryLayout,
     weeklyCategoryLayoutCustomized,
     weeklyLayoutDayStructure,

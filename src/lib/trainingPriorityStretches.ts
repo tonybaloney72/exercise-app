@@ -18,13 +18,6 @@ const BASE_WARM_QUOTAS: Record<StretchThemePoolId, number> = {
   conditioning: 2,
 };
 
-const BASE_COOL_QUOTAS: Record<StretchThemePoolId, number> = {
-  upper: 2,
-  lower: 2,
-  core: 1,
-  conditioning: 0,
-};
-
 function upperEmphasisScore(weights: TrainingPriorityWeights): number {
   return weights.upper_push + weights.upper_pull;
 }
@@ -108,11 +101,11 @@ export function shouldIncludeStretchPool(
 
   switch (pool) {
     case "upper":
-      return (
-        hasUpper ||
-        upperEmphasisScore(weights) >= 4 ||
-        preset === "strength"
-      );
+      if (hasUpper) return true;
+      if (preset === "strength") return true;
+      // Balanced follows each day's theme; do not pull upper on lower-only days.
+      if (preset === "balanced") return false;
+      return upperEmphasisScore(weights) >= 4;
     case "lower":
       if (preset === "upper_body" && !hasLower) return false;
       if (hasLower) return true;
@@ -182,44 +175,4 @@ export function stretchWarmUpQuota(
 
   const weights = weightsForPreset(preset);
   return scaledQuota(BASE_WARM_QUOTAS[pool], poolWeight(pool, weights));
-}
-
-/** Cool-down stretch count for a themed pool (derived from priority scores). */
-function stretchCoolDownQuota(
-  pool: StretchThemePoolId,
-  preset: TrainingPriorityPreset,
-  scores?: TrainingPriorityScores,
-  customized = false,
-): number {
-  if (pool === "conditioning") return 0;
-
-  if (customized && scores) {
-    const w = scores;
-    const groupScore =
-      pool === "upper"
-        ? Math.max(w.upper_push, w.upper_pull)
-        : pool === "lower"
-          ? w.lower
-          : w.core;
-    if (groupScore === 0) return 0;
-    return Math.min(5, groupScore + 1);
-  }
-
-  if (preset === "minimal_core" && pool === "core") return 0;
-  if (preset === "core_emphasis" && pool === "core") return 4;
-  if (preset === "upper_body") {
-    if (pool === "upper") return 4;
-    if (pool === "lower") return 1;
-  }
-  if (preset === "lower_body") {
-    if (pool === "lower") return 5;
-    if (pool === "upper") return 2;
-  }
-  if (preset === "conditioning") {
-    if (pool === "lower") return 3;
-    if (pool === "core") return 0;
-  }
-
-  const weights = weightsForPreset(preset);
-  return scaledQuota(BASE_COOL_QUOTAS[pool], poolWeight(pool, weights));
 }

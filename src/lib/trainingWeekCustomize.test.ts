@@ -22,20 +22,14 @@ import type { ExercisePreferenceMap, TrainingWeekDays } from "@/lib/repos";
 const EQUIP = [...DEFAULT_AVAILABLE_EQUIPMENT];
 const EMPTY_PREFS: ExercisePreferenceMap = {};
 
-function authStretchCtx(
-  warmUp: StretchEntry[] = [],
-  coolDown: StretchEntry[] = [],
-) {
+function authStretchCtx() {
   return buildStretchResolveContextFromInputs({
-    defaultWarmUp: warmUp,
-    defaultCoolDown: coolDown,
-    authMode: "authenticated",
     exercisePreferences: {},
   });
 }
 
 describe("dayPlanForCustomSave", () => {
-  it("omits warmUp/coolDown when lists match derived stretches", () => {
+  it("persists derived warmUp/coolDown on save", () => {
     const monday = buildCatalogWeek()[1]!;
     const ctx = authStretchCtx();
     const derived = resolveStretchesForDay(monday, ctx);
@@ -45,17 +39,21 @@ describe("dayPlanForCustomSave", () => {
       coolDown: derived.coolDown,
     };
     const saved = dayPlanForCustomSave(withDerivedOnly, ctx);
-    expect(saved.warmUp).toBeUndefined();
-    expect(saved.coolDown).toBeUndefined();
+    expect(saved.warmUp?.map((e) => e.exerciseId)).toEqual(
+      derived.warmUp.map((e) => e.exerciseId),
+    );
+    expect(saved.coolDown?.map((e) => e.exerciseId)).toEqual(
+      derived.coolDown.map((e) => e.exerciseId),
+    );
   });
 
-  it("persists stretch overrides that differ from auto-derived", () => {
+  it("persists stretch overrides from the editor", () => {
     const monday = buildCatalogWeek()[1]!;
     const ctx = authStretchCtx();
     const override: StretchEntry[] = [{ exerciseId: "SC-15", targetReps: "20–30 sec" }];
     const saved = dayPlanForCustomSave({ ...monday, coolDown: override }, ctx);
     expect(saved.coolDown?.map((e) => e.exerciseId)).toEqual(["SC-15"]);
-    expect(saved.warmUp).toBeUndefined();
+    expect(saved.warmUp?.length).toBeGreaterThan(0);
   });
 
   it("strips legacy defaultWarmUp/defaultCoolDown fields from the saved shape", () => {

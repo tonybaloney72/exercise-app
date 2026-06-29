@@ -1,5 +1,4 @@
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
-import { scoresFromPreset } from "@/lib/trainingPriorities";
 import {
   resolveStretchesForDay,
   resolveStretchesForWeekSequential,
@@ -8,21 +7,17 @@ import {
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 import {
-  resolveDefaultCoolDownFromSettings,
-  resolveDefaultWarmUpFromSettings,
-} from "@/lib/stretchDefaults";
-import type { AuthMode } from "@/core";
+  DEFAULT_COOL_DOWN_STRETCH_COUNT,
+  DEFAULT_WARM_UP_STRETCH_COUNT,
+  sanitizeStretchCount,
+} from "@/lib/stretchCounts";
 import { getWeekDateKeys } from "@/utils/weekCalendar";
-import type { TrainingPriorityScores } from "@/lib/trainingPriorities";
-import type { DayPlan, StretchEntry, TrainingPriorityPreset } from "@/types";
+import type { DayPlan } from "@/types";
 
 export type StretchResolveContext = {
-  defaultWarmUp: StretchEntry[];
-  defaultCoolDown: StretchEntry[];
+  warmUpStretchCount: number;
+  coolDownStretchCount: number;
   dislikedExerciseIds: ReadonlySet<string>;
-  trainingPriorityPreset: TrainingPriorityPreset;
-  trainingPriorityScores: TrainingPriorityScores;
-  trainingPriorityCustomized: boolean;
   /** Sunday date key for the active week - rotates catalog picks across weeks. */
   weekRotationKey: string;
   /** Stretch ids already assigned earlier in the same Sun–Sat week (generator variety). */
@@ -30,34 +25,21 @@ export type StretchResolveContext = {
 };
 
 export function buildStretchResolveContextFromInputs(inputs: {
-  defaultWarmUp: StretchEntry[];
-  defaultCoolDown: StretchEntry[];
-  authMode: AuthMode;
+  warmUpStretchCount?: number;
+  coolDownStretchCount?: number;
   exercisePreferences: ExercisePreferenceMap;
-  trainingPriorityPreset?: TrainingPriorityPreset;
-  trainingPriorityScores?: TrainingPriorityScores;
-  trainingPriorityCustomized?: boolean;
   weekRotationKey?: string;
 }): StretchResolveContext {
-  const dislikedExerciseIds = collectDislikedIds(inputs.exercisePreferences);
-  const useCatalogIfEmpty = inputs.authMode === "guest";
   return {
-    defaultWarmUp: resolveDefaultWarmUpFromSettings(
-      inputs.defaultWarmUp,
-      dislikedExerciseIds,
-      useCatalogIfEmpty,
+    warmUpStretchCount: sanitizeStretchCount(
+      inputs.warmUpStretchCount,
+      DEFAULT_WARM_UP_STRETCH_COUNT,
     ),
-    defaultCoolDown: resolveDefaultCoolDownFromSettings(
-      inputs.defaultCoolDown,
-      dislikedExerciseIds,
-      useCatalogIfEmpty,
+    coolDownStretchCount: sanitizeStretchCount(
+      inputs.coolDownStretchCount,
+      DEFAULT_COOL_DOWN_STRETCH_COUNT,
     ),
-    dislikedExerciseIds,
-    trainingPriorityPreset: inputs.trainingPriorityPreset ?? "balanced",
-    trainingPriorityScores:
-      inputs.trainingPriorityScores ??
-      scoresFromPreset(inputs.trainingPriorityPreset ?? "balanced"),
-    trainingPriorityCustomized: inputs.trainingPriorityCustomized ?? false,
+    dislikedExerciseIds: collectDislikedIds(inputs.exercisePreferences),
     weekRotationKey: inputs.weekRotationKey ?? getWeekDateKeys()[0]!,
   };
 }

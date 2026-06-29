@@ -12,7 +12,6 @@ import {
   weekNeedsMaterialization,
 } from "@/lib/planGenerator";
 import type { ExercisePreferenceMap, TrainingWeekDays } from "@/lib/repos";
-import type { StretchEntry } from "@/types";
 import { weekExerciseIdsByDay } from "@/test/weekTestUtils";
 
 const EQUIP = [...DEFAULT_AVAILABLE_EQUIPMENT];
@@ -63,9 +62,9 @@ describe("computePrefsFingerprint", () => {
     expect(computePrefsFingerprint(EMPTY_PREFS, ["bodyweight", "rings"])).not.toBe(
       base,
     );
-    const warmUp: StretchEntry[] = [{ exerciseId: "SW-1", targetReps: "10" }];
+    const warmCount = 6;
     expect(
-      computePrefsFingerprint(EMPTY_PREFS, EQUIP, "balanced", "standard", warmUp, []),
+      computePrefsFingerprint(EMPTY_PREFS, EQUIP, "balanced", "standard", warmCount, 5),
     ).not.toBe(base);
   });
 });

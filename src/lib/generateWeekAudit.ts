@@ -7,7 +7,6 @@ import { isEnduranceBlockExerciseId } from "@/lib/enduranceBlockExercises";
 import { materializeTrainingWeek } from "@/lib/planGenerator";
 import { buildStretchResolveContextFromInputs } from "@/lib/stretchResolveContext";
 import type { ExercisePreferenceMap, TrainingWeekDays } from "@/lib/repos";
-import { scoresFromPreset } from "@/lib/trainingPriorities";
 import type { DayPlan, RoundDensity, StretchEntry, TrainingPriorityPreset } from "@/types";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
@@ -151,13 +150,7 @@ export function buildWeekAuditReport(options: WeekAuditOptions = {}): WeekAuditR
   );
 
   const stretchCtx = buildStretchResolveContextFromInputs({
-    defaultWarmUp: [],
-    defaultCoolDown: [],
-    authMode: "authenticated",
     exercisePreferences: prefs,
-    trainingPriorityPreset: preset,
-    trainingPriorityScores: scoresFromPreset(preset),
-    trainingPriorityCustomized: false,
     weekRotationKey,
   });
 

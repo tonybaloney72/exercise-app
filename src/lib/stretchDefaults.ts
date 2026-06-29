@@ -1,11 +1,5 @@
 import { exerciseMap } from "@/core/catalog";
-import {
-  GUEST_FALLBACK_COOL_DOWN,
-  GUEST_FALLBACK_WARM_UP,
-} from "@/lib/stretchCatalogDefaults";
 import type { StretchEntry } from "@/types";
-
-export { GUEST_FALLBACK_COOL_DOWN, GUEST_FALLBACK_WARM_UP };
 
 /** Validate and dedupe stretch rows from settings JSON or DB. */
 export function sanitizeStretchEntries(raw: unknown): StretchEntry[] {
@@ -95,40 +89,7 @@ export function stretchListsEqual(a: StretchEntry[], b: StretchEntry[]): boolean
   return key(a) === key(b);
 }
 
-/**
- * Effective always-include warm-up from settings storage.
- * Signed-in users: empty storage → no defaults (they configure in Settings).
- * Guests: empty storage → catalog universal pool.
- */
-export function resolveDefaultWarmUpFromSettings(
-  stored: StretchEntry[] | undefined,
-  dislikedExerciseIds?: ReadonlySet<string>,
-  useCatalogIfEmpty = false,
-): StretchEntry[] {
-  const base =
-    stored != null && stored.length > 0
-      ? cloneStretchEntries(stored)
-      : useCatalogIfEmpty
-        ? cloneStretchEntries(GUEST_FALLBACK_WARM_UP)
-        : [];
-  return filterStretchesByDislikes(base, dislikedExerciseIds);
-}
-
-export function resolveDefaultCoolDownFromSettings(
-  stored: StretchEntry[] | undefined,
-  dislikedExerciseIds?: ReadonlySet<string>,
-  useCatalogIfEmpty = false,
-): StretchEntry[] {
-  const base =
-    stored != null && stored.length > 0
-      ? cloneStretchEntries(stored)
-      : useCatalogIfEmpty
-        ? cloneStretchEntries(GUEST_FALLBACK_COOL_DOWN)
-        : [];
-  return filterStretchesByDislikes(base, dislikedExerciseIds);
-}
-
-/** Stored settings lists with disliked exercises removed (for UI + persistence). */
+/** Stored settings lists with disliked exercises removed (legacy defaultWarmUp/defaultCoolDown). */
 export function pruneStoredStretchDefaults(
   storedWarmUp: StretchEntry[],
   storedCoolDown: StretchEntry[],
@@ -138,14 +99,4 @@ export function pruneStoredStretchDefaults(
     defaultWarmUp: filterStretchesByDislikes(storedWarmUp, dislikedExerciseIds),
     defaultCoolDown: filterStretchesByDislikes(storedCoolDown, dislikedExerciseIds),
   };
-}
-
-/** Stable ids for prefs fingerprint when default stretch lists change. */
-export function stretchDefaultsFingerprint(
-  defaultWarmUp: StretchEntry[],
-  defaultCoolDown: StretchEntry[],
-): string {
-  const w = defaultWarmUp.map((e) => e.exerciseId).sort().join(",");
-  const c = defaultCoolDown.map((e) => e.exerciseId).sort().join(",");
-  return `su:${w}|sd:${c}`;
 }

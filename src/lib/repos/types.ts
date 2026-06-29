@@ -20,9 +20,9 @@ import {
   type CustomBuildStyle,
 } from "@/lib/weekBlueprint";
 import {
-  GUEST_FALLBACK_COOL_DOWN,
-  GUEST_FALLBACK_WARM_UP,
-} from "@/lib/stretchDefaults";
+  DEFAULT_COOL_DOWN_STRETCH_COUNT,
+  DEFAULT_WARM_UP_STRETCH_COUNT,
+} from "@/lib/stretchCounts";
 
 export type ExerciseSettingsMap = Record<string, ExerciseSettingsValues>;
 
@@ -149,7 +149,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   ),
   weeklyLayoutDayStructureCustomized: false,
   roundDensity: "standard",
-  /** Signed-in users configure their own; guests get catalog fallbacks at resolve time. */
+  warmUpStretchCount: DEFAULT_WARM_UP_STRETCH_COUNT,
+  coolDownStretchCount: DEFAULT_COOL_DOWN_STRETCH_COUNT,
   defaultWarmUp: [],
   defaultCoolDown: [],
   weeklyRestDays: { ...DEFAULT_WEEKLY_REST_DAYS },
@@ -162,9 +163,3 @@ export const DEFAULT_SETTINGS: UserSettings = {
   releaseNotesSeenIds: [],
 };
 
-/** Stretch defaults seeded for guest localStorage when none are stored. */
-const GUEST_DEFAULT_SETTINGS: Pick<UserSettings, "defaultWarmUp" | "defaultCoolDown"> =
-  {
-    defaultWarmUp: [...GUEST_FALLBACK_WARM_UP],
-    defaultCoolDown: [...GUEST_FALLBACK_COOL_DOWN],
-  };

@@ -1,12 +1,10 @@
 import type { UserSettings } from "@/types";
 
-/** Stable key when default warm-up / cool-down lists change. */
+/** Stable key when per-day stretch counts change. */
 export function selectStretchDefaultsKey(
-  s: Pick<UserSettings, "defaultWarmUp" | "defaultCoolDown">,
+  s: Pick<UserSettings, "warmUpStretchCount" | "coolDownStretchCount">,
 ): string {
-  return [...s.defaultWarmUp, ...s.defaultCoolDown]
-    .map((e) => `${e.exerciseId}:${e.targetReps}`)
-    .join("|");
+  return `w${s.warmUpStretchCount}|c${s.coolDownStretchCount}`;
 }
 
 /** Stable dependency key when equipment changes (plan regen). */

@@ -8,8 +8,13 @@ import {
   expertiseByGroupFingerprint,
   resolveExpertiseFilter,
 } from "@/lib/expertiseLevels";
-import { stretchDefaultsFingerprint } from "@/lib/stretchDefaults";
-import type { StretchEntry } from "@/types";
+import { materializeStretchesOntoWeek } from "@/lib/dayStretchPlan";
+import { buildStretchResolveContextFromInputs } from "@/lib/stretchResolveContext";
+import {
+  DEFAULT_COOL_DOWN_STRETCH_COUNT,
+  DEFAULT_WARM_UP_STRETCH_COUNT,
+  stretchCountsFingerprint,
+} from "@/lib/stretchCounts";
 import { applyProgramProfileToWeek } from "@/lib/programProfile";
 import { dayPlanContainsDislikedExercise } from "@/lib/trainingWeekFrozenDay";
 import type { ExercisePreferenceMap, ExerciseSettingsMap } from "@/lib/repos";
@@ -61,8 +66,8 @@ export function computePrefsFingerprint(
   availableEquipment: ExerciseEquipment[],
   trainingPriorityPreset: TrainingPriorityPreset = "balanced",
   roundDensity: RoundDensity = "standard",
-  defaultWarmUp: StretchEntry[] = [],
-  defaultCoolDown: StretchEntry[] = [],
+  warmUpStretchCount: number = DEFAULT_WARM_UP_STRETCH_COUNT,
+  coolDownStretchCount: number = DEFAULT_COOL_DOWN_STRETCH_COUNT,
   trainingPriorityScores?: TrainingPriorityScores,
   trainingPriorityCustomized = false,
   programMode: ProgramMode = "preset",
@@ -86,7 +91,10 @@ export function computePrefsFingerprint(
     .map(([id]) => id)
     .sort();
   const equip = [...availableEquipment].sort();
-  const stretches = stretchDefaultsFingerprint(defaultWarmUp, defaultCoolDown);
+  const stretches = stretchCountsFingerprint(
+    warmUpStretchCount,
+    coolDownStretchCount,
+  );
   const scores =
     trainingPriorityScores ??
     resolveTrainingPriorityScores({ trainingPriorityPreset });
@@ -144,8 +152,8 @@ export function computePrefsFingerprintFromSettings(
     settings.availableEquipment,
     settings.trainingPriorityPreset,
     settings.roundDensity,
-    settings.defaultWarmUp,
-    settings.defaultCoolDown,
+    settings.warmUpStretchCount,
+    settings.coolDownStretchCount,
     resolveTrainingPriorityScores(settings),
     settings.trainingPriorityCustomized ?? false,
     settings.programMode ?? "preset",
@@ -303,13 +311,35 @@ export function materializeTrainingWeek(
     profile,
     userSettings,
   );
-  return applyDislikesToWeek(
-    profiled,
+  return materializeStretchesOnGeneratedWeek(
+    applyDislikesToWeek(
+      profiled,
+      prefs,
+      availableEquipment,
+      exerciseSettings,
+      userSettings,
+    ),
     prefs,
-    availableEquipment,
-    exerciseSettings,
     userSettings,
+    varietySeed,
   );
+}
+
+function materializeStretchesOnGeneratedWeek(
+  week: TrainingWeekDays,
+  prefs: ExercisePreferenceMap,
+  userSettings?: UserSettings,
+  varietySeed?: string,
+): TrainingWeekDays {
+  const ctx = buildStretchResolveContextFromInputs({
+    warmUpStretchCount:
+      userSettings?.warmUpStretchCount ?? DEFAULT_WARM_UP_STRETCH_COUNT,
+    coolDownStretchCount:
+      userSettings?.coolDownStretchCount ?? DEFAULT_COOL_DOWN_STRETCH_COUNT,
+    exercisePreferences: prefs,
+    weekRotationKey: varietySeed,
+  });
+  return materializeStretchesOntoWeek(week, ctx);
 }
 
 export function weekContainsDislikedExercise(

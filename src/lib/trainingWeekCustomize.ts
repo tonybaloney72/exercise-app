@@ -15,7 +15,6 @@ import {
   buildProgramProfileInputFromSettings,
 } from "@/lib/programProfile";
 import {
-  rebuildDerivedStretches,
   resolveStretchesForDay,
 } from "@/lib/dayStretchPlan";
 import { buildVarietySeed } from "@/lib/planVariety";
@@ -23,7 +22,6 @@ import {
   buildStretchResolveContextFromInputs,
   type StretchResolveContext,
 } from "@/lib/stretchResolveContext";
-import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
 
 async function resolveTrainingWeekForAuthInCustomize(dateKey: string) {
   const { resolveTrainingWeekForAuth } = await import("@/lib/planResolver");
@@ -41,7 +39,6 @@ import {
   cloneStretchEntries,
   hasStretchListOverride,
   normalizeStretchList,
-  stretchListsEqual,
 } from "@/lib/stretchDefaults";
 import {
   getExercisePreferenceRepo,
@@ -78,13 +75,9 @@ async function stretchContextFromRepos(): Promise<StretchResolveContext> {
     getSettingsRepo("authenticated").load(),
   ]);
   return buildStretchResolveContextFromInputs({
-    defaultWarmUp: settings.defaultWarmUp,
-    defaultCoolDown: settings.defaultCoolDown,
-    authMode: "authenticated",
+    warmUpStretchCount: settings.warmUpStretchCount,
+    coolDownStretchCount: settings.coolDownStretchCount,
     exercisePreferences: prefs,
-    trainingPriorityPreset: settings.trainingPriorityPreset,
-    trainingPriorityScores: resolveTrainingPriorityScores(settings),
-    trainingPriorityCustomized: settings.trainingPriorityCustomized,
   });
 }
 
@@ -157,7 +150,7 @@ export function prepareDayPlanForEditor(
   return { ...cloned, warmUp, coolDown };
 }
 
-/** Strip legacy fields; only persist per-day stretch overrides when they differ from derived. */
+/** Persist resolved stretch lists on each saved day plan. */
 export function dayPlanForCustomSave(
   plan: DayPlan,
   ctx: StretchResolveContext,
@@ -171,34 +164,13 @@ export function dayPlanForCustomSave(
     defaultCoolDown?: StretchEntry[];
   };
 
-  const basePlan: DayPlan = { ...rest };
-  const derived = rebuildDerivedStretches(
-    { ...basePlan, warmUp: undefined, coolDown: undefined },
-    ctx,
-  );
-
-  const normalizedWarm = hasStretchListOverride(rest.warmUp)
-    ? normalizeStretchList(rest.warmUp, ctx.dislikedExerciseIds)
-    : null;
-  const normalizedCool = hasStretchListOverride(rest.coolDown)
-    ? normalizeStretchList(rest.coolDown, ctx.dislikedExerciseIds)
-    : null;
-
-  const warmUp =
-    normalizedWarm != null && !stretchListsEqual(normalizedWarm, derived.warmUp)
-      ? normalizedWarm
-      : undefined;
-
-  const coolDown =
-    normalizedCool != null &&
-    !stretchListsEqual(normalizedCool, derived.coolDown)
-      ? normalizedCool
-      : undefined;
+  const basePlan = stripPhantomRestDayRounds({ ...rest });
+  const resolved = resolveStretchesForDay(basePlan, ctx);
 
   return normalizeDayPlanCardio({
     ...basePlan,
-    warmUp,
-    coolDown,
+    warmUp: resolved.warmUp,
+    coolDown: resolved.coolDown,
   });
 }
 

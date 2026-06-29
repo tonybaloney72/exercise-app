@@ -5,25 +5,20 @@ import {
   normalizeStretchList,
 } from "@/lib/stretchDefaults";
 import {
-  allCoolDownCatalogPool,
+  coolDownCatalogPool,
   warmSessionCatalogPool,
   type StretchThemePoolId,
 } from "@/lib/stretchCatalogPools";
 import type { StretchResolveContext } from "@/lib/stretchResolveContext";
-import {
-  shouldIncludeStretchPool,
-  stretchWarmUpQuota,
-} from "@/lib/trainingPriorityStretches";
+import { includedStretchPoolsForDay } from "@/lib/stretchDayFocus";
 import { shouldSkipStretchesForPlan } from "@/lib/restDays";
+import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan, ExerciseCategory, StretchEntry } from "@/types";
 
 export type ResolvedDayStretches = {
   warmUp: StretchEntry[];
   coolDown: StretchEntry[];
 };
-
-/** Prescribed cool-down count from the catalog generator (not counting user overrides). */
-export const COOL_DOWN_STRETCHES_PER_DAY = 5;
 
 function mergeExcludeIds(
   ...sets: (ReadonlySet<string> | undefined)[]
@@ -127,40 +122,78 @@ function isLightRecoveryDay(plan: DayPlan): boolean {
   return slotCount <= 6;
 }
 
-function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[] {
-  const recovery = isLightRecoveryDay(plan);
+function poolForSection(
+  poolId: StretchThemePoolId,
+  section: "warm" | "cool",
+): readonly StretchEntry[] {
+  return section === "warm"
+    ? warmSessionCatalogPool(poolId)
+    : coolDownCatalogPool(poolId);
+}
+
+function pickThemedStretchesForDay(
+  plan: DayPlan,
+  targetCount: number,
+  section: "warm" | "cool",
+  ctx: StretchResolveContext,
+  extraExclude: ReadonlySet<string> = new Set(),
+): StretchEntry[] {
+  if (targetCount <= 0) return [];
   const cats = categoriesInPlan(plan);
-  const preset = ctx.trainingPriorityPreset;
-  const { trainingPriorityScores: scores, trainingPriorityCustomized: customized } =
-    ctx;
-  const daySeed = `d${plan.dayOfWeek}-tp:${preset}`;
-  const warmParts: StretchEntry[] = [...ctx.defaultWarmUp];
-  const excludePlanIds = prescribedExerciseIdsInPlan(plan);
+  const included = includedStretchPoolsForDay(plan, cats);
+  if (included.length === 0) return [];
 
-  const poolIds: StretchThemePoolId[] = [
-    "upper",
-    "lower",
-    "core",
-    "conditioning",
-  ];
+  const daySeed = `d${plan.dayOfWeek}`;
+  const exclude = mergeExcludeIds(ctx.weekUsedStretchIds, extraExclude);
+  const parts: StretchEntry[] = [];
+  let slotsLeft = targetCount;
 
-  for (const id of poolIds) {
-    if (!shouldIncludeStretchPool(id, plan, cats, preset, scores, customized))
-      continue;
-    let quota = stretchWarmUpQuota(id, preset, scores, customized);
-    if (recovery) quota = Math.max(1, Math.ceil(quota * 0.6));
-    if (quota <= 0) continue;
+  for (const id of included) {
+    if (slotsLeft <= 0) break;
+    const before = parts.length;
     appendPickedPool(
-      warmParts,
-      warmSessionCatalogPool(id),
-      quota,
-      `${ctx.weekRotationKey}-${daySeed}-warm-${id}`,
+      parts,
+      poolForSection(id, section),
+      1,
+      `${ctx.weekRotationKey}-${daySeed}-${section}-${id}`,
       ctx,
-      mergeExcludeIds(ctx.weekUsedStretchIds, excludePlanIds),
+      mergeExcludeIds(exclude, new Set(parts.map((e) => e.exerciseId))),
+    );
+    slotsLeft -= parts.length - before;
+  }
+
+  if (slotsLeft > 0) {
+    const combined = included.flatMap((id) => poolForSection(id, section));
+    appendPickedPool(
+      parts,
+      combined,
+      slotsLeft,
+      `${ctx.weekRotationKey}-${daySeed}-${section}-fill`,
+      ctx,
+      mergeExcludeIds(exclude, new Set(parts.map((e) => e.exerciseId))),
     );
   }
 
-  return dedupeStretchEntries(warmParts);
+  return dedupeStretchEntries(parts).slice(0, targetCount);
+}
+
+function effectiveWarmUpCount(plan: DayPlan, ctx: StretchResolveContext): number {
+  let count = ctx.warmUpStretchCount;
+  if (isLightRecoveryDay(plan)) {
+    count = Math.max(1, Math.ceil(count * 0.6));
+  }
+  return count;
+}
+
+function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[] {
+  const count = effectiveWarmUpCount(plan, ctx);
+  return pickThemedStretchesForDay(
+    plan,
+    count,
+    "warm",
+    ctx,
+    prescribedExerciseIdsInPlan(plan),
+  );
 }
 
 function deriveCoolDown(
@@ -168,26 +201,13 @@ function deriveCoolDown(
   ctx: StretchResolveContext,
   warmExerciseIds: ReadonlySet<string>,
 ): StretchEntry[] {
-  const preset = ctx.trainingPriorityPreset;
-  const daySeed = `d${plan.dayOfWeek}-tp:${preset}`;
-  const seed = `${ctx.weekRotationKey}-${daySeed}-cool-all`;
-  const defaults = dedupeStretchEntries([...ctx.defaultCoolDown]);
-  const usedIds = new Set(defaults.map((e) => e.exerciseId));
-  const slotsLeft = Math.max(0, COOL_DOWN_STRETCHES_PER_DAY - defaults.length);
-
-  const picks =
-    slotsLeft > 0
-      ? pickStretchEntries(
-          allCoolDownCatalogPool(),
-          slotsLeft,
-          seed,
-          ctx.dislikedExerciseIds,
-          mergeExcludeIds(warmExerciseIds, usedIds),
-        )
-      : [];
-
-  const merged = dedupeStretchEntries([...defaults, ...picks]);
-  return merged.slice(0, COOL_DOWN_STRETCHES_PER_DAY);
+  return pickThemedStretchesForDay(
+    plan,
+    ctx.coolDownStretchCount,
+    "cool",
+    ctx,
+    warmExerciseIds,
+  );
 }
 
 /**
@@ -223,7 +243,7 @@ function warmIdsFromEntries(entries: StretchEntry[]): ReadonlySet<string> {
   return new Set(entries.map((e) => e.exerciseId));
 }
 
-/** Recompute warm-up / cool-down from settings defaults + day focus. */
+/** Recompute warm-up / cool-down from day focus and configured counts. */
 export function rebuildDerivedStretches(
   plan: DayPlan,
   ctx: StretchResolveContext,
@@ -237,8 +257,37 @@ export function rebuildDerivedStretches(
 }
 
 /**
+ * Materialize stretch lists onto each day in a generated week (persisted on save).
+ */
+export function materializeStretchesOntoWeek(
+  weekPlans: TrainingWeekDays,
+  ctx: StretchResolveContext,
+): TrainingWeekDays {
+  const weekUsed = new Set<string>();
+  const out: TrainingWeekDays = {};
+
+  for (let d = 0; d < 7; d++) {
+    const plan = weekPlans[d];
+    if (!plan) continue;
+    if (shouldSkipStretchesForPlan(plan)) {
+      out[d] = { ...plan, warmUp: [], coolDown: [] };
+      continue;
+    }
+    const dayCtx: StretchResolveContext = {
+      ...ctx,
+      weekUsedStretchIds: weekUsed,
+    };
+    const { warmUp, coolDown } = rebuildDerivedStretches(plan, dayCtx);
+    recordStretchUsage(weekUsed, warmUp);
+    out[d] = { ...plan, warmUp, coolDown };
+  }
+
+  return out;
+}
+
+/**
  * Warm-up / cool-down for a prescribed day. Per-day overrides win; otherwise derived
- * from settings defaults, training priorities, and rounds. Disliked stretches are excluded.
+ * from configured counts and day focus. Disliked stretches are excluded.
  */
 export function resolveStretchesForDay(
   plan: DayPlan,

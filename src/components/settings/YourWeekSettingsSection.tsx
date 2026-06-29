@@ -1,42 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import CustomBuildStyleSelector from "@/components/settings/CustomBuildStyleSelector";
-import DefaultStretchesModal from "@/components/settings/DefaultStretchesModal";
 import ProgramModeSelector from "@/components/settings/ProgramModeSelector";
 import PplWeekScheduleEditor from "@/components/settings/PplWeekScheduleEditor";
+import StretchCountEditor from "@/components/settings/StretchCountEditor";
 import WeekBuilderMigrationBanner from "@/components/settings/WeekBuilderMigrationBanner";
 import WeeklyCardioEditor from "@/components/settings/WeeklyCardioEditor";
-import { buildStretchResolveContextFromStores } from "@/adapters/stretchResolveContextFromStores";
 import { ROUND_DENSITY_OPTIONS } from "@/lib/programProfile";
 import { PPL_ROUND_DENSITY_OPTIONS } from "@/lib/pplRoundDensity";
 import type { CustomBuildStyle } from "@/lib/weekBlueprint";
 import type { ProgramMode } from "@/lib/weeklyCategoryLayout";
 import type { UserSettings } from "@/types";
-import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
 export default function YourWeekSettingsSection() {
   const settings = useSettingsStore();
-  const [stretchModalOpen, setStretchModalOpen] = useState(false);
-  const exercisePrefs = useExercisePreferencesStore((s) => s.byExerciseId);
-
-  const effectiveStretchDefaults = useMemo(() => {
-    if (!settings.hydrated) return { warm: 0, cool: 0 };
-    const ctx = buildStretchResolveContextFromStores();
-    return {
-      warm: ctx.defaultWarmUp.length,
-      cool: ctx.defaultCoolDown.length,
-    };
-  }, [
-    settings.hydrated,
-    settings.defaultWarmUp,
-    settings.defaultCoolDown,
-    settings.availableEquipment,
-    exercisePrefs,
-  ]);
 
   return (
     <>
@@ -201,32 +181,16 @@ export default function YourWeekSettingsSection() {
 
       <CollapsibleSection
         embedded
-        title="Default stretches"
-        hint="Always included in warm-up / cool-down when a day is built"
+        title="Stretches per day"
+        hint="How many warm-up and cool-down stretches to generate for each training day"
         defaultOpen={false}
       >
-        <p className="text-xs text-muted">
-          Start empty and add your own; disliked Library exercises are excluded.
-        </p>
-        <p className="text-xs text-foreground">
-          {effectiveStretchDefaults.warm === 0 &&
-          effectiveStretchDefaults.cool === 0
-            ? "None selected - focus-based stretches still apply per day."
-            : `${effectiveStretchDefaults.warm} warm-up · ${effectiveStretchDefaults.cool} cool-down`}
-        </p>
-        <button
-          type="button"
-          onClick={() => setStretchModalOpen(true)}
-          className="w-full rounded-xl border border-border bg-surface-hover py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent/40 hover:bg-accent/10"
-        >
-          Edit default stretches
-        </button>
+        <StretchCountEditor
+          warmUpStretchCount={settings.warmUpStretchCount}
+          coolDownStretchCount={settings.coolDownStretchCount}
+          onChange={(patch) => void settings.updateSettings(patch)}
+        />
       </CollapsibleSection>
-
-      <DefaultStretchesModal
-        open={stretchModalOpen}
-        onClose={() => setStretchModalOpen(false)}
-      />
     </>
   );
 }

@@ -33,4 +33,42 @@ describe("trainingPriorityStretches", () => {
   it("minimal_core suppresses core warm quota", () => {
     expect(stretchWarmUpQuota("core", "minimal_core")).toBe(0);
   });
+
+  it("balanced preset omits upper pool on lower-only days", () => {
+    const tuesday = buildCatalogWeek()[2]!;
+    expect(
+      shouldIncludeStretchPool(
+        "upper",
+        tuesday,
+        catsFromPlan("LB", "CR", "CS"),
+        "balanced",
+        undefined,
+        false,
+      ),
+    ).toBe(false);
+    expect(
+      shouldIncludeStretchPool(
+        "lower",
+        tuesday,
+        catsFromPlan("LB", "CR", "CS"),
+        "balanced",
+        undefined,
+        false,
+      ),
+    ).toBe(true);
+  });
+
+  it("balanced preset still includes upper pool on upper days", () => {
+    const monday = buildCatalogWeek()[1]!;
+    expect(
+      shouldIncludeStretchPool(
+        "upper",
+        monday,
+        catsFromPlan("UP", "CF", "CL"),
+        "balanced",
+        undefined,
+        false,
+      ),
+    ).toBe(true);
+  });
 });

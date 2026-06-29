@@ -17,16 +17,16 @@ describe("bundled release notes", () => {
 
 describe("getLatestReleaseNote", () => {
   it("returns the newest bundled note", () => {
-    expect(getLatestReleaseNote()?.id).toBe("2026-06-29-cardio-endurance");
+    expect(getLatestReleaseNote()?.id).toBe("2026-06-30-stretch-generation");
   });
 });
 
 describe("getRecentReleaseNotes", () => {
   it("returns up to three newest notes for settings", () => {
     expect(getRecentReleaseNotes(3).map((n) => n.id)).toEqual([
+      "2026-06-30-stretch-generation",
       "2026-06-29-cardio-endurance",
       "2026-06-28-cardio-speed-hc",
-      "2026-06-27-settings-workout",
     ]);
   });
 });
@@ -34,18 +34,18 @@ describe("getRecentReleaseNotes", () => {
 describe("getLatestUnseenReleaseNote", () => {
   it("returns only the newest note when it was not dismissed", () => {
     const note = getLatestUnseenReleaseNote(
-      new Set(["2026-06-28-cardio-speed-hc", "2026-06-27-settings-workout"]),
+      new Set(["2026-06-29-cardio-endurance", "2026-06-28-cardio-speed-hc"]),
     );
-    expect(note?.id).toBe("2026-06-29-cardio-endurance");
+    expect(note?.id).toBe("2026-06-30-stretch-generation");
   });
 
   it("returns nothing when the newest note was dismissed", () => {
     expect(
       getLatestUnseenReleaseNote(
         new Set([
+          "2026-06-30-stretch-generation",
           "2026-06-29-cardio-endurance",
           "2026-06-28-cardio-speed-hc",
-          "2026-06-27-settings-workout",
         ]),
       ),
     ).toBeUndefined();
@@ -55,9 +55,9 @@ describe("getLatestUnseenReleaseNote", () => {
 describe("getAllReleaseNotes", () => {
   it("returns every bundled note newest first", () => {
     expect(getAllReleaseNotes().map((n) => n.id)).toEqual([
+      "2026-06-30-stretch-generation",
       "2026-06-29-cardio-endurance",
       "2026-06-28-cardio-speed-hc",
-      "2026-06-27-settings-workout",
     ]);
   });
 });

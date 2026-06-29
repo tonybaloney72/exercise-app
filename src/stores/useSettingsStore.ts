@@ -70,11 +70,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         partial.customBuildStyle !== current.customBuildStyle) ||
       (partial.roundDensity != null &&
         partial.roundDensity !== current.roundDensity);
-    const stretchDefaultsChanged =
-      (partial.defaultWarmUp != null &&
-        !stretchListsEqual(current.defaultWarmUp, partial.defaultWarmUp)) ||
-      (partial.defaultCoolDown != null &&
-        !stretchListsEqual(current.defaultCoolDown, partial.defaultCoolDown));
+    const stretchCountsChanged =
+      (partial.warmUpStretchCount != null &&
+        partial.warmUpStretchCount !== current.warmUpStretchCount) ||
+      (partial.coolDownStretchCount != null &&
+        partial.coolDownStretchCount !== current.coolDownStretchCount);
     const weekScheduleChanged =
       weeklyRestSettingsChanged(partial, current) ||
       weeklyCardioSettingsChanged(partial, current);
@@ -124,7 +124,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         await refreshCurrentTrainingWeek("program");
       } else if (equipmentChanged) {
         await refreshCurrentTrainingWeek("equipment");
-      } else if (stretchDefaultsChanged) {
+      } else if (stretchCountsChanged) {
         await refreshCurrentTrainingWeek("program");
       }
     } catch (err) {
@@ -220,6 +220,8 @@ function pickUserSettingsFields(
     weeklyLayoutDayStructureCustomized:
       state.weeklyLayoutDayStructureCustomized,
     roundDensity: state.roundDensity,
+    warmUpStretchCount: state.warmUpStretchCount,
+    coolDownStretchCount: state.coolDownStretchCount,
     defaultWarmUp: state.defaultWarmUp,
     defaultCoolDown: state.defaultCoolDown,
     weeklyRestDays: state.weeklyRestDays,

@@ -7,7 +7,6 @@ import {
 } from "@/lib/dayStretchPlan";
 import { buildStretchResolveContextFromInputs } from "@/lib/stretchResolveContext";
 import type { TrainingWeekDays } from "@/lib/repos";
-import { useAuthStore } from "@/stores/useAuthStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { getWeekDateKeys } from "@/utils/weekCalendar";
@@ -19,8 +18,8 @@ const EMPTY: { warmUp: StretchEntry[]; coolDown: StretchEntry[] } = {
 };
 
 /**
- * Day-aware warm-up / cool-down for a prescribed plan, reactive to settings,
- * guest mode, and Library dislikes. Pass `weekByDow` to spread stretch variety
+ * Day-aware warm-up / cool-down for a prescribed plan, reactive to settings
+ * and Library dislikes. Pass `weekByDow` to spread stretch variety
  * across the current Sun–Sat week.
  */
 export function useResolvedStretches(
@@ -30,26 +29,13 @@ export function useResolvedStretches(
   warmUp: StretchEntry[];
   coolDown: StretchEntry[];
 } {
-  const authMode = useAuthStore((s) => s.mode);
-  const defaultWarmUp = useSettingsStore((s) => s.defaultWarmUp);
-  const defaultCoolDown = useSettingsStore((s) => s.defaultCoolDown);
+  const warmUpStretchCount = useSettingsStore((s) => s.warmUpStretchCount);
+  const coolDownStretchCount = useSettingsStore((s) => s.coolDownStretchCount);
   const exercisePreferences = useExercisePreferencesStore((s) => s.byExerciseId);
-  const trainingPriorityPreset = useSettingsStore(
-    (s) => s.trainingPriorityPreset,
-  );
-  const trainingPriorityScores = useSettingsStore(
-    (s) => s.trainingPriorityScores,
-  );
-  const trainingPriorityCustomized = useSettingsStore(
-    (s) => s.trainingPriorityCustomized,
-  );
 
-  const stretchDefaultsKey = useMemo(
-    () =>
-      [...defaultWarmUp, ...defaultCoolDown]
-        .map((e) => `${e.exerciseId}:${e.targetReps}`)
-        .join("|"),
-    [defaultWarmUp, defaultCoolDown],
+  const stretchCountsKey = useMemo(
+    () => `w${warmUpStretchCount}|c${coolDownStretchCount}`,
+    [warmUpStretchCount, coolDownStretchCount],
   );
 
   const weekKey = useMemo(
@@ -63,13 +49,9 @@ export function useResolvedStretches(
   return useMemo(() => {
     if (!plan) return EMPTY;
     const ctx = buildStretchResolveContextFromInputs({
-      defaultWarmUp,
-      defaultCoolDown,
-      authMode,
+      warmUpStretchCount,
+      coolDownStretchCount,
       exercisePreferences,
-      trainingPriorityPreset,
-      trainingPriorityScores,
-      trainingPriorityCustomized,
       weekRotationKey: getWeekDateKeys()[0],
     });
     if (weekByDow) {
@@ -82,13 +64,9 @@ export function useResolvedStretches(
     plan,
     weekByDow,
     weekKey,
-    authMode,
-    defaultWarmUp,
-    defaultCoolDown,
+    stretchCountsKey,
     exercisePreferences,
-    trainingPriorityPreset,
-    trainingPriorityScores,
-    trainingPriorityCustomized,
-    stretchDefaultsKey,
+    warmUpStretchCount,
+    coolDownStretchCount,
   ]);
 }

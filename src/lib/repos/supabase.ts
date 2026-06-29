@@ -162,6 +162,8 @@ interface SettingsRow {
   round_density?: string;
   default_warm_up?: unknown;
   default_cool_down?: unknown;
+  warm_up_stretch_count?: number | null;
+  cool_down_stretch_count?: number | null;
   weekly_rest_days?: unknown;
   weekly_rest_days_customized?: boolean;
   weekly_ppl_schedule?: unknown;
@@ -415,6 +417,8 @@ function rowToSettings(row: SettingsRow): UserSettings {
     roundDensity: sanitizeRoundDensity(row.round_density),
     defaultWarmUp: sanitizeStretchEntries(row.default_warm_up),
     defaultCoolDown: sanitizeStretchEntries(row.default_cool_down),
+    warmUpStretchCount: row.warm_up_stretch_count ?? undefined,
+    coolDownStretchCount: row.cool_down_stretch_count ?? undefined,
     weeklyRestDays: sanitizeWeeklyRestDays(row.weekly_rest_days),
     weeklyRestDaysCustomized: row.weekly_rest_days_customized ?? false,
     weeklyPplSchedule: sanitizeWeeklyPplSchedule(row.weekly_ppl_schedule),
@@ -458,6 +462,8 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     round_density: s.roundDensity,
     default_warm_up: s.defaultWarmUp,
     default_cool_down: s.defaultCoolDown,
+    warm_up_stretch_count: s.warmUpStretchCount,
+    cool_down_stretch_count: s.coolDownStretchCount,
     weekly_rest_days: s.weeklyRestDays,
     weekly_rest_days_customized: s.weeklyRestDaysCustomized,
     weekly_ppl_schedule: s.weeklyPplSchedule,

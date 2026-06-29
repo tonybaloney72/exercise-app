@@ -17,7 +17,6 @@ import {
   type LoadTrainingWeekForStretches,
 } from "@/lib/workoutStretchStart";
 import { buildStretchResolveContextFromInputs } from "@/lib/stretchResolveContext";
-import { resolveTrainingPriorityScores } from "@/lib/trainingPriorities";
 import { registerPrescribedPlanFreezeStateReader } from "@/lib/planResolverFreezeState";
 import type { AuthMode } from "@/core";
 import {
@@ -146,14 +145,9 @@ function stretchContextForWorkoutStart(weekAnchorDateKey?: string) {
     (weekAnchorDateKey ? weekKeyFromDateKey(weekAnchorDateKey) : null) ??
     weekKeyFromDateKey(formatLocalDateKey());
   return buildStretchResolveContextFromInputs({
-    defaultWarmUp: useSettingsStore.getState().defaultWarmUp,
-    defaultCoolDown: useSettingsStore.getState().defaultCoolDown,
-    authMode: useAuthStore.getState().mode,
+    warmUpStretchCount: useSettingsStore.getState().warmUpStretchCount,
+    coolDownStretchCount: useSettingsStore.getState().coolDownStretchCount,
     exercisePreferences: useExercisePreferencesStore.getState().byExerciseId,
-    trainingPriorityPreset: useSettingsStore.getState().trainingPriorityPreset,
-    trainingPriorityScores: resolveTrainingPriorityScores(useSettingsStore.getState()),
-    trainingPriorityCustomized:
-      useSettingsStore.getState().trainingPriorityCustomized,
     weekRotationKey: anchor ?? undefined,
   });
 }

@@ -353,9 +353,13 @@ export interface UserSettings {
   /** @deprecated Use {@link UserSettings.trainingPriorityPreset}. */
   programFocus?: TrainingPriorityPreset;
   roundDensity: RoundDensity;
-  /** Always-included warm-up stretches (Settings). Merged first when deriving a day's warm-up. */
+  /** Warm-up stretches generated per training day (Settings → Your Week). */
+  warmUpStretchCount: number;
+  /** Cool-down stretches generated per training day (Settings → Your Week). */
+  coolDownStretchCount: number;
+  /** @deprecated Replaced by {@link warmUpStretchCount} + per-day materialized lists. */
   defaultWarmUp: StretchEntry[];
-  /** Always-included cool-down stretches (Settings). Merged first when deriving cool-down. */
+  /** @deprecated Replaced by {@link coolDownStretchCount} + per-day materialized lists. */
   defaultCoolDown: StretchEntry[];
   /** Per weekday rest (full = no work; light = stretches only). */
   weeklyRestDays: WeeklyRestDays;
