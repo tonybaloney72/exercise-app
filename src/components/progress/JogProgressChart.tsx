@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type CSSProperties, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -25,15 +25,19 @@ import {
 } from "@/utils/cardioProgressStats";
 import { formatSecondsToMMSS } from "@/utils/time";
 import { PROGRESS_LINE_CHART_HEIGHT } from "@/components/progress/chartLayout";
-const tooltipStyle: CSSProperties = {
-  backgroundColor: "var(--surface)",
-  border: "1px solid var(--border-color)",
-  borderRadius: 10,
-  color: "var(--foreground)",
-  fontSize: 12,
-};
-
-const axisTick = { fill: "var(--muted)", fontSize: 11 };
+import {
+  PROGRESS_AXIS_TICK,
+  PROGRESS_BAR_CURSOR,
+  PROGRESS_CARTESIAN_GRID,
+  PROGRESS_CHART_MARGIN,
+  PROGRESS_LINE_CURSOR,
+  PROGRESS_LINE_STROKE,
+  PROGRESS_TOOLTIP_CONTENT_STYLE,
+  PROGRESS_TOOLTIP_PANEL_CLASS,
+  progressLineActiveDot,
+  progressLineDot,
+  progressYAxisLabel,
+} from "@/components/progress/rechartsProgressDefaults";
 
 interface Props {
   history: WorkoutLog[];
@@ -75,8 +79,8 @@ function CardioTooltipBody({
 
   return (
     <div
-      className="rounded-lg border border-border px-3 py-2 text-xs shadow-lg"
-      style={tooltipStyle}
+      className={PROGRESS_TOOLTIP_PANEL_CLASS}
+      style={PROGRESS_TOOLTIP_CONTENT_STYLE}
     >
       <p className="font-semibold text-foreground">
         {point.date}
@@ -155,9 +159,21 @@ export default function CardioProgressChart({
     return null;
   }
 
-  const sharedTooltip = (
+  const barTooltip = (
     <Tooltip
-      cursor={{ fill: "var(--surface-hover)" }}
+      cursor={PROGRESS_BAR_CURSOR}
+      content={({ active, payload }) => {
+        if (!active || !payload?.length) return null;
+        const p = payload[0]?.payload as CardioChartPoint | undefined;
+        if (!p) return null;
+        return <CardioTooltipBody point={p} exerciseLabel={exerciseLabel} />;
+      }}
+    />
+  );
+
+  const lineTooltip = (
+    <Tooltip
+      cursor={PROGRESS_LINE_CURSOR}
       content={({ active, payload }) => {
         if (!active || !payload?.length) return null;
         const p = payload[0]?.payload as CardioChartPoint | undefined;
@@ -180,40 +196,29 @@ export default function CardioProgressChart({
         >
           <ComposedChart
             data={composedData}
-            margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
+            margin={PROGRESS_CHART_MARGIN.legend}
           >
-            <CartesianGrid
-              stroke="var(--border-color)"
-              strokeDasharray="4 4"
-              vertical={false}
-            />
+            <CartesianGrid {...PROGRESS_CARTESIAN_GRID} />
             <XAxis
               dataKey="xLabel"
-              tick={axisTick}
+              tick={PROGRESS_AXIS_TICK}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               yAxisId="mi"
               width={40}
-              tick={axisTick}
+              tick={PROGRESS_AXIS_TICK}
               tickLine={false}
               axisLine={false}
               allowDecimals
-              label={{
-                value: "mi",
-                angle: -90,
-                position: "insideLeft",
-                fill: "var(--muted)",
-                fontSize: 10,
-                offset: 4,
-              }}
+              label={progressYAxisLabel("mi", 4)}
             />
             <YAxis
               yAxisId="min"
               orientation="right"
               width={36}
-              tick={axisTick}
+              tick={PROGRESS_AXIS_TICK}
               tickLine={false}
               axisLine={false}
               allowDecimals
@@ -226,7 +231,7 @@ export default function CardioProgressChart({
                 offset: 4,
               }}
             />
-            {sharedTooltip}
+            {barTooltip}
             <Legend
               verticalAlign="top"
               height={28}
@@ -265,12 +270,8 @@ export default function CardioProgressChart({
               name="durationPlot"
               stroke="var(--foreground)"
               strokeWidth={2}
-              dot={{
-                r: 3,
-                fill: "var(--foreground)",
-                stroke: "var(--background)",
-                strokeWidth: 1,
-              }}
+              dot={progressLineDot("var(--foreground)")}
+              activeDot={progressLineActiveDot("var(--foreground)")}
               connectNulls={false}
             />
           </ComposedChart>
@@ -292,35 +293,24 @@ export default function CardioProgressChart({
         >
           <BarChart
             data={series}
-            margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
+            margin={PROGRESS_CHART_MARGIN.legend}
           >
-            <CartesianGrid
-              stroke="var(--border-color)"
-              strokeDasharray="4 4"
-              vertical={false}
-            />
+            <CartesianGrid {...PROGRESS_CARTESIAN_GRID} />
             <XAxis
               dataKey="xLabel"
-              tick={axisTick}
+              tick={PROGRESS_AXIS_TICK}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               width={40}
-              tick={axisTick}
+              tick={PROGRESS_AXIS_TICK}
               tickLine={false}
               axisLine={false}
               allowDecimals
-              label={{
-                value: "Miles",
-                angle: -90,
-                position: "insideLeft",
-                fill: "var(--muted)",
-                fontSize: 10,
-                offset: 4,
-              }}
+              label={progressYAxisLabel("Miles", 4)}
             />
-            {sharedTooltip}
+            {barTooltip}
             <Legend
               verticalAlign="top"
               height={28}
@@ -354,35 +344,24 @@ export default function CardioProgressChart({
       >
         <LineChart
           data={series}
-          margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
+          margin={PROGRESS_CHART_MARGIN.legend}
         >
-          <CartesianGrid
-            stroke="var(--border-color)"
-            strokeDasharray="4 4"
-            vertical={false}
-          />
+          <CartesianGrid {...PROGRESS_CARTESIAN_GRID} />
           <XAxis
             dataKey="xLabel"
-            tick={axisTick}
+            tick={PROGRESS_AXIS_TICK}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
             width={44}
-            tick={axisTick}
+            tick={PROGRESS_AXIS_TICK}
             tickLine={false}
             axisLine={false}
             allowDecimals
-            label={{
-              value: "Minutes",
-              angle: -90,
-              position: "insideLeft",
-              fill: "var(--muted)",
-              fontSize: 10,
-              offset: 4,
-            }}
+            label={progressYAxisLabel("Minutes", 4)}
           />
-          {sharedTooltip}
+          {lineTooltip}
           <Legend
             verticalAlign="top"
             height={28}
@@ -394,14 +373,9 @@ export default function CardioProgressChart({
             type="monotone"
             dataKey="durationMin"
             name="Time"
-            stroke="var(--accent)"
-            strokeWidth={2}
-            dot={{
-              r: 3,
-              fill: "var(--accent)",
-              stroke: "var(--background)",
-              strokeWidth: 1,
-            }}
+            {...PROGRESS_LINE_STROKE}
+            dot={progressLineDot()}
+            activeDot={progressLineActiveDot()}
             connectNulls={false}
           />
         </LineChart>

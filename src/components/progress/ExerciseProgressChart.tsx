@@ -24,15 +24,17 @@ import BottomSheetModal from "@/components/common/BottomSheetModal";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import { PROGRESS_LINE_CHART_HEIGHT } from "@/components/progress/chartLayout";
-const tooltipStyle = {
-  backgroundColor: "var(--surface)",
-  border: "1px solid var(--border-color)",
-  borderRadius: 10,
-  color: "var(--foreground)",
-  fontSize: 12,
-};
-
-const axisTick = { fill: "var(--muted)", fontSize: 11 };
+import {
+  PROGRESS_AXIS_TICK,
+  PROGRESS_CARTESIAN_GRID,
+  PROGRESS_CHART_MARGIN,
+  PROGRESS_LINE_CURSOR,
+  PROGRESS_LINE_STROKE,
+  PROGRESS_TOOLTIP_CONTENT_STYLE,
+  progressLineActiveDot,
+  progressLineDot,
+  progressYAxisLabel,
+} from "@/components/progress/rechartsProgressDefaults";
 
 interface Props {
   history: WorkoutLog[];
@@ -191,34 +193,23 @@ export default function ExerciseProgressChart({ history }: Props) {
           >
             <LineChart
               data={series}
-              margin={{ top: 8, right: 8, left: 4, bottom: 4 }}
+              margin={PROGRESS_CHART_MARGIN.compact}
             >
-              <CartesianGrid
-                stroke="var(--border-color)"
-                strokeDasharray="4 4"
-                vertical={false}
-              />
+              <CartesianGrid {...PROGRESS_CARTESIAN_GRID} />
               <XAxis
                 dataKey="xLabel"
-                tick={axisTick}
+                tick={PROGRESS_AXIS_TICK}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
                 width={40}
-                tick={axisTick}
+                tick={PROGRESS_AXIS_TICK}
                 tickLine={false}
                 axisLine={false}
                 allowDecimals={axisMode === "duration"}
                 domain={[0, "auto"]}
-                label={{
-                  value: yLabel,
-                  angle: -90,
-                  position: "insideLeft",
-                  fill: "var(--muted)",
-                  fontSize: 10,
-                  offset: 0,
-                }}
+                label={progressYAxisLabel(yLabel)}
                 tickFormatter={(v) => {
                   if (axisMode !== "duration" || typeof v !== "number")
                     return String(v);
@@ -227,7 +218,8 @@ export default function ExerciseProgressChart({ history }: Props) {
                 }}
               />
               <Tooltip
-                contentStyle={tooltipStyle}
+                cursor={PROGRESS_LINE_CURSOR}
+                contentStyle={PROGRESS_TOOLTIP_CONTENT_STYLE}
                 labelFormatter={(_label, payload) => {
                   const row = payload?.[0]?.payload as
                     | { date?: string; xLabel?: string }
@@ -249,15 +241,9 @@ export default function ExerciseProgressChart({ history }: Props) {
                 type="monotone"
                 dataKey="value"
                 name={yLabel}
-                stroke="var(--accent)"
-                strokeWidth={2}
-                dot={{
-                  r: 3,
-                  fill: "var(--accent)",
-                  stroke: "var(--background)",
-                  strokeWidth: 1,
-                }}
-                activeDot={{ r: 5 }}
+                {...PROGRESS_LINE_STROKE}
+                dot={progressLineDot()}
+                activeDot={progressLineActiveDot()}
               />
             </LineChart>
           </ResponsiveContainer>

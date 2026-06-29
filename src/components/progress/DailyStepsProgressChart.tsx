@@ -1,6 +1,5 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -14,16 +13,15 @@ import {
 import type { DailyStepsChartPoint } from "@/lib/health/dailyStepsChart";
 import type { DailyHealthUnavailableReason } from "@/hooks/useDailyHealthFromHealth";
 import { PROGRESS_LINE_CHART_HEIGHT } from "@/components/progress/chartLayout";
-
-const tooltipStyle: CSSProperties = {
-  backgroundColor: "var(--surface)",
-  border: "1px solid var(--border-color)",
-  borderRadius: 10,
-  color: "var(--foreground)",
-  fontSize: 12,
-};
-
-const axisTick = { fill: "var(--muted)", fontSize: 11 };
+import {
+  PROGRESS_AXIS_TICK,
+  PROGRESS_BAR_CURSOR,
+  PROGRESS_CARTESIAN_GRID,
+  PROGRESS_CHART_MARGIN,
+  PROGRESS_TOOLTIP_CONTENT_STYLE,
+  PROGRESS_TOOLTIP_PANEL_CLASS,
+  progressYAxisLabel,
+} from "@/components/progress/rechartsProgressDefaults";
 
 interface Props {
   series: DailyStepsChartPoint[];
@@ -91,44 +89,33 @@ export default function DailyStepsProgressChart({
         >
           <BarChart
             data={series}
-            margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
+            margin={PROGRESS_CHART_MARGIN.legend}
           >
-            <CartesianGrid
-              stroke="var(--border-color)"
-              strokeDasharray="4 4"
-              vertical={false}
-            />
+            <CartesianGrid {...PROGRESS_CARTESIAN_GRID} />
             <XAxis
               dataKey="xLabel"
-              tick={axisTick}
+              tick={PROGRESS_AXIS_TICK}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               width={48}
-              tick={axisTick}
+              tick={PROGRESS_AXIS_TICK}
               tickLine={false}
               axisLine={false}
               allowDecimals={false}
-              label={{
-                value: "Steps",
-                angle: -90,
-                position: "insideLeft",
-                fill: "var(--muted)",
-                fontSize: 10,
-                offset: 4,
-              }}
+              label={progressYAxisLabel("Steps", 4)}
             />
             <Tooltip
-              cursor={{ fill: "var(--surface-hover)" }}
+              cursor={PROGRESS_BAR_CURSOR}
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 const p = payload[0]?.payload as DailyStepsChartPoint | undefined;
                 if (!p) return null;
                 return (
                   <div
-                    className="rounded-lg border border-border px-3 py-2 text-xs shadow-lg"
-                    style={tooltipStyle}
+                    className={PROGRESS_TOOLTIP_PANEL_CLASS}
+                    style={PROGRESS_TOOLTIP_CONTENT_STYLE}
                   >
                     <p className="font-semibold text-foreground">{p.date}</p>
                     <p className="mt-1 text-muted">

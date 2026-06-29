@@ -121,6 +121,16 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Recharts 3: tap focuses the chart (accessibilityLayer). Hide pointer focus ring on mobile. */
+.recharts-wrapper *:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.recharts-wrapper *:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* Number inputs: hide stepper arrows (mobile; clicks don’t blur / save). */
 input[type="number"] {
   -moz-appearance: textfield;

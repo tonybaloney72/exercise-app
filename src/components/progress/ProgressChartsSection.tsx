@@ -8,14 +8,7 @@ import { trainingCategoryTotals } from "@/utils/progressStats";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import { PROGRESS_PIE_CHART_HEIGHT } from "@/components/progress/chartLayout";
-
-const tooltipStyle = {
-  backgroundColor: "var(--surface)",
-  border: "1px solid var(--border-color)",
-  borderRadius: 10,
-  color: "var(--foreground)",
-  fontSize: 12,
-};
+import { PROGRESS_TOOLTIP_CONTENT_STYLE } from "@/components/progress/rechartsProgressDefaults";
 
 interface Props {
   history: WorkoutLog[];
@@ -83,7 +76,7 @@ export default function ProgressChartsSection({ history }: Props) {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={tooltipStyle}
+                  contentStyle={PROGRESS_TOOLTIP_CONTENT_STYLE}
                   formatter={(value, _name, item) => {
                     const v = Number(value ?? 0);
                     const total = categoryData.reduce((s, d) => s + d.value, 0);

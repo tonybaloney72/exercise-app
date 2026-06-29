@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type CSSProperties } from "react";
+import { useMemo } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -19,16 +19,19 @@ import {
 } from "@/utils/cardioHealthProgressStats";
 import { PROGRESS_LINE_CHART_HEIGHT } from "@/components/progress/chartLayout";
 import type { WorkoutLog } from "@/types";
-
-const tooltipStyle: CSSProperties = {
-  backgroundColor: "var(--surface)",
-  border: "1px solid var(--border-color)",
-  borderRadius: 10,
-  color: "var(--foreground)",
-  fontSize: 12,
-};
-
-const axisTick = { fill: "var(--muted)", fontSize: 11 };
+import {
+  PROGRESS_AXIS_TICK,
+  PROGRESS_BAR_CURSOR,
+  PROGRESS_CARTESIAN_GRID,
+  PROGRESS_CHART_MARGIN,
+  PROGRESS_LINE_CURSOR,
+  PROGRESS_LINE_STROKE,
+  PROGRESS_TOOLTIP_CONTENT_STYLE,
+  PROGRESS_TOOLTIP_PANEL_CLASS,
+  progressLineActiveDot,
+  progressLineDot,
+  progressYAxisLabel,
+} from "@/components/progress/rechartsProgressDefaults";
 
 interface Props {
   history: WorkoutLog[];
@@ -37,8 +40,8 @@ interface Props {
 function HealthTooltip({ point }: { point: CardioHealthChartPoint }) {
   return (
     <div
-      className="rounded-lg border border-border px-3 py-2 text-xs shadow-lg"
-      style={tooltipStyle}
+      className={PROGRESS_TOOLTIP_PANEL_CLASS}
+      style={PROGRESS_TOOLTIP_CONTENT_STYLE}
     >
       <p className="font-semibold text-foreground">
         {point.date}
@@ -84,6 +87,8 @@ function MetricChart({
   if (filtered.length === 0) return null;
 
   const Chart = dataKey === "avgHeartRateBpm" ? LineChart : BarChart;
+  const tooltipCursor =
+    dataKey === "avgHeartRateBpm" ? PROGRESS_LINE_CURSOR : PROGRESS_BAR_CURSOR;
 
   return (
     <div className="flex flex-col gap-3">
@@ -99,36 +104,25 @@ function MetricChart({
         >
           <Chart
             data={filtered}
-            margin={{ top: 28, right: 8, left: 0, bottom: 4 }}
+            margin={PROGRESS_CHART_MARGIN.legend}
           >
-            <CartesianGrid
-              stroke="var(--border-color)"
-              strokeDasharray="4 4"
-              vertical={false}
-            />
+            <CartesianGrid {...PROGRESS_CARTESIAN_GRID} />
             <XAxis
               dataKey="xLabel"
-              tick={axisTick}
+              tick={PROGRESS_AXIS_TICK}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               width={48}
-              tick={axisTick}
+              tick={PROGRESS_AXIS_TICK}
               tickLine={false}
               axisLine={false}
               allowDecimals={dataKey === "avgHeartRateBpm"}
-              label={{
-                value: yLabel,
-                angle: -90,
-                position: "insideLeft",
-                fill: "var(--muted)",
-                fontSize: 10,
-                offset: 4,
-              }}
+              label={progressYAxisLabel(yLabel, 4)}
             />
             <Tooltip
-              cursor={{ fill: "var(--surface-hover)" }}
+              cursor={tooltipCursor}
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 const p = payload[0]?.payload as CardioHealthChartPoint | undefined;
@@ -148,14 +142,9 @@ function MetricChart({
                 type="monotone"
                 dataKey={dataKey}
                 name={yLabel}
-                stroke="var(--accent)"
-                strokeWidth={2}
-                dot={{
-                  r: 3,
-                  fill: "var(--accent)",
-                  stroke: "var(--background)",
-                  strokeWidth: 1,
-                }}
+                {...PROGRESS_LINE_STROKE}
+                dot={progressLineDot()}
+                activeDot={progressLineActiveDot()}
                 connectNulls={false}
               />
             ) : (

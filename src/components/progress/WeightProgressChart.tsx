@@ -27,16 +27,17 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import { PROGRESS_LINE_CHART_HEIGHT } from "@/components/progress/chartLayout";
-
-const tooltipStyle = {
-  backgroundColor: "var(--surface)",
-  border: "1px solid var(--border-color)",
-  borderRadius: 10,
-  color: "var(--foreground)",
-  fontSize: 12,
-};
-
-const axisTick = { fill: "var(--muted)", fontSize: 11 };
+import {
+  PROGRESS_AXIS_TICK,
+  PROGRESS_CARTESIAN_GRID,
+  PROGRESS_CHART_MARGIN,
+  PROGRESS_LINE_CURSOR,
+  PROGRESS_LINE_STROKE,
+  PROGRESS_TOOLTIP_CONTENT_STYLE,
+  progressLineActiveDot,
+  progressLineDot,
+  progressYAxisLabel,
+} from "@/components/progress/rechartsProgressDefaults";
 
 export default function WeightProgressChart() {
   const mode = useAuthStore((s) => s.mode);
@@ -158,18 +159,14 @@ export default function WeightProgressChart() {
           >
             <LineChart
               data={series}
-              margin={{ top: 8, right: 8, left: 4, bottom: 4 }}
+              margin={PROGRESS_CHART_MARGIN.compact}
             >
-              <CartesianGrid
-                stroke="var(--border-color)"
-                strokeDasharray="4 4"
-                vertical={false}
-              />
+              <CartesianGrid {...PROGRESS_CARTESIAN_GRID} />
               <XAxis
                 dataKey="index"
                 type="number"
                 domain={["dataMin", "dataMax"]}
-                tick={axisTick}
+                tick={PROGRESS_AXIS_TICK}
                 tickLine={false}
                 axisLine={false}
                 allowDecimals={false}
@@ -182,21 +179,15 @@ export default function WeightProgressChart() {
               />
               <YAxis
                 width={44}
-                tick={axisTick}
+                tick={PROGRESS_AXIS_TICK}
                 tickLine={false}
                 axisLine={false}
                 domain={["auto", "auto"]}
-                label={{
-                  value: "lb",
-                  angle: -90,
-                  position: "insideLeft",
-                  fill: "var(--muted)",
-                  fontSize: 10,
-                  offset: 0,
-                }}
+                label={progressYAxisLabel("lb")}
               />
               <Tooltip
-                contentStyle={tooltipStyle}
+                cursor={PROGRESS_LINE_CURSOR}
+                contentStyle={PROGRESS_TOOLTIP_CONTENT_STYLE}
                 labelFormatter={(_label, payload) => {
                   const row = payload?.[0]?.payload as
                     | { date?: string }
@@ -212,10 +203,9 @@ export default function WeightProgressChart() {
                 type="monotone"
                 dataKey="weightLb"
                 name="Weight"
-                stroke="var(--accent)"
-                strokeWidth={2}
-                dot={{ r: 3, fill: "var(--accent)" }}
-                activeDot={{ r: 5 }}
+                {...PROGRESS_LINE_STROKE}
+                dot={progressLineDot()}
+                activeDot={progressLineActiveDot()}
               />
             </LineChart>
           </ResponsiveContainer>
