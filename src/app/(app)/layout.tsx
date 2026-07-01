@@ -1,6 +1,7 @@
 import BottomNav from "@/components/layout/BottomNav";
 import OnboardingGate from "@/components/onboarding/OnboardingGate";
 import AppDataSync from "@/components/layout/AppDataSync";
+import AppDailyHealthSync from "@/components/layout/AppDailyHealthSync";
 import PlanGeneratorInputsSync from "@/components/layout/PlanGeneratorInputsSync";
 import AppSettingsSync from "@/components/layout/AppSettingsSync";
 import WakeLockSync from "@/components/layout/WakeLockSync";
@@ -34,6 +35,7 @@ export default async function AppLayout({
       <AppSettingsSync />
       <PlanGeneratorInputsSync />
       <AppDataSync />
+      <AppDailyHealthSync />
       <OnboardingGate />
       <WakeLockSync />
       <NativeHealthBridgeInit />

@@ -77,8 +77,10 @@ describe("buildDailyHealthProgressFromRecords", () => {
 
     expect(view.todaySteps).toBe(4200);
     expect(view.todayActiveKcal).toBe(310);
-    expect(view.chartSeries).toHaveLength(2);
-    expect(view.chartSeries[1]?.stepCount).toBe(4200);
+    expect(view.stepsChartSeries).toHaveLength(2);
+    expect(view.stepsChartSeries[1]?.stepCount).toBe(4200);
+    expect(view.activeKcalChartSeries).toHaveLength(1);
+    expect(view.activeKcalChartSeries[0]?.value).toBe(310);
   });
 });
 

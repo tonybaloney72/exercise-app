@@ -1,4 +1,6 @@
 import type { DailyHealthDayMetrics } from "@/lib/health/cardioHealth";
+import { buildDailyHealthMetricChartSeries } from "@/lib/health/dailyHealthChart";
+import type { DailyHealthMetricChartPoint } from "@/lib/health/dailyHealthChart";
 import { buildDailyStepsChartSeries } from "@/lib/health/dailyStepsChart";
 import type { DailyStepsChartPoint } from "@/lib/health/dailyStepsChart";
 import {
@@ -15,7 +17,9 @@ export type DailyHealthProgressView = {
   todaySteps: number | null;
   todayActiveKcal: number | null;
   todayAvgHeartRateBpm: number | null;
-  chartSeries: DailyStepsChartPoint[];
+  stepsChartSeries: DailyStepsChartPoint[];
+  activeKcalChartSeries: DailyHealthMetricChartPoint[];
+  avgHeartRateChartSeries: DailyHealthMetricChartPoint[];
 };
 
 const METRIC_FIELD_BY_KEY: Partial<
@@ -88,16 +92,25 @@ export function buildDailyHealthProgressFromRecords(
   const byDate = indexDailyMetricRecords(records);
 
   const stepsByDate: Record<string, number> = {};
+  const activeKcalByDate: Record<string, number> = {};
+  const avgHeartRateByDate: Record<string, number> = {};
   for (const dateKey of chartDayKeys) {
     const steps = metricValue(byDate, dateKey, "steps");
     if (steps != null) stepsByDate[dateKey] = steps;
+    const activeKcal = metricValue(byDate, dateKey, "active_kcal");
+    if (activeKcal != null) activeKcalByDate[dateKey] = activeKcal;
+    const avgHr = metricValue(byDate, dateKey, "avg_heart_rate_bpm");
+    if (avgHr != null) avgHeartRateByDate[dateKey] = avgHr;
   }
 
   return {
     todaySteps: metricValue(byDate, todayKey, "steps"),
     todayActiveKcal: metricValue(byDate, todayKey, "active_kcal"),
     todayAvgHeartRateBpm: metricValue(byDate, todayKey, "avg_heart_rate_bpm"),
-    chartSeries: buildDailyStepsChartSeries(stepsByDate),
+    stepsChartSeries: buildDailyStepsChartSeries(stepsByDate),
+    activeKcalChartSeries: buildDailyHealthMetricChartSeries(activeKcalByDate),
+    avgHeartRateChartSeries:
+      buildDailyHealthMetricChartSeries(avgHeartRateByDate),
   };
 }
 
@@ -108,17 +121,39 @@ export function mergeLiveTodayOverProgressView(
 ): DailyHealthProgressView {
   if (!live) return view;
 
-  const stepsByDate = Object.fromEntries(
-    view.chartSeries.map((point) => [point.date, point.stepCount]),
-  );
+  const stepsByDate = seriesToRecord(view.stepsChartSeries, "stepCount");
+  const activeKcalByDate = seriesToRecord(view.activeKcalChartSeries, "value");
+  const avgHeartRateByDate = seriesToRecord(view.avgHeartRateChartSeries, "value");
+
   stepsByDate[todayKey] = live.steps;
+  activeKcalByDate[todayKey] = live.activeKcal;
+  if (live.avgHeartRateBpm != null) {
+    avgHeartRateByDate[todayKey] = live.avgHeartRateBpm;
+  }
 
   return {
     todaySteps: live.steps,
     todayActiveKcal: live.activeKcal,
     todayAvgHeartRateBpm: live.avgHeartRateBpm ?? null,
-    chartSeries: buildDailyStepsChartSeries(stepsByDate),
+    stepsChartSeries: buildDailyStepsChartSeries(stepsByDate),
+    activeKcalChartSeries: buildDailyHealthMetricChartSeries(activeKcalByDate),
+    avgHeartRateChartSeries:
+      buildDailyHealthMetricChartSeries(avgHeartRateByDate),
   };
+}
+
+function seriesToRecord<T extends { date: string }>(
+  series: readonly T[],
+  valueKey: keyof T,
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const point of series) {
+    const value = point[valueKey];
+    if (typeof value === "number" && Number.isFinite(value)) {
+      out[point.date] = value;
+    }
+  }
+  return out;
 }
 
 export function recordsHaveAnySyncedData(

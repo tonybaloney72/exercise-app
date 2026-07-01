@@ -229,9 +229,11 @@ export default function ProgressPage() {
 
       <ProgressChartsBlock
         history={cardioChartHistory}
-        dailyStepsSeries={dailyHealth.chartSeries}
-        dailyStepsLoading={dailyHealth.loading && dailyHealth.available}
-        dailyStepsUnavailableReason={dailyHealth.unavailableReason}
+        stepsChartSeries={dailyHealth.stepsChartSeries}
+        activeKcalChartSeries={dailyHealth.activeKcalChartSeries}
+        avgHeartRateChartSeries={dailyHealth.avgHeartRateChartSeries}
+        dailyHealthLoading={dailyHealth.loading && dailyHealth.available}
+        dailyHealthUnavailableReason={dailyHealth.unavailableReason}
       />
 
       {completedHistory.length > 0 && (
