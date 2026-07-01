@@ -1,5 +1,15 @@
 [
   {
+    "id": "2026-07-01-daily-health-charts",
+    "date": "2026-07-01",
+    "title": "Daily health on Progress",
+    "highlights": [
+      "Active calories chart now shows your full Health Connect daily total—strength workouts, cardio, and everyday activity—not only logged cardio sessions.",
+      "New average heart rate chart uses the same 14-day daily totals as steps.",
+      "Health Connect daily metrics refresh when you open the app or return from the background, not only when you visit Progress."
+    ]
+  },
+  {
     "id": "2026-06-30-stretch-generation",
     "date": "2026-06-30",
     "title": "Smarter stretch generation",
@@ -17,15 +27,6 @@
       "Finishing a workout without logging cardio no longer leaves empty jog rows in your session summary.",
       "In-workout cardio uses the same GPS timer, Health Connect import, and distance/time fields as quick log on Today.",
       "Cardio rows match other workout sections—the actions menu is on the left and the checkbox on the right."
-    ]
-  },
-  {
-    "id": "2026-06-28-cardio-speed-hc",
-    "date": "2026-06-28",
-    "title": "Cardio speed & Health Connect",
-    "highlights": [
-      "Tap a cardio session in Progress for distance, time, pace, and speed (mph) when both are logged.",
-      "Activities logged with distance and time also save average speed to Health Connect on Android (install the latest app build)."
     ]
   }
 ]

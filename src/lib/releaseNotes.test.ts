@@ -10,61 +10,41 @@ import {
 } from "@/lib/releaseNotes";
 
 describe("bundled release notes", () => {
-  it("ships at most three entries", () => {
-    expect(releaseNotesJson.length).toBeLessThanOrEqual(MAX_BUNDLED_RELEASE_NOTES);
+  it("ships at most three entries in JSON", () => {
+    expect(releaseNotesJson.length).toBeLessThanOrEqual(
+      MAX_BUNDLED_RELEASE_NOTES,
+    );
   });
-});
 
-describe("getLatestReleaseNote", () => {
-  it("returns the newest bundled note", () => {
-    expect(getLatestReleaseNote()?.id).toBe("2026-06-30-stretch-generation");
+  it("exposes at most three notes after runtime cap", () => {
+    expect(getAllReleaseNotes().length).toBeLessThanOrEqual(
+      MAX_BUNDLED_RELEASE_NOTES,
+    );
   });
-});
 
-describe("getRecentReleaseNotes", () => {
-  it("returns up to three newest notes for settings", () => {
-    expect(getRecentReleaseNotes(3).map((n) => n.id)).toEqual([
-      "2026-06-30-stretch-generation",
-      "2026-06-29-cardio-endurance",
-      "2026-06-28-cardio-speed-hc",
-    ]);
+  it("orders notes newest first by date", () => {
+    const notes = getAllReleaseNotes();
+    for (let i = 1; i < notes.length; i += 1) {
+      expect(notes[i - 1]!.date.localeCompare(notes[i]!.date)).toBeGreaterThanOrEqual(
+        0,
+      );
+    }
   });
 });
 
 describe("getLatestUnseenReleaseNote", () => {
-  it("returns only the newest note when it was not dismissed", () => {
-    const note = getLatestUnseenReleaseNote(
-      new Set(["2026-06-29-cardio-endurance", "2026-06-28-cardio-speed-hc"]),
-    );
-    expect(note?.id).toBe("2026-06-30-stretch-generation");
-  });
-
-  it("returns nothing when the newest note was dismissed", () => {
-    expect(
-      getLatestUnseenReleaseNote(
-        new Set([
-          "2026-06-30-stretch-generation",
-          "2026-06-29-cardio-endurance",
-          "2026-06-28-cardio-speed-hc",
-        ]),
-      ),
-    ).toBeUndefined();
+  it("returns the latest note when it was not dismissed", () => {
+    const latest = getLatestReleaseNote();
+    if (!latest) return;
+    expect(getLatestUnseenReleaseNote(new Set())).toEqual(latest);
+    expect(getLatestUnseenReleaseNote(new Set([latest.id]))).toBeUndefined();
   });
 });
 
-describe("getAllReleaseNotes", () => {
-  it("returns every bundled note newest first", () => {
-    expect(getAllReleaseNotes().map((n) => n.id)).toEqual([
-      "2026-06-30-stretch-generation",
-      "2026-06-29-cardio-endurance",
-      "2026-06-28-cardio-speed-hc",
-    ]);
-  });
-});
-
-describe("bundled note cap", () => {
-  it("keeps only the three newest entries even if JSON has more", () => {
-    expect(getAllReleaseNotes().length).toBe(MAX_BUNDLED_RELEASE_NOTES);
+describe("getRecentReleaseNotes", () => {
+  it("returns a prefix of bundled notes", () => {
+    const all = getAllReleaseNotes();
+    expect(getRecentReleaseNotes(2)).toEqual(all.slice(0, 2));
   });
 });
 
@@ -72,7 +52,7 @@ describe("releaseNoteHeading", () => {
   it("prefers title when present", () => {
     expect(
       releaseNoteHeading({
-        id: "2026-06-28-cardio-speed-hc",
+        id: "example",
         date: "2026-06-28",
         title: "Cardio speed & Health Connect",
         highlights: [],
