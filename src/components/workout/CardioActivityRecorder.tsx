@@ -2,10 +2,22 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  computeGpsTrackSnapshot,
   formatGpsTrackDuration,
   GpsTrackSession,
+  liveGpsTrackDistanceMi,
+  pauseGpsTrackSession,
+  resumeGpsTrackSession,
 } from "@/lib/geo/gpsTrackSession";
+import {
+  cardioActivityActiveSeconds,
+  initialCardioActivityTimerState,
+  isCardioActivityRecording,
+  pauseCardioActivityTimer,
+  resetCardioActivityTimer,
+  resumeCardioActivityTimer,
+  startCardioActivityTimer,
+  type CardioActivityTimerState,
+} from "@/lib/cardioActivityTimer";
 import { ensureCardioHealthReadAccess } from "@/lib/health";
 import {
   resolveCardioQuickLog,
@@ -30,22 +42,27 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
   const sessionRef = useRef<GpsTrackSession | null>(null);
   const startDateRef = useRef<Date | null>(null);
   const endDateRef = useRef<Date | null>(null);
+  const timerRef = useRef<CardioActivityTimerState>(
+    initialCardioActivityTimerState(),
+  );
+  const activeDurationRef = useRef(0);
   const [phase, setPhase] = useState<RecorderPhase>("idle");
+  const [paused, setPaused] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
   const [candidates, setCandidates] = useState<ScoredCardioSession[]>([]);
-  const [gpsSnapshot, setGpsSnapshot] = useState<ReturnType<
-    typeof computeGpsTrackSnapshot
+  const [gpsSnapshot, setGpsSnapshot] = useState<Awaited<
+    ReturnType<GpsTrackSession["stop"]>
   > | null>(null);
 
   const native = isNativePlatform();
   const usesGps = cardioKindUsesGps(kind);
 
   useEffect(() => {
-    if (phase !== "recording") return;
+    if (phase !== "recording" || paused) return;
     const id = window.setInterval(() => setTick((n) => n + 1), 1000);
     return () => window.clearInterval(id);
-  }, [phase]);
+  }, [phase, paused]);
 
   useEffect(() => {
     return () => {
@@ -55,32 +72,45 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
 
   const liveSnapshot = useMemo(() => {
     void tick;
-    const startedAt = startDateRef.current?.getTime();
-    const session = sessionRef.current;
-    if (phase !== "recording" || startedAt == null) return null;
-    if (!usesGps) {
-      return {
-        durationSeconds: Math.max(
-          1,
-          Math.round((Date.now() - startedAt) / 1000),
-        ),
-        distanceMi: 0,
-      };
+    const timer = timerRef.current;
+    if (phase !== "recording" || !isCardioActivityRecording(timer)) {
+      return null;
     }
-    const points = session?.getPoints() ?? [];
-    return computeGpsTrackSnapshot(points, startedAt);
+    const durationSeconds = cardioActivityActiveSeconds(timer);
+    if (!usesGps) {
+      return { durationSeconds, distanceMi: 0 };
+    }
+    return {
+      durationSeconds,
+      distanceMi: liveGpsTrackDistanceMi(sessionRef.current),
+    };
   }, [phase, tick, usesGps]);
+
+  const resetRecorder = useCallback(() => {
+    timerRef.current = resetCardioActivityTimer();
+    setPaused(false);
+    setCandidates([]);
+    setGpsSnapshot(null);
+    startDateRef.current = null;
+    endDateRef.current = null;
+    activeDurationRef.current = 0;
+  }, []);
 
   const finishResolve = useCallback(
     (result: ResolvedCardioQuickLog) => {
       setPhase("idle");
-      setCandidates([]);
-      setGpsSnapshot(null);
-      startDateRef.current = null;
-      endDateRef.current = null;
+      resetRecorder();
       onResolved(result);
     },
-    [onResolved],
+    [onResolved, resetRecorder],
+  );
+
+  const activeDurationSeconds = useCallback(
+    () =>
+      activeDurationRef.current > 0
+        ? activeDurationRef.current
+        : cardioActivityActiveSeconds(timerRef.current),
+    [],
   );
 
   async function handleStart() {
@@ -88,6 +118,8 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
     setCandidates([]);
     const startedAt = new Date();
     startDateRef.current = startedAt;
+    timerRef.current = startCardioActivityTimer(startedAt.getTime());
+    setPaused(false);
     clientTrace("cardio-recorder", "start", { kind });
 
     if (native && usesGps) {
@@ -98,6 +130,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
       } catch (err) {
         sessionRef.current = null;
         startDateRef.current = null;
+        timerRef.current = resetCardioActivityTimer();
         clientTrace(
           "cardio-recorder",
           "gps_start_error",
@@ -117,19 +150,54 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
     setPhase("recording");
   }
 
+  async function handlePause() {
+    if (phase !== "recording" || paused) return;
+    timerRef.current = pauseCardioActivityTimer(timerRef.current);
+    setPaused(true);
+    try {
+      await pauseGpsTrackSession(sessionRef.current);
+    } catch (err) {
+      clientTrace(
+        "cardio-recorder",
+        "gps_pause_error",
+        { message: err instanceof Error ? err.message : String(err) },
+        "warn",
+      );
+    }
+  }
+
+  async function handleResume() {
+    if (phase !== "recording" || !paused) return;
+    timerRef.current = resumeCardioActivityTimer(timerRef.current);
+    setPaused(false);
+    try {
+      await resumeGpsTrackSession(sessionRef.current);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not resume GPS. Timer is running again.",
+      );
+    }
+  }
+
   async function handleEnd() {
     const startDate = startDateRef.current;
     if (!startDate) return;
 
     const endDate = new Date();
     endDateRef.current = endDate;
+    timerRef.current = pauseCardioActivityTimer(timerRef.current);
+    const activeSeconds = cardioActivityActiveSeconds(timerRef.current);
+    activeDurationRef.current = activeSeconds;
     setPhase("resolving");
     setError(null);
+    setPaused(false);
 
     let snapshot = gpsSnapshot;
     const gps = sessionRef.current;
     if (gps) {
-      const stopped = await gps.stop();
+      const stopped = await gps.stop(activeSeconds);
       sessionRef.current = null;
       snapshot = stopped;
       setGpsSnapshot(stopped);
@@ -142,6 +210,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
         startDate,
         endDate,
         gpsSnapshot: snapshot,
+        activeDurationSeconds: activeSeconds,
       });
 
       if (result.ambiguousSessions && result.ambiguousSessions.length > 0) {
@@ -175,6 +244,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
         endDate,
         session: row.session,
         gpsSnapshot,
+        activeDurationSeconds: activeDurationSeconds(),
       });
       finishResolve(result);
     } catch (err) {
@@ -195,6 +265,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
       startDate,
       endDate,
       gpsSnapshot,
+      activeDurationSeconds: activeDurationSeconds(),
       preferSamples: true,
     });
     finishResolve(result);
@@ -203,10 +274,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
   async function handleCancel() {
     await sessionRef.current?.dispose();
     sessionRef.current = null;
-    startDateRef.current = null;
-    endDateRef.current = null;
-    setGpsSnapshot(null);
-    setCandidates([]);
+    resetRecorder();
     setPhase("idle");
     setError(null);
   }
@@ -214,16 +282,8 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
   if (!native) {
     return (
       <SimpleTimerRecorder
-        onResolved={(startDate, endDate) => {
-          onResolved({
-            startDate,
-            endDate,
-            durationSeconds: Math.max(
-              1,
-              Math.round((endDate.getTime() - startDate.getTime()) / 1000),
-            ),
-            resolution: "timer_only",
-          });
+        onResolved={(result) => {
+          onResolved(result);
         }}
       />
     );
@@ -231,11 +291,13 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
 
   const statusLine =
     phase === "recording" && liveSnapshot
-      ? `${formatGpsTrackDuration(liveSnapshot.durationSeconds)}${
+      ? `${paused ? "Paused · " : ""}${formatGpsTrackDuration(liveSnapshot.durationSeconds)}${
           usesGps
             ? liveSnapshot.distanceMi > 0
               ? ` · ${liveSnapshot.distanceMi} mi`
-              : " · GPS tracking…"
+              : paused
+                ? ""
+                : " · GPS tracking…"
             : ""
         }`
       : phase === "resolving"
@@ -254,17 +316,36 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
                 : "Start records time. Distance comes from Health Connect or your manual entry."
               : phase === "pick_session"
                 ? "Pick the Health Connect session that matches this activity."
-                : "Timer runs until you tap End."}
+                : "Pause stops the timer and GPS. Tap End when finished."}
           </p>
         </div>
         {phase === "recording" ? (
-          <button
-            type="button"
-            onClick={() => void handleEnd()}
-            className="shrink-0 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white"
-          >
-            End
-          </button>
+          <div className="flex shrink-0 items-center gap-1.5">
+            {paused ? (
+              <button
+                type="button"
+                onClick={() => void handleResume()}
+                className="rounded-lg border border-accent/40 px-3 py-1.5 text-xs font-semibold text-accent"
+              >
+                Resume
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void handlePause()}
+                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted"
+              >
+                Pause
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => void handleEnd()}
+              className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white"
+            >
+              End
+            </button>
+          </div>
         ) : phase === "idle" ? (
           <button
             type="button"
@@ -348,27 +429,27 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
 function SimpleTimerRecorder({
   onResolved,
 }: {
-  onResolved: (startDate: Date, endDate: Date) => void;
+  onResolved: (result: ResolvedCardioQuickLog) => void;
 }) {
   const startRef = useRef<Date | null>(null);
+  const timerRef = useRef<CardioActivityTimerState>(
+    initialCardioActivityTimerState(),
+  );
   const [recording, setRecording] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    if (!recording) return;
+    if (!recording || paused) return;
     const id = window.setInterval(() => setTick((n) => n + 1), 1000);
     return () => window.clearInterval(id);
-  }, [recording]);
+  }, [recording, paused]);
 
-  const elapsed =
-    recording && startRef.current
-      ? Math.max(
-          1,
-          Math.round((Date.now() - startRef.current.getTime()) / 1000),
-        )
-      : 0;
-
-  void tick;
+  const elapsed = useMemo(() => {
+    void tick;
+    if (!recording || !isCardioActivityRecording(timerRef.current)) return 0;
+    return cardioActivityActiveSeconds(timerRef.current);
+  }, [recording, tick]);
 
   return (
     <div className="flex flex-col rounded-xl border border-border bg-surface-hover/60 p-3 gap-2">
@@ -376,28 +457,68 @@ function SimpleTimerRecorder({
         <div>
           <p className="text-sm font-medium text-foreground">Track time</p>
           <p className="text-xs text-muted mt-0.5">
-            Start and end your activity.
+            {recording
+              ? "Pause stops the timer. Tap End when finished."
+              : "Start and end your activity."}
           </p>
         </div>
         {recording ? (
-          <button
-            type="button"
-            onClick={() => {
-              const start = startRef.current;
-              if (!start) return;
-              onResolved(start, new Date());
-              startRef.current = null;
-              setRecording(false);
-            }}
-            className="shrink-0 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white"
-          >
-            End
-          </button>
+          <div className="flex shrink-0 items-center gap-1.5">
+            {paused ? (
+              <button
+                type="button"
+                onClick={() => {
+                  timerRef.current = resumeCardioActivityTimer(timerRef.current);
+                  setPaused(false);
+                }}
+                className="rounded-lg border border-accent/40 px-3 py-1.5 text-xs font-semibold text-accent"
+              >
+                Resume
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  timerRef.current = pauseCardioActivityTimer(timerRef.current);
+                  setPaused(true);
+                }}
+                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted"
+              >
+                Pause
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                const start = startRef.current;
+                if (!start) return;
+                const activeSeconds = cardioActivityActiveSeconds(
+                  timerRef.current,
+                );
+                onResolved({
+                  startDate: start,
+                  endDate: new Date(),
+                  durationSeconds: activeSeconds,
+                  resolution: "timer_only",
+                });
+                startRef.current = null;
+                timerRef.current = resetCardioActivityTimer();
+                setRecording(false);
+                setPaused(false);
+              }}
+              className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white"
+            >
+              End
+            </button>
+          </div>
         ) : (
           <button
             type="button"
             onClick={() => {
-              startRef.current = new Date();
+              const startedAt = new Date();
+              startRef.current = startedAt;
+              timerRef.current = startCardioActivityTimer(startedAt.getTime());
+              setPaused(false);
               setRecording(true);
             }}
             className="shrink-0 rounded-lg border border-accent/40 px-3 py-1.5 text-xs font-semibold text-accent"
@@ -408,6 +529,7 @@ function SimpleTimerRecorder({
       </div>
       {recording ? (
         <p className="text-xs text-muted tabular-nums">
+          {paused ? "Paused · " : ""}
           {formatGpsTrackDuration(elapsed)}
         </p>
       ) : null}

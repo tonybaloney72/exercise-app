@@ -178,6 +178,19 @@ describe("resolveCardioQuickLog", () => {
     expect(result.distanceMi).toBe(1.5);
   });
 
+  it("uses active duration over wall-clock window", async () => {
+    checkCardioHealthReadAccess.mockResolvedValue(false);
+
+    const result = await resolveCardioQuickLog({
+      kind: "jog",
+      startDate,
+      endDate,
+      activeDurationSeconds: 600,
+    });
+
+    expect(result.durationSeconds).toBe(600);
+  });
+
   it("preferSamples skips session matching", async () => {
     const imported = session({
       startDate,

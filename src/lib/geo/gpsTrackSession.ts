@@ -20,28 +20,61 @@ export interface GpsTrackSnapshot {
   endDate: Date;
   pointCount: number;
   points: readonly GpsTrackPoint[];
+  /** Index in `points` where each active GPS segment begins (always includes 0). */
+  segmentStarts?: readonly number[];
+}
+
+/** Default segment start when none are provided (single continuous track). */
+function defaultGpsSegmentStarts(): readonly number[] {
+  return [0];
+}
+
+export function computeGpsTrackDistanceMi(
+  points: readonly GpsTrackPoint[],
+  segmentStarts?: readonly number[],
+): number {
+  if (points.length < 2) return 0;
+
+  const starts =
+    segmentStarts != null && segmentStarts.length > 0
+      ? segmentStarts
+      : defaultGpsSegmentStarts();
+
+  let distanceMeters = 0;
+  for (let s = 0; s < starts.length; s += 1) {
+    const from = starts[s]!;
+    const to = s + 1 < starts.length ? starts[s + 1]! : points.length;
+    if (from >= to) continue;
+    for (let i = from + 1; i < to; i += 1) {
+      distanceMeters += haversineDistanceMeters(points[i - 1]!, points[i]!);
+    }
+  }
+  return Math.round(metersToMiles(distanceMeters) * 100) / 100;
 }
 
 export function computeGpsTrackSnapshot(
   points: readonly GpsTrackPoint[],
   startedAtMs: number,
   endedAtMs: number = Date.now(),
+  activeDurationSeconds?: number,
+  segmentStarts?: readonly number[],
 ): GpsTrackSnapshot {
-  let distanceMeters = 0;
-  for (let i = 1; i < points.length; i += 1) {
-    distanceMeters += haversineDistanceMeters(points[i - 1]!, points[i]!);
-  }
-  const durationSeconds = Math.max(
-    1,
-    Math.round((endedAtMs - startedAtMs) / 1000),
-  );
+  const starts =
+    segmentStarts != null && segmentStarts.length > 0
+      ? segmentStarts
+      : defaultGpsSegmentStarts();
+  const distanceMi = computeGpsTrackDistanceMi(points, starts);
+  const durationSeconds =
+    activeDurationSeconds ??
+    Math.max(1, Math.round((endedAtMs - startedAtMs) / 1000));
   return {
     durationSeconds,
-    distanceMi: Math.round(metersToMiles(distanceMeters) * 100) / 100,
+    distanceMi,
     startDate: new Date(startedAtMs),
     endDate: new Date(endedAtMs),
     pointCount: points.length,
     points: [...points],
+    segmentStarts: [...starts],
   };
 }
 
@@ -113,12 +146,18 @@ type TrackingBackend = "foreground" | "geolocation";
 export class GpsTrackSession {
   private watchId: string | null = null;
   private points: GpsTrackPoint[] = [];
+  private segmentStarts: number[] = [0];
+  private nextPointStartsSegment = false;
   private startedAtMs: number | null = null;
   private backend: TrackingBackend | null = null;
   private locationListener: PluginListenerHandle | null = null;
 
   getPoints(): readonly GpsTrackPoint[] {
     return this.points;
+  }
+
+  getDistanceMi(): number {
+    return computeGpsTrackDistanceMi(this.points, this.segmentStarts);
   }
 
   /** Start timer and GPS together (no separate warm-up modal). */
@@ -129,6 +168,8 @@ export class GpsTrackSession {
     if (this.backend) return;
 
     this.points = [];
+    this.segmentStarts = [0];
+    this.nextPointStartsSegment = false;
     this.startedAtMs = Date.now();
 
     if (isForegroundGpsTrackingAvailable()) {
@@ -200,20 +241,53 @@ export class GpsTrackSession {
     if (!shouldAppendGpsTrackPoint(last, point, position.coords.accuracy)) {
       return;
     }
+    if (this.nextPointStartsSegment) {
+      if (this.points.length > 0) {
+        this.segmentStarts.push(this.points.length);
+      }
+      this.nextPointStartsSegment = false;
+    }
     this.points.push(point);
   }
 
-  async stop(): Promise<GpsTrackSnapshot | null> {
+  async stop(activeDurationSeconds?: number): Promise<GpsTrackSnapshot | null> {
     await this.clearWatch();
     if (this.startedAtMs == null) return null;
-    const snapshot = computeGpsTrackSnapshot(this.points, this.startedAtMs);
+    const snapshot = computeGpsTrackSnapshot(
+      this.points,
+      this.startedAtMs,
+      Date.now(),
+      activeDurationSeconds,
+      this.segmentStarts,
+    );
     this.startedAtMs = null;
     return snapshot;
+  }
+
+  /** Stop GPS updates while keeping the route collected so far. */
+  async pause(): Promise<void> {
+    if (this.startedAtMs == null || this.backend == null) return;
+    await this.clearWatch();
+  }
+
+  /** Resume GPS updates after {@link pause}. */
+  async resume(): Promise<void> {
+    if (this.startedAtMs == null || this.backend != null) return;
+    this.nextPointStartsSegment = true;
+
+    if (isForegroundGpsTrackingAvailable()) {
+      await this.startForegroundTracking();
+      return;
+    }
+
+    await this.startGeolocationWatch();
   }
 
   async dispose(): Promise<void> {
     await this.clearWatch();
     this.points = [];
+    this.segmentStarts = [0];
+    this.nextPointStartsSegment = false;
     this.startedAtMs = null;
   }
 
@@ -233,4 +307,22 @@ export class GpsTrackSession {
     }
     this.backend = null;
   }
+}
+
+export function liveGpsTrackDistanceMi(
+  session: GpsTrackSession | null | undefined,
+): number {
+  return session?.getDistanceMi() ?? 0;
+}
+
+export async function pauseGpsTrackSession(
+  session: GpsTrackSession | null | undefined,
+): Promise<void> {
+  await session?.pause();
+}
+
+export async function resumeGpsTrackSession(
+  session: GpsTrackSession | null | undefined,
+): Promise<void> {
+  await session?.resume();
 }

@@ -41,6 +41,19 @@ function durationSecondsBetween(start: Date, end: Date): number {
   return Math.max(1, Math.round((end.getTime() - start.getTime()) / 1000));
 }
 
+function effectiveDurationSeconds(
+  startDate: Date,
+  endDate: Date,
+  gpsSnapshot?: GpsTrackSnapshot | null,
+  activeDurationSeconds?: number,
+): number {
+  return (
+    activeDurationSeconds ??
+    gpsSnapshot?.durationSeconds ??
+    durationSecondsBetween(startDate, endDate)
+  );
+}
+
 function gpsDistanceMi(snapshot?: GpsTrackSnapshot | null): number | undefined {
   if (!snapshot || snapshot.distanceMi <= 0 || snapshot.pointCount < 2) {
     return undefined;
@@ -91,6 +104,7 @@ async function resolveFromSession(
   endDate: Date,
   session: ImportedCardioSession,
   gpsSnapshot?: GpsTrackSnapshot | null,
+  activeDurationSeconds?: number,
 ): Promise<ResolvedCardioQuickLog> {
   const windowMetrics = await fetchCardioHealthMetricsForWindow(
     session.startDate,
@@ -107,7 +121,12 @@ async function resolveFromSession(
     {
       startDate,
       endDate,
-      durationSeconds: durationSecondsBetween(startDate, endDate),
+      durationSeconds: effectiveDurationSeconds(
+        startDate,
+        endDate,
+        gpsSnapshot,
+        activeDurationSeconds,
+      ),
       distanceMi: pickDistanceMi({
         sessionDistanceMi: session.distanceMi,
         sampleDistanceMi: windowMetrics.distanceMi,
@@ -131,6 +150,7 @@ async function resolveFromSamples(
   startDate: Date,
   endDate: Date,
   gpsSnapshot?: GpsTrackSnapshot | null,
+  activeDurationSeconds?: number,
 ): Promise<ResolvedCardioQuickLog> {
   const windowMetrics = await fetchCardioHealthMetricsForWindow(
     startDate,
@@ -142,7 +162,12 @@ async function resolveFromSamples(
     {
       startDate,
       endDate,
-      durationSeconds: durationSecondsBetween(startDate, endDate),
+      durationSeconds: effectiveDurationSeconds(
+        startDate,
+        endDate,
+        gpsSnapshot,
+        activeDurationSeconds,
+      ),
       distanceMi: pickDistanceMi({
         sampleDistanceMi: windowMetrics.distanceMi,
         gpsMi,
@@ -161,12 +186,18 @@ function resolveFromGps(
   startDate: Date,
   endDate: Date,
   gpsSnapshot: GpsTrackSnapshot,
+  activeDurationSeconds?: number,
 ): ResolvedCardioQuickLog {
   return enrichWithGpsTrack(
     {
       startDate,
       endDate,
-      durationSeconds: durationSecondsBetween(startDate, endDate),
+      durationSeconds: effectiveDurationSeconds(
+        startDate,
+        endDate,
+        gpsSnapshot,
+        activeDurationSeconds,
+      ),
       distanceMi: gpsDistanceMi(gpsSnapshot),
       health: { source: "gps" },
       resolution: "gps",
@@ -175,11 +206,16 @@ function resolveFromGps(
   );
 }
 
-function resolveTimerOnly(startDate: Date, endDate: Date): ResolvedCardioQuickLog {
+function resolveTimerOnly(
+  startDate: Date,
+  endDate: Date,
+  activeDurationSeconds?: number,
+): ResolvedCardioQuickLog {
   return {
     startDate,
     endDate,
-    durationSeconds: durationSecondsBetween(startDate, endDate),
+    durationSeconds:
+      activeDurationSeconds ?? durationSecondsBetween(startDate, endDate),
     resolution: "timer_only",
   };
 }
@@ -190,10 +226,19 @@ export async function resolveCardioQuickLog(input: {
   startDate: Date;
   endDate: Date;
   gpsSnapshot?: GpsTrackSnapshot | null;
+  /** Active (non-paused) seconds from the in-app timer. */
+  activeDurationSeconds?: number;
   /** Skip session matching and use HC samples in the user window. */
   preferSamples?: boolean;
 }): Promise<ResolvedCardioQuickLog> {
-  const { kind, startDate, endDate, gpsSnapshot, preferSamples } = input;
+  const {
+    kind,
+    startDate,
+    endDate,
+    gpsSnapshot,
+    activeDurationSeconds,
+    preferSamples,
+  } = input;
   const gpsMi = gpsDistanceMi(gpsSnapshot);
 
   clientTrace("cardio-resolve", "start", {
@@ -206,9 +251,14 @@ export async function resolveCardioQuickLog(input: {
   if (!(await checkCardioHealthReadAccess())) {
     clientTrace("cardio-resolve", "no_hc_access");
     if (gpsMi != null && gpsSnapshot) {
-      return resolveFromGps(startDate, endDate, gpsSnapshot);
+      return resolveFromGps(
+        startDate,
+        endDate,
+        gpsSnapshot,
+        activeDurationSeconds,
+      );
     }
-    return resolveTimerOnly(startDate, endDate);
+    return resolveTimerOnly(startDate, endDate, activeDurationSeconds);
   }
 
   if (!preferSamples) {
@@ -239,13 +289,14 @@ export async function resolveCardioQuickLog(input: {
         endDate,
         autoPick.session,
         gpsSnapshot,
+        activeDurationSeconds,
       );
     }
 
     if (ranked.length > 0) {
       clientTrace("cardio-resolve", "session_ambiguous", { count: ranked.length });
       return {
-        ...resolveTimerOnly(startDate, endDate),
+        ...resolveTimerOnly(startDate, endDate, activeDurationSeconds),
         ambiguousSessions: ranked.slice(0, 3),
       };
     }
@@ -267,12 +318,22 @@ export async function resolveCardioQuickLog(input: {
       steps: sampleMetrics.stepCount,
       gpsDistanceMi: gpsMi,
     });
-    return resolveFromSamples(startDate, endDate, gpsSnapshot);
+    return resolveFromSamples(
+      startDate,
+      endDate,
+      gpsSnapshot,
+      activeDurationSeconds,
+    );
   }
 
   if (gpsMi != null && gpsSnapshot) {
     clientTrace("cardio-resolve", "gps_only", { distanceMi: gpsMi });
-    const base = resolveFromGps(startDate, endDate, gpsSnapshot);
+    const base = resolveFromGps(
+      startDate,
+      endDate,
+      gpsSnapshot,
+      activeDurationSeconds,
+    );
     const enriched = await fetchCardioHealthMetricsForWindow(startDate, endDate);
     return enrichWithGpsTrack(
       {
@@ -287,7 +348,7 @@ export async function resolveCardioQuickLog(input: {
   }
 
   clientTrace("cardio-resolve", "timer_only");
-  return resolveTimerOnly(startDate, endDate);
+  return resolveTimerOnly(startDate, endDate, activeDurationSeconds);
 }
 
 export async function resolveCardioQuickLogFromSession(input: {
@@ -296,6 +357,7 @@ export async function resolveCardioQuickLogFromSession(input: {
   endDate: Date;
   session: ImportedCardioSession;
   gpsSnapshot?: GpsTrackSnapshot | null;
+  activeDurationSeconds?: number;
 }): Promise<ResolvedCardioQuickLog> {
   return resolveFromSession(
     input.kind,
@@ -303,5 +365,6 @@ export async function resolveCardioQuickLogFromSession(input: {
     input.endDate,
     input.session,
     input.gpsSnapshot,
+    input.activeDurationSeconds,
   );
 }
