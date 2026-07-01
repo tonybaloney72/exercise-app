@@ -1,0 +1,43 @@
+import { describe, expect, it } from "vitest";
+import {
+  categoryMuscleGroups,
+  resolveMuscleGroups,
+} from "./category-muscle-groups.mjs";
+
+describe("categoryMuscleGroups", () => {
+  it("includes biceps on upper push and upper pull defaults", () => {
+    expect(categoryMuscleGroups("UP")).toContain("Biceps");
+    expect(categoryMuscleGroups("UPL")).toContain("Biceps");
+  });
+
+  it("merges secondary category muscles", () => {
+    const groups = categoryMuscleGroups("CL", "UPL");
+    expect(groups).toContain("Hip Flexors");
+    expect(groups).toContain("Lats");
+  });
+});
+
+describe("resolveMuscleGroups", () => {
+  it("adds push muscles and name inference for catalog push-ups", () => {
+    const groups = resolveMuscleGroups({
+      name: "Knee Push-Up",
+      category: "UP",
+      source: "catalog",
+    });
+    expect(groups).toContain("Biceps");
+    expect(groups).toContain("Chest");
+    expect(groups).toContain("Triceps");
+  });
+
+  it("preserves hybrid tags while adding category defaults", () => {
+    const groups = resolveMuscleGroups({
+      name: "45 Degree Back Raise",
+      category: "CS",
+      existingMuscleGroups: ["Spinal Erectors"],
+      source: "hybrid",
+    });
+    expect(groups).toContain("Spinal Erectors");
+    expect(groups).toContain("Glutes");
+    expect(groups).toContain("Hamstrings");
+  });
+});

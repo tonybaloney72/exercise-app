@@ -2,36 +2,20 @@
  * Adds `equipment` and `muscleGroups` to each catalog exercise in exercises.ts.
  * Ensures catalog + hybrid merge export when missing.
  * Run: node scripts/enrich-catalog-exercises.mjs
+ *
+ * For a full muscleGroups refresh on existing rows, run:
+ *   node scripts/sync-exercise-muscle-groups.mjs
  */
 
 import { readFileSync, writeFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import {
+  resolveMuscleGroups,
+} from "./lib/category-muscle-groups.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const EXERCISES = join(__dirname, "../src/core/catalog/data/exercises.ts");
-
-/** Aligns with Hybrid Calisthenics muscle tags where applicable. */
-const CATEGORY_MUSCLE_GROUPS = {
-  CF: ["Abs"],
-  CL: ["Hip Flexors", "Abs"],
-  CR: ["Obliques"],
-  CS: ["Transverse Abdominis", "Spinal Erectors"],
-  UP: ["Chest", "Front Deltoids", "Triceps"],
-  UPL: ["Lats", "Rhomboids", "Rear Deltoids", "Biceps"],
-  LB: ["Quadriceps", "Hamstrings", "Glutes", "Calves"],
-  PC: ["Quadriceps", "Glutes"],
-  SW: ["Mobility"],
-  SC: ["Mobility"],
-};
-
-function muscleGroupsFor(primary, secondary) {
-  const set = new Set(CATEGORY_MUSCLE_GROUPS[primary] ?? []);
-  if (secondary) {
-    for (const m of CATEGORY_MUSCLE_GROUPS[secondary] ?? []) set.add(m);
-  }
-  return [...set].sort();
-}
 
 function equipmentFor(name) {
   if (/\bring\b/i.test(name)) return ["rings"];
@@ -61,20 +45,25 @@ function enrichObject(block) {
   if (!cat) return block;
 
   const equipment = equipmentFor(name);
-  const muscleGroups = muscleGroupsFor(cat, secondary);
+  const muscleGroups = resolveMuscleGroups({
+    name,
+    category: cat,
+    secondaryCategory: secondary,
+    source: "catalog",
+  });
   const insert = [
-    `\t\tequipment: ${JSON.stringify(equipment)},`,
-    `\t\tmuscleGroups: ${JSON.stringify(muscleGroups)},`,
-  ].join("\r\n");
+    `    equipment: ${JSON.stringify(equipment)},`,
+    `    muscleGroups: ${JSON.stringify(muscleGroups)},`,
+  ].join("\n");
 
   return block.replace(
-    /(\r?\n\t\tcategory: "[^"]+",)\r?\n/,
-    `$1\r\n${insert}\r\n`,
+    /(\n    category: "[^"]+",)\n/,
+    `$1\n${insert}\n`,
   );
 }
 
 function enrichCatalogSection(middle) {
-  return middle.replace(/\t\{[\s\S]*?\r?\n\t\},/g, enrichObject);
+  return middle.replace(/\n  \{[\s\S]*?\n  \},/g, enrichObject);
 }
 
 function ensureHybridMerge(content) {

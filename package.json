@@ -23,6 +23,7 @@
     "generate:category-index": "node scripts/generate-exercise-category-index.mjs",
     "analyze": "ANALYZE=true npm run build",
     "catalog:enrich": "node scripts/catalog-enrich.mjs",
+    "catalog:sync-muscles": "node scripts/sync-exercise-muscle-groups.mjs",
     "catalog:scrape-hc": "node scripts/scrape-hc-progressions.mjs",
     "catalog:suggest-videos": "node scripts/catalog-suggest-videos.mjs",
     "catalog:video-review": "node scripts/catalog-video-review.mjs",

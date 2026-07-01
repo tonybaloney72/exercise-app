@@ -10,7 +10,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Hinge at hips over the pad; raise torso to a neutral line, pause briefly, lower with control.",
@@ -24,7 +24,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CF",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Abs"],
+    muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
@@ -38,7 +38,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Abductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Press leg out against resistance; control the return without letting weight slam.",
@@ -52,7 +52,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Adductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Squeeze legs together against resistance; smooth motion, full controlled range.",
@@ -66,7 +66,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["bodyweight"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     hcProgressionStep: 8,
     hcProgressionTotal: 10,
@@ -82,7 +82,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes: "Prone on floor; extend spine with no equipment.",
     source: "Repetitions Fitness RPT",
@@ -95,7 +95,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["machine"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Pad at hips; extend spine to neutral and lower under control. Add load only when form is solid.",
@@ -109,7 +109,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Bar on upper back; brace core, sit hips back and down, knees track toes, drive through mid-foot to stand.",
@@ -123,7 +123,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -137,7 +137,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -151,7 +151,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -165,7 +165,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rotator Cuff"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Rotator Cuff", "Traps"],
     defaultReps: "10",
     notes:
       "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
@@ -179,7 +179,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rotator Cuff"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Rotator Cuff", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward face with elbows high; externally rotate at the end of the rep.",
@@ -193,7 +193,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Front Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms to shoulder height with soft elbows; lower without swinging.",
@@ -207,7 +207,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Triceps"],
     defaultReps: "10 each leg",
     notes:
       "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
@@ -221,7 +221,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Brachialis"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -235,7 +235,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Abductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Press leg out against resistance; control the return without letting weight slam.",
@@ -249,7 +249,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Adductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Squeeze legs together against resistance; smooth motion, full controlled range.",
@@ -263,7 +263,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rotator Cuff"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Rotator Cuff", "Traps"],
     defaultReps: "10",
     notes:
       "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
@@ -277,7 +277,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Triceps"],
     defaultReps: "10 each leg",
     notes:
       "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
@@ -291,7 +291,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Lats"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
@@ -305,7 +305,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
@@ -319,7 +319,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
       "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
@@ -333,7 +333,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Front Deltoids", "Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
@@ -347,7 +347,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Keep upper arms still; extend elbows fully, lower weight with control.",
@@ -361,7 +361,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
       "Press band or cable straight out from chest; resist rotation and hold a tall posture.",
@@ -375,7 +375,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
@@ -389,7 +389,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Rotate forearm slowly against band resistance; keep elbow stable at your side.",
@@ -403,7 +403,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Arms straight; pull band apart by squeezing shoulder blades, control the return.",
@@ -417,7 +417,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Calves"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Rise onto toes with control; pause at top, lower heels below platform if available.",
@@ -431,7 +431,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CF",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Abs"],
+    muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
@@ -445,7 +445,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CL",
     equipment: ["resistance_band"],
     expertiseLevel: "novice",
-    muscleGroups: ["Hip Flexors"],
+    muscleGroups: ["Abs", "Glutes", "Hip Flexors", "Obliques", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
@@ -459,7 +459,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CL",
     equipment: ["pull_up_bar", "resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Hip Flexors"],
+    muscleGroups: ["Abs", "Hip Flexors", "Obliques"],
     defaultReps: "10",
     notes:
       "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
@@ -473,7 +473,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Extend knees to straight; pause at top, lower without dropping the weight.",
@@ -487,7 +487,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CF",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Abs"],
+    muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
@@ -501,7 +501,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -515,7 +515,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -529,7 +529,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "novice",
-    muscleGroups: ["Abductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Band adds tension at the top; split stance, lower until back knee nears floor, front shin stays vertical.",
@@ -543,7 +543,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "novice",
-    muscleGroups: ["Glutes", "Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Stand on the band or anchor it low; squat against increasing tension at the top—control the descent.",
@@ -557,7 +557,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Calves"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Rise onto toes with control; pause at top, lower heels below platform if available.",
@@ -571,7 +571,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -585,7 +585,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Tibialis"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Dorsiflex against resistance; lift toes toward shins, pause, lower slowly.",
@@ -599,7 +599,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -613,7 +613,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Chest", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps", "Triceps"],
     defaultReps: "10",
     notes:
       "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
@@ -627,7 +627,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lats", "Rear Deltoids", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -641,7 +641,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
@@ -655,7 +655,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Rotate forearm slowly against band resistance; keep elbow stable at your side.",
@@ -669,7 +669,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Keep upper arms still; extend elbows fully, lower weight with control.",
@@ -683,7 +683,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Lats", "Rear Deltoids", "Rhomboids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -697,7 +697,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
       "Chop diagonally across the body; rotate through the torso, not the arms alone.",
@@ -711,7 +711,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Forearms supported; flex or extend wrists through full range under control.",
@@ -725,7 +725,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Forearms supported; flex or extend wrists through full range under control.",
@@ -739,7 +739,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -753,7 +753,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Pectoralis Major", "Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Body in one line; lower chest toward floor, press back up without sagging hips.",
@@ -767,7 +767,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Serratus Anterior"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Protract shoulder blades forward; reach through full range without shrugging.",
@@ -781,7 +781,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -795,7 +795,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "novice",
-    muscleGroups: ["Serratus Anterior"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Body in one line; lower chest toward floor, press back up without sagging hips.",
@@ -809,7 +809,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CF",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Abs"],
+    muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Brace core; roll or crunch through a controlled range without sagging the lower back.",
@@ -823,7 +823,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "High- or low-bar on back; break at hips and knees together, depth as mobility allows, stand by driving hips up.",
@@ -837,7 +837,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -851,7 +851,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Calves"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Rise onto toes with control; pause at top, lower heels below platform if available.",
@@ -866,7 +866,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Lats", "Rear Deltoids", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -880,7 +880,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -894,7 +894,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -908,7 +908,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Front Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms to shoulder height with soft elbows; lower without swinging.",
@@ -922,7 +922,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -936,12 +936,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Front Deltoids",
-      "Lateral Deltoids",
-      "Rotator Cuff",
-      "Serratus Anterior",
-    ],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Rotator Cuff", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
@@ -955,7 +950,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Keep upper arms still; extend elbows fully, lower weight with control.",
@@ -969,7 +964,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Brachialis", "Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -983,7 +978,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -997,7 +992,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -1011,7 +1006,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
@@ -1025,7 +1020,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Keep upper arms still; extend elbows fully, lower weight with control.",
@@ -1039,7 +1034,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Abductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Bar on back; long split stance, lower straight down with most weight on the front leg, torso upright.",
@@ -1053,7 +1048,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Calves"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Rise onto toes with control; pause at top, lower heels below platform if available.",
@@ -1068,7 +1063,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -1082,7 +1077,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Rotate torso side to side with control; keep chest up and core braced throughout.",
@@ -1096,7 +1091,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Lats", "Rear Deltoids", "Rhomboids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -1110,7 +1105,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -1124,7 +1119,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Calves"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Rise onto toes with control; pause at top, lower heels below platform if available.",
@@ -1138,7 +1133,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lats", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -1153,7 +1148,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
@@ -1167,7 +1162,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -1181,7 +1176,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CF",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Abs"],
+    muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
@@ -1195,7 +1190,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -1209,7 +1204,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Rotator Cuff"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Rotator Cuff", "Traps"],
     defaultReps: "10",
     notes:
       "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
@@ -1223,7 +1218,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Rotator Cuff"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Rotator Cuff", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward face with elbows high; externally rotate at the end of the rep.",
@@ -1237,7 +1232,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Front Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms to shoulder height with soft elbows; lower without swinging.",
@@ -1251,7 +1246,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Serratus Anterior"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms to shoulder height with soft elbows; lower without swinging.",
@@ -1265,7 +1260,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Triceps"],
     defaultReps: "10 each leg",
     notes:
       "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
@@ -1279,7 +1274,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Brachialis"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -1293,7 +1288,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Abductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Press leg out against resistance; control the return without letting weight slam.",
@@ -1307,7 +1302,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Adductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Squeeze legs together against resistance; smooth motion, full controlled range.",
@@ -1321,7 +1316,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Rotator Cuff"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Rotator Cuff", "Traps"],
     defaultReps: "10",
     notes:
       "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
@@ -1335,7 +1330,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Triceps"],
     defaultReps: "10 each leg",
     notes:
       "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
@@ -1349,7 +1344,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lats"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
@@ -1363,7 +1358,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lats"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps", "Triceps"],
     defaultReps: "10",
     notes:
       "Push handles down in an arc; keep ribs down and finish with lats engaged.",
@@ -1377,7 +1372,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
@@ -1391,7 +1386,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Extend knees to straight; pause at top, lower without dropping the weight.",
@@ -1405,7 +1400,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Hip Flexors"],
+    muscleGroups: ["Abs", "Hip Flexors", "Obliques"],
     defaultReps: "10",
     notes:
       "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
@@ -1419,7 +1414,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
       "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
@@ -1433,7 +1428,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Front Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
@@ -1447,7 +1442,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
       "Press band or cable straight out from chest; resist rotation and hold a tall posture.",
@@ -1461,7 +1456,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
@@ -1475,7 +1470,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Serratus Anterior"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Protract shoulder blades forward; reach through full range without shrugging.",
@@ -1489,7 +1484,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Calves"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Rise onto toes with control; pause at top, lower heels below platform if available.",
@@ -1503,7 +1498,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Calves"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Rise onto toes with control; pause at top, lower heels below platform if available.",
@@ -1517,7 +1512,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -1531,7 +1526,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Chest", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps", "Triceps"],
     defaultReps: "10",
     notes:
       "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
@@ -1545,7 +1540,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -1559,7 +1554,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lats", "Rear Deltoids", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -1573,7 +1568,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
@@ -1587,7 +1582,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Tibialis"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Dorsiflex against resistance; lift toes toward shins, pause, lower slowly.",
@@ -1601,7 +1596,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Keep upper arms still; extend elbows fully, lower weight with control.",
@@ -1615,7 +1610,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Lats", "Rear Deltoids", "Rhomboids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -1629,7 +1624,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
       "Chop diagonally across the body; rotate through the torso, not the arms alone.",
@@ -1643,7 +1638,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -1657,7 +1652,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes: "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
     source: "Bradley Bowden",
@@ -1671,7 +1666,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -1685,7 +1680,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -1699,7 +1694,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Body in one line; lower chest toward floor, press back up without sagging hips.",
@@ -1713,7 +1708,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["pull_up_bar"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lats", "Pectoralis Major", "Rear Deltoids", "Rhomboids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Full hang to start; pull until chin clears the bar, lower with control.",
@@ -1727,7 +1722,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bench"],
     expertiseLevel: "novice",
-    muscleGroups: ["Adductors"],
+    muscleGroups: ["Abductors", "Abs", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "30 sec each side",
     notes:
       "Stack shoulders over elbow or wrist; lift hips in a straight line and breathe steadily.",
@@ -1741,7 +1736,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
-    muscleGroups: ["Adductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each side",
     notes:
       "Wide stance; shift weight to one leg and squat deep to that side while the opposite leg stays straight—keep heel down if you can.",
@@ -1755,7 +1750,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Keep upper arms still; extend elbows fully, lower weight with control.",
@@ -1769,7 +1764,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CF",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Abs"],
+    muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
@@ -1784,7 +1779,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -1798,7 +1793,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -1812,7 +1807,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["bench", "plyo_box"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Body in one line; lower chest toward floor, press back up without sagging hips.",
@@ -1826,7 +1821,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CL",
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
-    muscleGroups: ["Hip Flexors"],
+    muscleGroups: ["Abs", "Glutes", "Hip Flexors", "Obliques", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
@@ -1840,7 +1835,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["pull_up_bar", "rings"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major", "Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Parallel bars, dip station, or rings; lower until upper arms are roughly parallel, then press up without flaring elbows wide.",
@@ -1854,7 +1849,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Upper back on bench; drive hips up, squeeze glutes at top, lower under control.",
@@ -1868,7 +1863,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -1882,7 +1877,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Calves"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Rise onto toes with control; pause at top, lower heels below platform if available.",
@@ -1896,7 +1891,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Rear Deltoids"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -1910,7 +1905,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -1924,7 +1919,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
@@ -1938,7 +1933,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Front Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms to shoulder height with soft elbows; lower without swinging.",
@@ -1952,7 +1947,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Serratus Anterior"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms to shoulder height with soft elbows; lower without swinging.",
@@ -1966,7 +1961,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Brachialis"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -1980,7 +1975,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -1994,7 +1989,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
@@ -2008,7 +2003,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rotator Cuff"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Rotator Cuff", "Traps"],
     defaultReps: "10 each arm",
     notes:
       "Lying on side; raise arm through Lu raise path with control, keep shoulder packed.",
@@ -2022,7 +2017,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Front Deltoids", "Lateral Deltoids", "Serratus Anterior"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
@@ -2036,7 +2031,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Keep upper arms still; extend elbows fully, lower weight with control.",
@@ -2050,7 +2045,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2064,7 +2059,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Arms extended; lower weight behind head with control, pull back over the chest.",
@@ -2078,7 +2073,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Brachialis", "Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2092,7 +2087,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rear Deltoids", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Chest", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps", "Triceps"],
     defaultReps: "10",
     notes:
       "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
@@ -2106,7 +2101,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2120,7 +2115,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -2134,7 +2129,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
@@ -2148,7 +2143,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
       "Stand tall; bend laterally toward one side, return to center without twisting.",
@@ -2162,7 +2157,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Keep upper arms still; extend elbows fully, lower weight with control.",
@@ -2176,7 +2171,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2190,7 +2185,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Abductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Hold dumbbells at your sides; split stance, lower until back knee nears floor, push through the front heel.",
@@ -2204,7 +2199,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Calves"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Rise onto toes with control; pause at top, lower heels below platform if available.",
@@ -2218,7 +2213,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -2232,7 +2227,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Serratus Anterior"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Protract shoulder blades forward; reach through full range without shrugging.",
@@ -2246,7 +2241,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Lats", "Rear Deltoids", "Rhomboids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -2260,7 +2255,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Forearms"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2274,7 +2269,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Lateral Deltoids", "Traps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Traps", "Triceps"],
     defaultReps: "10",
     notes: "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
     source: "Jeremy Daniels",
@@ -2287,7 +2282,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
@@ -2301,7 +2296,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["pull_up_bar"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Lats", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull shoulders down and back; lift or press through the lats with a braced core.",
@@ -2315,7 +2310,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2329,7 +2324,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rear Deltoids"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward face with elbows high; externally rotate at the end of the rep.",
@@ -2344,7 +2339,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Bar on front rack, elbows high; sit straight down between your hips, torso upright, drive up through mid-foot.",
@@ -2359,7 +2354,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Triceps"],
     defaultReps: "10 each leg",
     notes:
       "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
@@ -2373,7 +2368,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell", "kettlebell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Glutes", "Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Hold weight at chest; sit deep with elbows inside knees and an upright torso, then stand by driving through heels.",
@@ -2387,7 +2382,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Bar on upper back; hinge at hips with a flat back, then drive hips forward to stand.",
@@ -2401,7 +2396,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Adductors", "Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Shoulders on pads, feet forward on platform; lower until thighs are parallel, press through heels—back stays on pad.",
@@ -2415,7 +2410,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "30 sec",
     notes:
       "Control the eccentric; use padding under knees and progress range gradually.",
@@ -2429,7 +2424,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "expert",
-    muscleGroups: ["Front Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Body in one line; lower chest toward floor, press back up without sagging hips.",
@@ -2444,7 +2439,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2458,7 +2453,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CL",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Hip Flexors"],
+    muscleGroups: ["Abs", "Hip Flexors", "Obliques"],
     defaultReps: "10",
     notes:
       "Lift knee against pad resistance; avoid rocking the torso, control the lowering phase.",
@@ -2472,7 +2467,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bodyweight", "bench"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Upper back on bench; drive hips up, squeeze glutes at top, lower under control.",
@@ -2487,7 +2482,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Upper back on bench; drive hips up, squeeze glutes at top, lower under control.",
@@ -2502,7 +2497,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -2516,7 +2511,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2530,7 +2525,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["pull_up_bar"],
     expertiseLevel: "expert",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Glutes", "Hamstrings", "Lats", "Rear Deltoids", "Rhomboids", "Spinal Erectors", "Transverse Abdominis", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -2545,7 +2540,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["bodyweight", "bench", "plyo_box"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Stand on bench or box, round down with bodyweight only. See Weighted Jefferson Curl for loaded version.",
@@ -2559,7 +2554,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lats", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
@@ -2573,7 +2568,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lats"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
@@ -2587,7 +2582,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Extend knees to straight; pause at top, lower without dropping the weight.",
@@ -2601,7 +2596,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Adductors", "Glutes", "Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Feet shoulder-width on platform; lower until knees reach about 90°, press without locking out or lifting hips off the seat.",
@@ -2615,7 +2610,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CF",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Abs", "Hip Flexors"],
+    muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
@@ -2629,7 +2624,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2643,7 +2638,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2657,7 +2652,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
@@ -2671,7 +2666,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -2685,7 +2680,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -2699,7 +2694,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
@@ -2713,7 +2708,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
@@ -2727,12 +2722,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: [
-      "Front Deltoids",
-      "Lateral Deltoids",
-      "Rotator Cuff",
-      "Serratus Anterior",
-    ],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Rotator Cuff", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
@@ -2746,7 +2736,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Rear Deltoids", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Chest", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps", "Triceps"],
     defaultReps: "10",
     notes:
       "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
@@ -2760,7 +2750,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Lats", "Rear Deltoids", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -2774,7 +2764,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bench"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Calves", "Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2788,7 +2778,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
       "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
@@ -2802,7 +2792,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Rotate torso side to side with control; keep chest up and core braced throughout.",
@@ -2816,7 +2806,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["rings"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Full hang to start; pull until chin clears the bar, lower with control.",
@@ -2830,7 +2820,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Follow the machine arc; feet slightly forward, lower with control, drive up through heels—keep hips in the pad.",
@@ -2844,7 +2834,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CL",
     equipment: ["bodyweight"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Hip Flexors"],
+    muscleGroups: ["Abs", "Hip Flexors", "Obliques"],
     defaultReps: "10",
     notes:
       "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
@@ -2858,7 +2848,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Front Deltoids", "Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Body in one line; lower chest toward floor, press back up without sagging hips.",
@@ -2872,7 +2862,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
-    muscleGroups: ["Transverse Abdominis"],
+    muscleGroups: ["Abs", "Glutes", "Hamstrings", "Hip Flexors", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "30 sec",
     notes:
       "Hold a rigid plank from shoulders to heels; keep ribs down and glutes engaged.",
@@ -2886,7 +2876,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
-    muscleGroups: ["Serratus Anterior"],
+    muscleGroups: ["Abs", "Biceps", "Chest", "Front Deltoids", "Hip Flexors", "Serratus Anterior", "Triceps"],
     defaultReps: "5",
     notes:
       "Hold a rigid plank from shoulders to heels; keep ribs down and glutes engaged.",
@@ -2900,7 +2890,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -2914,7 +2904,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "expert",
-    muscleGroups: ["Front Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Body in one line; lower chest toward floor, press back up without sagging hips.",
@@ -2928,7 +2918,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["pull_up_bar"],
     expertiseLevel: "novice",
-    muscleGroups: ["Brachialis", "Forearms", "Lats", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Full hang to start; pull until chin clears the bar, lower with control.",
@@ -2942,7 +2932,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Pectoralis Major"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Pectoralis Major", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Body in one line; lower chest toward floor, press back up without sagging hips.",
@@ -2956,7 +2946,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rear Deltoids"],
+    muscleGroups: ["Biceps", "Brachialis", "Chest", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps", "Triceps"],
     defaultReps: "10",
     notes:
       "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
@@ -2971,7 +2961,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["bench", "machine"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Torso on bench or reverse-hyper machine pad; legs swing up. Requires bench/box or machine (not floor-only bodyweight).",
@@ -2985,7 +2975,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Torso on bench or pad; swing legs up to hip height with control, avoid jerking at the top.",
@@ -2999,7 +2989,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bench"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Control the eccentric; use padding under knees and progress range gradually.",
@@ -3013,7 +3003,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["rings"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Brachialis"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -3027,7 +3017,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["rings"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -3041,7 +3031,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["rings"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Rear Deltoids", "Rotator Cuff"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Rotator Cuff", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward face with elbows high; externally rotate at the end of the rep.",
@@ -3055,7 +3045,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["rings"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Rear Deltoids", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Chest", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps", "Triceps"],
     defaultReps: "10",
     notes:
       "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
@@ -3069,7 +3059,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["rings"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Abs", "Serratus Anterior"],
+    muscleGroups: ["Abs", "Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Brace core; roll or crunch through a controlled range without sagging the lower back.",
@@ -3083,7 +3073,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["rings"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Rear Deltoids"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -3097,7 +3087,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["rings"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Lateral Deltoids", "Traps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Traps", "Triceps"],
     defaultReps: "10",
     notes: "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
     source: "Team Training Day",
@@ -3110,7 +3100,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["rings"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Keep upper arms still; extend elbows fully, lower weight with control.",
@@ -3124,7 +3114,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["pull_up_bar"],
     expertiseLevel: "novice",
-    muscleGroups: ["Brachialis", "Forearms", "Lats", "Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -3139,7 +3129,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Tibialis"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
@@ -3153,7 +3143,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10 each side",
     notes:
       "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
@@ -3167,7 +3157,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rotator Cuff"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Rotator Cuff", "Traps"],
     defaultReps: "10 each arm",
     notes:
       "Elbow at side, forearm rotates through range; move slowly, no momentum.",
@@ -3181,7 +3171,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Rotator Cuff"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Rotator Cuff", "Traps"],
     defaultReps: "10 each arm",
     notes:
       "Elbow at side, forearm rotates through range; move slowly, no momentum.",
@@ -3195,7 +3185,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Abductors"],
+    muscleGroups: ["Abductors", "Abs", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
@@ -3209,7 +3199,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bench", "plyo_box"],
     expertiseLevel: "novice",
-    muscleGroups: ["Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Stay upright and lean back as knees travel forward over toes; use a bench for balance—only go as low as knees tolerate.",
@@ -3223,7 +3213,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -3237,7 +3227,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Rear foot elevated on a bench; lower under the bar path, front knee over mid-foot, torso tall throughout.",
@@ -3251,7 +3241,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CL",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Hip Flexors"],
+    muscleGroups: ["Abs", "Glutes", "Hip Flexors", "Obliques", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
@@ -3265,7 +3255,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Bar on upper back; hinge at hips with a flat back, then drive hips forward to stand.",
@@ -3279,7 +3269,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Abductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Split stance under the bar; lower straight down along the fixed path, most load on the front leg.",
@@ -3293,7 +3283,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Feet slightly ahead of the bar line; sit back and down along the guided path, knees track toes.",
@@ -3307,7 +3297,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -3321,7 +3311,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
-    muscleGroups: ["Abductors", "Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Static split stance; lower until back knee nears floor, front shin mostly vertical, push through front heel.",
@@ -3335,7 +3325,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: ["Hamstrings"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -3349,7 +3339,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Biceps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
@@ -3363,7 +3353,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Calves"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Rise onto toes with control; pause at top, lower heels below platform if available.",
@@ -3377,7 +3367,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Adductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Spinal Erectors"],
     defaultReps: "10",
     notes:
       "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
@@ -3392,7 +3382,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Rhomboids", "Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Pull toward the torso; squeeze shoulder blades together and control the return.",
@@ -3406,7 +3396,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Tibialis"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Dorsiflex against resistance; lift toes toward shins, pause, lower slowly.",
@@ -3420,7 +3410,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Lower until upper arms are roughly parallel; press up without flaring elbows wide.",
@@ -3434,7 +3424,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["machine"],
     expertiseLevel: "novice",
-    muscleGroups: ["Triceps"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Lower until upper arms are roughly parallel; press up without flaring elbows wide.",
@@ -3448,7 +3438,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["pull_up_bar", "rings", "bench"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Traps"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
@@ -3462,7 +3452,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Lateral Deltoids"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Lateral Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "5 each side",
     notes:
       "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
@@ -3476,7 +3466,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "SW",
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
-    muscleGroups: ["Mobility", "Tibialis"],
+    muscleGroups: ["Mobility"],
     defaultReps: "10",
     notes:
       "Back against wall, lift toes toward shins with heels down - tibialis / ankle prep for lower-body days.",
@@ -3491,7 +3481,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Serratus Anterior"],
+    muscleGroups: ["Biceps", "Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "30 sec",
     notes:
       "Protract shoulder blades forward; reach through full range without shrugging.",
@@ -3505,7 +3495,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["machine", "dumbbell", "kettlebell"],
     expertiseLevel: "expert",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Back extension machine with plate or dumbbell/kettlebell held to chest. Progression from Back Extension Machine.",
@@ -3519,7 +3509,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Spinal Erectors", "Transverse Abdominis"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
       "On all fours, extend opposite arm and leg; keep hips level and avoid rotating the torso.",
@@ -3533,7 +3523,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Adductors"],
+    muscleGroups: ["Abductors", "Abs", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "30 sec each side",
     notes:
       "Stack shoulders over elbow or wrist; lift hips in a straight line and breathe steadily.",
@@ -3547,7 +3537,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Adductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each side",
     notes:
       "Hold weight at chest; shift into a deep side squat on one leg with the opposite leg extended—move slowly and stay controlled.",
@@ -3562,7 +3552,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CF",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Abs"],
+    muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
@@ -3577,7 +3567,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Transverse Abdominis"],
+    muscleGroups: ["Abs", "Glutes", "Hamstrings", "Hip Flexors", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Low back flat on floor; extend opposite arm and leg without letting ribs flare.",
@@ -3591,7 +3581,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CL",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Hip Flexors"],
+    muscleGroups: ["Abs", "Glutes", "Hip Flexors", "Obliques", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
@@ -3606,7 +3596,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Adductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Hold weight at chest; sit into maximal depth with heels down and a neutral spine—use a counterweight if needed.",
@@ -3621,7 +3611,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CF",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Abs", "Transverse Abdominis"],
+    muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "30 sec",
     notes:
       "Lower back pressed down; lift shoulders and legs off floor and hold a tight hollow shape.",
@@ -3636,7 +3626,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CS",
     equipment: ["barbell", "dumbbell", "kettlebell", "bench", "plyo_box"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Spinal Erectors"],
+    muscleGroups: ["Glutes", "Hamstrings", "Spinal Erectors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Jefferson curl on bench/box with barbell, dumbbell, or kettlebell. Progression from Jefferson Curl (HC-196).",
@@ -3651,7 +3641,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Glutes"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
@@ -3665,7 +3655,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Obliques"],
+    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Rotate torso side to side with control; keep chest up and core braced throughout.",
@@ -3679,7 +3669,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Tibialis"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
@@ -3694,7 +3684,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "CR",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Abductors", "Obliques"],
+    muscleGroups: ["Abductors", "Abs", "Hip Flexors", "Obliques", "Transverse Abdominis"],
     defaultReps: "30 sec each side",
     notes:
       "Stack shoulders over elbow or wrist; lift hips in a straight line and breathe steadily.",
@@ -3708,7 +3698,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Quadriceps"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
       "Dumbbells at your sides; split stance, controlled lower, drive up through the front leg.",
@@ -3723,7 +3713,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Adductors"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps"],
     defaultReps: "10",
     notes:
       "Wide stance, toes out; hold the bar between legs, sit straight down, knees track over toes.",
@@ -3737,7 +3727,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Tibialis"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
@@ -3751,7 +3741,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "LB",
     equipment: ["barbell"],
     expertiseLevel: "advanced",
-    muscleGroups: ["Tibialis"],
+    muscleGroups: ["Abductors", "Adductors", "Calves", "Glutes", "Hamstrings", "Hip Flexors", "Quadriceps", "Tibialis"],
     defaultReps: "10",
     notes:
       "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
@@ -3766,7 +3756,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: ["Brachialis"],
+    muscleGroups: ["Biceps", "Brachialis", "Forearms", "Lats", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Curl with elbows fixed; full range up and controlled lower on the way down.",
