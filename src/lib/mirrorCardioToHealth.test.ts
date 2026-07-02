@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { shouldMirrorCardioCaptureToHealth } from "@/lib/cardioHealthMirrorPolicy";
+import {
+  isMeOriginatedCardioRow,
+  shouldMirrorCardioCaptureToHealth,
+} from "@/lib/cardioHealthMirrorPolicy";
 
 describe("shouldMirrorCardioCaptureToHealth", () => {
   it("skips when health metadata is from Health Connect", () => {
@@ -31,5 +34,19 @@ describe("shouldMirrorCardioCaptureToHealth", () => {
     expect(
       shouldMirrorCardioCaptureToHealth({ resolution: "timer_only" }),
     ).toBe(true);
+  });
+});
+
+describe("isMeOriginatedCardioRow", () => {
+  it("rejects Health Connect-imported rows", () => {
+    expect(isMeOriginatedCardioRow({ activitySource: "health_connect" })).toBe(
+      false,
+    );
+  });
+
+  it("allows GPS and manual rows", () => {
+    expect(isMeOriginatedCardioRow({ activitySource: "gps" })).toBe(true);
+    expect(isMeOriginatedCardioRow({ activitySource: "manual" })).toBe(true);
+    expect(isMeOriginatedCardioRow({})).toBe(true);
   });
 });

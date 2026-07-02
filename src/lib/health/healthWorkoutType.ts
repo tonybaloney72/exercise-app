@@ -1,4 +1,5 @@
 import type { WorkoutType } from "@capgo/capacitor-health";
+import { isMeOriginatedCardioRow } from "@/lib/cardioHealthMirrorPolicy";
 import { CARDIO_KIND_TO_EXERCISE_ID } from "@/lib/cardioKinds";
 import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
@@ -31,6 +32,7 @@ export function totalCompletedCardioDistanceMeters(
   let totalMi = 0;
   for (const row of resolveWorkoutCardioExercises(log)) {
     if (!row.completed || row.skipped) continue;
+    if (!isMeOriginatedCardioRow(row)) continue;
     if (row.actualDistanceMi != null && row.actualDistanceMi > 0) {
       totalMi += row.actualDistanceMi;
     }
@@ -47,6 +49,7 @@ export function completedCardioSpeedMetersPerSecond(
   let totalSec = 0;
   for (const row of resolveWorkoutCardioExercises(log)) {
     if (!row.completed || row.skipped) continue;
+    if (!isMeOriginatedCardioRow(row)) continue;
     if (row.actualDistanceMi != null && row.actualDistanceMi > 0) {
       totalMi += row.actualDistanceMi;
     }

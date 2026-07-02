@@ -1,4 +1,5 @@
 import type { CardioActivitySource } from "@/types";
+import type { ExerciseLog } from "@/types";
 
 type CardioMirrorResolution =
   | "health_connect_session"
@@ -19,4 +20,11 @@ export function shouldMirrorCardioCaptureToHealth(options: {
     return false;
   }
   return true;
+}
+
+/** Cardio logged from HC already exists there — exclude from ME health writes. */
+export function isMeOriginatedCardioRow(
+  row: Pick<ExerciseLog, "activitySource">,
+): boolean {
+  return row.activitySource !== "health_connect";
 }

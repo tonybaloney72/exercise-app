@@ -86,6 +86,43 @@ describe("totalCompletedCardioDistanceMeters", () => {
     });
     expect(totalCompletedCardioDistanceMeters(log)).toBeCloseTo(1.5 * 1609.344, 1);
   });
+
+  it("excludes Health Connect-imported cardio distance", () => {
+    const log = baseLog({
+      cardioExercises: [
+        {
+          exerciseId: "END-JOG",
+          completed: true,
+          skipped: false,
+          actualDistanceMi: 1.5,
+          activitySource: "health_connect",
+        },
+        {
+          exerciseId: "END-WALK",
+          completed: true,
+          skipped: false,
+          actualDistanceMi: 0.5,
+          activitySource: "gps",
+        },
+      ],
+    });
+    expect(totalCompletedCardioDistanceMeters(log)).toBeCloseTo(0.5 * 1609.344, 1);
+  });
+
+  it("returns undefined when only cardio was imported from Health Connect", () => {
+    const log = baseLog({
+      cardioExercises: [
+        {
+          exerciseId: "END-JOG",
+          completed: true,
+          skipped: false,
+          actualDistanceMi: 1.5,
+          activitySource: "health_connect",
+        },
+      ],
+    });
+    expect(totalCompletedCardioDistanceMeters(log)).toBeUndefined();
+  });
 });
 
 describe("completedCardioSpeedMetersPerSecond", () => {
@@ -112,6 +149,22 @@ describe("completedCardioSpeedMetersPerSecond", () => {
           completed: true,
           skipped: false,
           actualDistanceMi: 1,
+        },
+      ],
+    });
+    expect(completedCardioSpeedMetersPerSecond(log)).toBeUndefined();
+  });
+
+  it("excludes Health Connect-imported cardio from speed", () => {
+    const log = baseLog({
+      cardioExercises: [
+        {
+          exerciseId: "END-JOG",
+          completed: true,
+          skipped: false,
+          actualDistanceMi: 1.5,
+          actualDuration: 2400,
+          activitySource: "health_connect",
         },
       ],
     });
