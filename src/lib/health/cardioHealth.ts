@@ -23,6 +23,7 @@ import {
   aggregatedBucketTotal,
   perSourceDailySampleTotals,
   resolveDailyHealthMetricTotal,
+  rollupHealthSamplesForWindow,
   sumHealthSampleValues,
 } from "@/lib/health/healthSampleAggregation";
 
@@ -243,7 +244,7 @@ export async function fetchCardioHealthMetricsForWindow(
       fetchHeartRateAverage(startDate, endDate),
     ]);
 
-  const stepTotal = sumHealthSampleValues(stepSamples);
+  const stepTotal = rollupHealthSamplesForWindow(stepSamples);
   const distanceMeters = sumHealthSampleValues(distanceSamples);
   const distanceMi =
     distanceMeters > 0

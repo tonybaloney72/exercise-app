@@ -154,15 +154,48 @@ describe("resolveDailyHealthMetricTotal", () => {
 });
 
 describe("aggregatedBucketTotal", () => {
-  it("sums distinct HC day buckets", () => {
+  it("uses max across per-source day buckets (never sums)", () => {
     expect(
       aggregatedBucketTotal([{ value: 4200 }, { value: 0 }, { value: 300 }]),
-    ).toBe(4500);
+    ).toBe(4200);
+    expect(
+      aggregatedBucketTotal([{ value: 2333 }, { value: 2633 }]),
+    ).toBe(2633);
   });
 
   it("dedupes similar buckets from multiple sources", () => {
     expect(
       aggregatedBucketTotal([{ value: 1498 }, { value: 1500 }]),
     ).toBe(1500);
+  });
+});
+
+describe("resolveDailyHealthMetricTotal — multi-writer daily steps", () => {
+  it("uses max across buckets that previously summed to ~2× HC (2333 + 2633)", () => {
+    const buckets = [{ value: 2333 }, { value: 2633 }];
+    expect(aggregatedBucketTotal(buckets)).toBe(2633);
+    expect(resolveDailyHealthMetricTotal(aggregatedBucketTotal(buckets), [])).toBe(
+      2633,
+    );
+  });
+
+  it("prefers HC aggregate when sample rollup over-counts overlapping sources", () => {
+    expect(
+      resolveDailyHealthMetricTotal(
+        2633,
+        [
+          {
+            value: 2483,
+            sourceName: "Nothing Watch",
+            endDate: "2026-06-20T10:00:00.000Z",
+          },
+          {
+            value: 4966,
+            sourceName: "android",
+            endDate: "2026-06-20T12:00:00.000Z",
+          },
+        ],
+      ),
+    ).toBe(2633);
   });
 });

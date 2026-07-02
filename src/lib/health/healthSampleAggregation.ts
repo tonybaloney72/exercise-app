@@ -113,6 +113,16 @@ export function aggregateDailyHealthSampleTotal(
   return dedupePerSourceDailyTotals(perSourceTotals);
 }
 
+/**
+ * Roll up HC samples for an activity time window (cardio session import).
+ * Uses per-source dedupe — not a naive sum across overlapping writers.
+ */
+export function rollupHealthSamplesForWindow(
+  samples: ReadonlyArray<DailyHealthSampleLike>,
+): number {
+  return aggregateDailyHealthSampleTotal(samples);
+}
+
 export function aggregatedBucketTotal(
   buckets: ReadonlyArray<{ value: number }>,
 ): number {
@@ -120,16 +130,8 @@ export function aggregatedBucketTotal(
     .map((bucket) => bucket.value)
     .filter((value) => Number.isFinite(value) && value > 0);
   if (values.length === 0) return 0;
-  if (values.length === 1) return Math.round(values[0]!);
-
-  const maxVal = Math.max(...values);
-  const minVal = Math.min(...values);
-  // Multiple day buckets with similar totals → duplicate source rollups, not additive.
-  if (minVal / maxVal >= 0.85) {
-    return Math.round(maxVal);
-  }
-
-  return Math.round(values.reduce((sum, value) => sum + value, 0));
+  // HC day buckets are per-source totals for the same day — never sum them.
+  return Math.round(Math.max(...values));
 }
 
 /**
@@ -137,6 +139,15 @@ export function aggregatedBucketTotal(
  * Sample rollup is per-source then deduped. Prefer samples when aggregate
  * is stale/partial or sums duplicate sources (~2× HC UI).
  */
+function aggregateLooksPartial(
+  aggregatedTotal: number,
+  fromSamples: number,
+): boolean {
+  if (fromSamples <= 0) return false;
+  // HC day aggregate still syncing — well under deduped sample rollup.
+  return aggregatedTotal < fromSamples * 0.45;
+}
+
 export function resolveDailyHealthMetricTotal(
   aggregatedTotal: number,
   samples: ReadonlyArray<DailyHealthSampleLike>,
@@ -148,8 +159,16 @@ export function resolveDailyHealthMetricTotal(
   if (fromSamples <= 0) return aggregatedTotal;
 
   const ratio = aggregatedTotal / fromSamples;
-  if (ratio > 1.15 || ratio < 1 / 1.15) {
+  if (ratio > 1.15) {
+    // Aggregate summed or duplicated sources — trust deduped sample rollup.
     return fromSamples;
+  }
+  if (ratio < 1 / 1.15) {
+    if (aggregateLooksPartial(aggregatedTotal, fromSamples)) {
+      return Math.max(fromSamples, Math.round(peak));
+    }
+    // Sample rollup over-counted overlapping writers — trust HC day aggregate.
+    return aggregatedTotal;
   }
 
   if (peak > 0 && aggregatedTotal < peak * 0.85) {
