@@ -19,7 +19,7 @@ import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import { rankCardioSessionsForImport } from "@/lib/health/cardioSessionMatch";
 import type { HealthDataType } from "@capgo/capacitor-health";
 import { sumHealthSampleValues } from "@/lib/health/healthSampleAggregation";
-import { queryHealthConnectRangeTotal } from "@/lib/health/healthConnectAggregate";
+import { queryHealthConnectLocalDayTotal } from "@/lib/health/healthConnectAggregate";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
@@ -377,16 +377,20 @@ export function healthConnectAggregatedDayValue(
 }
 
 async function readDailyHealthMetricTotal(
-  isoStart: string,
-  isoEnd: string,
+  dateKey: string,
+  isToday: boolean,
   dataType: HealthDataType,
 ): Promise<number> {
-  const rangeTotal = await queryHealthConnectRangeTotal({
+  const localDayTotal = await queryHealthConnectLocalDayTotal({
+    dateKey,
+    isToday,
     dataType,
-    startDate: isoStart,
-    endDate: isoEnd,
   });
-  if (rangeTotal != null) return rangeTotal;
+  if (localDayTotal != null) return localDayTotal;
+
+  const { start, end } = localDayHealthWindow(dateKey);
+  const isoStart = start.toISOString();
+  const isoEnd = end.toISOString();
 
   if (dataType === "totalCalories") return 0;
 
@@ -398,7 +402,14 @@ async function readDailyHealthMetricTotal(
     aggregation: "sum",
   });
 
-  return healthConnectAggregatedDayValue(buckets);
+  const fallback = healthConnectAggregatedDayValue(buckets);
+  clientTrace("health-cardio", "daily_metric_fallback_buckets", {
+    dataType,
+    dateKey,
+    fallback,
+    bucketCount: buckets.length,
+  });
+  return fallback;
 }
 
 /** Health Connect totals for one local calendar day (midnight → now if today). */
@@ -412,12 +423,13 @@ export async function fetchDailyHealthMetrics(
   const { start, end } = localDayHealthWindow(dateKey, now);
   const isoStart = start.toISOString();
   const isoEnd = end.toISOString();
+  const isToday = dateKey === formatLocalDateKey(now);
 
   const [steps, caloriesFromActive, caloriesFromTotal, heartRateSamples] =
     await Promise.all([
-      readDailyHealthMetricTotal(isoStart, isoEnd, "steps"),
-      readDailyHealthMetricTotal(isoStart, isoEnd, "calories"),
-      readDailyHealthMetricTotal(isoStart, isoEnd, "totalCalories"),
+      readDailyHealthMetricTotal(dateKey, isToday, "steps"),
+      readDailyHealthMetricTotal(dateKey, isToday, "calories"),
+      readDailyHealthMetricTotal(dateKey, isToday, "totalCalories"),
       readNativeHealthSamples({
         dataType: "heartRate",
         startDate: isoStart,
