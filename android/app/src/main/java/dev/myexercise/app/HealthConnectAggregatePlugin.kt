@@ -2,7 +2,6 @@ package dev.myexercise.app
 
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.aggregate.AggregationResult
-import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.StepsRecord
@@ -15,8 +14,6 @@ import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.Period
 import java.time.ZoneId
 import java.time.format.DateTimeParseException
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +23,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 /**
- * Health Connect daily totals using the device local calendar day — matches the HC app.
+ * Health Connect daily totals using AggregateRequest over the device local calendar day.
  */
 @CapacitorPlugin(name = "HealthConnectAggregate")
 class HealthConnectAggregatePlugin : Plugin() {
@@ -37,7 +34,7 @@ class HealthConnectAggregatePlugin : Plugin() {
     pluginScope.cancel()
   }
 
-  /** Preferred: local calendar day on device (YYYY-MM-DD), not JS ISO instants. */
+  /** Local calendar day on device (YYYY-MM-DD) — matches the HC app day total. */
   @PluginMethod
   fun queryLocalDayTotal(call: PluginCall) {
     val dateKey = call.getString("dateKey")
@@ -109,18 +106,18 @@ class HealthConnectAggregatePlugin : Plugin() {
     }
   }
 
-  private fun localDayWindow(
+  private fun localDayInstantWindow(
     dateKey: String,
     isToday: Boolean,
-  ): Pair<LocalDateTime, LocalDateTime> {
+  ): Pair<Instant, Instant> {
     val zone = ZoneId.systemDefault()
     val date = LocalDate.parse(dateKey)
-    val start = date.atStartOfDay()
+    val start = date.atStartOfDay(zone).toInstant()
     val end =
       if (isToday) {
-        LocalDateTime.now(zone)
+        Instant.now()
       } else {
-        date.plusDays(1).atStartOfDay().minusNanos(1)
+        date.plusDays(1).atStartOfDay(zone).toInstant().minusMillis(1)
       }
     return start to end
   }
@@ -131,32 +128,8 @@ class HealthConnectAggregatePlugin : Plugin() {
     dateKey: String,
     isToday: Boolean,
   ): Double {
-    val (start, end) = localDayWindow(dateKey, isToday)
-    val filter = TimeRangeFilter.between(start, end)
-    val metrics = metricsFor(dataType)
-
-    val periodResults =
-      client.aggregateGroupByPeriod(
-        AggregateGroupByPeriodRequest(
-          metrics = metrics,
-          timeRangeFilter = filter,
-          timeRangeSlicer = Period.ofDays(1),
-        ),
-      )
-    var total = 0.0
-    for (grouped in periodResults) {
-      total += extractMetric(dataType, grouped.result)
-    }
-    if (total > 0) return total
-
-    val rangeResult =
-      client.aggregate(
-        AggregateRequest(
-          metrics = metrics,
-          timeRangeFilter = filter,
-        ),
-      )
-    return extractMetric(dataType, rangeResult)
+    val (start, end) = localDayInstantWindow(dateKey, isToday)
+    return queryRangeTotal(client, dataType, start, end)
   }
 
   private suspend fun queryRangeTotal(

@@ -32,6 +32,10 @@ function isAndroidNative(): boolean {
   return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
 }
 
+export function isHealthConnectLocalDayNativeAvailable(): boolean {
+  return isAndroidNative();
+}
+
 /** Android: HC total for a local calendar day (computed on device, matches HC app). */
 export async function queryHealthConnectLocalDayTotal(options: {
   dateKey: string;
@@ -49,8 +53,8 @@ export async function queryHealthConnectLocalDayTotal(options: {
       isToday: options.isToday,
       dataType: metric,
     });
-    if (!Number.isFinite(value) || value < 0) return undefined;
-    const rounded = Math.round(value);
+    if (!Number.isFinite(value)) return undefined;
+    const rounded = Math.round(Math.max(0, value));
     clientTrace("health-connect", "local_day_total", {
       dateKey: options.dateKey,
       isToday: options.isToday,

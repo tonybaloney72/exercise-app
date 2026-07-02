@@ -19,7 +19,10 @@ import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import { rankCardioSessionsForImport } from "@/lib/health/cardioSessionMatch";
 import type { HealthDataType } from "@capgo/capacitor-health";
 import { sumHealthSampleValues } from "@/lib/health/healthSampleAggregation";
-import { queryHealthConnectLocalDayTotal } from "@/lib/health/healthConnectAggregate";
+import {
+  isHealthConnectLocalDayNativeAvailable,
+  queryHealthConnectLocalDayTotal,
+} from "@/lib/health/healthConnectAggregate";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
@@ -387,6 +390,17 @@ async function readDailyHealthMetricTotal(
     dataType,
   });
   if (localDayTotal != null) return localDayTotal;
+
+  // On Android, steps must come from the native HC aggregate — bucket API returns partial segments.
+  if (isHealthConnectLocalDayNativeAvailable() && dataType === "steps") {
+    clientTrace(
+      "health-cardio",
+      "daily_steps_native_unavailable",
+      { dateKey, isToday },
+      "warn",
+    );
+    return 0;
+  }
 
   const { start, end } = localDayHealthWindow(dateKey);
   const isoStart = start.toISOString();
