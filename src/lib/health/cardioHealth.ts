@@ -18,11 +18,13 @@ import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import { rankCardioSessionsForImport } from "@/lib/health/cardioSessionMatch";
 import type { HealthDataType } from "@capgo/capacitor-health";
-import { sumHealthSampleValues } from "@/lib/health/healthSampleAggregation";
 import {
-  isHealthConnectLocalDayNativeAvailable,
-  queryHealthConnectLocalDayTotal,
-} from "@/lib/health/healthConnectAggregate";
+  aggregateDailyHealthSampleTotal,
+  aggregatedBucketTotal,
+  perSourceDailySampleTotals,
+  resolveDailyHealthMetricTotal,
+  sumHealthSampleValues,
+} from "@/lib/health/healthSampleAggregation";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
@@ -368,62 +370,54 @@ function averageHealthSampleValues(
   return Math.round(total / values.length);
 }
 
-/** Sum Health Connect day-bucket values for the queried window (HC segments, not ME math). */
-export function healthConnectAggregatedDayValue(
-  buckets: ReadonlyArray<{ value: number }>,
-): number {
-  const values = buckets
-    .map((bucket) => bucket.value)
-    .filter((value) => Number.isFinite(value) && value > 0);
-  if (values.length === 0) return 0;
-  return Math.round(values.reduce((sum, value) => sum + value, 0));
-}
-
 async function readDailyHealthMetricTotal(
-  dateKey: string,
-  isToday: boolean,
+  isoStart: string,
+  isoEnd: string,
   dataType: HealthDataType,
 ): Promise<number> {
-  const localDayTotal = await queryHealthConnectLocalDayTotal({
-    dateKey,
-    isToday,
-    dataType,
-  });
-  if (localDayTotal != null) return localDayTotal;
-
-  // On Android, steps must come from the native HC aggregate — bucket API returns partial segments.
-  if (isHealthConnectLocalDayNativeAvailable() && dataType === "steps") {
-    clientTrace(
-      "health-cardio",
-      "daily_steps_native_unavailable",
-      { dateKey, isToday },
-      "warn",
-    );
-    return 0;
-  }
-
-  const { start, end } = localDayHealthWindow(dateKey);
-  const isoStart = start.toISOString();
-  const isoEnd = end.toISOString();
-
-  if (dataType === "totalCalories") return 0;
-
-  const buckets = await queryNativeHealthAggregated({
+  const samplesPromise = readNativeHealthSamples({
     dataType,
     startDate: isoStart,
     endDate: isoEnd,
-    bucket: "day",
-    aggregation: "sum",
+    limit: 500,
   });
 
-  const fallback = healthConnectAggregatedDayValue(buckets);
-  clientTrace("health-cardio", "daily_metric_fallback_buckets", {
+  const [buckets, samples] = await Promise.all([
+    dataType === "totalCalories"
+      ? Promise.resolve([])
+      : queryNativeHealthAggregated({
+          dataType,
+          startDate: isoStart,
+          endDate: isoEnd,
+          bucket: "day",
+          aggregation: "sum",
+        }),
+    samplesPromise,
+  ]);
+
+  const aggregate = aggregatedBucketTotal(buckets);
+  const fromSamples = aggregateDailyHealthSampleTotal(samples);
+  const resolved = resolveDailyHealthMetricTotal(aggregate, samples);
+
+  clientTrace("health-cardio", "daily_metric_resolve", {
     dataType,
-    dateKey,
-    fallback,
-    bucketCount: buckets.length,
+    startDate: isoStart,
+    endDate: isoEnd,
+    aggregate,
+    sampleCount: samples.length,
+    fromSamples,
+    resolved,
+    perSourceTotals: perSourceDailySampleTotals(samples),
+    sourceNames: [
+      ...new Set(
+        samples
+          .map((sample) => sample.sourceName?.trim())
+          .filter((name): name is string => Boolean(name)),
+      ),
+    ],
   });
-  return fallback;
+
+  return resolved;
 }
 
 /** Health Connect totals for one local calendar day (midnight → now if today). */
@@ -437,13 +431,11 @@ export async function fetchDailyHealthMetrics(
   const { start, end } = localDayHealthWindow(dateKey, now);
   const isoStart = start.toISOString();
   const isoEnd = end.toISOString();
-  const isToday = dateKey === formatLocalDateKey(now);
-
   const [steps, caloriesFromActive, caloriesFromTotal, heartRateSamples] =
     await Promise.all([
-      readDailyHealthMetricTotal(dateKey, isToday, "steps"),
-      readDailyHealthMetricTotal(dateKey, isToday, "calories"),
-      readDailyHealthMetricTotal(dateKey, isToday, "totalCalories"),
+      readDailyHealthMetricTotal(isoStart, isoEnd, "steps"),
+      readDailyHealthMetricTotal(isoStart, isoEnd, "calories"),
+      readDailyHealthMetricTotal(isoStart, isoEnd, "totalCalories"),
       readNativeHealthSamples({
         dataType: "heartRate",
         startDate: isoStart,
