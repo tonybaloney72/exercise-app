@@ -4,7 +4,7 @@
  */
 
 /** @type {Record<string, string[]>} */
-export const CATEGORY_MUSCLE_GROUPS = {
+const CATEGORY_MUSCLE_GROUPS = {
   CF: ["Abs", "Transverse Abdominis", "Hip Flexors"],
   CL: ["Hip Flexors", "Abs", "Obliques"],
   CR: ["Obliques", "Abs", "Transverse Abdominis"],
@@ -34,7 +34,7 @@ export const CATEGORY_MUSCLE_GROUPS = {
 };
 
 /** @type {Array<{ pattern: RegExp; muscles: string[]; unless?: RegExp }>} */
-export const NAME_MUSCLE_RULES = [
+const NAME_MUSCLE_RULES = [
   {
     pattern:
       /\b(diamond push|close grip push|tricep push|bench dip)\b/i,
@@ -133,7 +133,7 @@ export function categoryMuscleGroups(primary, secondary) {
  * @param {string} name
  * @param {string | null | undefined} category
  */
-export function inferMusclesFromName(name, category) {
+function inferMusclesFromName(name, category) {
   const set = new Set();
   const normalized = name.toLowerCase();
 

@@ -37,6 +37,24 @@ function groupSamplesBySource(
   return bySource;
 }
 
+function dedupeOverlappingTotals(values: number[]): number {
+  if (values.length === 0) return 0;
+  if (values.length === 1) return Math.round(values[0]!);
+
+  const maxVal = Math.max(...values);
+  const minVal = Math.min(...values);
+  const ratio = minVal / maxVal;
+
+  // Near-identical totals from duplicate syncs (e.g. Samsung Health + phone).
+  if (ratio >= 0.85) return Math.round(maxVal);
+
+  // Tiny bucket is a partial/stale rollup — keep the fuller stream.
+  if (ratio < 0.15) return Math.round(maxVal);
+
+  // Overlapping writers counting the same steps — match HC dedupe (lower total).
+  return Math.round(minVal);
+}
+
 /** Roll up one HC source's samples for a calendar day (intervals or duplicate snapshots). */
 function aggregateSingleSourceDailySampleTotal(
   samples: ReadonlyArray<DailyHealthSampleLike>,
@@ -70,21 +88,16 @@ function aggregateSingleSourceDailySampleTotal(
     return Math.round(latest);
   }
 
+  // Running daily totals mis-read as deltas — peak is the day count, not the sum.
+  if (maxVal > 0 && maxVal / sum < 0.35) {
+    return Math.round(maxVal);
+  }
+
   return Math.round(sum);
 }
 
 function dedupePerSourceDailyTotals(perSourceTotals: number[]): number {
-  if (perSourceTotals.length === 0) return 0;
-  if (perSourceTotals.length === 1) return perSourceTotals[0]!;
-
-  const maxVal = Math.max(...perSourceTotals);
-  const minVal = Math.min(...perSourceTotals);
-  // Samsung Health + phone pedometer track the same steps — match HC UI dedupe.
-  if (minVal / maxVal >= 0.85) {
-    return Math.round(maxVal);
-  }
-
-  return Math.round(maxVal);
+  return dedupeOverlappingTotals(perSourceTotals);
 }
 
 export function perSourceDailySampleTotals(
@@ -129,9 +142,7 @@ export function aggregatedBucketTotal(
   const values = buckets
     .map((bucket) => bucket.value)
     .filter((value) => Number.isFinite(value) && value > 0);
-  if (values.length === 0) return 0;
-  // HC day buckets are per-source totals for the same day — never sum them.
-  return Math.round(Math.max(...values));
+  return dedupeOverlappingTotals(values);
 }
 
 /**
@@ -172,8 +183,29 @@ export function resolveDailyHealthMetricTotal(
   }
 
   if (peak > 0 && aggregatedTotal < peak * 0.85) {
-    return Math.max(fromSamples, Math.round(peak));
+    const baseline = Math.max(aggregatedTotal, fromSamples);
+    if (peak > baseline * 1.4) {
+      return Math.round(baseline);
+    }
+    return Math.max(baseline, Math.round(peak));
   }
 
-  return aggregatedTotal;
+  let resolved = aggregatedTotal;
+
+  const candidates = [aggregatedTotal, fromSamples, peak].filter(
+    (value) => value > 0,
+  );
+  if (candidates.length >= 2) {
+    const minCandidate = Math.min(...candidates);
+    const maxCandidate = Math.max(...candidates);
+    if (
+      minCandidate > 0 &&
+      maxCandidate / minCandidate >= 1.4 &&
+      resolved > minCandidate
+    ) {
+      resolved = minCandidate;
+    }
+  }
+
+  return resolved;
 }

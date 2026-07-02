@@ -4,8 +4,6 @@ import type { CardioQuickLogResolution } from "@/lib/health/resolveCardioQuickLo
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import type { CardioActivityKind, CardioActivitySource } from "@/types";
 
-export { shouldMirrorCardioCaptureToHealth } from "@/lib/cardioHealthMirrorPolicy";
-
 export async function mirrorCardioCaptureToHealth(input: {
   kind: CardioActivityKind;
   distanceMi?: number;
