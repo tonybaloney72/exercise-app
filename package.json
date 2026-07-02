@@ -1,6 +1,6 @@
 {
   "name": "exercise-app",
-  "version": "0.21.0",
+  "version": "0.21.1",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack --hostname 0.0.0.0",
@@ -30,11 +30,12 @@
     "build:capacitor": "node scripts/capacitor-export-build.mjs",
     "cap:sync": "npx cap sync android",
     "cap:open:android": "npx cap open android",
-    "cap:run:android": "npx cap run android",
+    "cap:run:android": "node scripts/cap-android.mjs bundle --run",
     "android:remote": "node scripts/cap-android.mjs remote",
     "android:remote:run": "node scripts/cap-android.mjs remote --run",
     "android:dev": "node scripts/cap-android.mjs dev --run",
     "android:bundle:sync": "node scripts/cap-android.mjs bundle",
+    "android:bundle:run": "node scripts/cap-android.mjs bundle --run",
     "android:apk": "node scripts/android-apk-publish.mjs"
   },
   "dependencies": {

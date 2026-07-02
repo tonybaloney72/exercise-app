@@ -79,6 +79,14 @@ function restoreFile(fromRel, backupRel) {
   fs.rmSync(backup, { force: true });
 }
 
+/** Dev-only route types still reference `src/app/api` after we move it aside. */
+function clearStaleNextDevTypes() {
+  const devTypes = backupPath(".next/dev/types");
+  if (fs.existsSync(devTypes)) {
+    fs.rmSync(devTypes, { recursive: true, force: true });
+  }
+}
+
 function prepareExportTree() {
   ensureDir(backupPath(".capacitor-backup"));
   for (const { from, backup } of dirBackups) {
@@ -120,6 +128,7 @@ if (fs.existsSync(backupPath(".capacitor-backup/app-api"))) {
 try {
   prepareExportTree();
   prepared = true;
+  clearStaleNextDevTypes();
 
   const env = {
     ...process.env,

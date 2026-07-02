@@ -17,6 +17,7 @@ public class MainActivity extends BridgeActivity {
   public void onCreate(Bundle savedInstanceState) {
     registerPlugin(GpsTrackingPlugin.class);
     registerPlugin(HealthExerciseWritePlugin.class);
+    registerPlugin(HealthConnectAggregatePlugin.class);
     registerPlugin(TimerAudioFocusPlugin.class);
     super.onCreate(savedInstanceState);
     if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {

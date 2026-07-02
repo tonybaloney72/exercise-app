@@ -19,6 +19,7 @@ import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import { rankCardioSessionsForImport } from "@/lib/health/cardioSessionMatch";
 import type { HealthDataType } from "@capgo/capacitor-health";
 import { sumHealthSampleValues } from "@/lib/health/healthSampleAggregation";
+import { queryHealthConnectRangeTotal } from "@/lib/health/healthConnectAggregate";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
@@ -380,6 +381,13 @@ async function readDailyHealthMetricTotal(
   isoEnd: string,
   dataType: HealthDataType,
 ): Promise<number> {
+  const rangeTotal = await queryHealthConnectRangeTotal({
+    dataType,
+    startDate: isoStart,
+    endDate: isoEnd,
+  });
+  if (rangeTotal != null) return rangeTotal;
+
   if (dataType === "totalCalories") return 0;
 
   const buckets = await queryNativeHealthAggregated({
