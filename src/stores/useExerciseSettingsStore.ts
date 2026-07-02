@@ -46,15 +46,19 @@ export const useExerciseSettingsStore = create<ExerciseSettingsState>(
       if (mode === "loading") return;
 
       const prev = get().byExerciseId;
+      const merged: ExerciseSettingsValues = {
+        ...prev[exerciseId],
+        ...values,
+      };
       set({
         byExerciseId: {
           ...prev,
-          [exerciseId]: values,
+          [exerciseId]: merged,
         },
       });
 
       try {
-        await getExerciseSettingsRepo(mode).upsert(exerciseId, values);
+        await getExerciseSettingsRepo(mode).upsert(exerciseId, merged);
       } catch (err) {
         toastSaveError("exercise settings", err);
         try {

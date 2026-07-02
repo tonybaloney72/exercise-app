@@ -5,6 +5,7 @@ import AppearanceSettingsSection from "@/components/settings/AppearanceSettingsS
 import CardioPermissionsSection from "@/components/settings/CardioPermissionsSection";
 import SettingsSectionBlock from "@/components/settings/SettingsSectionBlock";
 import SettingsSubpageLayout from "@/components/settings/SettingsSubpageLayout";
+import RepProgressionSettingsSection from "@/components/settings/RepProgressionSettingsSection";
 import TimersDeviceSettingsSection from "@/components/settings/TimersDeviceSettingsSection";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 
@@ -32,6 +33,15 @@ export default function DeviceSettingsPage() {
             hint="Rest timers, sounds, vibration, and screen wake"
           >
             <TimersDeviceSettingsSection />
+          </SettingsSectionBlock>
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.045}>
+          <SettingsSectionBlock
+            title="Progression"
+            hint="Library default increases after strong sessions"
+          >
+            <RepProgressionSettingsSection />
           </SettingsSectionBlock>
         </AnimatedSection>
 

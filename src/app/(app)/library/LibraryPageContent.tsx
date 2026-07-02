@@ -28,6 +28,7 @@ import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStor
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
+import { buildExerciseSettingsClearRepSuggestionIgnore } from "@/lib/applyRepIncreaseSuggestion";
 import { exerciseVideoLinkLabel } from "@/lib/exerciseVideoLink";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
@@ -761,6 +762,39 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                     </p>
                   </div>
                 )}
+                {stored?.repSuggestionIgnored || stored?.repSuggestionSnoozedUntil ? (
+                  <div className="flex flex-col gap-2 border-t border-border pt-3">
+                    <p className="text-caption font-medium uppercase tracking-wide text-muted">
+                      Rep suggestions
+                    </p>
+                    {stored.repSuggestionIgnored ? (
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-xs text-muted">
+                          Ignored for increase suggestions
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void upsert(
+                              exercise.id,
+                              buildExerciseSettingsClearRepSuggestionIgnore(
+                                exercise.id,
+                                stored,
+                              ),
+                            )
+                          }
+                          className="text-xs font-medium text-accent hover:underline"
+                        >
+                          Allow
+                        </button>
+                      </div>
+                    ) : stored.repSuggestionSnoozedUntil ? (
+                      <p className="text-xs text-muted">
+                        Snoozed until {stored.repSuggestionSnoozedUntil}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
             </div>
           </motion.div>

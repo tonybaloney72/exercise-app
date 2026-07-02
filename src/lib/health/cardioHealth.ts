@@ -25,6 +25,10 @@ import {
   resolveDailyHealthMetricTotal,
   sumHealthSampleValues,
 } from "@/lib/health/healthSampleAggregation";
+import {
+  queryHealthConnectLocalDayTotal,
+  queryHealthConnectRangeTotal,
+} from "@/lib/health/healthConnectAggregate";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
@@ -375,6 +379,19 @@ async function readDailyHealthMetricTotal(
   isoEnd: string,
   dataType: HealthDataType,
 ): Promise<number> {
+  if (
+    dataType === "steps" ||
+    dataType === "calories" ||
+    dataType === "totalCalories"
+  ) {
+    const nativeTotal = await queryHealthConnectRangeTotal({
+      dataType,
+      startDate: isoStart,
+      endDate: isoEnd,
+    });
+    if (nativeTotal != null) return nativeTotal;
+  }
+
   const samplesPromise = readNativeHealthSamples({
     dataType,
     startDate: isoStart,
@@ -428,14 +445,38 @@ export async function fetchDailyHealthMetrics(
   if (!isNativePlatform()) return undefined;
   if (!(await hasCardioHealthReadAccess())) return undefined;
 
+  const isToday = dateKey === formatLocalDateKey(now);
+
+  async function readDailyMetric(dataType: HealthDataType): Promise<number> {
+    if (
+      dataType === "steps" ||
+      dataType === "calories" ||
+      dataType === "totalCalories"
+    ) {
+      const localDayTotal = await queryHealthConnectLocalDayTotal({
+        dateKey,
+        isToday,
+        dataType,
+      });
+      if (localDayTotal != null) return localDayTotal;
+    }
+
+    const { start, end } = localDayHealthWindow(dateKey, now);
+    return readDailyHealthMetricTotal(
+      start.toISOString(),
+      end.toISOString(),
+      dataType,
+    );
+  }
+
   const { start, end } = localDayHealthWindow(dateKey, now);
   const isoStart = start.toISOString();
   const isoEnd = end.toISOString();
   const [steps, caloriesFromActive, caloriesFromTotal, heartRateSamples] =
     await Promise.all([
-      readDailyHealthMetricTotal(isoStart, isoEnd, "steps"),
-      readDailyHealthMetricTotal(isoStart, isoEnd, "calories"),
-      readDailyHealthMetricTotal(isoStart, isoEnd, "totalCalories"),
+      readDailyMetric("steps"),
+      readDailyMetric("calories"),
+      readDailyMetric("totalCalories"),
       readNativeHealthSamples({
         dataType: "heartRate",
         startDate: isoStart,

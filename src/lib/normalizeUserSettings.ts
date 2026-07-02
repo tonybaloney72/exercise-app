@@ -237,6 +237,8 @@ export function normalizeUserSettings(
           ),
         }
       : {}),
+    suggestRepIncreases:
+      partial.suggestRepIncreases ?? DEFAULT_SETTINGS.suggestRepIncreases,
   };
 }
 

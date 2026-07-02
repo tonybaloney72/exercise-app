@@ -99,6 +99,12 @@ export interface ExerciseSettingsValues {
   defaultTimerSeconds?: number | null;
   /** Rep target for reps mode; omit or null when mode is timer. */
   defaultTargetReps?: number | null;
+  /** When true, rep-increase suggestions are suppressed for this exercise. */
+  repSuggestionIgnored?: boolean;
+  /** Local date key (`YYYY-MM-DD`); suggestions resume after this day. */
+  repSuggestionSnoozedUntil?: string | null;
+  /** Local date key when the user last accepted a rep-increase suggestion. */
+  repSuggestionLastAcceptedAt?: string | null;
 }
 
 export interface CategoryMeta {
@@ -374,6 +380,11 @@ export interface UserSettings {
   expertiseByGroup: ExpertiseByGroup;
   /** Dismissed What's New release note ids (signed-in users; synced via Supabase). */
   releaseNotesSeenIds: string[];
+  /**
+   * When true, offer to bump Library defaults after consistently exceeding rep/timer
+   * targets (Today post-workout only).
+   */
+  suggestRepIncreases: boolean;
 }
 
 /** Body weight for a local calendar day (stored in pounds). */

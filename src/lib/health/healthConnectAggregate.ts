@@ -32,10 +32,6 @@ function isAndroidNative(): boolean {
   return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
 }
 
-export function isHealthConnectLocalDayNativeAvailable(): boolean {
-  return isAndroidNative();
-}
-
 /** Android: HC total for a local calendar day (computed on device, matches HC app). */
 export async function queryHealthConnectLocalDayTotal(options: {
   dateKey: string;

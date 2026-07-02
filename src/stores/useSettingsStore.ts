@@ -232,6 +232,7 @@ function pickUserSettingsFields(
     weeklyCardioCustomized: state.weeklyCardioCustomized,
     expertiseByGroup: state.expertiseByGroup,
     releaseNotesSeenIds: state.releaseNotesSeenIds,
+    suggestRepIncreases: state.suggestRepIncreases,
   };
 }
 

@@ -10,6 +10,7 @@ import CategoryBadge from "@/components/common/CategoryBadge";
 import PlanMetaPill from "@/components/common/PlanMetaPill";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import PostWorkoutSummary from "@/components/workout/PostWorkoutSummary";
+import RepIncreasePrompt from "@/components/workout/RepIncreasePrompt";
 import StaleWorkoutSessionsBanner from "@/components/workout/StaleWorkoutSessionsBanner";
 import TodayWorkoutPanel, {
   type TodayWorkoutPanelMode,
@@ -418,14 +419,17 @@ function TodayPageInner() {
 
       {/* Completed today - summary card unchanged */}
       {isTodaySession && showTodaysCompletedReview && !showWorkoutDetails && (
-        <PostWorkoutSummary
-          plan={plan}
-          log={completedLogForUi!}
-          onMoreDetails={() => {
-            setShowWorkoutDetails(true);
-            scrollTodayToTop();
-          }}
-        />
+        <>
+          <RepIncreasePrompt log={completedLogForUi!} todayKey={todayKey} />
+          <PostWorkoutSummary
+            plan={plan}
+            log={completedLogForUi!}
+            onMoreDetails={() => {
+              setShowWorkoutDetails(true);
+              scrollTodayToTop();
+            }}
+          />
+        </>
       )}
 
       {isTodaySession && showTodaysCompletedReview && showWorkoutDetails && (

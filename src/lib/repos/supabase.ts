@@ -175,6 +175,7 @@ interface SettingsRow {
   expertise_by_group_customized?: boolean;
   progression_families_enabled?: boolean;
   release_notes_seen_ids?: string[] | null;
+  suggest_rep_increases?: boolean;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -432,6 +433,7 @@ function rowToSettings(row: SettingsRow): UserSettings {
           (id): id is string => typeof id === "string" && id.length > 0,
         )
       : [],
+    suggestRepIncreases: row.suggest_rep_increases ?? false,
   });
 }
 
@@ -474,6 +476,7 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     expertise_by_group: s.expertiseByGroup,
     expertise_by_group_customized: true,
     release_notes_seen_ids: s.releaseNotesSeenIds,
+    suggest_rep_increases: s.suggestRepIncreases,
   };
 }
 
@@ -571,6 +574,16 @@ interface ExerciseSettingsRow {
   default_set_mode: string;
   default_timer_seconds: number | null;
   default_target_reps: number | null;
+  rep_suggestion_ignored?: boolean | null;
+  rep_suggestion_snoozed_until?: string | null;
+  rep_suggestion_last_accepted_at?: string | null;
+}
+
+function sanitizeDateKeyOrNull(value: unknown): string | null | undefined {
+  if (value === null) return null;
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(trimmed) ? trimmed : undefined;
 }
 
 function rowToExerciseSettingsValues(
@@ -583,6 +596,11 @@ function rowToExerciseSettingsValues(
     defaultSetMode: row.default_set_mode as ExerciseSetMode,
     defaultTimerSeconds: row.default_timer_seconds ?? undefined,
     defaultTargetReps: row.default_target_reps ?? undefined,
+    repSuggestionIgnored: row.rep_suggestion_ignored ?? undefined,
+    repSuggestionSnoozedUntil:
+      sanitizeDateKeyOrNull(row.rep_suggestion_snoozed_until) ?? undefined,
+    repSuggestionLastAcceptedAt:
+      sanitizeDateKeyOrNull(row.rep_suggestion_last_accepted_at) ?? undefined,
   };
 }
 
@@ -597,7 +615,7 @@ export const supabaseExerciseSettingsRepo: ExerciseSettingsRepo = {
     const { data, error } = await supabase
       .from("exercise_settings")
       .select(
-        "exercise_id, default_set_mode, default_timer_seconds, default_target_reps",
+        "exercise_id, default_set_mode, default_timer_seconds, default_target_reps, rep_suggestion_ignored, rep_suggestion_snoozed_until, rep_suggestion_last_accepted_at",
       )
       .eq("user_id", user.id);
 
@@ -647,6 +665,10 @@ export const supabaseExerciseSettingsRepo: ExerciseSettingsRepo = {
         default_set_mode: values.defaultSetMode,
         default_timer_seconds,
         default_target_reps,
+        rep_suggestion_ignored: values.repSuggestionIgnored ?? false,
+        rep_suggestion_snoozed_until: values.repSuggestionSnoozedUntil ?? null,
+        rep_suggestion_last_accepted_at:
+          values.repSuggestionLastAcceptedAt ?? null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id,exercise_id" },

@@ -106,6 +106,22 @@ function sanitizeExerciseSettingsMap(raw: unknown): ExerciseSettingsMap {
         typeof ts === "number" && ts > 0 ? ts : ts === null ? null : undefined,
       defaultTargetReps:
         typeof tr === "number" && tr > 0 ? tr : tr === null ? null : undefined,
+      repSuggestionIgnored:
+        typeof o.repSuggestionIgnored === "boolean"
+          ? o.repSuggestionIgnored
+          : undefined,
+      repSuggestionSnoozedUntil:
+        typeof o.repSuggestionSnoozedUntil === "string"
+          ? o.repSuggestionSnoozedUntil
+          : o.repSuggestionSnoozedUntil === null
+            ? null
+            : undefined,
+      repSuggestionLastAcceptedAt:
+        typeof o.repSuggestionLastAcceptedAt === "string"
+          ? o.repSuggestionLastAcceptedAt
+          : o.repSuggestionLastAcceptedAt === null
+            ? null
+            : undefined,
     };
   }
   return out;

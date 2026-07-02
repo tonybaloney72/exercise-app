@@ -161,5 +161,6 @@ export const DEFAULT_SETTINGS: UserSettings = {
   weeklyCardioCustomized: false,
   expertiseByGroup: { ...DEFAULT_EXPERTISE_BY_GROUP },
   releaseNotesSeenIds: [],
+  suggestRepIncreases: false,
 };
 
