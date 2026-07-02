@@ -364,15 +364,15 @@ function averageHealthSampleValues(
   return Math.round(total / values.length);
 }
 
-/** Health Connect's deduped day aggregate — no ME sample rollup. */
-function healthConnectAggregatedDayValue(
+/** Sum Health Connect day-bucket values for the queried window (HC segments, not ME math). */
+export function healthConnectAggregatedDayValue(
   buckets: ReadonlyArray<{ value: number }>,
 ): number {
   const values = buckets
     .map((bucket) => bucket.value)
     .filter((value) => Number.isFinite(value) && value > 0);
   if (values.length === 0) return 0;
-  return Math.round(values[0]!);
+  return Math.round(values.reduce((sum, value) => sum + value, 0));
 }
 
 async function readDailyHealthMetricTotal(
