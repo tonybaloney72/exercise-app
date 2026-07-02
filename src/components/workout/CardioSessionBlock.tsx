@@ -128,6 +128,8 @@ export default function CardioSessionBlock({
         activityStartTime: capture.activityStartTime,
         activityEndTime: capture.activityEndTime,
         weightLb,
+        healthSource: result.health?.source,
+        resolution: result.resolution,
       }).catch(() => {
         // Optional mirror to Health Connect.
       });

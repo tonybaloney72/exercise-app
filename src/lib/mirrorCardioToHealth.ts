@@ -1,6 +1,10 @@
 import { writeAppTrackedCardioToHealth } from "@/lib/health";
+import { shouldMirrorCardioCaptureToHealth } from "@/lib/cardioHealthMirrorPolicy";
+import type { CardioQuickLogResolution } from "@/lib/health/resolveCardioQuickLog";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
-import type { CardioActivityKind } from "@/types";
+import type { CardioActivityKind, CardioActivitySource } from "@/types";
+
+export { shouldMirrorCardioCaptureToHealth } from "@/lib/cardioHealthMirrorPolicy";
 
 export async function mirrorCardioCaptureToHealth(input: {
   kind: CardioActivityKind;
@@ -10,8 +14,11 @@ export async function mirrorCardioCaptureToHealth(input: {
   activityStartTime?: string;
   activityEndTime?: string;
   weightLb?: number;
+  healthSource?: CardioActivitySource;
+  resolution?: CardioQuickLogResolution | null;
 }): Promise<void> {
   if (!isNativePlatform()) return;
+  if (!shouldMirrorCardioCaptureToHealth(input)) return;
 
   const hasDistance =
     input.distanceMi != null && input.distanceMi > 0 && !Number.isNaN(input.distanceMi);

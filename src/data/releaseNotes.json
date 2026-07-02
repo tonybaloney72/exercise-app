@@ -1,5 +1,15 @@
 [
   {
+    "id": "2026-07-02-hc-import-mirror-fix",
+    "date": "2026-07-02",
+    "title": "Health Connect import fix",
+    "highlights": [
+      "Importing a walk or cardio session from Health Connect no longer writes a duplicate session back to Health Connect.",
+      "That duplicate could inflate daily step totals when your watch and phone both report activity—ME now only mirrors sessions it tracked itself (GPS or timer).",
+      "If you already imported walks before this fix, you may need to remove duplicate My Exercise sessions in Health Connect for today's step count to match."
+    ]
+  },
+  {
     "id": "2026-07-01-daily-health-charts",
     "date": "2026-07-01",
     "title": "Daily health on Progress",
@@ -17,16 +27,6 @@
       "Settings → Your Week now has Stretches per day—pick how many warm-up and cool-down stretches each training day gets (replaces Default stretches).",
       "Stretches are chosen from pools that match that day's focus (upper, lower, core, cardio) instead of the same global list on every day.",
       "Generated weeks save stretch lists on each day, so leg day won't pick arm/chest stretches just because they were in your defaults."
-    ]
-  },
-  {
-    "id": "2026-06-29-cardio-endurance",
-    "date": "2026-06-29",
-    "title": "Cardio & endurance logging",
-    "highlights": [
-      "Finishing a workout without logging cardio no longer leaves empty jog rows in your session summary.",
-      "In-workout cardio uses the same GPS timer, Health Connect import, and distance/time fields as quick log on Today.",
-      "Cardio rows match other workout sections—the actions menu is on the left and the checkbox on the right."
     ]
   }
 ]

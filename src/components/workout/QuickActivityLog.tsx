@@ -145,6 +145,8 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
           activityStartTime: activityWindow?.startDate.toISOString(),
           activityEndTime: activityWindow?.endDate.toISOString(),
           weightLb,
+          healthSource: healthMeta?.source,
+          resolution,
         }).catch(() => {
           // Optional mirror to Health Connect; logging in-app already succeeded.
         });
