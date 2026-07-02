@@ -65,6 +65,18 @@ describe("aggregateDailyHealthSampleTotal", () => {
       ]),
     ).toBe(2500);
   });
+
+  it("does not add jog intervals on top of end-of-day cumulative total", () => {
+    expect(
+      aggregateDailyHealthSampleTotal([
+        { value: 400, endDate: "2026-07-02T08:00:00.000Z", sourceName: "Nothing X" },
+        { value: 600, endDate: "2026-07-02T09:00:00.000Z", sourceName: "Nothing X" },
+        { value: 700, endDate: "2026-07-02T09:30:00.000Z", sourceName: "Nothing X" },
+        { value: 1111, endDate: "2026-07-02T10:00:00.000Z", sourceName: "Nothing X" },
+        { value: 3378, endDate: "2026-07-02T17:00:00.000Z", sourceName: "Nothing X" },
+      ]),
+    ).toBe(3378);
+  });
 });
 
 describe("resolveDailyHealthMetricTotal", () => {
@@ -184,5 +196,27 @@ describe("aggregatedBucketTotal", () => {
     expect(
       aggregatedBucketTotal([{ value: 1498 }, { value: 1500 }]),
     ).toBe(1500);
+  });
+
+  it("does not sum daily cumulative bucket with jog-sized bucket", () => {
+    expect(aggregatedBucketTotal([{ value: 3378 }, { value: 2411 }])).toBe(3378);
+  });
+
+  it("still sums partial HC day segments", () => {
+    expect(aggregatedBucketTotal([{ value: 1156 }, { value: 1639 }])).toBe(2795);
+  });
+});
+
+describe("resolveDailyHealthMetricTotal jog double-count", () => {
+  it("clamps when aggregate and samples both sum cumulative plus jog", () => {
+    expect(
+      resolveDailyHealthMetricTotal(
+        5789,
+        [
+          { value: 3378, endDate: "2026-07-02T17:00:00.000Z", sourceName: "Nothing X" },
+          { value: 2411, endDate: "2026-07-02T10:00:00.000Z", sourceName: "Nothing X" },
+        ],
+      ),
+    ).toBe(3378);
   });
 });

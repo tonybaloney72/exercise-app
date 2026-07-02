@@ -70,6 +70,18 @@ function aggregateSingleSourceDailySampleTotal(
     return Math.round(latest);
   }
 
+  // End-of-day cumulative total already includes earlier jog/activity intervals.
+  if (sortedByEnd.length >= 2) {
+    const secondLatest = sortedByEnd[sortedByEnd.length - 2]?.value ?? 0;
+    if (
+      latest === maxVal &&
+      latest > secondLatest * 2 &&
+      sum > latest * 1.15
+    ) {
+      return Math.round(latest);
+    }
+  }
+
   return Math.round(sum);
 }
 
@@ -129,6 +141,15 @@ export function aggregatedBucketTotal(
     return Math.round(maxVal);
   }
 
+  // Daily cumulative bucket + jog-sized bucket (e.g. 3378 + 2411) — do not sum.
+  if (
+    values.length === 2 &&
+    maxVal >= 2000 &&
+    minVal / maxVal >= 0.65
+  ) {
+    return Math.round(maxVal);
+  }
+
   return Math.round(values.reduce((sum, value) => sum + value, 0));
 }
 
@@ -148,13 +169,19 @@ export function resolveDailyHealthMetricTotal(
   if (fromSamples <= 0) return aggregatedTotal;
 
   const ratio = aggregatedTotal / fromSamples;
+  let resolved: number;
   if (ratio > 1.15 || ratio < 1 / 1.15) {
-    return fromSamples;
+    resolved = fromSamples;
+  } else if (peak > 0 && aggregatedTotal < peak * 0.85) {
+    resolved = Math.max(fromSamples, Math.round(peak));
+  } else {
+    resolved = aggregatedTotal;
   }
 
-  if (peak > 0 && aggregatedTotal < peak * 0.85) {
-    return Math.max(fromSamples, Math.round(peak));
+  // Rollup summed a daily cumulative total plus jog intervals already inside it.
+  if (peak > 0 && resolved > peak * 1.15 && peak >= resolved / 2.5) {
+    return Math.round(peak);
   }
 
-  return aggregatedTotal;
+  return resolved;
 }
