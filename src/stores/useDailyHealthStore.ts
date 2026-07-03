@@ -3,6 +3,7 @@ import {
   checkCardioHealthReadAccess,
   fetchDailyHealthMetrics,
   fetchDailyHealthMetricsForKeys,
+  fetchVo2MaxHistory,
   lastNLocalDateKeys,
 } from "@/lib/health/cardioHealth";
 import {
@@ -34,9 +35,17 @@ const emptyProgress = (): DailyHealthProgressView => ({
   todaySteps: null,
   todayActiveKcal: null,
   todayAvgHeartRateBpm: null,
+  todayRestingHeartRateBpm: null,
+  todayOxygenSaturationPct: null,
+  todaySleepTotalMin: null,
+  todayVo2MaxMlKgMin: null,
   stepsChartSeries: [],
   activeKcalChartSeries: [],
   avgHeartRateChartSeries: [],
+  restingHeartRateChartSeries: [],
+  oxygenSaturationChartSeries: [],
+  sleepTotalChartSeries: [],
+  vo2MaxChartSeries: [],
 });
 
 export const useDailyHealthStore = create<DailyHealthState>((set) => ({
@@ -66,6 +75,17 @@ export const useDailyHealthStore = create<DailyHealthState>((set) => ({
             dayKeys,
             now,
           );
+          const vo2History = await fetchVo2MaxHistory(now);
+          for (const row of vo2History) {
+            const existing = metricsByDate[row.dateKey] ?? {
+              steps: 0,
+              activeKcal: 0,
+            };
+            metricsByDate[row.dateKey] = {
+              ...existing,
+              vo2MaxMlKgMin: row.value,
+            };
+          }
           const liveToday = await fetchDailyHealthMetrics(todayKey, now);
 
           try {

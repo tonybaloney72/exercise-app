@@ -2,8 +2,11 @@ import { Capacitor, registerPlugin } from "@capacitor/core";
 import type {
   AuthorizationStatus,
   AvailabilityResult,
+  ExerciseRouteFetchResult,
   HealthConnectRangeMetric,
   HealthDataType,
+  SleepDayTotals,
+  Vo2MaxReading,
   Workout,
 } from "@/lib/health/healthConnectTypes";
 
@@ -35,6 +38,18 @@ type HealthConnectNativePlugin = {
     isToday: boolean;
     dataType: HealthConnectRangeMetric;
   }): Promise<{ value: number; dateKey: string; isToday: boolean }>;
+  querySleepDayTotals(options: {
+    dateKey: string;
+    isToday: boolean;
+  }): Promise<SleepDayTotals>;
+  queryLatestVo2Max(): Promise<{ value?: number; time?: string }>;
+  queryVo2MaxHistory(options: {
+    startDate: string;
+    endDate: string;
+  }): Promise<{ readings: Vo2MaxReading[] }>;
+  requestExerciseRoute(options: {
+    platformId: string;
+  }): Promise<ExerciseRouteFetchResult>;
   writeHealthSample(options: {
     dataType: "distance" | "calories" | "weight";
     value: number;

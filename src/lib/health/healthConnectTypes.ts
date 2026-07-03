@@ -6,6 +6,9 @@ export type HealthDataType =
   | "totalCalories"
   | "heartRate"
   | "restingHeartRate"
+  | "oxygenSaturation"
+  | "sleep"
+  | "vo2Max"
   | "weight"
   | "workouts";
 
@@ -22,6 +25,10 @@ export interface AuthorizationStatus {
   readDenied: HealthDataType[];
   writeAuthorized: HealthDataType[];
   writeDenied: HealthDataType[];
+  historyReadGranted?: boolean;
+  backgroundReadGranted?: boolean;
+  /** Granted in HC Settings or via per-session route consent — not bulk-requestable. */
+  exerciseRoutesReadGranted?: boolean;
 }
 
 export interface AvailabilityResult {
@@ -47,4 +54,37 @@ export type HealthConnectRangeMetric =
   | "calories"
   | "totalCalories"
   | "distance"
-  | "heartRate";
+  | "heartRate"
+  | "restingHeartRate"
+  | "oxygenSaturation";
+
+export type ExerciseRoutePoint = {
+  lat: number;
+  lng: number;
+  timestamp: number;
+};
+
+export type ExerciseRouteFetchStatus =
+  | "data"
+  | "consentRequired"
+  | "noData"
+  | "denied";
+
+export type ExerciseRouteFetchResult = {
+  status: ExerciseRouteFetchStatus;
+  points: ExerciseRoutePoint[];
+};
+
+export type SleepDayTotals = {
+  sleepTotalMin: number;
+  sleepDeepMin: number;
+  sleepRemMin: number;
+  sleepLightMin: number;
+  sleepAwakeMin: number;
+  dateKey: string;
+};
+
+export type Vo2MaxReading = {
+  value: number;
+  time: string;
+};

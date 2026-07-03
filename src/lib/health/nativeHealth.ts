@@ -1,7 +1,10 @@
 import type {
   AuthorizationOptions,
   AuthorizationStatus,
+  ExerciseRouteFetchResult,
   HealthDataType,
+  SleepDayTotals,
+  Vo2MaxReading,
   Workout,
 } from "@/lib/health/healthConnectTypes";
 import {
@@ -27,6 +30,10 @@ export const CARDIO_HEALTH_READ_TYPES: HealthDataType[] = [
   "calories",
   "totalCalories",
   "heartRate",
+  "restingHeartRate",
+  "oxygenSaturation",
+  "sleep",
+  "vo2Max",
 ];
 
 export const CARDIO_HEALTH_WRITE_TYPES: HealthDataType[] = [
@@ -210,6 +217,81 @@ export async function queryNativeWorkouts(options: {
       },
     );
     return workouts;
+  } catch {
+    return [];
+  }
+}
+
+export async function requestNativeExerciseRoute(
+  platformId: string,
+): Promise<ExerciseRouteFetchResult> {
+  if (!isAndroidNative() || !platformId.trim()) {
+    return { status: "noData", points: [] };
+  }
+  try {
+    return await runTimedNativeCall(
+      "requestExerciseRoute",
+      () => HealthConnectNative.requestExerciseRoute({ platformId }),
+      NATIVE_HEALTH_INTERACTIVE_TIMEOUT_MS,
+      { platformId },
+    );
+  } catch (err) {
+    clientTrace(
+      "health-native",
+      "requestExerciseRoute_failed",
+      { message: err instanceof Error ? err.message : String(err) },
+      "warn",
+    );
+    return { status: "noData", points: [] };
+  }
+}
+
+export async function queryNativeSleepDayTotals(options: {
+  dateKey: string;
+  isToday: boolean;
+}): Promise<SleepDayTotals | undefined> {
+  if (!isAndroidNative()) return undefined;
+  try {
+    return await runTimedNativeCall(
+      "querySleepDayTotals",
+      () => HealthConnectNative.querySleepDayTotals(options),
+      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
+      options,
+    );
+  } catch {
+    return undefined;
+  }
+}
+
+export async function queryNativeLatestVo2Max(): Promise<
+  Vo2MaxReading | undefined
+> {
+  if (!isAndroidNative()) return undefined;
+  try {
+    const result = await runTimedNativeCall(
+      "queryLatestVo2Max",
+      () => HealthConnectNative.queryLatestVo2Max(),
+      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
+    );
+    if (result.value == null || !Number.isFinite(result.value)) return undefined;
+    return { value: result.value, time: result.time ?? new Date().toISOString() };
+  } catch {
+    return undefined;
+  }
+}
+
+export async function queryNativeVo2MaxHistory(options: {
+  startDate: string;
+  endDate: string;
+}): Promise<Vo2MaxReading[]> {
+  if (!isAndroidNative()) return [];
+  try {
+    const { readings } = await runTimedNativeCall(
+      "queryVo2MaxHistory",
+      () => HealthConnectNative.queryVo2MaxHistory(options),
+      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
+    );
+    return readings ?? [];
   } catch {
     return [];
   }

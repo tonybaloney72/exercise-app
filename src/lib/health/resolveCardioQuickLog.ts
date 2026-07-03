@@ -8,6 +8,7 @@ import {
   queryWorkoutsOverlappingWindow,
   mapWorkoutToImportedSession,
   checkCardioHealthReadAccess,
+  enrichImportedSessionWithRoute,
   type CardioHealthMeta,
   type ImportedCardioSession,
 } from "@/lib/health/cardioHealth";
@@ -98,6 +99,19 @@ function enrichWithGpsTrack(
   };
 }
 
+function enrichWithHcOrMeGpsTrack(
+  result: ResolvedCardioQuickLog,
+  gpsSnapshot?: GpsTrackSnapshot | null,
+  hcRoute?: readonly GpsTrackPoint[],
+): ResolvedCardioQuickLog {
+  const meEnriched = enrichWithGpsTrack(result, gpsSnapshot);
+  if (meEnriched.gpsTrack && meEnriched.gpsTrack.length >= 2) {
+    return meEnriched;
+  }
+  if (!hcRoute || hcRoute.length < 2) return meEnriched;
+  return { ...meEnriched, gpsTrack: hcRoute };
+}
+
 async function resolveFromSession(
   kind: CardioActivityKind,
   startDate: Date,
@@ -106,18 +120,19 @@ async function resolveFromSession(
   gpsSnapshot?: GpsTrackSnapshot | null,
   activeDurationSeconds?: number,
 ): Promise<ResolvedCardioQuickLog> {
+  const withRoute = await enrichImportedSessionWithRoute(session);
   const windowMetrics = await fetchCardioHealthMetricsForWindow(
-    session.startDate,
-    session.endDate,
+    withRoute.startDate,
+    withRoute.endDate,
     {
-      activeCaloriesKcal: session.activeCaloriesKcal,
-      healthSourceName: session.sourceName,
+      activeCaloriesKcal: withRoute.activeCaloriesKcal,
+      healthSourceName: withRoute.sourceName,
     },
   );
 
   const gpsMi = gpsDistanceMi(gpsSnapshot);
 
-  return enrichWithGpsTrack(
+  return enrichWithHcOrMeGpsTrack(
     {
       startDate,
       endDate,
@@ -128,21 +143,22 @@ async function resolveFromSession(
         activeDurationSeconds,
       ),
       distanceMi: pickDistanceMi({
-        sessionDistanceMi: session.distanceMi,
+        sessionDistanceMi: withRoute.distanceMi,
         sampleDistanceMi: windowMetrics.distanceMi,
         gpsMi,
       }),
       health: {
         stepCount: windowMetrics.stepCount,
         activeCaloriesKcal:
-          windowMetrics.activeCaloriesKcal ?? session.activeCaloriesKcal,
+          windowMetrics.activeCaloriesKcal ?? withRoute.activeCaloriesKcal,
         avgHeartRateBpm: windowMetrics.avgHeartRateBpm,
         source: "health_connect",
-        healthSourceName: session.sourceName ?? windowMetrics.healthSourceName,
+        healthSourceName: withRoute.sourceName ?? windowMetrics.healthSourceName,
       },
       resolution: "health_connect_session",
     },
     gpsSnapshot,
+    withRoute.gpsTrack,
   );
 }
 

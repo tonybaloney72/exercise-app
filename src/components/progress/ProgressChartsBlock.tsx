@@ -17,6 +17,10 @@ export default function ProgressChartsBlock({
   stepsChartSeries,
   activeKcalChartSeries,
   avgHeartRateChartSeries,
+  restingHeartRateChartSeries,
+  oxygenSaturationChartSeries,
+  sleepTotalChartSeries,
+  vo2MaxChartSeries,
   dailyHealthLoading,
   dailyHealthUnavailableReason,
 }: {
@@ -24,6 +28,10 @@ export default function ProgressChartsBlock({
   stepsChartSeries: DailyStepsChartPoint[];
   activeKcalChartSeries: DailyHealthMetricChartPoint[];
   avgHeartRateChartSeries: DailyHealthMetricChartPoint[];
+  restingHeartRateChartSeries: DailyHealthMetricChartPoint[];
+  oxygenSaturationChartSeries: DailyHealthMetricChartPoint[];
+  sleepTotalChartSeries: DailyHealthMetricChartPoint[];
+  vo2MaxChartSeries: DailyHealthMetricChartPoint[];
   dailyHealthLoading?: boolean;
   dailyHealthUnavailableReason?: DailyHealthUnavailableReason | null;
 }) {
@@ -55,6 +63,53 @@ export default function ProgressChartsBlock({
         yLabel="bpm"
         emptyDetail="No heart rate data for the last two weeks yet."
         formatValue={(v) => `${Math.round(v)} bpm`}
+        loading={loading}
+        unavailableReason={dailyHealthUnavailableReason}
+        chartType="line"
+        allowDecimals
+      />
+      <DailyHealthMetricProgressChart
+        title="Resting heart rate"
+        subtitle="Daily resting heart rate from Health Connect."
+        series={restingHeartRateChartSeries}
+        yLabel="bpm"
+        emptyDetail="No resting heart rate data for the last two weeks yet."
+        formatValue={(v) => `${Math.round(v)} bpm`}
+        loading={loading}
+        unavailableReason={dailyHealthUnavailableReason}
+        chartType="line"
+        allowDecimals
+      />
+      <DailyHealthMetricProgressChart
+        title="Blood oxygen (SpO₂)"
+        subtitle="Daily average oxygen saturation from Health Connect."
+        series={oxygenSaturationChartSeries}
+        yLabel="%"
+        emptyDetail="No SpO₂ data for the last two weeks yet."
+        formatValue={(v) => `${v.toFixed(1)}%`}
+        loading={loading}
+        unavailableReason={dailyHealthUnavailableReason}
+        chartType="line"
+        allowDecimals
+      />
+      <DailyHealthMetricProgressChart
+        title="Sleep"
+        subtitle="Total sleep per night (wake date) from Health Connect."
+        series={sleepTotalChartSeries}
+        yLabel="min"
+        emptyDetail="No sleep data for the last two weeks yet."
+        formatValue={(v) => `${Math.round(v)} min`}
+        loading={loading}
+        unavailableReason={dailyHealthUnavailableReason}
+        chartType="bar"
+      />
+      <DailyHealthMetricProgressChart
+        title="VO₂ max"
+        subtitle="Latest reading per day when your watch or phone reports VO₂ max."
+        series={vo2MaxChartSeries}
+        yLabel="ml/kg/min"
+        emptyDetail="No VO₂ max readings in the last three months yet."
+        formatValue={(v) => `${v.toFixed(1)}`}
         loading={loading}
         unavailableReason={dailyHealthUnavailableReason}
         chartType="line"

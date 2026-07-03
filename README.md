@@ -53,7 +53,7 @@ Capacitor 8 remote WebView shell (production site or bundled static export — s
 | Capacitor plugin                                    | Purpose                                          |
 | --------------------------------------------------- | ------------------------------------------------ |
 | `@capacitor/geolocation`                            | GPS fallback when foreground service unavailable |
-| `@capgo/capacitor-health`                           | Health Connect read (workouts, samples)          |
+| `HealthConnect` (custom)                            | Health Connect read — aggregates, exercise sessions |
 | `@capacitor/haptics`                                | Exercise complete feedback                       |
 | `@capacitor/app`, `@capacitor/browser`              | Deep links, native Google OAuth                  |
 | `@capacitor/splash-screen`, `@capacitor/status-bar` | Launch & system chrome                           |
@@ -64,6 +64,7 @@ Capacitor 8 remote WebView shell (production site or bundled static export — s
 | --------------------------- | ------------------------------------------------------------------------- |
 | `GpsTrackingService`        | Foreground service + Google Play Services fused location (screen-off GPS) |
 | `GpsTrackingPlugin`         | Capacitor bridge for GPS start/stop/location events                       |
+| `HealthConnectPlugin`       | Health Connect auth, aggregates, exercise sessions, sample writes         |
 | `HealthExerciseWritePlugin` | Write exercise sessions to Health Connect                                 |
 
 **App TypeScript:** `src/lib/health/` (Health Connect, cardio resolver, daily metrics), `src/lib/geo/` (GPS session, haversine distance).
@@ -155,7 +156,7 @@ src/
     repos/       # Supabase + localStorage data access
   stores/        # Zustand
 android/         # Capacitor Android project + native GPS/HC plugins
-docs/            # Deployment, Android, catalog, Supabase, cardio
+docs/            # Deployment, Android, catalog, Supabase
 supabase/        # SQL migrations + Edge Functions
 public/          # PWA assets, downloads/myexercise.apk
 ```
@@ -166,7 +167,7 @@ public/          # PWA assets, downloads/myexercise.apk
 | ----------------------------------------------------- | ------------------------------------------- |
 | [deployment.md](docs/deployment.md)                   | Vercel env, version checks, feedback digest |
 | [capacitor-android.md](docs/capacitor-android.md)     | APK build, OAuth deep link, emulator dev    |
-| [cardio-tracking.md](docs/cardio-tracking.md)         | Health Connect + GPS engineering notes      |
+| [ROADMAP.md](ROADMAP.md)                              | Product backlog & shipped history             |
 | [supabase-migrations.md](docs/supabase-migrations.md) | Database schema                             |
 | [guest-vs-account.md](docs/guest-vs-account.md)       | Guest cookie vs signed-in sync              |
 | [catalog-maintenance.md](docs/catalog-maintenance.md) | Exercise catalog tooling                    |

@@ -6,9 +6,12 @@ import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.OxygenSaturationRecord
 import androidx.health.connect.client.records.RestingHeartRateRecord
+import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.records.Vo2MaxRecord
 import androidx.health.connect.client.records.WeightRecord
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
@@ -23,6 +26,9 @@ object HealthConnectScopes {
       "totalCalories" to HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
       "heartRate" to HealthPermission.getReadPermission(HeartRateRecord::class),
       "restingHeartRate" to HealthPermission.getReadPermission(RestingHeartRateRecord::class),
+      "oxygenSaturation" to HealthPermission.getReadPermission(OxygenSaturationRecord::class),
+      "sleep" to HealthPermission.getReadPermission(SleepSessionRecord::class),
+      "vo2Max" to HealthPermission.getReadPermission(Vo2MaxRecord::class),
       "workouts" to HealthPermission.getReadPermission(ExerciseSessionRecord::class),
     )
 
@@ -38,6 +44,7 @@ object HealthConnectScopes {
     val permissions = readScopes.mapNotNull { readScopeToPermission[it] }.toMutableSet()
     if (permissions.isNotEmpty()) {
       permissions.add(HealthPermission.PERMISSION_READ_HEALTH_DATA_HISTORY)
+      permissions.add(HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND)
     }
     return permissions
   }
@@ -74,6 +81,18 @@ object HealthConnectScopes {
       put("readDenied", readDenied)
       put("writeAuthorized", writeAuthorized)
       put("writeDenied", writeDenied)
+      put(
+        "historyReadGranted",
+        granted.contains(HealthPermission.PERMISSION_READ_HEALTH_DATA_HISTORY),
+      )
+      put(
+        "backgroundReadGranted",
+        granted.contains(HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND),
+      )
+      put(
+        "exerciseRoutesReadGranted",
+        granted.contains("android.permission.health.READ_EXERCISE_ROUTES"),
+      )
     }
   }
 }

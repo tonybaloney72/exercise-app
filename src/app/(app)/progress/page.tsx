@@ -164,6 +164,42 @@ export default function ProgressPage() {
         ),
         icon: "❤️",
       },
+      {
+        label: "Resting HR today",
+        value: formatDailyHealthStatValue(
+          dailyHealth.loading,
+          dailyHealth.todayRestingHeartRateBpm,
+          (v) => `${Math.round(v)} bpm`,
+        ),
+        icon: "💓",
+      },
+      {
+        label: "SpO₂ today",
+        value: formatDailyHealthStatValue(
+          dailyHealth.loading,
+          dailyHealth.todayOxygenSaturationPct,
+          (v) => `${v.toFixed(1)}%`,
+        ),
+        icon: "🫁",
+      },
+      {
+        label: "Sleep last night",
+        value: formatDailyHealthStatValue(
+          dailyHealth.loading,
+          dailyHealth.todaySleepTotalMin,
+          (v) => `${Math.round(v / 60)}h ${Math.round(v % 60)}m`,
+        ),
+        icon: "😴",
+      },
+      {
+        label: "VO₂ max",
+        value: formatDailyHealthStatValue(
+          dailyHealth.loading,
+          dailyHealth.todayVo2MaxMlKgMin,
+          (v) => `${v.toFixed(1)}`,
+        ),
+        icon: "🎯",
+      },
     ];
 
     return { base, cardioStats, healthStats };
@@ -173,6 +209,10 @@ export default function ProgressPage() {
     dailyHealth.todaySteps,
     dailyHealth.todayActiveKcal,
     dailyHealth.todayAvgHeartRateBpm,
+    dailyHealth.todayRestingHeartRateBpm,
+    dailyHealth.todayOxygenSaturationPct,
+    dailyHealth.todaySleepTotalMin,
+    dailyHealth.todayVo2MaxMlKgMin,
   ]);
 
   const gridCards = useMemo((): ProgressGridItem[] => {
@@ -232,6 +272,10 @@ export default function ProgressPage() {
         stepsChartSeries={dailyHealth.stepsChartSeries}
         activeKcalChartSeries={dailyHealth.activeKcalChartSeries}
         avgHeartRateChartSeries={dailyHealth.avgHeartRateChartSeries}
+        restingHeartRateChartSeries={dailyHealth.restingHeartRateChartSeries}
+        oxygenSaturationChartSeries={dailyHealth.oxygenSaturationChartSeries}
+        sleepTotalChartSeries={dailyHealth.sleepTotalChartSeries}
+        vo2MaxChartSeries={dailyHealth.vo2MaxChartSeries}
         dailyHealthLoading={dailyHealth.loading && dailyHealth.available}
         dailyHealthUnavailableReason={dailyHealth.unavailableReason}
       />

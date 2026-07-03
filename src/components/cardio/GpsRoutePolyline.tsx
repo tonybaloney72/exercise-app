@@ -33,7 +33,7 @@ export default function GpsRoutePolyline({
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label={ariaLabel}
-        className="block h-auto w-full min-h-[7rem] max-h-[12.5rem] text-accent"
+        className="block h-auto w-full min-h-28 max-h-50 text-accent"
       >
         <path
           d={model.pathD}

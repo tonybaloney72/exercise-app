@@ -131,6 +131,7 @@ export default function CardioActivityLogFields({
                         endDate: session.endDate,
                         durationSeconds: session.durationSeconds,
                         distanceMi: session.distanceMi,
+                        gpsTrack: session.gpsTrack,
                         health: {
                           stepCount: session.stepCount,
                           activeCaloriesKcal: session.activeCaloriesKcal,

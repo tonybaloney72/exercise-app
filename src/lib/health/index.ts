@@ -1,6 +1,7 @@
 export { openNativeHealthSettings } from "@/lib/health/nativeHealth";
 export {
   ensureCardioHealthReadAccess,
+  enrichImportedSessionWithRoute,
   fetchCardioHealthMetricsForWindow,
   importRecentCardioSessions,
   type CardioHealthMeta,

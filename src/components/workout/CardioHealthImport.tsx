@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   ensureCardioHealthReadAccess,
+  enrichImportedSessionWithRoute,
   fetchCardioHealthMetricsForWindow,
   importRecentCardioSessions,
   openNativeHealthSettings,
@@ -70,6 +71,7 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
     clientTrace("health-import", "pick_session", {
       durationSeconds: session.durationSeconds,
       distanceMi: session.distanceMi,
+      platformId: session.platformId,
     });
     let enriched = session;
     try {
@@ -91,8 +93,17 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
     } catch {
       // Steps/HR are optional; still import distance/time/calories.
     }
+    try {
+      enriched = await enrichImportedSessionWithRoute(enriched);
+    } catch {
+      // Route is optional; summary fields still import.
+    }
     onImport(enriched);
-    toast.success("Imported from Health Connect");
+    toast.success(
+      enriched.gpsTrack && enriched.gpsTrack.length >= 2
+        ? "Imported from Health Connect with route"
+        : "Imported from Health Connect",
+    );
   }
 
   async function handleOpenSettings() {

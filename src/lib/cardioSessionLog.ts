@@ -19,6 +19,8 @@ export function buildCardioSessionCapturePatch(
   const hasGps =
     input.gpsTrackPoints != null && input.gpsTrackPoints.length >= 2;
   const healthFields = applyCardioHealthMeta(input.health);
+  const hcRoute =
+    hasGps && input.health?.source === "health_connect";
   return {
     completed: true,
     skipped: false,
@@ -27,8 +29,8 @@ export function buildCardioSessionCapturePatch(
     ...healthFields,
     ...(hasGps
       ? {
-          activitySource: "gps" as const,
           gpsTrackPoints: [...input.gpsTrackPoints!],
+          activitySource: hcRoute ? ("health_connect" as const) : ("gps" as const),
         }
       : healthFields.activitySource
         ? {}

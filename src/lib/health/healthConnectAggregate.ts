@@ -12,7 +12,9 @@ function toRangeMetric(dataType: HealthDataType): HealthConnectRangeMetric | nul
     dataType === "calories" ||
     dataType === "totalCalories" ||
     dataType === "distance" ||
-    dataType === "heartRate"
+    dataType === "heartRate" ||
+    dataType === "restingHeartRate" ||
+    dataType === "oxygenSaturation"
   ) {
     return dataType;
   }
@@ -37,7 +39,11 @@ export async function queryHealthConnectLocalDayTotal(options: {
       dataType: metric,
     });
     if (!Number.isFinite(value)) return undefined;
-    const rounded = Math.round(Math.max(0, value));
+    const normalized = Math.max(0, value);
+    const rounded =
+      metric === "oxygenSaturation" || metric === "restingHeartRate"
+        ? Math.round(normalized * 10) / 10
+        : Math.round(normalized);
     clientTrace("health-connect", "local_day_total", {
       dateKey: options.dateKey,
       isToday: options.isToday,

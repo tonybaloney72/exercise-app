@@ -17,9 +17,17 @@ export type DailyHealthProgressView = {
   todaySteps: number | null;
   todayActiveKcal: number | null;
   todayAvgHeartRateBpm: number | null;
+  todayRestingHeartRateBpm: number | null;
+  todayOxygenSaturationPct: number | null;
+  todaySleepTotalMin: number | null;
+  todayVo2MaxMlKgMin: number | null;
   stepsChartSeries: DailyStepsChartPoint[];
   activeKcalChartSeries: DailyHealthMetricChartPoint[];
   avgHeartRateChartSeries: DailyHealthMetricChartPoint[];
+  restingHeartRateChartSeries: DailyHealthMetricChartPoint[];
+  oxygenSaturationChartSeries: DailyHealthMetricChartPoint[];
+  sleepTotalChartSeries: DailyHealthMetricChartPoint[];
+  vo2MaxChartSeries: DailyHealthMetricChartPoint[];
 };
 
 const METRIC_FIELD_BY_KEY: Partial<
@@ -28,6 +36,14 @@ const METRIC_FIELD_BY_KEY: Partial<
   steps: "steps",
   active_kcal: "activeKcal",
   avg_heart_rate_bpm: "avgHeartRateBpm",
+  resting_heart_rate_bpm: "restingHeartRateBpm",
+  oxygen_saturation_pct: "oxygenSaturationPct",
+  sleep_total_min: "sleepTotalMin",
+  sleep_deep_min: "sleepDeepMin",
+  sleep_rem_min: "sleepRemMin",
+  sleep_light_min: "sleepLightMin",
+  sleep_awake_min: "sleepAwakeMin",
+  vo2_max_ml_kg_min: "vo2MaxMlKgMin",
 };
 
 export function dailyHealthDayMetricsToUpserts(
@@ -84,6 +100,19 @@ function metricValue(
   return value != null && Number.isFinite(value) ? value : null;
 }
 
+function collectSeries(
+  byDate: Map<string, Map<HealthDailyMetricKey, HealthDailyMetricRecord>>,
+  chartDayKeys: readonly string[],
+  key: HealthDailyMetricKey,
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const dateKey of chartDayKeys) {
+    const value = metricValue(byDate, dateKey, key);
+    if (value != null) out[dateKey] = value;
+  }
+  return out;
+}
+
 export function buildDailyHealthProgressFromRecords(
   records: readonly HealthDailyMetricRecord[],
   todayKey: string,
@@ -91,26 +120,53 @@ export function buildDailyHealthProgressFromRecords(
 ): DailyHealthProgressView {
   const byDate = indexDailyMetricRecords(records);
 
-  const stepsByDate: Record<string, number> = {};
-  const activeKcalByDate: Record<string, number> = {};
-  const avgHeartRateByDate: Record<string, number> = {};
-  for (const dateKey of chartDayKeys) {
-    const steps = metricValue(byDate, dateKey, "steps");
-    if (steps != null) stepsByDate[dateKey] = steps;
-    const activeKcal = metricValue(byDate, dateKey, "active_kcal");
-    if (activeKcal != null) activeKcalByDate[dateKey] = activeKcal;
-    const avgHr = metricValue(byDate, dateKey, "avg_heart_rate_bpm");
-    if (avgHr != null) avgHeartRateByDate[dateKey] = avgHr;
-  }
+  const stepsByDate = collectSeries(byDate, chartDayKeys, "steps");
+  const activeKcalByDate = collectSeries(byDate, chartDayKeys, "active_kcal");
+  const avgHeartRateByDate = collectSeries(
+    byDate,
+    chartDayKeys,
+    "avg_heart_rate_bpm",
+  );
+  const restingHeartRateByDate = collectSeries(
+    byDate,
+    chartDayKeys,
+    "resting_heart_rate_bpm",
+  );
+  const oxygenByDate = collectSeries(
+    byDate,
+    chartDayKeys,
+    "oxygen_saturation_pct",
+  );
+  const sleepByDate = collectSeries(byDate, chartDayKeys, "sleep_total_min");
+  const vo2ByDate = collectSeries(byDate, chartDayKeys, "vo2_max_ml_kg_min");
 
   return {
     todaySteps: metricValue(byDate, todayKey, "steps"),
     todayActiveKcal: metricValue(byDate, todayKey, "active_kcal"),
     todayAvgHeartRateBpm: metricValue(byDate, todayKey, "avg_heart_rate_bpm"),
+    todayRestingHeartRateBpm: metricValue(
+      byDate,
+      todayKey,
+      "resting_heart_rate_bpm",
+    ),
+    todayOxygenSaturationPct: metricValue(
+      byDate,
+      todayKey,
+      "oxygen_saturation_pct",
+    ),
+    todaySleepTotalMin: metricValue(byDate, todayKey, "sleep_total_min"),
+    todayVo2MaxMlKgMin: metricValue(byDate, todayKey, "vo2_max_ml_kg_min"),
     stepsChartSeries: buildDailyStepsChartSeries(stepsByDate),
     activeKcalChartSeries: buildDailyHealthMetricChartSeries(activeKcalByDate),
     avgHeartRateChartSeries:
       buildDailyHealthMetricChartSeries(avgHeartRateByDate),
+    restingHeartRateChartSeries: buildDailyHealthMetricChartSeries(
+      restingHeartRateByDate,
+    ),
+    oxygenSaturationChartSeries:
+      buildDailyHealthMetricChartSeries(oxygenByDate),
+    sleepTotalChartSeries: buildDailyHealthMetricChartSeries(sleepByDate),
+    vo2MaxChartSeries: buildDailyHealthMetricChartSeries(vo2ByDate),
   };
 }
 
@@ -123,22 +179,58 @@ export function mergeLiveTodayOverProgressView(
 
   const stepsByDate = seriesToRecord(view.stepsChartSeries, "stepCount");
   const activeKcalByDate = seriesToRecord(view.activeKcalChartSeries, "value");
-  const avgHeartRateByDate = seriesToRecord(view.avgHeartRateChartSeries, "value");
+  const avgHeartRateByDate = seriesToRecord(
+    view.avgHeartRateChartSeries,
+    "value",
+  );
+  const restingHeartRateByDate = seriesToRecord(
+    view.restingHeartRateChartSeries,
+    "value",
+  );
+  const oxygenByDate = seriesToRecord(
+    view.oxygenSaturationChartSeries,
+    "value",
+  );
+  const sleepByDate = seriesToRecord(view.sleepTotalChartSeries, "value");
+  const vo2ByDate = seriesToRecord(view.vo2MaxChartSeries, "value");
 
   stepsByDate[todayKey] = live.steps;
   activeKcalByDate[todayKey] = live.activeKcal;
   if (live.avgHeartRateBpm != null) {
     avgHeartRateByDate[todayKey] = live.avgHeartRateBpm;
   }
+  if (live.restingHeartRateBpm != null) {
+    restingHeartRateByDate[todayKey] = live.restingHeartRateBpm;
+  }
+  if (live.oxygenSaturationPct != null) {
+    oxygenByDate[todayKey] = live.oxygenSaturationPct;
+  }
+  if (live.sleepTotalMin != null) {
+    sleepByDate[todayKey] = live.sleepTotalMin;
+  }
+  if (live.vo2MaxMlKgMin != null) {
+    vo2ByDate[todayKey] = live.vo2MaxMlKgMin;
+  }
 
   return {
     todaySteps: live.steps,
     todayActiveKcal: live.activeKcal,
     todayAvgHeartRateBpm: live.avgHeartRateBpm ?? null,
+    todayRestingHeartRateBpm: live.restingHeartRateBpm ?? null,
+    todayOxygenSaturationPct: live.oxygenSaturationPct ?? null,
+    todaySleepTotalMin: live.sleepTotalMin ?? null,
+    todayVo2MaxMlKgMin: live.vo2MaxMlKgMin ?? null,
     stepsChartSeries: buildDailyStepsChartSeries(stepsByDate),
     activeKcalChartSeries: buildDailyHealthMetricChartSeries(activeKcalByDate),
     avgHeartRateChartSeries:
       buildDailyHealthMetricChartSeries(avgHeartRateByDate),
+    restingHeartRateChartSeries: buildDailyHealthMetricChartSeries(
+      restingHeartRateByDate,
+    ),
+    oxygenSaturationChartSeries:
+      buildDailyHealthMetricChartSeries(oxygenByDate),
+    sleepTotalChartSeries: buildDailyHealthMetricChartSeries(sleepByDate),
+    vo2MaxChartSeries: buildDailyHealthMetricChartSeries(vo2ByDate),
   };
 }
 

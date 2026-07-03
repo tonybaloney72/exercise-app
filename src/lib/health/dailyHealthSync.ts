@@ -131,6 +131,18 @@ export function buildDailyHealthSyncUpserts(options: {
           ...(metrics.avgHeartRateBpm != null
             ? { avg_heart_rate_bpm: metrics.avgHeartRateBpm }
             : {}),
+          ...(metrics.restingHeartRateBpm != null
+            ? { resting_heart_rate_bpm: metrics.restingHeartRateBpm }
+            : {}),
+          ...(metrics.oxygenSaturationPct != null
+            ? { oxygen_saturation_pct: metrics.oxygenSaturationPct }
+            : {}),
+          ...(metrics.sleepTotalMin != null
+            ? { sleep_total_min: metrics.sleepTotalMin }
+            : {}),
+          ...(metrics.vo2MaxMlKgMin != null
+            ? { vo2_max_ml_kg_min: metrics.vo2MaxMlKgMin }
+            : {}),
         },
       },
     };

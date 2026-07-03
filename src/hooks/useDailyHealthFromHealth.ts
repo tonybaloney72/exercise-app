@@ -18,9 +18,17 @@ export type DailyHealthState = {
   todaySteps: number | null;
   todayActiveKcal: number | null;
   todayAvgHeartRateBpm: number | null;
+  todayRestingHeartRateBpm: number | null;
+  todayOxygenSaturationPct: number | null;
+  todaySleepTotalMin: number | null;
+  todayVo2MaxMlKgMin: number | null;
   stepsChartSeries: DailyStepsChartPoint[];
   activeKcalChartSeries: DailyHealthMetricChartPoint[];
   avgHeartRateChartSeries: DailyHealthMetricChartPoint[];
+  restingHeartRateChartSeries: DailyHealthMetricChartPoint[];
+  oxygenSaturationChartSeries: DailyHealthMetricChartPoint[];
+  sleepTotalChartSeries: DailyHealthMetricChartPoint[];
+  vo2MaxChartSeries: DailyHealthMetricChartPoint[];
   refresh: () => void;
   unavailableReason: DailyHealthUnavailableReason | null;
 };
@@ -47,9 +55,17 @@ export function useDailyHealthFromHealth(): DailyHealthState {
     todaySteps: progress.todaySteps,
     todayActiveKcal: progress.todayActiveKcal,
     todayAvgHeartRateBpm: progress.todayAvgHeartRateBpm,
+    todayRestingHeartRateBpm: progress.todayRestingHeartRateBpm,
+    todayOxygenSaturationPct: progress.todayOxygenSaturationPct,
+    todaySleepTotalMin: progress.todaySleepTotalMin,
+    todayVo2MaxMlKgMin: progress.todayVo2MaxMlKgMin,
     stepsChartSeries: progress.stepsChartSeries,
     activeKcalChartSeries: progress.activeKcalChartSeries,
     avgHeartRateChartSeries: progress.avgHeartRateChartSeries,
+    restingHeartRateChartSeries: progress.restingHeartRateChartSeries,
+    oxygenSaturationChartSeries: progress.oxygenSaturationChartSeries,
+    sleepTotalChartSeries: progress.sleepTotalChartSeries,
+    vo2MaxChartSeries: progress.vo2MaxChartSeries,
     refresh,
     unavailableReason,
   };

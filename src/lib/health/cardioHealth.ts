@@ -7,9 +7,14 @@ import {
   CARDIO_HEALTH_READ_TYPES,
   checkNativeHealthAuthorization,
   isNativeHealthAvailable,
+  queryNativeSleepDayTotals,
+  queryNativeLatestVo2Max,
+  queryNativeVo2MaxHistory,
   queryNativeWorkouts,
   requestNativeHealthAuthorization,
 } from "@/lib/health/nativeHealth";
+import { fetchHealthConnectExerciseRoute } from "@/lib/health/exerciseRouteImport";
+import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
@@ -44,6 +49,8 @@ export interface ImportedCardioSession {
   endDate: Date;
   sourceName?: string;
   workoutType?: string;
+  platformId?: string;
+  gpsTrack?: readonly GpsTrackPoint[];
 }
 
 export function dominantHealthSampleSource(
@@ -90,7 +97,20 @@ export function mapWorkoutToImportedSession(workout: Workout): ImportedCardioSes
     endDate: new Date(workout.endDate),
     sourceName: workout.sourceName,
     workoutType: workout.workoutType,
+    platformId: workout.platformId,
   };
+}
+
+/** Import HC route for a session (shows consent UI when required). */
+export async function enrichImportedSessionWithRoute(
+  session: ImportedCardioSession,
+): Promise<ImportedCardioSession> {
+  if (!session.platformId || (session.gpsTrack?.length ?? 0) >= 2) {
+    return session;
+  }
+  const gpsTrack = await fetchHealthConnectExerciseRoute(session.platformId);
+  if (gpsTrack.length < 2) return session;
+  return { ...session, gpsTrack };
 }
 
 async function hasCardioHealthReadAccess(): Promise<boolean> {
@@ -345,6 +365,14 @@ export type DailyHealthDayMetrics = {
   steps: number;
   activeKcal: number;
   avgHeartRateBpm?: number;
+  restingHeartRateBpm?: number;
+  oxygenSaturationPct?: number;
+  sleepTotalMin?: number;
+  sleepDeepMin?: number;
+  sleepRemMin?: number;
+  sleepLightMin?: number;
+  sleepAwakeMin?: number;
+  vo2MaxMlKgMin?: number;
 };
 
 function isAggregateMetric(dataType: HealthDataType): boolean {
@@ -352,7 +380,9 @@ function isAggregateMetric(dataType: HealthDataType): boolean {
     dataType === "steps" ||
     dataType === "calories" ||
     dataType === "totalCalories" ||
-    dataType === "heartRate"
+    dataType === "heartRate" ||
+    dataType === "restingHeartRate" ||
+    dataType === "oxygenSaturation"
   );
 }
 
@@ -385,7 +415,9 @@ export async function fetchDailyHealthMetrics(
     if (
       dataType === "steps" ||
       dataType === "calories" ||
-      dataType === "totalCalories"
+      dataType === "totalCalories" ||
+      dataType === "restingHeartRate" ||
+      dataType === "oxygenSaturation"
     ) {
       const localDayTotal = await queryHealthConnectLocalDayTotal({
         dateKey,
@@ -406,23 +438,53 @@ export async function fetchDailyHealthMetrics(
   const { start, end } = localDayHealthWindow(dateKey, now);
   const isoStart = start.toISOString();
   const isoEnd = end.toISOString();
-  const [steps, caloriesFromActive, caloriesFromTotal, avgHeartRateBpm] =
-    await Promise.all([
-      readDailyMetric("steps"),
-      readDailyMetric("calories"),
-      readDailyMetric("totalCalories"),
-      readDailyHealthMetricTotal(isoStart, isoEnd, "heartRate").then((v) =>
-        v > 0 ? v : undefined,
-      ),
-    ]);
+  const [
+    steps,
+    caloriesFromActive,
+    caloriesFromTotal,
+    avgHeartRateBpm,
+    restingHeartRateBpm,
+    oxygenSaturationPct,
+    sleepTotals,
+  ] = await Promise.all([
+    readDailyMetric("steps"),
+    readDailyMetric("calories"),
+    readDailyMetric("totalCalories"),
+    readDailyHealthMetricTotal(isoStart, isoEnd, "heartRate").then((v) =>
+      v > 0 ? v : undefined,
+    ),
+    readDailyMetric("restingHeartRate").then((v) => (v > 0 ? v : undefined)),
+    readDailyMetric("oxygenSaturation").then((v) => (v > 0 ? v : undefined)),
+    queryNativeSleepDayTotals({ dateKey, isToday }),
+  ]);
 
   const activeKcal =
     caloriesFromActive > 0 ? caloriesFromActive : caloriesFromTotal;
+
+  let vo2MaxMlKgMin: number | undefined;
+  if (isToday) {
+    const latest = await queryNativeLatestVo2Max();
+    if (latest != null && Number.isFinite(latest.value)) {
+      vo2MaxMlKgMin = Math.round(latest.value * 10) / 10;
+    }
+  }
 
   return {
     steps,
     activeKcal,
     ...(avgHeartRateBpm != null ? { avgHeartRateBpm } : {}),
+    ...(restingHeartRateBpm != null ? { restingHeartRateBpm } : {}),
+    ...(oxygenSaturationPct != null ? { oxygenSaturationPct } : {}),
+    ...(sleepTotals != null && sleepTotals.sleepTotalMin > 0
+      ? {
+          sleepTotalMin: Math.round(sleepTotals.sleepTotalMin),
+          sleepDeepMin: Math.round(sleepTotals.sleepDeepMin),
+          sleepRemMin: Math.round(sleepTotals.sleepRemMin),
+          sleepLightMin: Math.round(sleepTotals.sleepLightMin),
+          sleepAwakeMin: Math.round(sleepTotals.sleepAwakeMin),
+        }
+      : {}),
+    ...(vo2MaxMlKgMin != null ? { vo2MaxMlKgMin } : {}),
   };
 }
 
@@ -445,6 +507,33 @@ export async function fetchDailyHealthMetricsForKeys(
     if (metrics != null) out[dateKey] = metrics;
   }
   return out;
+}
+
+/** Sparse VO₂ readings for trend chart (last ~90 days). */
+export async function fetchVo2MaxHistory(
+  now: Date = new Date(),
+): Promise<Array<{ dateKey: string; value: number }>> {
+  if (!isNativePlatform()) return [];
+  if (!(await hasCardioHealthReadAccess())) return [];
+
+  const end = now;
+  const start = new Date(now);
+  start.setDate(start.getDate() - 90);
+
+  const readings = await queryNativeVo2MaxHistory({
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+  });
+
+  const byDate = new Map<string, number>();
+  for (const reading of readings) {
+    if (!Number.isFinite(reading.value)) continue;
+    const dateKey = formatLocalDateKey(new Date(reading.time));
+    byDate.set(dateKey, reading.value);
+  }
+  return [...byDate.entries()]
+    .map(([dateKey, value]) => ({ dateKey, value }))
+    .sort((a, b) => a.dateKey.localeCompare(b.dateKey));
 }
 
 /** Read-only check — does not open the Health Connect permission UI. */

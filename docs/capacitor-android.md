@@ -11,7 +11,7 @@ MyExercise on Android uses **Capacitor** with the same React/Next UI. Two load m
 
 **Android Capacitor + Health Connect first.** Web/PWA on all platforms. **iPhone: PWA only** — no App Store or HealthKit in the near term. React/Next UI is unchanged; native code is a thin shell only. iOS native and other deferred ideas → [ROADMAP — Ideas](../ROADMAP.md#ideas--future-considerations).
 
-Cardio import/GPS notes → [cardio-tracking.md](cardio-tracking.md).
+Health Connect + GPS code → `src/lib/health/`, `src/lib/geo/`. Backlog → [ROADMAP.md](../ROADMAP.md).
 
 ## Prerequisites
 

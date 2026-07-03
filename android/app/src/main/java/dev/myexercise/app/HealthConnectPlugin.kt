@@ -5,6 +5,8 @@ import android.content.Intent
 import androidx.activity.result.ActivityResult
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
+import androidx.health.connect.client.contracts.ExerciseRouteRequestContract
+import androidx.health.connect.client.records.ExerciseRoute
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
@@ -27,6 +29,7 @@ import kotlinx.coroutines.launch
 class HealthConnectPlugin : Plugin() {
   private val pluginScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
   private val permissionContract = PermissionController.createRequestPermissionResultContract()
+  private val exerciseRouteContract = ExerciseRouteRequestContract()
   private var pendingReadScopes: List<String> = emptyList()
   private var pendingWriteScopes: List<String> = emptyList()
 
@@ -201,6 +204,94 @@ class HealthConnectPlugin : Plugin() {
         call.reject(e.message ?: "Failed to read local day total", null, e)
       }
     }
+  }
+
+  @PluginMethod
+  fun querySleepDayTotals(call: PluginCall) {
+    val dateKey = call.getString("dateKey")
+    if (dateKey.isNullOrBlank()) {
+      call.reject("dateKey is required")
+      return
+    }
+    val isToday = call.getBoolean("isToday", false) ?: false
+    pluginScope.launch {
+      val client = getClientOrReject(call) ?: return@launch
+      try {
+        val result =
+          HealthConnectRepository.querySleepDayTotals(client, dateKey, isToday)
+        call.resolve(result)
+      } catch (e: Exception) {
+        call.reject(e.message ?: "Failed to read sleep totals", null, e)
+      }
+    }
+  }
+
+  @PluginMethod
+  fun queryLatestVo2Max(call: PluginCall) {
+    pluginScope.launch {
+      val client = getClientOrReject(call) ?: return@launch
+      try {
+        call.resolve(HealthConnectRepository.queryLatestVo2Max(client))
+      } catch (e: Exception) {
+        call.reject(e.message ?: "Failed to read VO2 max", null, e)
+      }
+    }
+  }
+
+  @PluginMethod
+  fun queryVo2MaxHistory(call: PluginCall) {
+    val startInstant = parseInstantArg(call, "startDate") ?: return
+    val endInstant = parseInstantArg(call, "endDate") ?: return
+    pluginScope.launch {
+      val client = getClientOrReject(call) ?: return@launch
+      try {
+        val result =
+          HealthConnectRepository.queryVo2MaxHistory(client, startInstant, endInstant)
+        call.resolve(result)
+      } catch (e: Exception) {
+        call.reject(e.message ?: "Failed to read VO2 max history", null, e)
+      }
+    }
+  }
+
+  @PluginMethod
+  fun requestExerciseRoute(call: PluginCall) {
+    val platformId = call.getString("platformId")
+    if (platformId.isNullOrBlank()) {
+      call.reject("platformId is required")
+      return
+    }
+    pluginScope.launch {
+      val client = getClientOrReject(call) ?: return@launch
+      try {
+        val status = HealthConnectRepository.readExerciseRouteStatus(client, platformId)
+        if (status.getString("status") == "consentRequired") {
+          val intent = exerciseRouteContract.createIntent(context, platformId)
+          startActivityForResult(call, intent, "handleExerciseRouteResult")
+          return@launch
+        }
+        call.resolve(status)
+      } catch (e: Exception) {
+        call.reject(e.message ?: "Failed to read exercise route", null, e)
+      }
+    }
+  }
+
+  @ActivityCallback
+  private fun handleExerciseRouteResult(call: PluginCall?, result: ActivityResult) {
+    if (call == null) return
+    val route: ExerciseRoute? =
+      exerciseRouteContract.parseResult(result.resultCode, result.data)
+    if (route == null) {
+      call.resolve(
+        JSObject().apply {
+          put("status", "denied")
+          put("points", JSArray())
+        },
+      )
+      return
+    }
+    call.resolve(HealthConnectRepository.exerciseRouteToJs(route))
   }
 
   @PluginMethod

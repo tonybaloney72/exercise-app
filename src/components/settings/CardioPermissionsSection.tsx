@@ -18,6 +18,9 @@ type HealthAccessState = "unknown" | "granted" | "denied";
 export default function CardioPermissionsSection() {
   const [healthAccess, setHealthAccess] =
     useState<HealthAccessState>("unknown");
+  const [backgroundReadGranted, setBackgroundReadGranted] = useState<
+    boolean | null
+  >(null);
   const [locationGranted, setLocationGranted] = useState<boolean | null>(null);
   const [healthBusy, setHealthBusy] = useState(false);
   const [locationBusy, setLocationBusy] = useState(false);
@@ -29,6 +32,7 @@ export default function CardioPermissionsSection() {
     });
     const granted = (status?.readAuthorized.length ?? 0) > 0;
     setHealthAccess(granted ? "granted" : "denied");
+    setBackgroundReadGranted(status?.backgroundReadGranted ?? null);
   }, []);
 
   useEffect(() => {
@@ -39,7 +43,7 @@ export default function CardioPermissionsSection() {
     setHealthBusy(true);
     try {
       const granted = await ensureCardioHealthReadAccess();
-      setHealthAccess(granted ? "granted" : "denied");
+      await refreshHealthAccess();
       if (granted) {
         toast.success("Health Connect access granted");
       } else {
@@ -90,9 +94,10 @@ export default function CardioPermissionsSection() {
   return (
     <div className="flex flex-col gap-4">
       <p className="text-xs text-muted leading-relaxed">
-        Pull steps, calories, heart rate, and other data from Health Connect.
-        Finished workouts and logged activities can be saved back as exercise
-        sessions.
+        Pull steps, calories, heart rate, sleep, routes, and other data from
+        Health Connect. Finished workouts and logged activities can be saved back
+        as exercise sessions. Background read lets daily metrics refresh when you
+        return to the app without reconnecting.
       </p>
 
       <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface-hover/40 p-3">
@@ -101,6 +106,12 @@ export default function CardioPermissionsSection() {
             <p className="text-sm font-medium text-foreground">
               Health Connect
             </p>
+            {backgroundReadGranted != null ? (
+              <p className="text-xs text-muted mt-0.5">
+                Background updates:{" "}
+                {backgroundReadGranted ? "allowed" : "not allowed"}
+              </p>
+            ) : null}
           </div>
           <HealthStatusBadge state={healthAccess} />
         </div>
