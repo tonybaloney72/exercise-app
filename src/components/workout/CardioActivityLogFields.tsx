@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import CardioActivityRecorder from "@/components/workout/CardioActivityRecorder";
 import CardioHealthImport from "@/components/workout/CardioHealthImport";
 import {
@@ -22,6 +23,8 @@ export type CardioActivityLogFieldsProps = {
   onTimeInputChange: (value: string) => void;
   healthMeta?: CardioHealthMeta;
   onResolved: (result: ResolvedCardioQuickLog) => void;
+  /** Start/End recorder (and GPS). Off when the row is already completed. */
+  showRecorder?: boolean;
   showHealthImport?: boolean;
   compact?: boolean;
 };
@@ -59,6 +62,7 @@ export default function CardioActivityLogFields({
   onTimeInputChange,
   healthMeta,
   onResolved,
+  showRecorder = true,
   showHealthImport = true,
   compact = false,
 }: CardioActivityLogFieldsProps) {
@@ -88,45 +92,63 @@ export default function CardioActivityLogFields({
     ? "mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
     : "mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm";
 
+  const showTrackingControls =
+    showRecorder || (showHealthImport && isNativePlatform());
+
   return (
     <div className="flex flex-col gap-3">
-      <CardioActivityRecorder kind={kind} onResolved={onResolved} />
-
-      {showHealthImport && isNativePlatform() ? (
-        <div className="flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={() => setShowEarlierImport((v) => !v)}
-            className="text-xs font-medium text-accent hover:underline text-left"
+      <AnimatePresence initial={false}>
+        {showTrackingControls ? (
+          <motion.div
+            key="cardio-tracking-controls"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="flex flex-col gap-3 overflow-hidden"
           >
-            {showEarlierImport
-              ? "Hide earlier Health Connect sessions"
-              : "Import an earlier session instead"}
-          </button>
-          {showEarlierImport ? (
-            <CardioHealthImport
-              kind={kind}
-              onImport={(session) => {
-                onResolved({
-                  startDate: session.startDate,
-                  endDate: session.endDate,
-                  durationSeconds: session.durationSeconds,
-                  distanceMi: session.distanceMi,
-                  health: {
-                    stepCount: session.stepCount,
-                    activeCaloriesKcal: session.activeCaloriesKcal,
-                    avgHeartRateBpm: session.avgHeartRateBpm,
-                    source: "health_connect",
-                    healthSourceName: session.sourceName,
-                  },
-                  resolution: "health_connect_session",
-                });
-                setShowEarlierImport(false);
-              }}
-            />
-          ) : null}
-        </div>
-      ) : null}
+            {showRecorder ? (
+              <CardioActivityRecorder kind={kind} onResolved={onResolved} />
+            ) : null}
+
+            {showHealthImport && isNativePlatform() ? (
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEarlierImport((v) => !v)}
+                  className="text-xs font-medium text-accent hover:underline text-left"
+                >
+                  {showEarlierImport
+                    ? "Hide earlier Health Connect sessions"
+                    : "Import an earlier session instead"}
+                </button>
+                {showEarlierImport ? (
+                  <CardioHealthImport
+                    kind={kind}
+                    onImport={(session) => {
+                      onResolved({
+                        startDate: session.startDate,
+                        endDate: session.endDate,
+                        durationSeconds: session.durationSeconds,
+                        distanceMi: session.distanceMi,
+                        health: {
+                          stepCount: session.stepCount,
+                          activeCaloriesKcal: session.activeCaloriesKcal,
+                          avgHeartRateBpm: session.avgHeartRateBpm,
+                          source: "health_connect",
+                          healthSourceName: session.sourceName,
+                        },
+                        resolution: "health_connect_session",
+                      });
+                      setShowEarlierImport(false);
+                    }}
+                  />
+                ) : null}
+              </div>
+            ) : null}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       <label className="block">
         <span className="text-caption text-muted uppercase tracking-wider">

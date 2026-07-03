@@ -73,11 +73,7 @@ function aggregateSingleSourceDailySampleTotal(
   // End-of-day cumulative total already includes earlier jog/activity intervals.
   if (sortedByEnd.length >= 2) {
     const secondLatest = sortedByEnd[sortedByEnd.length - 2]?.value ?? 0;
-    if (
-      latest === maxVal &&
-      latest > secondLatest * 2 &&
-      sum > latest * 1.15
-    ) {
+    if (latest === maxVal && latest > secondLatest * 2 && sum > latest * 1.15) {
       return Math.round(latest);
     }
   }
@@ -97,16 +93,6 @@ function dedupePerSourceDailyTotals(perSourceTotals: number[]): number {
   }
 
   return Math.round(maxVal);
-}
-
-export function perSourceDailySampleTotals(
-  samples: ReadonlyArray<DailyHealthSampleLike>,
-): Record<string, number> {
-  const totals: Record<string, number> = {};
-  for (const [source, sourceSamples] of groupSamplesBySource(samples)) {
-    totals[source] = aggregateSingleSourceDailySampleTotal(sourceSamples);
-  }
-  return totals;
 }
 
 /**
@@ -142,11 +128,7 @@ export function aggregatedBucketTotal(
   }
 
   // Daily cumulative bucket + jog-sized bucket (e.g. 3378 + 2411) — do not sum.
-  if (
-    values.length === 2 &&
-    maxVal >= 2000 &&
-    minVal / maxVal >= 0.65
-  ) {
+  if (values.length === 2 && maxVal >= 2000 && minVal / maxVal >= 0.65) {
     return Math.round(maxVal);
   }
 

@@ -59,10 +59,7 @@ export default function CardioSection({
         }}
       />
 
-      <motion.div
-        layout
-        className="rounded-xl border border-border bg-surface overflow-hidden"
-      >
+      <motion.div className="relative z-10 rounded-xl border border-border bg-surface overflow-hidden">
         <div className="flex w-full items-center gap-2 px-4 py-3">
           <button
             type="button"

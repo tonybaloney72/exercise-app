@@ -1,4 +1,4 @@
-import type { Workout } from "@capgo/capacitor-health";
+import type { Workout } from "@/lib/health/healthConnectTypes";
 import type { CardioActivityKind, CardioActivitySource } from "@/types";
 import { metersToMiles } from "@/lib/geo/haversine";
 import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
@@ -8,8 +8,6 @@ import {
   checkNativeHealthAuthorization,
   isNativeHealthAvailable,
   queryNativeWorkouts,
-  readNativeHealthSamples,
-  queryNativeHealthAggregated,
   requestNativeHealthAuthorization,
 } from "@/lib/health/nativeHealth";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
@@ -17,14 +15,7 @@ import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import { rankCardioSessionsForImport } from "@/lib/health/cardioSessionMatch";
-import type { HealthDataType } from "@capgo/capacitor-health";
-import {
-  aggregateDailyHealthSampleTotal,
-  aggregatedBucketTotal,
-  perSourceDailySampleTotals,
-  resolveDailyHealthMetricTotal,
-  sumHealthSampleValues,
-} from "@/lib/health/healthSampleAggregation";
+import type { HealthDataType } from "@/lib/health/healthConnectTypes";
 import {
   queryHealthConnectLocalDayTotal,
   queryHealthConnectRangeTotal,
@@ -193,18 +184,13 @@ async function fetchHeartRateAverage(
   startDate: Date,
   endDate: Date,
 ): Promise<number | undefined> {
-  const samples = await readNativeHealthSamples({
+  const avg = await queryHealthConnectRangeTotal({
     dataType: "heartRate",
     startDate: startDate.toISOString(),
     endDate: endDate.toISOString(),
-    limit: 200,
   });
-  const values = samples
-    .map((sample) => sample.value)
-    .filter((value) => Number.isFinite(value) && value > 0);
-  if (values.length === 0) return undefined;
-  const total = values.reduce((sum, value) => sum + value, 0);
-  return Math.round(total / values.length);
+  if (avg == null || avg <= 0) return undefined;
+  return avg;
 }
 
 export async function fetchCardioHealthMetricsForWindow(
@@ -222,44 +208,42 @@ export async function fetchCardioHealthMetricsForWindow(
   const needsCalories =
     options?.activeCaloriesKcal == null || options.activeCaloriesKcal <= 0;
 
-  const [distanceSamples, calorieSamples, avgHeartRateBpm] = await Promise.all([
-    readNativeHealthSamples({
-      dataType: "distance",
-      startDate: isoStart,
-      endDate: isoEnd,
-      limit: 500,
-    }),
-    needsCalories
-      ? readNativeHealthSamples({
-          dataType: "calories",
-          startDate: isoStart,
-          endDate: isoEnd,
-          limit: 500,
-        })
-      : Promise.resolve([]),
-    fetchHeartRateAverage(startDate, endDate),
-  ]);
+  const [stepCount, distanceMeters, calorieTotal, avgHeartRateBpm] =
+    await Promise.all([
+      queryHealthConnectRangeTotal({
+        dataType: "steps",
+        startDate: isoStart,
+        endDate: isoEnd,
+      }),
+      queryHealthConnectRangeTotal({
+        dataType: "distance",
+        startDate: isoStart,
+        endDate: isoEnd,
+      }),
+      needsCalories
+        ? queryHealthConnectRangeTotal({
+            dataType: "calories",
+            startDate: isoStart,
+            endDate: isoEnd,
+          })
+        : Promise.resolve(undefined),
+      fetchHeartRateAverage(startDate, endDate),
+    ]);
 
-  const distanceMeters = sumHealthSampleValues(distanceSamples);
   const distanceMi =
-    distanceMeters > 0
+    distanceMeters != null && distanceMeters > 0
       ? Math.round(metersToMiles(distanceMeters) * 100) / 100
       : undefined;
-  const calorieTotal = needsCalories
-    ? sumHealthSampleValues(calorieSamples)
-    : options?.activeCaloriesKcal ?? 0;
-
-  const healthSourceName =
-    options?.healthSourceName?.trim() ||
-    dominantHealthSampleSource(distanceSamples) ||
-    dominantHealthSampleSource(calorieSamples);
 
   return {
+    stepCount: stepCount != null && stepCount > 0 ? stepCount : undefined,
     activeCaloriesKcal:
-      calorieTotal > 0 ? Math.round(calorieTotal) : options?.activeCaloriesKcal,
+      calorieTotal != null && calorieTotal > 0
+        ? Math.round(calorieTotal)
+        : options?.activeCaloriesKcal,
     avgHeartRateBpm,
     distanceMi,
-    healthSourceName,
+    healthSourceName: options?.healthSourceName,
   };
 }
 
@@ -363,15 +347,13 @@ export type DailyHealthDayMetrics = {
   avgHeartRateBpm?: number;
 };
 
-function averageHealthSampleValues(
-  samples: ReadonlyArray<{ value: number }>,
-): number | undefined {
-  const values = samples
-    .map((sample) => sample.value)
-    .filter((value) => Number.isFinite(value) && value > 0);
-  if (values.length === 0) return undefined;
-  const total = values.reduce((sum, value) => sum + value, 0);
-  return Math.round(total / values.length);
+function isAggregateMetric(dataType: HealthDataType): boolean {
+  return (
+    dataType === "steps" ||
+    dataType === "calories" ||
+    dataType === "totalCalories" ||
+    dataType === "heartRate"
+  );
 }
 
 async function readDailyHealthMetricTotal(
@@ -379,62 +361,14 @@ async function readDailyHealthMetricTotal(
   isoEnd: string,
   dataType: HealthDataType,
 ): Promise<number> {
-  if (
-    dataType === "steps" ||
-    dataType === "calories" ||
-    dataType === "totalCalories"
-  ) {
-    const nativeTotal = await queryHealthConnectRangeTotal({
-      dataType,
-      startDate: isoStart,
-      endDate: isoEnd,
-    });
-    if (nativeTotal != null) return nativeTotal;
-  }
+  if (!isAggregateMetric(dataType)) return 0;
 
-  const samplesPromise = readNativeHealthSamples({
+  const nativeTotal = await queryHealthConnectRangeTotal({
     dataType,
     startDate: isoStart,
     endDate: isoEnd,
-    limit: 500,
   });
-
-  const [buckets, samples] = await Promise.all([
-    dataType === "totalCalories"
-      ? Promise.resolve([])
-      : queryNativeHealthAggregated({
-          dataType,
-          startDate: isoStart,
-          endDate: isoEnd,
-          bucket: "day",
-          aggregation: "sum",
-        }),
-    samplesPromise,
-  ]);
-
-  const aggregate = aggregatedBucketTotal(buckets);
-  const fromSamples = aggregateDailyHealthSampleTotal(samples);
-  const resolved = resolveDailyHealthMetricTotal(aggregate, samples);
-
-  clientTrace("health-cardio", "daily_metric_resolve", {
-    dataType,
-    startDate: isoStart,
-    endDate: isoEnd,
-    aggregate,
-    sampleCount: samples.length,
-    fromSamples,
-    resolved,
-    perSourceTotals: perSourceDailySampleTotals(samples),
-    sourceNames: [
-      ...new Set(
-        samples
-          .map((sample) => sample.sourceName?.trim())
-          .filter((name): name is string => Boolean(name)),
-      ),
-    ],
-  });
-
-  return resolved;
+  return nativeTotal ?? 0;
 }
 
 /** Health Connect totals for one local calendar day (midnight → now if today). */
@@ -472,23 +406,18 @@ export async function fetchDailyHealthMetrics(
   const { start, end } = localDayHealthWindow(dateKey, now);
   const isoStart = start.toISOString();
   const isoEnd = end.toISOString();
-  const [steps, caloriesFromActive, caloriesFromTotal, heartRateSamples] =
+  const [steps, caloriesFromActive, caloriesFromTotal, avgHeartRateBpm] =
     await Promise.all([
       readDailyMetric("steps"),
       readDailyMetric("calories"),
       readDailyMetric("totalCalories"),
-      readNativeHealthSamples({
-        dataType: "heartRate",
-        startDate: isoStart,
-        endDate: isoEnd,
-        limit: 500,
-      }),
+      readDailyHealthMetricTotal(isoStart, isoEnd, "heartRate").then((v) =>
+        v > 0 ? v : undefined,
+      ),
     ]);
 
   const activeKcal =
     caloriesFromActive > 0 ? caloriesFromActive : caloriesFromTotal;
-
-  const avgHeartRateBpm = averageHealthSampleValues(heartRateSamples);
 
   return {
     steps,

@@ -1,13 +1,13 @@
-import { Health } from "@capgo/capacitor-health";
 import type {
   AuthorizationOptions,
   AuthorizationStatus,
-  AggregationType,
-  BucketType,
   HealthDataType,
-  QueryWorkoutsOptions,
   Workout,
-} from "@capgo/capacitor-health";
+} from "@/lib/health/healthConnectTypes";
+import {
+  HealthConnectNative,
+  isAndroidNative,
+} from "@/lib/health/healthConnectPlugin";
 import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
@@ -19,12 +19,14 @@ const NATIVE_HEALTH_INTERACTIVE_TIMEOUT_MS = 120_000;
 const HEALTH_CONNECT_SETTINGS_INTENT =
   "intent:#Intent;action=androidx.health.ACTION_HEALTH_CONNECT_SETTINGS;end";
 
+/** Scopes requested for cardio read + Progress daily health (matches AndroidManifest). */
 export const CARDIO_HEALTH_READ_TYPES: HealthDataType[] = [
   "workouts",
+  "steps",
   "distance",
   "calories",
+  "totalCalories",
   "heartRate",
-  "steps",
 ];
 
 export const CARDIO_HEALTH_WRITE_TYPES: HealthDataType[] = [
@@ -63,10 +65,10 @@ async function runTimedNativeCall<T>(
 
 /** Runs once at app startup on native to register the Health plugin early. */
 export async function probeNativeHealthBridgeOnStartup(): Promise<void> {
-  if (!isNativePlatform()) return;
+  if (!isAndroidNative()) return;
   try {
     const { version } = await withTimeout(
-      Health.getPluginVersion(),
+      HealthConnectNative.getPluginVersion(),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
       "Health bridge probe timed out",
     );
@@ -82,18 +84,18 @@ export async function probeNativeHealthBridgeOnStartup(): Promise<void> {
 }
 
 export async function testNativeHealthBridge(): Promise<HealthBridgeTestResult> {
-  if (!isNativePlatform()) {
-    return { ok: false, error: "Not on native platform" };
+  if (!isAndroidNative()) {
+    return { ok: false, error: "Not on native Android" };
   }
   try {
     const { version } = await runTimedNativeCall(
       "getPluginVersion",
-      () => Health.getPluginVersion(),
+      () => HealthConnectNative.getPluginVersion(),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
     );
     const availability = await runTimedNativeCall(
       "isAvailable",
-      () => Health.isAvailable(),
+      () => HealthConnectNative.isAvailable(),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
     );
     clientTrace("health-native", "bridge_test_ok", {
@@ -120,16 +122,12 @@ export async function testNativeHealthBridge(): Promise<HealthBridgeTestResult> 
   }
 }
 
-/**
- * Some devices hang on {@link Health.isAvailable}; treat timeout as unavailable.
- * Prefer {@link checkNativeHealthAuthorization} on user-initiated flows.
- */
 export async function isNativeHealthAvailable(): Promise<boolean> {
-  if (!isNativePlatform()) return false;
+  if (!isAndroidNative()) return false;
   try {
     return await runTimedNativeCall(
       "isAvailable",
-      () => Health.isAvailable().then((a) => a.available),
+      () => HealthConnectNative.isAvailable().then((a) => a.available),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
     );
   } catch (err) {
@@ -146,11 +144,11 @@ export async function isNativeHealthAvailable(): Promise<boolean> {
 export async function requestNativeHealthAuthorization(
   options: AuthorizationOptions,
 ): Promise<AuthorizationStatus | null> {
-  if (!isNativePlatform()) return null;
+  if (!isAndroidNative()) return null;
   try {
     return await runTimedNativeCall(
       "requestAuthorization",
-      () => Health.requestAuthorization(options),
+      () => HealthConnectNative.requestAuthorization(options),
       NATIVE_HEALTH_INTERACTIVE_TIMEOUT_MS,
       {
         read: options.read,
@@ -171,11 +169,11 @@ export async function requestNativeHealthAuthorization(
 export async function checkNativeHealthAuthorization(
   options: AuthorizationOptions,
 ): Promise<AuthorizationStatus | null> {
-  if (!isNativePlatform()) return null;
+  if (!isAndroidNative()) return null;
   try {
     return await runTimedNativeCall(
       "checkAuthorization",
-      () => Health.checkAuthorization(options),
+      () => HealthConnectNative.checkAuthorization(options),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
       {
         read: options.read,
@@ -193,17 +191,19 @@ export async function checkNativeHealthAuthorization(
   }
 }
 
-export async function queryNativeWorkouts(
-  options: QueryWorkoutsOptions,
-): Promise<Workout[]> {
-  if (!isNativePlatform()) return [];
+export async function queryNativeWorkouts(options: {
+  startDate: string;
+  endDate: string;
+  limit?: number;
+  ascending?: boolean;
+}): Promise<Workout[]> {
+  if (!isAndroidNative()) return [];
   try {
     const { workouts } = await runTimedNativeCall(
-      "queryWorkouts",
-      () => Health.queryWorkouts(options),
+      "queryExerciseSessions",
+      () => HealthConnectNative.queryExerciseSessions(options),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
       {
-        workoutType: options.workoutType,
         startDate: options.startDate,
         endDate: options.endDate,
         limit: options.limit,
@@ -215,76 +215,17 @@ export async function queryNativeWorkouts(
   }
 }
 
-export async function readNativeHealthSamples(options: {
-  dataType: HealthDataType;
-  startDate: string;
-  endDate: string;
-  limit?: number;
-}) {
-  if (!isNativePlatform()) return [];
-  try {
-    const { samples } = await runTimedNativeCall(
-      "readSamples",
-      () => Health.readSamples(options),
-      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
-      {
-        dataType: options.dataType,
-        startDate: options.startDate,
-        endDate: options.endDate,
-        limit: options.limit,
-      },
-    );
-    return samples;
-  } catch {
-    return [];
-  }
-}
-
-export async function queryNativeHealthAggregated(options: {
-  dataType: HealthDataType;
-  startDate: string;
-  endDate: string;
-  bucket?: BucketType;
-  aggregation?: AggregationType;
-}) {
-  if (!isNativePlatform()) return [];
-  try {
-    const { samples } = await runTimedNativeCall(
-      "queryAggregated",
-      () =>
-        Health.queryAggregated({
-          dataType: options.dataType,
-          startDate: options.startDate,
-          endDate: options.endDate,
-          bucket: options.bucket ?? "day",
-          aggregation: options.aggregation ?? "sum",
-        }),
-      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
-      {
-        dataType: options.dataType,
-        startDate: options.startDate,
-        endDate: options.endDate,
-        bucket: options.bucket ?? "day",
-        aggregation: options.aggregation ?? "sum",
-      },
-    );
-    return samples;
-  } catch {
-    return [];
-  }
-}
-
 export async function writeNativeHealthSample(options: {
-  dataType: HealthDataType;
+  dataType: "distance" | "calories" | "weight";
   value: number;
   startDate: string;
   endDate: string;
 }): Promise<void> {
-  if (!isNativePlatform()) return;
+  if (!isAndroidNative()) return;
   try {
     await runTimedNativeCall(
-      "saveSample",
-      () => Health.saveSample(options),
+      "writeHealthSample",
+      () => HealthConnectNative.writeHealthSample(options),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
       { dataType: options.dataType },
     );
@@ -328,10 +269,11 @@ async function fallbackOpenHealthConnectSettings(): Promise<boolean> {
 
 export async function openNativeHealthSettings(): Promise<boolean> {
   if (!isNativePlatform()) return false;
+  if (!isAndroidNative()) return false;
   try {
     await runTimedNativeCall(
       "openHealthConnectSettings",
-      () => Health.openHealthConnectSettings(),
+      () => HealthConnectNative.openHealthConnectSettings(),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
     );
     return true;

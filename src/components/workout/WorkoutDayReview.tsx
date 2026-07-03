@@ -11,7 +11,9 @@ import { formatCardioHealthSummary } from "@/lib/health";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import { cardioLabelForRow } from "@/lib/cardioInstances";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
+import { hasRenderableGpsRoute } from "@/lib/geo/gpsTrackPolyline";
 import { formatLoggedDuration } from "@/utils/time";
+import GpsRoutePolyline from "@/components/cardio/GpsRoutePolyline";
 import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
 
 interface WorkoutDayReviewProps {
@@ -177,6 +179,13 @@ export default function WorkoutDayReview({
                   </p>
                   {healthSummary ? (
                     <p className="text-xs text-muted">{healthSummary}</p>
+                  ) : null}
+                  {hasRenderableGpsRoute(entry.gpsTrackPoints) ? (
+                    <GpsRoutePolyline
+                      points={entry.gpsTrackPoints!}
+                      className="mt-2"
+                      ariaLabel={`${title} GPS route`}
+                    />
                   ) : null}
                   {entry.notes ? (
                     <p className="text-sm text-muted italic">{entry.notes}</p>

@@ -1,4 +1,4 @@
-import type { WorkoutType } from "@capgo/capacitor-health";
+import type { WorkoutType } from "@/lib/health/healthConnectTypes";
 import type { CardioActivityKind } from "@/types";
 
 const CARDIO_TO_WORKOUT_TYPE: Partial<Record<CardioActivityKind, WorkoutType>> = {

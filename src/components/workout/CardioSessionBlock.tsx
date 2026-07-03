@@ -17,7 +17,9 @@ import {
 import { formatCardioHealthSummary, type CardioHealthMeta } from "@/lib/health";
 import type { ResolvedCardioQuickLog } from "@/lib/health/resolveCardioQuickLog";
 import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
+import { hasRenderableGpsRoute } from "@/lib/geo/gpsTrackPolyline";
 import { mirrorCardioCaptureToHealth } from "@/lib/mirrorCardioToHealth";
+import GpsRoutePolyline from "@/components/cardio/GpsRoutePolyline";
 import { getWeightForDate } from "@/lib/weightLog";
 import type { CardioSessionCaptureInput } from "@/lib/cardioSessionLog";
 import { useWeightStore } from "@/stores/useWeightStore";
@@ -70,9 +72,11 @@ export default function CardioSessionBlock({
   const meta = exerciseMap[log.exerciseId];
   const title = meta?.name ?? log.exerciseId;
   const done = log.completed || log.skipped;
+  const allowLiveTracking = !log.completed;
   const healthSummary =
     formatCardioHealthSummary(healthMeta ?? log) ||
     formatCardioHealthSummary(log);
+  const routePoints = log.gpsTrackPoints ?? gpsTrack;
 
   const overflowItems: WorkoutRowMenuItem[] = [];
   if (!log.completed && !log.skipped) {
@@ -172,10 +176,19 @@ export default function CardioSessionBlock({
             onTimeInputChange={setTimeInput}
             healthMeta={healthMeta}
             onResolved={handleResolved}
+            showRecorder={allowLiveTracking}
+            showHealthImport={allowLiveTracking}
             compact
           />
+          {hasRenderableGpsRoute(routePoints) ? (
+            <GpsRoutePolyline
+              points={routePoints!}
+              className="mt-3"
+              ariaLabel={`${title} GPS route`}
+            />
+          ) : null}
         </div>
-      ) : (
+      ) : !log.skipped ? (
         <span className="flex gap-3 px-2 pb-3 md:px-3">
           <label className="flex-1 block">
             <span className="text-caption text-muted uppercase tracking-wider">
@@ -216,7 +229,7 @@ export default function CardioSessionBlock({
             />
           </label>
         </span>
-      )}
+      ) : null}
 
       {healthSummary && !kind ? (
         <p className="px-2 pb-3 text-xs text-muted md:px-3">{healthSummary}</p>

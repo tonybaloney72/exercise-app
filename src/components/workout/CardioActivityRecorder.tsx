@@ -305,7 +305,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
         : null;
 
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-surface-hover/60 p-3 gap-2">
+    <div>
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-sm font-medium text-foreground">Track activity</p>
@@ -468,7 +468,9 @@ function SimpleTimerRecorder({
               <button
                 type="button"
                 onClick={() => {
-                  timerRef.current = resumeCardioActivityTimer(timerRef.current);
+                  timerRef.current = resumeCardioActivityTimer(
+                    timerRef.current,
+                  );
                   setPaused(false);
                 }}
                 className="rounded-lg border border-accent/40 px-3 py-1.5 text-xs font-semibold text-accent"

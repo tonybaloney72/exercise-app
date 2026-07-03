@@ -21,7 +21,9 @@ type Props = {
 
 export default function CardioHealthImport({ kind, onImport }: Props) {
   const [loading, setLoading] = useState(false);
-  const [sessions, setSessions] = useState<ImportedCardioSession[] | null>(null);
+  const [sessions, setSessions] = useState<ImportedCardioSession[] | null>(
+    null,
+  );
 
   if (!isNativePlatform()) return null;
 
@@ -38,7 +40,9 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
         return;
       }
       const imported = await importRecentCardioSessions(kind);
-      clientTrace("health-import", "import_sessions", { count: imported.length });
+      clientTrace("health-import", "import_sessions", {
+        count: imported.length,
+      });
       if (imported.length === 0) {
         toast.message(
           "No matching sessions in Health Connect. Try Start/End to pull data from your activity window.",
@@ -101,7 +105,7 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
   }
 
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-surface-hover/60 p-3 gap-2">
+    <div>
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-sm font-medium text-foreground">Health Connect</p>
@@ -137,12 +141,15 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
               }),
               formatSecondsToMMSS(session.durationSeconds),
             ];
-            if (session.distanceMi != null) labelParts.push(`${session.distanceMi} mi`);
+            if (session.distanceMi != null)
+              labelParts.push(`${session.distanceMi} mi`);
             if (session.activeCaloriesKcal != null) {
               labelParts.push(`${session.activeCaloriesKcal} kcal`);
             }
             return (
-              <li key={`${session.startDate.toISOString()}-${session.durationSeconds}`}>
+              <li
+                key={`${session.startDate.toISOString()}-${session.durationSeconds}`}
+              >
                 <button
                   type="button"
                   onClick={() => void handlePick(session)}
@@ -169,7 +176,9 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
         </ul>
       ) : null}
       {sessions && sessions.length === 0 ? (
-        <p className="text-xs text-muted">No matching sessions in the last 48 hours.</p>
+        <p className="text-xs text-muted">
+          No matching sessions in the last 48 hours.
+        </p>
       ) : null}
     </div>
   );

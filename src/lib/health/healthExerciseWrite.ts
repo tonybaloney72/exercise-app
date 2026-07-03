@@ -1,5 +1,5 @@
 import { registerPlugin } from "@capacitor/core";
-import type { WorkoutType } from "@capgo/capacitor-health";
+import type { WorkoutType } from "@/lib/health/healthConnectTypes";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 

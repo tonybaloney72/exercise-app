@@ -1,4 +1,4 @@
-import type { HealthDataType } from "@capgo/capacitor-health";
+import type { HealthDataType } from "@/lib/health/healthConnectTypes";
 import type {
   HealthDailyMetricKey,
   HealthMetricAggMethod,

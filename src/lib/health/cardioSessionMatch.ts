@@ -1,4 +1,4 @@
-import type { WorkoutType } from "@capgo/capacitor-health";
+import type { WorkoutType } from "@/lib/health/healthConnectTypes";
 import type { CardioActivityKind } from "@/types";
 import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
 import type { ImportedCardioSession } from "@/lib/health/cardioHealth";

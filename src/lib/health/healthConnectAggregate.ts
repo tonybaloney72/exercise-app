@@ -1,38 +1,25 @@
-import { Capacitor, registerPlugin } from "@capacitor/core";
-import type { HealthDataType } from "@capgo/capacitor-health";
+import type { HealthConnectRangeMetric } from "@/lib/health/healthConnectTypes";
+import type { HealthDataType } from "@/lib/health/healthConnectTypes";
+import {
+  HealthConnectNative,
+  isAndroidNative,
+} from "@/lib/health/healthConnectPlugin";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 
-type HealthConnectRangeMetric = "steps" | "calories" | "totalCalories";
-
-type HealthConnectAggregatePlugin = {
-  queryLocalDayTotal(options: {
-    dateKey: string;
-    isToday: boolean;
-    dataType: HealthConnectRangeMetric;
-  }): Promise<{ value: number }>;
-  queryRangeTotal(options: {
-    dataType: HealthConnectRangeMetric;
-    startDate: string;
-    endDate: string;
-  }): Promise<{ value: number }>;
-};
-
-const HealthConnectAggregate = registerPlugin<HealthConnectAggregatePlugin>(
-  "HealthConnectAggregate",
-);
-
 function toRangeMetric(dataType: HealthDataType): HealthConnectRangeMetric | null {
-  if (dataType === "steps" || dataType === "calories" || dataType === "totalCalories") {
+  if (
+    dataType === "steps" ||
+    dataType === "calories" ||
+    dataType === "totalCalories" ||
+    dataType === "distance" ||
+    dataType === "heartRate"
+  ) {
     return dataType;
   }
   return null;
 }
 
-function isAndroidNative(): boolean {
-  return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
-}
-
-/** Android: HC total for a local calendar day (computed on device, matches HC app). */
+/** Android: HC AggregateRequest total for a local calendar day (matches HC app). */
 export async function queryHealthConnectLocalDayTotal(options: {
   dateKey: string;
   isToday: boolean;
@@ -44,7 +31,7 @@ export async function queryHealthConnectLocalDayTotal(options: {
   if (!metric) return undefined;
 
   try {
-    const { value } = await HealthConnectAggregate.queryLocalDayTotal({
+    const { value } = await HealthConnectNative.queryLocalDayTotal({
       dateKey: options.dateKey,
       isToday: options.isToday,
       dataType: metric,
@@ -74,7 +61,7 @@ export async function queryHealthConnectLocalDayTotal(options: {
   }
 }
 
-/** Android-only: HC AggregateRequest for one deduped total over an ISO window. */
+/** Android: HC AggregateRequest for one deduped total over an ISO window. */
 export async function queryHealthConnectRangeTotal(options: {
   dataType: HealthDataType;
   startDate: string;
@@ -86,7 +73,7 @@ export async function queryHealthConnectRangeTotal(options: {
   if (!metric) return undefined;
 
   try {
-    const { value } = await HealthConnectAggregate.queryRangeTotal({
+    const { value } = await HealthConnectNative.queryRangeTotal({
       dataType: metric,
       startDate: options.startDate,
       endDate: options.endDate,
