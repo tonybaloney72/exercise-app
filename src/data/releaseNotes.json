@@ -1,5 +1,25 @@
 [
   {
+    "id": "2026-07-03-progress-vitals-sleep",
+    "date": "2026-07-03",
+    "title": "More daily health on Progress",
+    "highlights": [
+      "Progress now charts resting heart rate, blood oxygen (SpO₂), sleep, and VO₂ max from Health Connect—alongside steps, active calories, and average heart rate.",
+      "Today's stat cards rotate through the new vitals and sleep when your watch or phone reports them.",
+      "Settings → Cardio & sensors shows whether background Health Connect updates are allowed so daily totals can refresh when you return to the app."
+    ]
+  },
+  {
+    "id": "2026-07-03-hc-exercise-routes",
+    "date": "2026-07-03",
+    "title": "Health Connect routes on import",
+    "highlights": [
+      "Importing a cardio session from Health Connect can now pull the watch or phone route—Health Connect may ask you to allow route access for that session.",
+      "Imported routes show the same map polyline as app GPS tracking on the cardio row and in workout history.",
+      "Re-import a recent session (within 48 hours) if you imported before routes were available—uncheck the done checkbox on the row to show Import again."
+    ]
+  },
+  {
     "id": "2026-07-02-rep-increase-suggestions",
     "date": "2026-07-02",
     "title": "Suggest rep increases",
@@ -7,26 +27,6 @@
       "Settings → Device & timers → Progression: turn on Suggest rep increases to get optional Library default bumps after strong sessions.",
       "When you're ready, a Ready to level up? card appears on Today after you finish a workout—tap to review exercises and accept +2 reps or seconds.",
       "Snooze for 14 days or ignore per exercise; ignored exercises can be re-enabled in Settings or Library."
-    ]
-  },
-  {
-    "id": "2026-07-02-hc-import-mirror-fix",
-    "date": "2026-07-02",
-    "title": "Health Connect import fix",
-    "highlights": [
-      "Importing a walk or cardio session from Health Connect no longer writes a duplicate session back to Health Connect.",
-      "That duplicate could inflate daily step totals when your watch and phone both report activity—ME now only mirrors sessions it tracked itself (GPS or timer).",
-      "If you already imported walks before this fix, you may need to remove duplicate My Exercise sessions in Health Connect for today's step count to match."
-    ]
-  },
-  {
-    "id": "2026-07-01-daily-health-charts",
-    "date": "2026-07-01",
-    "title": "Daily health on Progress",
-    "highlights": [
-      "Active calories chart now shows your full Health Connect daily total—strength workouts, cardio, and everyday activity—not only logged cardio sessions.",
-      "New average heart rate chart uses the same 14-day daily totals as steps.",
-      "Health Connect daily metrics refresh when you open the app or return from the background, not only when you visit Progress."
     ]
   }
 ]
