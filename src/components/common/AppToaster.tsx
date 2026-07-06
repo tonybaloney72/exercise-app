@@ -1,15 +1,15 @@
 "use client";
 
 import { Toaster } from "sonner";
-import { useSettingsStore } from "@/stores/useSettingsStore";
+import { useEffectiveDarkMode } from "@/hooks/useEffectiveDarkMode";
 
 export default function AppToaster() {
-  const darkMode = useSettingsStore((s) => s.darkMode);
+  const isDark = useEffectiveDarkMode();
 
   return (
     <Toaster
       position="top-center"
-      theme={darkMode ? "dark" : "light"}
+      theme={isDark ? "dark" : "light"}
       richColors
       closeButton
       duration={5000}

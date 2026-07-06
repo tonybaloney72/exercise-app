@@ -310,10 +310,13 @@ export type TrainingPriorityPreset =
 /** Target exercises per round when materializing from templates (Slice 5). */
 export type RoundDensity = "compact" | "standard" | "full";
 
+export type ThemeMode = "auto" | "light" | "dark";
+
 export interface UserSettings {
   restBetweenRounds: number;
   weekStartDate?: string;
-  darkMode: boolean;
+  /** App theme; `auto` follows the device light/dark setting. */
+  themeMode: ThemeMode;
   /**
    * When true, finishing a round opens the rest countdown immediately.
    * When false, show a manual “Start rest” control on the completed round.

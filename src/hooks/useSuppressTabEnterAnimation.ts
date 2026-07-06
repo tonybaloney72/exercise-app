@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useLayoutEffect } from "react";
-import { isMainTabRoute } from "@/lib/tabRoutes";
+import { isMainTabRoute } from "@/lib/appRoutes";
 
 /** Survives tab remounts so the next tab can detect a bottom-nav switch. */
 let previousTabPathname: string | null = null;

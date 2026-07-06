@@ -127,7 +127,7 @@ export interface WorkoutDayTemplateRepo {
 
 export const DEFAULT_SETTINGS: UserSettings = {
   restBetweenRounds: 90,
-  darkMode: true,
+  themeMode: "auto",
   restTimerAutoStart: true,
   timerSoundsEnabled: true,
   timerVibrationEnabled: true,

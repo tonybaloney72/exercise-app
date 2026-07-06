@@ -54,16 +54,6 @@ export function groupCompletedWorkoutsByMonth(
     .sort((a, b) => b.monthKey.localeCompare(a.monthKey));
 }
 
-export function formatWorkoutHistoryDayLabel(dateKey: string): string {
-  const d = parseLocalDateKey(dateKey);
-  if (!d) return dateKey;
-  return d.toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-}
-
 export function formatCompletedBannerTitle(dateKey: string): string {
   const d = parseLocalDateKey(dateKey);
   if (!d) return "Completed";

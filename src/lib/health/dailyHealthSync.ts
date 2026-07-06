@@ -8,6 +8,8 @@ import type { HealthDailyMetricKey, HealthDailyMetricUpsert } from "@/types/heal
 
 const DAILY_HEALTH_SYNC_STORAGE_KEY = "exercise-app-health-daily-sync-v1";
 export const DAILY_HEALTH_CHART_DAYS = 14;
+/** Repo + chart history window for Health detail ranges (up to 1 year). */
+export const DAILY_HEALTH_HISTORY_DAYS = 365;
 const DAILY_HEALTH_TODAY_SYNC_MIN_INTERVAL_MS = 30 * 60 * 1000;
 const DAILY_HEALTH_TODAY_STEP_DELTA = 100;
 

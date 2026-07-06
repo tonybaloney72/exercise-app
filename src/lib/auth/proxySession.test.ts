@@ -25,18 +25,18 @@ describe("proxySession", () => {
   });
 
   it("classifies app shell paths", () => {
-    expect(isAppShellPath("/today")).toBe(true);
-    expect(isAppShellPath("/progress/history")).toBe(true);
+    expect(isAppShellPath("/workout")).toBe(true);
+    expect(isAppShellPath("/workout/history")).toBe(true);
     expect(isAppShellPath("/login")).toBe(false);
     expect(isAppShellPath("/")).toBe(false);
   });
 
   it("uses session-only auth on soft in-app navigation", () => {
     expect(
-      shouldUseSessionOnlyAuth(mockRequest({ RSC: "1" }), "/weekly"),
+      shouldUseSessionOnlyAuth(mockRequest({ RSC: "1" }), "/workout/week"),
     ).toBe(true);
     expect(
-      shouldUseSessionOnlyAuth(mockRequest({}), "/weekly"),
+      shouldUseSessionOnlyAuth(mockRequest({}), "/workout/week"),
     ).toBe(false);
     expect(
       shouldUseSessionOnlyAuth(mockRequest({ RSC: "1" }), "/login"),

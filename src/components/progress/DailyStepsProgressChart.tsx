@@ -27,6 +27,7 @@ interface Props {
   series: DailyStepsChartPoint[];
   loading?: boolean;
   unavailableReason?: DailyHealthUnavailableReason | null;
+  hideHeader?: boolean;
 }
 
 function unavailableCopy(reason: DailyHealthUnavailableReason): string {
@@ -40,14 +41,19 @@ export default function DailyStepsProgressChart({
   series,
   loading,
   unavailableReason,
+  hideHeader = false,
 }: Props) {
   if (loading) {
     return (
       <div className="flex flex-col gap-3">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">Daily steps</h2>
-          <p className="text-xs text-muted mt-0.5">Loading from Health Connect…</p>
-        </div>
+        {!hideHeader ? (
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Daily steps</h2>
+            <p className="text-xs text-muted mt-0.5">Loading from Health Connect…</p>
+          </div>
+        ) : (
+          <p className="text-xs text-muted">Loading from Health Connect…</p>
+        )}
       </div>
     );
   }
@@ -55,18 +61,20 @@ export default function DailyStepsProgressChart({
   if (series.length === 0) {
     return (
       <div className="flex flex-col gap-3">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">Daily steps</h2>
-          <p className="text-xs text-muted mt-0.5">
-            Total steps per calendar day from Health Connect (today through midnight
-            so far).
-          </p>
-        </div>
+        {!hideHeader ? (
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Daily steps</h2>
+            <p className="text-xs text-muted mt-0.5">
+              Total steps per calendar day from Health Connect (today through midnight
+              so far).
+            </p>
+          </div>
+        ) : null}
         <div className="w-full rounded-xl border border-dashed border-border bg-surface/50 px-4 py-8 text-center">
           <p className="text-sm text-muted">
             {unavailableReason
               ? unavailableCopy(unavailableReason)
-              : "No step data for the last two weeks yet."}
+              : "No step data for this range yet."}
           </p>
         </div>
       </div>
@@ -75,12 +83,14 @@ export default function DailyStepsProgressChart({
 
   return (
     <div className="flex flex-col gap-3">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">Daily steps</h2>
-        <p className="text-xs text-muted mt-0.5">
-          Total steps per calendar day from Health Connect (today through midnight so far).
-        </p>
-      </div>
+      {!hideHeader ? (
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">Daily steps</h2>
+          <p className="text-xs text-muted mt-0.5">
+            Total steps per calendar day from Health Connect (today through midnight so far).
+          </p>
+        </div>
+      ) : null}
       <div className="w-full rounded-xl border border-border bg-surface p-2 py-3">
         <ResponsiveContainer
           width="100%"

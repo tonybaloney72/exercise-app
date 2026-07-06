@@ -1,5 +1,15 @@
 [
   {
+    "id": "2026-07-06-health-nav-theme",
+    "date": "2026-07-06",
+    "title": "Workout, Health & Settings",
+    "highlights": [
+      "Bottom navigation is now three tabs: Workout (today's plan and logging), Health, and Settings. Week and History live under Workout.",
+      "Health brings together today's vitals, weight, calories burned, and cardio exercise charts. Open an activity to see distance and pace over time, browse sessions by day, and tap a row for full metrics and GPS route when available.",
+      "Settings → Device & timers → Appearance: choose Auto (match your device), Light, or Dark."
+    ]
+  },
+  {
     "id": "2026-07-03-progress-vitals-sleep",
     "date": "2026-07-03",
     "title": "More daily health on Progress",
@@ -17,16 +27,6 @@
       "Importing a cardio session from Health Connect can now pull the watch or phone route—Health Connect may ask you to allow route access for that session.",
       "Imported routes show the same map polyline as app GPS tracking on the cardio row and in workout history.",
       "Re-import a recent session (within 48 hours) if you imported before routes were available—uncheck the done checkbox on the row to show Import again."
-    ]
-  },
-  {
-    "id": "2026-07-02-rep-increase-suggestions",
-    "date": "2026-07-02",
-    "title": "Suggest rep increases",
-    "highlights": [
-      "Settings → Device & timers → Progression: turn on Suggest rep increases to get optional Library default bumps after strong sessions.",
-      "When you're ready, a Ready to level up? card appears on Today after you finish a workout—tap to review exercises and accept +2 reps or seconds.",
-      "Snooze for 14 days or ignore per exercise; ignored exercises can be re-enabled in Settings or Library."
     ]
   }
 ]

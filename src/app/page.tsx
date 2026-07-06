@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { resolveApiUrl } from "@/lib/apiBaseUrl";
 import { isCapacitorBundledBuild, isNativePlatform } from "@/lib/capacitorRuntime";
+import { APP_HOME } from "@/lib/auth/constants";
 import { setGuestCookieActive } from "@/lib/auth/guestCookieClient";
 
 export default function LandingPage() {
@@ -22,14 +23,14 @@ export default function LandingPage() {
       if (isCapacitorBundledBuild() || isNativePlatform()) {
         setGuestCookieActive();
         setGuest(true);
-        router.push("/today");
+        router.push(APP_HOME);
         return;
       }
       const res = await fetch(resolveApiUrl("/api/auth/guest"), { method: "POST" });
       if (!res.ok) throw new Error("Failed to start guest session.");
       setGuest(true);
       router.refresh();
-      router.push("/today");
+      router.push(APP_HOME);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
       setBusy(false);

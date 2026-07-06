@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { CARDIO_KIND_TO_EXERCISE_ID } from "@/lib/cardioActivities";
-import { buildCardioChartSeries } from "@/utils/cardioProgressStats";
+import {
+  buildCardioChartSeries,
+  buildCardioSessionRows,
+  formatCardioHistoryDayLabel,
+  formatCardioSessionQuickSummary,
+  groupCardioSessionsByDay,
+} from "@/utils/cardioProgressStats";
 import type { WorkoutLog } from "@/types";
 
 describe("buildCardioChartSeries", () => {
@@ -61,5 +67,68 @@ describe("buildCardioChartSeries", () => {
     expect(series).toHaveLength(1);
     expect(series[0]?.stepCount).toBe(3100);
     expect(series[0]?.activeCaloriesKcal).toBeUndefined();
+  });
+});
+
+describe("buildCardioSessionRows", () => {
+  it("groups sessions by day with quick summaries", () => {
+    const walkId = CARDIO_KIND_TO_EXERCISE_ID.walk;
+    const history = [
+      {
+        id: "w1",
+        date: "2026-05-18",
+        cardioExercises: [
+          {
+            exerciseId: walkId,
+            completed: true,
+            skipped: false,
+            actualDistanceMi: 2.5,
+            actualDuration: 2400,
+            activeCaloriesKcal: 180,
+            cardioInstanceId: "a",
+          },
+          {
+            exerciseId: walkId,
+            completed: true,
+            skipped: false,
+            actualDistanceMi: 1,
+            actualDuration: 900,
+            cardioInstanceId: "b",
+          },
+        ],
+      } satisfies Partial<WorkoutLog> as WorkoutLog,
+      {
+        id: "w2",
+        date: "2026-05-17",
+        cardioExercises: [
+          {
+            exerciseId: walkId,
+            completed: true,
+            skipped: false,
+            actualDuration: 600,
+          },
+        ],
+      } satisfies Partial<WorkoutLog> as WorkoutLog,
+    ];
+
+    const rows = buildCardioSessionRows(history, walkId);
+    expect(rows).toHaveLength(3);
+
+    const groups = groupCardioSessionsByDay(rows);
+    expect(groups).toHaveLength(2);
+    expect(groups[0]?.date).toBe("2026-05-18");
+    expect(groups[0]?.sessions).toHaveLength(2);
+    expect(groups[0]?.sessions[0]?.label).toBe("Walk (1)");
+    expect(groups[0]?.sessions[1]?.label).toBe("Walk (2)");
+    expect(formatCardioSessionQuickSummary(groups[0]!.sessions[0]!)).toBe(
+      "2.5 mi · 40:00 · 180 kcal",
+    );
+    expect(groups[1]?.sessions[0]?.label).toBe("Walk");
+  });
+
+  it("labels today in local timezone", () => {
+    const today = new Date(2026, 5, 18, 12, 0, 0);
+    expect(formatCardioHistoryDayLabel("2026-06-18", today)).toBe("Today");
+    expect(formatCardioHistoryDayLabel("2026-05-17", today)).toMatch(/May 17/);
   });
 });

@@ -40,6 +40,8 @@ interface Props {
   unavailableReason?: DailyHealthUnavailableReason | null;
   chartType?: "bar" | "line";
   allowDecimals?: boolean;
+  /** Page provides title + range switcher. */
+  hideHeader?: boolean;
 }
 
 function unavailableCopy(reason: DailyHealthUnavailableReason): string {
@@ -60,14 +62,19 @@ export default function DailyHealthMetricProgressChart({
   unavailableReason,
   chartType = "bar",
   allowDecimals = false,
+  hideHeader = false,
 }: Props) {
   if (loading) {
     return (
       <div className="flex flex-col gap-3">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-          <p className="text-xs text-muted mt-0.5">Loading from Health Connect…</p>
-        </div>
+        {!hideHeader ? (
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+            <p className="text-xs text-muted mt-0.5">Loading from Health Connect…</p>
+          </div>
+        ) : (
+          <p className="text-xs text-muted">Loading from Health Connect…</p>
+        )}
       </div>
     );
   }
@@ -75,10 +82,12 @@ export default function DailyHealthMetricProgressChart({
   if (series.length === 0) {
     return (
       <div className="flex flex-col gap-3">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-          <p className="text-xs text-muted mt-0.5">{subtitle}</p>
-        </div>
+        {!hideHeader ? (
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+            <p className="text-xs text-muted mt-0.5">{subtitle}</p>
+          </div>
+        ) : null}
         <div className="w-full rounded-xl border border-dashed border-border bg-surface/50 px-4 py-8 text-center">
           <p className="text-sm text-muted">
             {unavailableReason
@@ -96,10 +105,12 @@ export default function DailyHealthMetricProgressChart({
 
   return (
     <div className="flex flex-col gap-3">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-        <p className="text-xs text-muted mt-0.5">{subtitle}</p>
-      </div>
+      {!hideHeader ? (
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+          <p className="text-xs text-muted mt-0.5">{subtitle}</p>
+        </div>
+      ) : null}
       <div className="w-full rounded-xl border border-border bg-surface p-2 py-3">
         <ResponsiveContainer
           width="100%"

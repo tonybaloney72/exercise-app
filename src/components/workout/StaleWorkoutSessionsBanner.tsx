@@ -16,6 +16,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 import type { WorkoutLog } from "@/types";
+import { routes } from "@/lib/appRoutes";
 
 interface StaleWorkoutSessionsBannerProps {
   /** Hide while customizing or in an active session. */
@@ -38,7 +39,7 @@ function StaleWorkoutSessionCard({
     workoutHistory,
     activeWorkout,
   });
-  const logHref = `/progress/history/${session.date}/log`;
+  const logHref = routes.workoutHistoryLog(session.date);
 
   return (
     <SurfaceCard className="flex flex-col border-amber-500/30 bg-amber-500/5 p-4 gap-3 h-full">

@@ -13,6 +13,7 @@ import { createClient } from "@/lib/supabase/client";
 import { sanitizeStretchEntries } from "@/lib/stretchDefaults";
 import { sanitizeExpertiseByGroup } from "@/lib/expertiseLevels";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
+import { sanitizeThemeMode } from "@/lib/themeMode";
 import { clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import {
   sanitizeTrainingPriorityPreset,
@@ -142,6 +143,7 @@ interface SettingsRow {
   rest_between_rounds: number;
   week_start_date: string | null;
   dark_mode: boolean;
+  theme_mode?: string;
   timer_sounds_enabled?: boolean;
   timer_vibration_enabled?: boolean;
   keep_screen_awake?: boolean;
@@ -385,6 +387,9 @@ function rowToSettings(row: SettingsRow): UserSettings {
     restBetweenRounds: row.rest_between_rounds,
     weekStartDate: row.week_start_date ?? undefined,
     darkMode: row.dark_mode,
+    ...(row.theme_mode != null
+      ? { themeMode: sanitizeThemeMode(row.theme_mode) }
+      : {}),
     restTimerAutoStart: row.rest_timer_auto_start ?? true,
     timerSoundsEnabled: row.timer_sounds_enabled ?? true,
     timerVibrationEnabled: row.timer_vibration_enabled ?? true,
@@ -434,7 +439,7 @@ function rowToSettings(row: SettingsRow): UserSettings {
         )
       : [],
     suggestRepIncreases: row.suggest_rep_increases ?? false,
-  });
+  } as Partial<UserSettings> & { darkMode?: boolean });
 }
 
 function settingsToRow(s: UserSettings, userId: string): SettingsRow {
@@ -442,7 +447,8 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     user_id: userId,
     rest_between_rounds: s.restBetweenRounds,
     week_start_date: s.weekStartDate ?? null,
-    dark_mode: s.darkMode,
+    dark_mode: s.themeMode !== "light",
+    theme_mode: s.themeMode,
     rest_timer_auto_start: s.restTimerAutoStart,
     timer_sounds_enabled: s.timerSoundsEnabled,
     timer_vibration_enabled: s.timerVibrationEnabled,

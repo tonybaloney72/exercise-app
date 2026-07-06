@@ -52,6 +52,10 @@ import {
   DEFAULT_WARM_UP_STRETCH_COUNT,
   sanitizeStretchCount,
 } from "@/lib/stretchCounts";
+import {
+  resolveThemeMode,
+  sanitizeThemeMode,
+} from "@/lib/themeMode";
 import type { UserSettings } from "@/types";
 
 const EMPTY_RELEASE_NOTES_SEEN: string[] = [];
@@ -63,7 +67,11 @@ export function normalizeUserSettings(
   const preset = sanitizeTrainingPriorityPreset(
     partial.trainingPriorityPreset ?? partial.programFocus,
   );
-  const { programFocus: _legacy, ...rest } = partial;
+  const {
+    programFocus: _legacy,
+    darkMode: legacyDarkMode,
+    ...rest
+  } = partial as Partial<UserSettings> & { darkMode?: boolean };
 
   const presetScores = scoresFromPreset(preset);
   let scores = partial.trainingPriorityScores
@@ -201,6 +209,10 @@ export function normalizeUserSettings(
     DEFAULT_COOL_DOWN_STRETCH_COUNT,
   );
 
+  const themeMode = sanitizeThemeMode(
+    resolveThemeMode({ ...partial, darkMode: legacyDarkMode }),
+  );
+
   return {
     ...DEFAULT_SETTINGS,
     ...rest,
@@ -239,6 +251,7 @@ export function normalizeUserSettings(
       : {}),
     suggestRepIncreases:
       partial.suggestRepIncreases ?? DEFAULT_SETTINGS.suggestRepIncreases,
+    themeMode,
   };
 }
 

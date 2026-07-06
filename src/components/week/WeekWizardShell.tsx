@@ -6,7 +6,6 @@ import { WEEK_DAY_ABBRS } from "@/lib/weekWizardConstants";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 type Props = {
-  backLabel?: string;
   title: string;
   subtitle: string;
   activeDow: number;
@@ -18,7 +17,6 @@ type Props = {
 };
 
 export default function WeekWizardShell({
-  backLabel = "Back",
   title,
   subtitle,
   activeDow,
@@ -33,7 +31,7 @@ export default function WeekWizardShell({
   return (
     <div className="flex flex-col py-6 gap-5 pb-24">
       <div>
-        <BackNavLink label={backLabel} />
+        <BackNavLink />
         <h1 className="mt-2 text-2xl font-bold text-foreground">{title}</h1>
         <p className="mt-1 text-sm text-muted">{subtitle}</p>
       </div>

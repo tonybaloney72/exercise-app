@@ -14,6 +14,7 @@ import type { CustomBuildStyle } from "@/lib/weekBlueprint";
 import type { ProgramMode } from "@/lib/weeklyCategoryLayout";
 import type { UserSettings } from "@/types";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { routes } from "@/lib/appRoutes";
 
 export default function YourWeekSettingsSection() {
   const settings = useSettingsStore();
@@ -54,7 +55,7 @@ export default function YourWeekSettingsSection() {
       settings.customBuildStyle === "manual" ? (
         <div className="flex flex-col gap-2">
           <Link
-            href="/weekly/build"
+            href={routes.settingsBuildCustom}
             className="w-full rounded-xl bg-accent py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-accent/90"
           >
             Open week builder
@@ -70,7 +71,7 @@ export default function YourWeekSettingsSection() {
       settings.customBuildStyle === "guided" ? (
         <div className="flex flex-col gap-2">
           <Link
-            href="/weekly/build-guided"
+            href={routes.settingsBuildGuided}
             className="w-full rounded-xl bg-accent py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-accent/90"
           >
             Plan guided week

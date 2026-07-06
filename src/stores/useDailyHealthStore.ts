@@ -14,6 +14,7 @@ import {
 } from "@/lib/health/dailyHealthRecords";
 import {
   DAILY_HEALTH_CHART_DAYS,
+  DAILY_HEALTH_HISTORY_DAYS,
   syncDailyHealthMetricsToRepo,
 } from "@/lib/health/dailyHealthSync";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
@@ -61,7 +62,8 @@ export const useDailyHealthStore = create<DailyHealthState>((set) => ({
     try {
       const now = new Date();
       const todayKey = formatLocalDateKey(now);
-      const dayKeys = lastNLocalDateKeys(DAILY_HEALTH_CHART_DAYS, now);
+      const dayKeys = lastNLocalDateKeys(DAILY_HEALTH_HISTORY_DAYS, now);
+      const hcSyncKeys = lastNLocalDateKeys(DAILY_HEALTH_CHART_DAYS, now);
       const sinceKey = dayKeys[0] ?? todayKey;
       const repo = getDailyHealthMetricRepo(authMode);
 
@@ -72,7 +74,7 @@ export const useDailyHealthStore = create<DailyHealthState>((set) => ({
         const hcGranted = await checkCardioHealthReadAccess();
         if (hcGranted) {
           const metricsByDate = await fetchDailyHealthMetricsForKeys(
-            dayKeys,
+            hcSyncKeys,
             now,
           );
           const vo2History = await fetchVo2MaxHistory(now);

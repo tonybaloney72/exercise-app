@@ -12,6 +12,7 @@ import WeekWizardShell, {
 } from "@/components/week/WeekWizardShell";
 import WorkoutPlanEditor from "@/components/workout/WorkoutPlanEditor";
 import { countPlannedExercises } from "@/lib/dayPlanDraft";
+import { routes } from "@/lib/appRoutes";
 import type { WeekBlueprintPresetId } from "@/lib/weekBlueprintPresets";
 import {
   cloneDayPlan,
@@ -86,7 +87,7 @@ export default function CustomWeekWizard() {
   useEffect(() => {
     if (!hydrated || mode === "loading") return;
     if (mode !== "authenticated") {
-      router.replace("/weekly");
+      router.replace(routes.workoutWeek);
       return;
     }
     if (programMode !== "custom") {
@@ -94,7 +95,7 @@ export default function CustomWeekWizard() {
       return;
     }
     if (isGuidedCustomSettings({ programMode, customBuildStyle })) {
-      router.replace("/weekly/build-guided");
+      router.replace(routes.settingsBuildGuided);
     }
   }, [customBuildStyle, hydrated, mode, programMode, router]);
 
@@ -219,7 +220,7 @@ export default function CustomWeekWizard() {
     return (
       <div className="flex flex-col py-8 gap-4">
         <p className="text-sm text-red-400">{error}</p>
-        <BackNavLink label="Back" />
+        <BackNavLink />
       </div>
     );
   }
@@ -248,7 +249,7 @@ export default function CustomWeekWizard() {
             if (nextDow != null) {
               requestDayChange(nextDow);
             } else {
-              router.push("/weekly");
+              router.push(routes.workoutWeek);
             }
           }}
           nextLabel={
@@ -276,7 +277,7 @@ export default function CustomWeekWizard() {
       <p className="text-xs text-muted text-center">
         Prefer structure over picking exercises?{" "}
         <Link
-          href="/weekly/build-guided"
+          href={routes.settingsBuildGuided}
           className="text-accent hover:underline"
         >
           Switch to guided week
@@ -345,13 +346,13 @@ export default function CustomWeekWizard() {
             void persistDay(edited);
           }
         }}
-        onCancel={() => router.push("/weekly")}
+        onCancel={() => router.push(routes.workoutWeek)}
         onResetDay={() => void handleResetDay()}
       />
 
       {nextDow == null ? (
         <Link
-          href="/weekly"
+          href={routes.workoutWeek}
           className="block w-full rounded-xl border border-border py-3 text-center text-sm font-semibold text-foreground hover:bg-surface-hover"
         >
           Done - view week

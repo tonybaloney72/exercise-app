@@ -1,11 +1,9 @@
 import type { NextConfig } from "next";
-import bundleAnalyzer from "@next/bundle-analyzer";
+import { createRequire } from "module";
 import packageJson from "./package.json";
 import { resolveCapacitorDevOrigins } from "./capacitor-dev-origins.mjs";
 
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
-});
+const require = createRequire(import.meta.url);
 
 const buildId =
   process.env.VERCEL_GIT_COMMIT_SHA ??
@@ -37,4 +35,12 @@ const nextConfig: NextConfig = {
     : {}),
 };
 
-export default withBundleAnalyzer(nextConfig);
+function withOptionalBundleAnalyzer(config: NextConfig): NextConfig {
+  if (process.env.ANALYZE !== "true") return config;
+  const bundleAnalyzer = require("@next/bundle-analyzer") as (
+    options: { enabled: boolean },
+  ) => (config: NextConfig) => NextConfig;
+  return bundleAnalyzer({ enabled: true })(config);
+}
+
+export default withOptionalBundleAnalyzer(nextConfig);

@@ -64,7 +64,7 @@ export function mergeWeightEntries(
 }
 
 export function getWeightForDate(
-  log: WeightLogEntry[],
+  log: readonly WeightLogEntry[],
   dateKey: string,
 ): WeightLogEntry | undefined {
   return log.find((e) => e.date === dateKey);

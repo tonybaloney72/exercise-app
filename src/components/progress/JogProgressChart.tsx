@@ -43,6 +43,8 @@ interface Props {
   history: WorkoutLog[];
   exerciseId: string;
   title?: string;
+  /** Page provides the activity title (e.g. `/health/exercises/[kind]`). */
+  hideHeader?: boolean;
 }
 
 function CardioTooltipBody({
@@ -105,18 +107,24 @@ function CardioTooltipBody({
 function ChartShell({
   title,
   subtitle,
+  hideHeader = false,
   children,
 }: {
-  title: string;
-  subtitle: string;
+  title?: string;
+  subtitle?: string;
+  hideHeader?: boolean;
   children: ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-3">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-        <p className="text-xs text-muted mt-0.5">{subtitle}</p>
-      </div>
+      {!hideHeader && title ? (
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+          {subtitle ? (
+            <p className="text-xs text-muted mt-0.5">{subtitle}</p>
+          ) : null}
+        </div>
+      ) : null}
       <div className="w-full rounded-xl border border-border bg-surface p-2 py-3">
         {children}
       </div>
@@ -128,6 +136,7 @@ export default function CardioProgressChart({
   history,
   exerciseId,
   title,
+  hideHeader = false,
 }: Props) {
   const activityTitle = title ?? cardioExerciseTitle(exerciseId);
   const exerciseLabel = cardioExerciseTitle(exerciseId);
@@ -156,6 +165,13 @@ export default function CardioProgressChart({
   );
 
   if (series.length === 0) {
+    if (hideHeader) {
+      return (
+        <div className="w-full rounded-xl border border-dashed border-border bg-surface/50 px-4 py-8 text-center">
+          <p className="text-sm text-muted">No sessions in this range.</p>
+        </div>
+      );
+    }
     return null;
   }
 
@@ -185,10 +201,7 @@ export default function CardioProgressChart({
 
   if (hasDistance && hasDuration) {
     return (
-      <ChartShell
-        title={activityTitle}
-        subtitle="Distance (bars) and session time (line). Tap a session for pace, speed, and Health Connect metrics when logged."
-      >
+      <ChartShell hideHeader={hideHeader}>
         <ResponsiveContainer
           width="100%"
           height={PROGRESS_LINE_CHART_HEIGHT}
@@ -283,6 +296,7 @@ export default function CardioProgressChart({
   if (hasDistance && !hasDuration) {
     return (
       <ChartShell
+        hideHeader={hideHeader}
         title={activityTitle}
         subtitle="Distance per completed session. Tap a session for pace, speed, and Health Connect metrics when logged."
       >
@@ -291,10 +305,7 @@ export default function CardioProgressChart({
           height={PROGRESS_LINE_CHART_HEIGHT}
           minWidth={0}
         >
-          <BarChart
-            data={series}
-            margin={PROGRESS_CHART_MARGIN.legend}
-          >
+          <BarChart data={series} margin={PROGRESS_CHART_MARGIN.legend}>
             <CartesianGrid {...PROGRESS_CARTESIAN_GRID} />
             <XAxis
               dataKey="xLabel"
@@ -334,6 +345,7 @@ export default function CardioProgressChart({
 
   return (
     <ChartShell
+      hideHeader={hideHeader}
       title={activityTitle}
       subtitle="Session time per completed session. Tap a session for Health Connect metrics when logged."
     >
@@ -342,10 +354,7 @@ export default function CardioProgressChart({
         height={PROGRESS_LINE_CHART_HEIGHT}
         minWidth={0}
       >
-        <LineChart
-          data={series}
-          margin={PROGRESS_CHART_MARGIN.legend}
-        >
+        <LineChart data={series} margin={PROGRESS_CHART_MARGIN.legend}>
           <CartesianGrid {...PROGRESS_CARTESIAN_GRID} />
           <XAxis
             dataKey="xLabel"

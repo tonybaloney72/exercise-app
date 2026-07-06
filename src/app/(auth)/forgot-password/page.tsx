@@ -43,8 +43,6 @@ export default function ForgotPasswordPage() {
           we sent instructions to reset your password.
         </p>
         <BackNavLink
-          label="Back to log in"
-          prefixArrow={false}
           fallbackHref="/login"
           className="inline-block rounded-xl border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-surface-hover"
         />
@@ -90,14 +88,15 @@ export default function ForgotPasswordPage() {
       <div className="flex flex-col gap-1 text-center text-sm text-muted sm:gap-2 sm:text-xs">
         <p>
           <BackNavLink
-            label="Back to log in"
-            prefixArrow={false}
             fallbackHref="/login"
             className="text-accent hover:underline"
           />
         </p>
         <p>
-          <BackNavLink label="Back" fallbackHref="/" className="text-sm text-muted hover:text-foreground" />
+          <BackNavLink
+            fallbackHref="/"
+            className="text-sm text-muted hover:text-foreground"
+          />
         </p>
       </div>
     </div>

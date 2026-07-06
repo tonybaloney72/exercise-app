@@ -39,14 +39,14 @@ describe("workoutHistoryCalendar", () => {
         dayOfMonth: 10,
         status: "completed",
       }),
-    ).toBe("/progress/history/2026-05-10");
+    ).toBe("/workout/history/2026-05-10");
     expect(
       hrefForCalendarCell({
         dateKey: "2026-05-18",
         dayOfMonth: 18,
         status: "today",
       }),
-    ).toBe("/today");
+    ).toBe("/workout");
   });
 
   it("collects completed date keys", () => {

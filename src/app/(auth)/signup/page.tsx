@@ -146,7 +146,7 @@ function SignupForm() {
           </Link>
         </p>
         <p>
-          <BackNavLink label="Back" fallbackHref="/" className="text-sm text-muted hover:text-foreground" />
+          <BackNavLink fallbackHref="/" className="text-sm text-muted hover:text-foreground" />
         </p>
       </div>
     </div>

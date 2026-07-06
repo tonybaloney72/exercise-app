@@ -100,55 +100,32 @@ object HealthConnectRepository {
 
     // Sessions that end on this local day (wake-date attribution).
     val queryStart = dayStart.minus(Duration.ofDays(1))
-    val response =
-      client.readRecords(
-        ReadRecordsRequest(
-          recordType = SleepSessionRecord::class,
-          timeRangeFilter = TimeRangeFilter.between(queryStart, dayEnd),
-          pageSize = MAX_PAGE_SIZE,
-        ),
-      )
-
-    var totalMin = 0.0
-    var deepMin = 0.0
-    var remMin = 0.0
-    var lightMin = 0.0
-    var awakeMin = 0.0
-
-    for (record in response.records) {
-      val session = record as SleepSessionRecord
-      val wakeInstant = session.endTime
-      val wakeDate = wakeInstant.atZone(zone).toLocalDate()
-      if (wakeDate != date) continue
-
-      val stages = session.stages
-      if (stages.isNullOrEmpty()) {
-        val sessionMin =
-          Duration.between(session.startTime, session.endTime).toMillis() / 60_000.0
-        if (sessionMin > 0) totalMin += sessionMin
-        continue
+    val records = mutableListOf<SleepSessionRecord>()
+    var pageToken: String? = null
+    do {
+      val response =
+        client.readRecords(
+          ReadRecordsRequest(
+            recordType = SleepSessionRecord::class,
+            timeRangeFilter = TimeRangeFilter.between(queryStart, dayEnd),
+            pageSize = MAX_PAGE_SIZE,
+            pageToken = pageToken,
+          ),
+        )
+      for (record in response.records) {
+        records.add(record as SleepSessionRecord)
       }
+      pageToken = response.pageToken
+    } while (pageToken != null)
 
-      for (stage in stages) {
-        val stageMin = Duration.between(stage.startTime, stage.endTime).toMillis() / 60_000.0
-        if (stageMin <= 0) continue
-        totalMin += stageMin
-        when (stage.stage) {
-          SleepSessionRecord.STAGE_TYPE_DEEP -> deepMin += stageMin
-          SleepSessionRecord.STAGE_TYPE_REM -> remMin += stageMin
-          SleepSessionRecord.STAGE_TYPE_LIGHT -> lightMin += stageMin
-          SleepSessionRecord.STAGE_TYPE_AWAKE -> awakeMin += stageMin
-          else -> Unit
-        }
-      }
-    }
+    val totals = SleepAggregation.totalsForWakeDate(records, dateKey, zone)
 
     return JSObject().apply {
-      put("sleepTotalMin", totalMin)
-      put("sleepDeepMin", deepMin)
-      put("sleepRemMin", remMin)
-      put("sleepLightMin", lightMin)
-      put("sleepAwakeMin", awakeMin)
+      put("sleepTotalMin", totals.totalMin)
+      put("sleepDeepMin", totals.deepMin)
+      put("sleepRemMin", totals.remMin)
+      put("sleepLightMin", totals.lightMin)
+      put("sleepAwakeMin", totals.awakeMin)
       put("dateKey", dateKey)
     }
   }

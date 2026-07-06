@@ -13,6 +13,7 @@ import {
   describeDayBlueprint,
   shortDayBlueprintLabel,
 } from "@/lib/weekBlueprintDraft";
+import { routes } from "@/lib/appRoutes";
 import {
   resolveWeekBlueprint,
   sanitizeWeekBlueprint,
@@ -58,7 +59,7 @@ export default function GuidedWeekWizard() {
   useEffect(() => {
     if (!hydrated || mode === "loading") return;
     if (mode !== "authenticated") {
-      router.replace("/weekly");
+      router.replace(routes.workoutWeek);
       return;
     }
     if (!isGuidedCustomSettings(settings)) {
@@ -77,7 +78,7 @@ export default function GuidedWeekWizard() {
         weekBlueprintCustomized: true,
         weekBuilderMigrationAcknowledged: true,
       });
-      router.push("/weekly");
+      router.push(routes.workoutWeek);
     } catch (e: unknown) {
       setSaveError(e instanceof Error ? e.message : "Could not save week plan");
     } finally {
@@ -221,7 +222,7 @@ export default function GuidedWeekWizard() {
 
       <p className="text-xs text-muted text-center">
         Want to hand-pick every exercise?{" "}
-        <Link href="/weekly/build" className="text-accent hover:underline">
+        <Link href={routes.settingsBuildCustom} className="text-accent hover:underline">
           Switch to manual week
         </Link>{" "}
         after saving - or change build style in Settings.

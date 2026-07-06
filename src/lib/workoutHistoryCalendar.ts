@@ -1,4 +1,5 @@
 import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
+import { APP_HOME, routes } from "@/lib/appRoutes";
 
 /** Compare calendar keys (`YYYY-MM-DD`) to a reference day key. */
 export function compareDateKeyToRef(
@@ -134,13 +135,13 @@ export function hrefForCalendarCell(cell: CalendarDayCell): string | null {
   if (!cell.dateKey || cell.status === "outside" || cell.status === "future") {
     return null;
   }
-  if (cell.status === "today") return "/today";
+  if (cell.status === "today") return APP_HOME;
   if (
     cell.status === "completed" ||
     cell.status === "today-completed" ||
     cell.status === "past-missed"
   ) {
-    return `/progress/history/${cell.dateKey}`;
+    return routes.workoutHistoryDay(cell.dateKey);
   }
   return null;
 }

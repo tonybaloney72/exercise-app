@@ -1,7 +1,9 @@
+import { APP_HOME } from "@/lib/appRoutes";
+
 export const GUEST_COOKIE_NAME = "exercise_app_guest";
 export const GUEST_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
-export const APP_HOME = "/today";
+export { APP_HOME };
 export const LANDING_PATH = "/";
 
 /**

@@ -20,11 +20,16 @@ import {
   WEIGHT_RANGE_PRESETS,
   filterWeightEntriesByRange,
 } from "@/lib/weightRangePresets";
+import {
+  filterEntriesByHealthRange,
+  type HealthRangePresetId,
+} from "@/lib/health/healthRangePresets";
 import { uiChoicePillSolidClass } from "@/lib/uiClasses";
 import { settingsHydrationMatchesAuth } from "@/lib/settingsHydration";
 import { useWeightStore } from "@/stores/useWeightStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import EmptyState from "@/components/common/EmptyState";
+import { routes } from "@/lib/appRoutes";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import { PROGRESS_LINE_CHART_HEIGHT } from "@/components/progress/chartLayout";
 import {
@@ -39,7 +44,14 @@ import {
   progressYAxisLabel,
 } from "@/components/progress/rechartsProgressDefaults";
 
-export default function WeightProgressChart() {
+export default function WeightProgressChart({
+  variant = "legacy",
+  healthRange = "week",
+}: {
+  /** `health` — range controlled by parent (`/health/weight`). */
+  variant?: "legacy" | "health";
+  healthRange?: HealthRangePresetId;
+} = {}) {
   const mode = useAuthStore((s) => s.mode);
   const userId = useAuthStore((s) => s.user?.id);
   const entries = useWeightStore((s) => s.entries);
@@ -59,10 +71,12 @@ export default function WeightProgressChart() {
     void load();
   }, [load, mode, userId]);
 
-  const filteredEntries = useMemo(
-    () => filterWeightEntriesByRange(entries, rangePreset),
-    [entries, rangePreset],
-  );
+  const filteredEntries = useMemo(() => {
+    if (variant === "health") {
+      return filterEntriesByHealthRange(entries, healthRange);
+    }
+    return filterWeightEntriesByRange(entries, rangePreset);
+  }, [entries, variant, healthRange, rangePreset]);
 
   const series = useMemo(
     () => buildWeightChartSeries(filteredEntries),
@@ -93,17 +107,19 @@ export default function WeightProgressChart() {
   if (entries.length === 0) {
     return (
       <div className="flex flex-col gap-3">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
-          <p className="text-xs text-muted mt-0.5">
-            One entry per day; log on Today to see gains and losses over time
-          </p>
-        </div>
+        {variant === "legacy" ? (
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
+            <p className="text-xs text-muted mt-0.5">
+              One entry per day; log on Workout to see gains and losses over time
+            </p>
+          </div>
+        ) : null}
         <SurfaceCard className="border-dashed bg-surface/50 px-4 py-8">
           <EmptyState
             title="No weight logged yet."
-            description="Use the body weight field on Today to start your trend line."
-            action={{ label: "Go to Today", href: "/today" }}
+            description="Use the body weight field on Workout to start your trend line."
+            action={{ label: "Go to Workout", href: routes.workout }}
             className="text-xs"
           />
         </SurfaceCard>
@@ -113,42 +129,46 @@ export default function WeightProgressChart() {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
+      {variant === "legacy" ? (
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
+          </div>
+          <div
+            className="flex flex-wrap gap-1.5"
+            role="group"
+            aria-label="Chart time range"
+          >
+            {WEIGHT_RANGE_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => setRangePreset(preset.id)}
+                className={uiChoicePillSolidClass(rangePreset === preset.id)}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div
-          className="flex flex-wrap gap-1.5"
-          role="group"
-          aria-label="Chart time range"
-        >
-          {WEIGHT_RANGE_PRESETS.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              onClick={() => setRangePreset(preset.id)}
-              className={uiChoicePillSolidClass(rangePreset === preset.id)}
-            >
-              {preset.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      ) : null}
       {series.length === 0 ? (
         <SurfaceCard className="flex flex-col border-dashed bg-surface/50 px-4 py-8 text-center gap-3">
           <p className="text-sm font-medium text-foreground">
             No entries in this range.
           </p>
           <p className="text-xs text-muted">
-            Try a wider time range or log weight on Today.
+            Try a wider time range or log weight on Workout.
           </p>
-          <button
-            type="button"
-            onClick={() => setRangePreset("all")}
-            className="inline-flex rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
-          >
-            Show all time
-          </button>
+          {variant === "legacy" ? (
+            <button
+              type="button"
+              onClick={() => setRangePreset("all")}
+              className="inline-flex rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+            >
+              Show all time
+            </button>
+          ) : null}
         </SurfaceCard>
       ) : (
         <SurfaceCard className="w-full p-2 py-3">

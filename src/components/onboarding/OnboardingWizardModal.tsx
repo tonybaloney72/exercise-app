@@ -18,6 +18,7 @@ import {
 } from "@/lib/onboardingWizard";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { ExerciseEquipment, ExpertiseByGroup } from "@/types";
+import { routes } from "@/lib/appRoutes";
 
 type FinishOptions = {
   equipment: ExerciseEquipment[];
@@ -297,10 +298,10 @@ function stepFooter(args: {
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <Link
-            href="/weekly/build-guided"
+            href={routes.settingsBuildGuided}
             onClick={(e) => {
               e.preventDefault();
-              void finishWithDraft("/weekly/build-guided");
+              void finishWithDraft(routes.settingsBuildGuided);
             }}
             className="rounded-xl border border-border bg-surface-hover px-4 py-2.5 text-center text-sm font-medium text-foreground hover:border-accent/40"
           >

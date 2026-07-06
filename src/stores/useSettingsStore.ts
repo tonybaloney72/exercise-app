@@ -199,7 +199,7 @@ function pickUserSettingsFields(
   return {
     restBetweenRounds: state.restBetweenRounds,
     weekStartDate: state.weekStartDate,
-    darkMode: state.darkMode,
+    themeMode: state.themeMode,
     restTimerAutoStart: state.restTimerAutoStart,
     timerSoundsEnabled: state.timerSoundsEnabled,
     timerVibrationEnabled: state.timerVibrationEnabled,

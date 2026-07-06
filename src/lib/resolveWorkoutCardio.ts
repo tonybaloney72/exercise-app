@@ -1,7 +1,4 @@
-import {
-  CARDIO_KIND_TO_EXERCISE_ID,
-  CARDIO_ACTIVITY_ORDER,
-} from "@/lib/cardioActivities";
+import { CARDIO_KIND_TO_EXERCISE_ID } from "@/lib/cardioActivities";
 import { hydrateCardioFromNotes } from "@/lib/workoutCardioPersistence";
 import type { ExerciseLog, WorkoutLog } from "@/types";
 
@@ -79,20 +76,4 @@ export function buildCardioMilesTotals(
   }
 
   return totals;
-}
-
-export function formatCardioRecentLine(log: WorkoutLog): string | null {
-  const parts: string[] = [];
-  for (const row of resolveWorkoutCardioExercises(log)) {
-    if (!row.completed || row.skipped) continue;
-    if (!ENDURANCE_EXERCISE_IDS.has(row.exerciseId)) continue;
-    const dist =
-      row.actualDistanceMi != null ? `${row.actualDistanceMi}mi` : null;
-    const kind =
-      CARDIO_ACTIVITY_ORDER.find(
-        (k) => CARDIO_KIND_TO_EXERCISE_ID[k] === row.exerciseId,
-      ) ?? row.exerciseId;
-    parts.push(dist ? `${dist} ${kind}` : kind);
-  }
-  return parts.length > 0 ? parts.join(" · ") : null;
 }

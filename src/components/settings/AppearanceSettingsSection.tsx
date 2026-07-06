@@ -1,34 +1,17 @@
 "use client";
 
+import ThemeModeSelector from "@/components/settings/ThemeModeSelector";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import type { ThemeMode } from "@/types";
 
 export default function AppearanceSettingsSection() {
-  const settings = useSettingsStore();
+  const themeMode = useSettingsStore((s) => s.themeMode);
+  const updateSettings = useSettingsStore((s) => s.updateSettings);
 
   return (
-    <div className="flex items-center justify-between gap-4">
-      <div>
-        <p className="text-sm font-medium text-foreground">Dark mode</p>
-        <p className="text-xs text-muted mt-0.5">
-          Turn off for a light background across the app
-        </p>
-      </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={settings.darkMode}
-        onClick={() => settings.updateSettings({ darkMode: !settings.darkMode })}
-        className={`relative h-8 w-14 shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-          settings.darkMode ? "bg-accent" : "bg-border"
-        }`}
-      >
-        <span
-          className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
-            settings.darkMode ? "translate-x-6" : "translate-x-0"
-          }`}
-        />
-        <span className="sr-only">{settings.darkMode ? "On" : "Off"}</span>
-      </button>
-    </div>
+    <ThemeModeSelector
+      value={themeMode}
+      onChange={(mode: ThemeMode) => void updateSettings({ themeMode: mode })}
+    />
   );
 }

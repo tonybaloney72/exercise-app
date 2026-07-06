@@ -7,6 +7,7 @@ import AboutDeveloperSection from "@/components/settings/AboutDeveloperSection";
 import SettingsFeedbackSection from "@/components/settings/SettingsFeedbackSection";
 import SettingsLinkRow from "@/components/settings/SettingsLinkRow";
 import { useDiagnosticLogUnlock } from "@/hooks/useDiagnosticLogUnlock";
+import { routes } from "@/lib/appRoutes";
 
 export default function SettingsPage() {
   const {
@@ -36,17 +37,32 @@ export default function SettingsPage() {
       <AnimatedSection delay={0.03}>
         <div className="flex flex-col gap-2">
           <SettingsLinkRow
-            href="/settings/training"
+            href={routes.settingsLibrary}
+            title="Exercise library"
+            hint="Browse and manage exercises"
+          />
+          <SettingsLinkRow
+            href={routes.settingsTraining}
             title="Training plan"
             hint="Week layout, difficulty, and equipment"
           />
           <SettingsLinkRow
-            href="/settings/device"
+            href={routes.settingsBuildGuided}
+            title="Guided week builder"
+            hint="Step-by-step plan for your week"
+          />
+          <SettingsLinkRow
+            href={routes.settingsBuildCustom}
+            title="Custom week builder"
+            hint="Full control over each day"
+          />
+          <SettingsLinkRow
+            href={routes.settingsDevice}
             title="Device & timers"
             hint="Theme, rest timers, and Health Connect"
           />
           <SettingsLinkRow
-            href="/settings/app"
+            href={routes.settingsApp}
             title="App & updates"
             hint="What's new, Android app, and troubleshooting"
           />

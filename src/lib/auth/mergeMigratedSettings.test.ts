@@ -8,7 +8,7 @@ describe("mergeMigratedSettings", () => {
     const cloud: UserSettings = {
       ...DEFAULT_SETTINGS,
       equipmentOnboardingCompleted: true,
-      darkMode: true,
+      themeMode: "dark",
     };
     const local: UserSettings = {
       ...DEFAULT_SETTINGS,
@@ -34,15 +34,15 @@ describe("mergeMigratedSettings", () => {
     const cloud: UserSettings = {
       ...DEFAULT_SETTINGS,
       equipmentOnboardingCompleted: true,
-      darkMode: false,
+      themeMode: "light",
     };
     const local: UserSettings = {
       ...DEFAULT_SETTINGS,
       equipmentOnboardingCompleted: false,
-      darkMode: true,
+      themeMode: "dark",
     };
     const merged = mergeMigratedSettings(cloud, local);
     expect(merged.equipmentOnboardingCompleted).toBe(true);
-    expect(merged.darkMode).toBe(true);
+    expect(merged.themeMode).toBe("dark");
   });
 });

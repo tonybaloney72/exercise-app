@@ -3,6 +3,7 @@
 import { useRef, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFocusTrap, type FocusTrapInitialFocus } from "@/hooks/useFocusTrap";
+import { useHistoryBackToClose } from "@/hooks/useHistoryBackToClose";
 import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 
 function CloseIcon() {
@@ -40,6 +41,11 @@ export type BottomSheetModalProps = {
   showCloseButton?: boolean;
   /** When false, Escape does not call onClose. Default true. */
   closeOnEscape?: boolean;
+  /**
+   * When false, mobile / browser back does not close the modal.
+   * Defaults to `closeOnEscape && showCloseButton`.
+   */
+  closeOnHistoryBack?: boolean;
   titleClassName?: string;
   hintClassName?: string;
   /**
@@ -73,6 +79,7 @@ export default function BottomSheetModal({
   closeOnBackdropClick = true,
   showCloseButton = true,
   closeOnEscape = true,
+  closeOnHistoryBack,
   titleClassName = "",
   hintClassName = "",
   placement = "sheet",
@@ -81,6 +88,10 @@ export default function BottomSheetModal({
   const panelRef = useRef<HTMLDivElement>(null);
   const centered = placement === "center";
   const keyboardInset = useKeyboardInset(open && centered);
+  const historyBackEnabled =
+    closeOnHistoryBack ?? (closeOnEscape && showCloseButton);
+
+  useHistoryBackToClose(open, onClose, historyBackEnabled);
 
   useFocusTrap({
     open,

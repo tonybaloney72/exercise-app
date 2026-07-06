@@ -9,14 +9,14 @@ const APP_ID = "dev.myexercise.app";
 
 describe("buildNativeOAuthCallbackUrl", () => {
   it("builds deep link without next for default home", () => {
-    expect(buildNativeOAuthCallbackUrl("/today", APP_ID)).toBe(
+    expect(buildNativeOAuthCallbackUrl("/workout", APP_ID)).toBe(
       "dev.myexercise.app://auth/callback",
     );
   });
 
   it("includes next for custom return paths", () => {
-    expect(buildNativeOAuthCallbackUrl("/weekly", APP_ID)).toBe(
-      "dev.myexercise.app://auth/callback?next=%2Fweekly",
+    expect(buildNativeOAuthCallbackUrl("/workout/week", APP_ID)).toBe(
+      "dev.myexercise.app://auth/callback?next=%2Fworkout%2Fweek",
     );
   });
 });
@@ -25,10 +25,10 @@ describe("parseNativeOAuthCallbackUrl", () => {
   it("parses code and next", () => {
     expect(
       parseNativeOAuthCallbackUrl(
-        "dev.myexercise.app://auth/callback?code=abc123&next=%2Fweekly",
+        "dev.myexercise.app://auth/callback?code=abc123&next=%2Fworkout%2Fweek",
         APP_ID,
       ),
-    ).toEqual({ code: "abc123", next: "/weekly" });
+    ).toEqual({ code: "abc123", next: "/workout/week" });
   });
 
   it("defaults next to app home", () => {
@@ -37,7 +37,7 @@ describe("parseNativeOAuthCallbackUrl", () => {
         "dev.myexercise.app://auth/callback?code=abc123",
         APP_ID,
       ),
-    ).toEqual({ code: "abc123", next: "/today" });
+    ).toEqual({ code: "abc123", next: "/workout" });
   });
 
   it("rejects unrelated deep links", () => {
