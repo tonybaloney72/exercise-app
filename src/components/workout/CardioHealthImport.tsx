@@ -12,6 +12,7 @@ import {
 } from "@/lib/health";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
+import { displayHealthSourceName } from "@/lib/health/healthSourceDisplayName";
 import { formatSecondsToMMSS } from "@/utils/time";
 import type { CardioActivityKind } from "@/types";
 
@@ -157,6 +158,7 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
             if (session.activeCaloriesKcal != null) {
               labelParts.push(`${session.activeCaloriesKcal} kcal`);
             }
+            const recordedBy = displayHealthSourceName(session.sourceName);
             return (
               <li
                 key={`${session.startDate.toISOString()}-${session.durationSeconds}`}
@@ -171,14 +173,12 @@ export default function CardioHealthImport({ kind, onImport }: Props) {
                   </span>
                   {session.workoutType ? (
                     <span className="mt-0.5 block text-muted capitalize">
-                      {session.sourceName
-                        ? `${session.workoutType} · ${session.sourceName}`
+                      {recordedBy
+                        ? `${session.workoutType} · ${recordedBy}`
                         : session.workoutType}
                     </span>
-                  ) : session.sourceName ? (
-                    <span className="mt-0.5 block text-muted">
-                      {session.sourceName}
-                    </span>
+                  ) : recordedBy ? (
+                    <span className="mt-0.5 block text-muted">{recordedBy}</span>
                   ) : null}
                 </button>
               </li>

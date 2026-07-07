@@ -119,6 +119,16 @@ describe("cardio health helpers", () => {
     ).toBe("4,832 steps · 182 active kcal · 141 bpm avg · GPS · Samsung Health");
   });
 
+  it("formats legacy package ids in health summaries", () => {
+    expect(
+      formatCardioHealthSummary({
+        stepCount: 1000,
+        activitySource: "health_connect",
+        healthSourceName: "com.nothing.smartcenter",
+      }),
+    ).toBe("1,000 steps · Health Connect · Nothing Watch");
+  });
+
   it("maps health metadata onto exercise log fields", () => {
     expect(
       applyCardioHealthMeta({
@@ -150,5 +160,17 @@ describe("cardio health helpers", () => {
     expect(session.distanceMi).toBeCloseTo(2, 0);
     expect(session.activeCaloriesKcal).toBe(220);
     expect(session.sourceName).toBe("Pixel Watch");
+  });
+
+  it("normalizes package-style Health Connect source names on import", () => {
+    const session = mapWorkoutToImportedSession({
+      workoutType: "running",
+      duration: 1200,
+      startDate: "2026-06-16T12:00:00.000Z",
+      endDate: "2026-06-16T12:20:00.000Z",
+      sourceId: "com.nothing.smartcenter",
+      sourceName: "com.nothing.smartcenter",
+    });
+    expect(session.sourceName).toBe("Nothing Watch");
   });
 });

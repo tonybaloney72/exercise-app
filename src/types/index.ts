@@ -244,7 +244,7 @@ export interface ExerciseLog {
   avgHeartRateBpm?: number;
   /** How distance/time/health metrics were captured for this row. */
   activitySource?: CardioActivitySource;
-  /** Health Connect recorder name (e.g. Samsung Health, Pixel). */
+  /** Friendly Health Connect recorder label (e.g. Nothing Watch, Samsung Health). */
   healthSourceName?: string;
   /** GPS route captured during ME Start/End tracking (when available). */
   gpsTrackPoints?: GpsTrackPoint[];

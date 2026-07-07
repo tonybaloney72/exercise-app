@@ -137,6 +137,7 @@ class HealthConnectPlugin : Plugin() {
       try {
         val result =
           HealthConnectRepository.queryExerciseSessions(
+            context.applicationContext,
             client,
             startInstant,
             endInstant,

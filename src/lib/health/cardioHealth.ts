@@ -25,6 +25,7 @@ import {
   queryHealthConnectLocalDayTotal,
   queryHealthConnectRangeTotal,
 } from "@/lib/health/healthConnectAggregate";
+import { normalizeHealthSourceDisplayName } from "@/lib/health/healthSourceDisplayName";
 
 /** Max wait for optional Health Connect reads during GPS/quick-log save. */
 const CARDIO_HEALTH_ENRICH_TIMEOUT_MS = 8_000;
@@ -48,6 +49,7 @@ export interface ImportedCardioSession {
   startDate: Date;
   endDate: Date;
   sourceName?: string;
+  sourceId?: string;
   workoutType?: string;
   platformId?: string;
   gpsTrack?: readonly GpsTrackPoint[];
@@ -58,7 +60,9 @@ export function dominantHealthSampleSource(
 ): string | undefined {
   const counts = new Map<string, number>();
   for (const sample of samples) {
-    const name = sample.sourceName?.trim();
+    const name = normalizeHealthSourceDisplayName({
+      sourceName: sample.sourceName,
+    });
     if (!name) continue;
     counts.set(name, (counts.get(name) ?? 0) + 1);
   }
@@ -95,7 +99,11 @@ export function mapWorkoutToImportedSession(workout: Workout): ImportedCardioSes
         : undefined,
     startDate: new Date(workout.startDate),
     endDate: new Date(workout.endDate),
-    sourceName: workout.sourceName,
+    sourceId: workout.sourceId,
+    sourceName: normalizeHealthSourceDisplayName({
+      sourceId: workout.sourceId,
+      sourceName: workout.sourceName,
+    }),
     workoutType: workout.workoutType,
     platformId: workout.platformId,
   };
@@ -263,7 +271,9 @@ export async function fetchCardioHealthMetricsForWindow(
         : options?.activeCaloriesKcal,
     avgHeartRateBpm,
     distanceMi,
-    healthSourceName: options?.healthSourceName,
+    healthSourceName: normalizeHealthSourceDisplayName({
+      sourceName: options?.healthSourceName,
+    }),
   };
 }
 
@@ -311,7 +321,10 @@ export async function enrichCardioHealthMeta(
       activeCaloriesKcal: fetched.activeCaloriesKcal ?? base?.activeCaloriesKcal,
       avgHeartRateBpm: fetched.avgHeartRateBpm ?? base?.avgHeartRateBpm,
       distanceMi: fetched.distanceMi ?? base?.distanceMi,
-      healthSourceName: fetched.healthSourceName ?? base?.healthSourceName,
+      healthSourceName:
+        normalizeHealthSourceDisplayName({
+          sourceName: fetched.healthSourceName ?? base?.healthSourceName,
+        }) ?? base?.healthSourceName,
       source: base?.source,
     };
   } catch (err) {

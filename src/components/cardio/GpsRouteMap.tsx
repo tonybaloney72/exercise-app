@@ -17,6 +17,14 @@ type Props = {
   ariaLabel?: string;
 };
 
+/** Show compact attribution (ⓘ only); full text stays available on tap. */
+function collapseMapLibreAttribution(container: HTMLElement) {
+  const attrib = container.querySelector(".maplibregl-ctrl-attrib");
+  if (!(attrib instanceof HTMLElement)) return;
+  attrib.classList.remove("maplibregl-compact-show");
+  attrib.removeAttribute("open");
+}
+
 /** MapLibre basemap with GPS route overlay (detail views). */
 export default function GpsRouteMap({
   points,
@@ -62,6 +70,7 @@ export default function GpsRouteMap({
 
       map.on("load", () => {
         if (!mapRef.current) return;
+        collapseMapLibreAttribution(container);
         syncGpsRouteMapOverlay(mapRef.current, points);
         mapRef.current.fitBounds(bounds, { padding: 40, maxZoom: 16, duration: 0 });
       });
@@ -91,7 +100,8 @@ export default function GpsRouteMap({
     const targetStyle = openFreemapStyleForDarkMode(isDark);
 
     const applyOverlay = () => {
-      if (!mapRef.current) return;
+      if (!mapRef.current || !containerRef.current) return;
+      collapseMapLibreAttribution(containerRef.current);
       syncGpsRouteMapOverlay(mapRef.current, points);
       mapRef.current.fitBounds(bounds, {
         padding: 40,

@@ -1,6 +1,7 @@
 import { exerciseMap } from "@/core/catalog";
 import { cardioLabelForRow, cardioRowKey } from "@/lib/cardioInstances";
 import { computeCardioPaceMetrics } from "@/lib/health/cardioPaceMetrics";
+import { displayHealthSourceName } from "@/lib/health/healthSourceDisplayName";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import type { CardioActivitySource, ExerciseLog, WorkoutLog } from "@/types";
 import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
@@ -221,10 +222,11 @@ export function buildCardioSessionDetailMetrics(
       value: CARDIO_SOURCE_LABELS[row.activitySource],
     });
   }
-  if (row.healthSourceName?.trim()) {
+  const recordedBy = displayHealthSourceName(row.healthSourceName);
+  if (recordedBy) {
     metrics.push({
       label: "Recorded by",
-      value: row.healthSourceName.trim(),
+      value: recordedBy,
     });
   }
 

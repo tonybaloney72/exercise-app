@@ -262,6 +262,7 @@ object HealthConnectRepository {
   }
 
   suspend fun queryExerciseSessions(
+    context: android.content.Context,
     client: HealthConnectClient,
     startInstant: Instant,
     endInstant: Instant,
@@ -287,7 +288,7 @@ object HealthConnectRepository {
       for (record in response.records) {
         val session = record as ExerciseSessionRecord
         val aggregated = aggregateWorkoutData(client, session)
-        workouts.add(session.startTime to createWorkoutPayload(session, aggregated))
+        workouts.add(session.startTime to createWorkoutPayload(context, session, aggregated))
       }
 
       fetched += response.records.size
@@ -431,6 +432,7 @@ object HealthConnectRepository {
   )
 
   private fun createWorkoutPayload(
+    context: android.content.Context,
     session: ExerciseSessionRecord,
     aggregatedData: WorkoutAggregatedData,
   ): JSObject {
@@ -446,18 +448,22 @@ object HealthConnectRepository {
     aggregatedData.totalEnergyBurned?.let { payload.put("totalEnergyBurned", it) }
 
     val dataOrigin = session.metadata.dataOrigin
-    payload.put("sourceId", dataOrigin.packageName)
-    payload.put("sourceName", dataOrigin.packageName)
-    session.metadata.device?.let { device ->
-      val label =
+    val packageName = dataOrigin.packageName
+    payload.put("sourceId", packageName)
+    val deviceLabel =
+      session.metadata.device?.let { device ->
         listOfNotNull(
             device.manufacturer?.takeIf { it.isNotBlank() },
             device.model?.takeIf { it.isNotBlank() },
           )
           .joinToString(" ")
           .trim()
-      if (label.isNotEmpty()) payload.put("sourceName", label)
-    }
+          .takeIf { it.isNotEmpty() }
+      }
+    payload.put(
+      "sourceName",
+      HealthSourceDisplay.resolve(context, packageName, deviceLabel),
+    )
     payload.put("platformId", session.metadata.id)
     return payload
   }

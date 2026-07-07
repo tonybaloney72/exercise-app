@@ -19,6 +19,7 @@ import {
   type CardioActivityTimerState,
 } from "@/lib/cardioActivityTimer";
 import { ensureCardioHealthReadAccess } from "@/lib/health";
+import { displayHealthSourceName } from "@/lib/health/healthSourceDisplayName";
 import {
   resolveCardioQuickLog,
   resolveCardioQuickLogFromSession,
@@ -388,6 +389,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
             if (session.distanceMi != null) {
               labelParts.push(`${session.distanceMi} mi`);
             }
+            const recordedBy = displayHealthSourceName(session.sourceName);
             return (
               <li
                 key={`${session.startDate.toISOString()}-${session.workoutType}`}
@@ -400,10 +402,8 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
                   <span className="font-medium text-foreground">
                     {labelParts.join(" · ")}
                   </span>
-                  {session.sourceName ? (
-                    <span className="mt-0.5 block text-muted">
-                      {session.sourceName}
-                    </span>
+                  {recordedBy ? (
+                    <span className="mt-0.5 block text-muted">{recordedBy}</span>
                   ) : null}
                 </button>
               </li>
