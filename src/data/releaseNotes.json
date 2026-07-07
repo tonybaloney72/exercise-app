@@ -1,5 +1,16 @@
 [
   {
+    "id": "2026-07-07-workout-tabs-timers",
+    "date": "2026-07-07",
+    "title": "Workout tabs, filters & timer alerts",
+    "highlights": [
+      "Workout and Health use header tabs—Today, Week, and History under Workout; Health and Exercises under Health. Week and History hide while you're in a live workout or customizing today's plan.",
+      "Adding an exercise to a round shows the same category filter chips as the Library. Filters reset when you close the picker; Random Pick is gone.",
+      "On Android, rest and set timers can alert you with a notification when the app is in the background—sound and vibration follow Settings → Device & timers.",
+      "Guided and Custom week builders are no longer on the main Settings screen; open them from Settings → Training."
+    ]
+  },
+  {
     "id": "2026-07-06-health-nav-theme",
     "date": "2026-07-06",
     "title": "Workout, Health & Settings",
@@ -17,16 +28,6 @@
       "Progress now charts resting heart rate, blood oxygen (SpO₂), sleep, and VO₂ max from Health Connect—alongside steps, active calories, and average heart rate.",
       "Today's stat cards rotate through the new vitals and sleep when your watch or phone reports them.",
       "Settings → Cardio & sensors shows whether background Health Connect updates are allowed so daily totals can refresh when you return to the app."
-    ]
-  },
-  {
-    "id": "2026-07-03-hc-exercise-routes",
-    "date": "2026-07-03",
-    "title": "Health Connect routes on import",
-    "highlights": [
-      "Importing a cardio session from Health Connect can now pull the watch or phone route—Health Connect may ask you to allow route access for that session.",
-      "Imported routes show the same map polyline as app GPS tracking on the cardio row and in workout history.",
-      "Re-import a recent session (within 48 hours) if you imported before routes were available—uncheck the done checkbox on the row to show Import again."
     ]
   }
 ]

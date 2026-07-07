@@ -1,9 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
+import { completeTimerCountdown } from "@/lib/timerBackgroundAlert";
 
 vi.mock("@/utils/timerAlert", () => ({
   primeTimerAudio: vi.fn(),
   playTimerDoneAlert: vi.fn(),
+}));
+
+vi.mock("@/lib/timerBackgroundAlert", () => ({
+  completeTimerCountdown: vi.fn(),
+  resetTimerCompletionTracking: vi.fn(),
+  cancelTimerBackgroundNotification: vi.fn(),
 }));
 
 describe("useFloatingTimerStore syncTimerClock", () => {
@@ -43,6 +50,7 @@ describe("useFloatingTimerStore syncTimerClock", () => {
     expect(s.seconds).toBe(0);
     expect(s.countdownRemainingMs).toBe(0);
     expect(s.running).toBe(false);
+    expect(completeTimerCountdown).toHaveBeenCalled();
   });
 
   it("updates countdownRemainingMs between second ticks", () => {

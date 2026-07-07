@@ -107,3 +107,8 @@ export const CATEGORY_ORDER: ExerciseCategory[] = [
   "SW",
   "SC",
 ];
+
+/** Training categories (excludes warm-up / cool-down stretches). */
+export const TRAINING_CATEGORY_ORDER = CATEGORY_ORDER.filter(
+  (c) => c !== "SW" && c !== "SC",
+);

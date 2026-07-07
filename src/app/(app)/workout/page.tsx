@@ -9,7 +9,6 @@ import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import PlanMetaPill from "@/components/common/PlanMetaPill";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
-import WorkoutHubLinks from "@/components/workout/WorkoutHubLinks";
 import { routes } from "@/lib/appRoutes";
 import PostWorkoutSummary from "@/components/workout/PostWorkoutSummary";
 import RepIncreasePrompt from "@/components/workout/RepIncreasePrompt";
@@ -25,6 +24,7 @@ import { resetTrainingDayToGenerated } from "@/lib/trainingWeekRefresh";
 import { saveCustomDayPlan } from "@/lib/trainingWeekCustomize";
 import { useWeekSourceForDate } from "@/hooks/useWeekSourceForDate";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { useWorkoutSubnavStore } from "@/stores/useWorkoutSubnavStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import { toastSaveError } from "@/utils/saveErrorToast";
@@ -46,11 +46,6 @@ function formatSessionHeaderDate(dateKey: string): string {
     month: "short",
     day: "numeric",
   });
-}
-
-function formatTodayWeekdayName(dateKey: string): string {
-  const d = parseLocalDateKey(dateKey);
-  return d?.toLocaleDateString(undefined, { weekday: "long" }) ?? "Today";
 }
 
 function TodayPageInner() {
@@ -130,6 +125,28 @@ function TodayPageInner() {
     !activeWorkout &&
     !completedLogForUi &&
     (pausedWorkoutDate === todayKey || pausedDraftTodayKey === todayKey);
+
+  const showWorkoutEntry =
+    !activeWorkout && !completedLogForUi && !hasPausedDraftToday;
+
+  const setHideSiblingTabs = useWorkoutSubnavStore((s) => s.setHideSiblingTabs);
+
+  useEffect(() => {
+    const hide =
+      Boolean(activeWorkout) ||
+      customizing ||
+      showWorkoutDetails ||
+      (showWorkoutEntry && workoutDetailOpen);
+    setHideSiblingTabs(hide);
+    return () => setHideSiblingTabs(false);
+  }, [
+    activeWorkout,
+    customizing,
+    showWorkoutDetails,
+    showWorkoutEntry,
+    workoutDetailOpen,
+    setHideSiblingTabs,
+  ]);
 
   const canCustomize = mode === "authenticated" && !!plan;
   const showCustomizeSlot =
@@ -213,9 +230,6 @@ function TodayPageInner() {
   const showQuickLogsAfterReview =
     showQuickLogsSection && showTodaysCompletedReview;
 
-  const showWorkoutEntry =
-    !activeWorkout && !completedLogForUi && !hasPausedDraftToday;
-
   const todayWorkoutPanelMode: TodayWorkoutPanelMode | null =
     activeWorkout && isTodaySession
       ? "session"
@@ -280,7 +294,7 @@ function TodayPageInner() {
   }
 
   return (
-    <div className="flex flex-col gap-3 py-6">
+    <div className="flex flex-col gap-3 pt-3">
       {devForcePreWorkout && (
         <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
           Dev: pre-workout view forced (
@@ -289,13 +303,12 @@ function TodayPageInner() {
         </p>
       )}
 
-      {/* Header */}
       <TabEnterMotion y={-10}>
         {showTodaysCompletedReview ? (
-          <h1 className="flex min-w-0 flex-nowrap items-baseline gap-x-2 leading-tight">
-            <span className="truncate text-2xl font-bold text-foreground">
-              {formatTodayWeekdayName(todayKey)}
-            </span>
+          <div className="flex min-w-0 flex-nowrap items-baseline gap-x-2 leading-tight">
+            <h1 className="truncate text-xl font-bold text-foreground">
+              {plan.name}
+            </h1>
             <span
               className="shrink-0 text-muted font-normal text-xl"
               aria-hidden
@@ -305,13 +318,11 @@ function TodayPageInner() {
             <span className="shrink-0 text-[11px] font-medium uppercase tracking-wider text-green-400">
               Workout complete
             </span>
-          </h1>
+          </div>
         ) : (
-          <h1 className="text-2xl font-bold text-foreground">{plan.name}</h1>
+          <h1 className="text-xl font-bold text-foreground">{plan.name}</h1>
         )}
       </TabEnterMotion>
-
-      {!showWorkoutDetails && <WorkoutHubLinks />}
 
       {/* Category chips on today's plan (collapsed or expanded) */}
       {!completedLogForUi && !activeWorkout && !customizing && (

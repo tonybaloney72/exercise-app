@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import StretchPickModal from "@/components/workout/StretchPickModal";
 import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
-import { CATEGORY_ORDER } from "@/core/catalog";
+import { TRAINING_CATEGORY_ORDER } from "@/core/catalog";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import {
   getPlanAddCandidatesAllCategories,
@@ -14,10 +14,6 @@ import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStor
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { stretchEntriesFromLogs } from "@/lib/workoutEditSession";
 import type { WorkoutLog } from "@/types";
-
-const ROUND_ADD_CATEGORIES = CATEGORY_ORDER.filter(
-  (c) => c !== "SW" && c !== "SC",
-);
 
 export type SessionStructurePickTarget =
   | { kind: "addStrength"; roundNumber: number }
@@ -72,7 +68,7 @@ export default function WorkoutSessionStructurePick({
     );
     if (!round) return [];
     return getPlanAddCandidatesAllCategories({
-      categories: ROUND_ADD_CATEGORIES,
+      categories: TRAINING_CATEGORY_ORDER,
       roundExerciseIds: round.exercises.map((e) => e.exerciseId),
       availableEquipment,
       dislikedExerciseIds: dislikedIds,

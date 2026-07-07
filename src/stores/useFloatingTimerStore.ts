@@ -1,7 +1,12 @@
 "use client";
 
 import { create } from "zustand";
-import { primeTimerAudio, playTimerDoneAlert } from "@/utils/timerAlert";
+import { primeTimerAudio } from "@/utils/timerAlert";
+import {
+  cancelTimerBackgroundNotification,
+  completeTimerCountdown,
+  resetTimerCompletionTracking,
+} from "@/lib/timerBackgroundAlert";
 import { displayCountdownSeconds } from "@/utils/time";
 
 export type TimerMode = "idle" | "rest" | "stopwatch" | "setTimer";
@@ -76,6 +81,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
 
   startRest: (totalSeconds, autoStart = true) => {
     primeTimerAudio();
+    resetTimerCompletionTracking();
     const seconds = Math.max(0, Math.floor(totalSeconds));
     set({
       mode: "rest",
@@ -94,6 +100,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
 
   startSetCountdown: (totalSeconds) => {
     primeTimerAudio();
+    resetTimerCompletionTracking();
     const seconds = Math.max(0, Math.floor(totalSeconds));
     set({
       mode: "setTimer",
@@ -230,6 +237,8 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
 
   stop: () => {
     const { mode, seconds } = get();
+    resetTimerCompletionTracking();
+    void cancelTimerBackgroundNotification();
     set({
       mode: "idle",
       presentation: "fullscreen",
@@ -261,7 +270,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
         if (s.countdownEndsAtMs == null) return s;
         const remainingMs = Math.max(0, s.countdownEndsAtMs - Date.now());
         if (remainingMs <= 0) {
-          playTimerDoneAlert();
+          completeTimerCountdown(s.countdownEndsAtMs);
           return {
             seconds: 0,
             running: false,

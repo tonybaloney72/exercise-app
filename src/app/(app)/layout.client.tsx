@@ -6,6 +6,7 @@ import AppDataSync from "@/components/layout/AppDataSync";
 import PlanGeneratorInputsSync from "@/components/layout/PlanGeneratorInputsSync";
 import AppSettingsSync from "@/components/layout/AppSettingsSync";
 import WakeLockSync from "@/components/layout/WakeLockSync";
+import TimerBackgroundAlertSync from "@/components/layout/TimerBackgroundAlertSync";
 import AppToaster from "@/components/layout/AppToaster";
 import PullToRefresh from "@/components/layout/PullToRefresh";
 import AuthInitializer from "@/components/auth/AuthInitializer";
@@ -28,6 +29,7 @@ export default function CapacitorAppLayout({
       <AppDataSync />
       <OnboardingGate />
       <WakeLockSync />
+      <TimerBackgroundAlertSync />
       <WhatsNewSync />
       <AppToaster />
       <PullToRefresh />

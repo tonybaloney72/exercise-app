@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import BackNavLink from "@/components/common/BackNavLink";
 import ProgressChartsSkeleton from "@/components/progress/ProgressChartsSkeleton";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useHistoryReady } from "@/hooks/useHistoryReady";
@@ -75,14 +74,10 @@ export default function HealthExercisesPage() {
   }
 
   return (
-    <div className="flex flex-col gap-2 py-6">
-      <BackNavLink fallbackHref={routes.health} />
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Exercises</h1>
-        <p className="text-sm text-muted mt-1">
-          Training focus and progress over time
-        </p>
-      </div>
+    <div className="flex flex-col gap-2 pt-3">
+      <p className="text-sm text-muted">
+        Training focus and progress over time
+      </p>
 
       {cardioLinks.length > 0 && (
         <div className="flex flex-col gap-2">

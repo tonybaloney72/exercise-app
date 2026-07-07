@@ -2,7 +2,7 @@ import HealthLandingContent from "@/components/health/HealthLandingContent";
 
 export default function HealthPage() {
   return (
-    <div className="py-6">
+    <div className="pt-3">
       <HealthLandingContent />
     </div>
   );

@@ -2,7 +2,7 @@ import type { Exercise, ExerciseCategory } from "@/types";
 import { exerciseCategoryById } from "./data/exerciseCategoryIndex";
 import { exerciseMap, exercises } from "./data/exercises";
 
-export { CATEGORIES, CATEGORY_ORDER } from "./categories";
+export { CATEGORIES, CATEGORY_ORDER, TRAINING_CATEGORY_ORDER } from "./categories";
 export { exerciseCategoryById } from "./data/exerciseCategoryIndex";
 export { exerciseMap, exercises } from "./data/exercises";
 

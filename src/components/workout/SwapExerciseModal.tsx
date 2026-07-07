@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
-import { formatLaterRoundWarning, pickRandomSwap } from "@/lib/exerciseSwap";
+import CategoryFilterChips from "@/components/common/CategoryFilterChips";
+import { TRAINING_CATEGORY_ORDER } from "@/core/catalog";
+import { formatLaterRoundWarning } from "@/lib/exerciseSwap";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
-import type { Exercise } from "@/types";
+import type { Exercise, ExerciseCategory } from "@/types";
 
 interface SwapExerciseModalProps {
   open: boolean;
@@ -37,6 +39,8 @@ export default function SwapExerciseModal({
   emptyPoolMessage = "No other exercises in this category for this round.",
 }: SwapExerciseModalProps) {
   const [query, setQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] =
+    useState<ExerciseCategory | null>(null);
   const byExerciseId = useExerciseSettingsStore((s) => s.byExerciseId);
   const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
   const [pendingLaterRound, setPendingLaterRound] = useState<{
@@ -45,11 +49,24 @@ export default function SwapExerciseModal({
     roundNumbers: readonly number[];
   } | null>(null);
 
+  useEffect(() => {
+    if (!open) {
+      setQuery("");
+      setSelectedCategory(null);
+      setPendingLaterRound(null);
+    }
+  }, [open]);
+
+  const categoryFiltered = useMemo(() => {
+    if (!selectedCategory) return candidates;
+    return candidates.filter((c) => c.category === selectedCategory);
+  }, [candidates, selectedCategory]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return candidates;
-    return candidates.filter((c) => c.name.toLowerCase().includes(q));
-  }, [candidates, query]);
+    if (!q) return categoryFiltered;
+    return categoryFiltered.filter((c) => c.name.toLowerCase().includes(q));
+  }, [categoryFiltered, query]);
 
   const targetByExerciseId = useMemo(() => {
     const map = new Map<string, string>();
@@ -92,14 +109,6 @@ export default function SwapExerciseModal({
     commitPick(exercise.id);
   }
 
-  function handleRandom() {
-    const pick = pickRandomSwap(
-      filtered.length > 0 ? filtered : candidates,
-    );
-    if (!pick) return;
-    requestPick(pick);
-  }
-
   const confirmHint = pendingLaterRound
     ? formatLaterRoundWarning(pendingLaterRound.roundNumbers)
     : "";
@@ -107,7 +116,7 @@ export default function SwapExerciseModal({
   const title = mode === "add" ? "Add exercise" : "Swap exercise";
   const hint =
     mode === "add"
-      ? "Search the catalog or pick from the list."
+      ? "Filter by category or search by name."
       : `Same category as prescribed · planned: ${plannedName}`;
   const confirmVerb = mode === "add" ? "add" : "swap to";
 
@@ -119,16 +128,8 @@ export default function SwapExerciseModal({
       hint={hint}
       ariaLabel={title}
       headerExtra={
-        <div className="flex flex-wrap gap-2 border-b border-border px-4 py-2">
-          <button
-            type="button"
-            onClick={handleRandom}
-            disabled={candidates.length === 0 || !!pendingLaterRound}
-            className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover disabled:opacity-40"
-          >
-            Random pick
-          </button>
-          {hasSwap && (
+        hasSwap ? (
+          <div className="flex flex-wrap gap-2 border-b border-border px-4 py-2">
             <button
               type="button"
               onClick={() => {
@@ -139,8 +140,8 @@ export default function SwapExerciseModal({
             >
               Use prescribed
             </button>
-          )}
-        </div>
+          </div>
+        ) : undefined
       }
       bodyClassName="overflow-hidden"
     >
@@ -175,7 +176,7 @@ export default function SwapExerciseModal({
         </div>
       ) : (
         <>
-          <div className="px-4 py-2">
+          <div className="flex flex-col gap-2 px-4 py-2">
             <input
               type="search"
               value={query}
@@ -184,6 +185,14 @@ export default function SwapExerciseModal({
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
               autoComplete="off"
             />
+            {mode === "add" ? (
+              <CategoryFilterChips
+                mode="single"
+                categories={TRAINING_CATEGORY_ORDER}
+                selected={selectedCategory}
+                onSelectedChange={setSelectedCategory}
+              />
+            ) : null}
           </div>
           <ul className="max-h-[min(50vh,360px)] overflow-y-auto px-2 pb-4">
             {filtered.length === 0 ? (

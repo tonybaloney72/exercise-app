@@ -47,16 +47,6 @@ export default function SettingsPage() {
             hint="Week layout, difficulty, and equipment"
           />
           <SettingsLinkRow
-            href={routes.settingsBuildGuided}
-            title="Guided week builder"
-            hint="Step-by-step plan for your week"
-          />
-          <SettingsLinkRow
-            href={routes.settingsBuildCustom}
-            title="Custom week builder"
-            hint="Full control over each day"
-          />
-          <SettingsLinkRow
             href={routes.settingsDevice}
             title="Device & timers"
             hint="Theme, rest timers, and Health Connect"

@@ -23,7 +23,6 @@ import { formatLocalDateKey } from "@/utils/localDateKey";
 import { findCompletedWorkoutForDate } from "@/utils/workoutLogLookup";
 import { countRoundExerciseSlots } from "@/utils/workoutLogCounts";
 import { routes } from "@/lib/appRoutes";
-import BackNavLink from "@/components/common/BackNavLink";
 
 const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 /** Same Sun–Sat order as the week strip and `weekDates`. */
@@ -92,12 +91,7 @@ export default function WeeklyPage() {
   }, [workoutHistory, weekDateKeys]);
 
   return (
-    <div className="flex flex-col py-6 gap-5">
-      <BackNavLink fallbackHref={routes.workout} />
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Weekly Overview</h1>
-      </div>
-
+    <div className="flex flex-col gap-5 pt-3">
       {weekError && (
         <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-foreground">
           {weekError}

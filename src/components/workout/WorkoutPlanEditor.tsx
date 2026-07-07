@@ -12,7 +12,7 @@ import StretchPlanSection from "@/components/workout/StretchPlanSection";
 import WorkoutDayTemplateToolbar from "@/components/workout/WorkoutDayTemplateToolbar";
 import StretchPickModal from "@/components/workout/StretchPickModal";
 import SwapExerciseModal from "@/components/workout/SwapExerciseModal";
-import { CATEGORY_ORDER } from "@/core/catalog";
+import { TRAINING_CATEGORY_ORDER } from "@/core/catalog";
 import { exerciseMap } from "@/core/catalog";
 import { rebuildDerivedStretches } from "@/lib/dayStretchPlan";
 import { buildStretchResolveContextFromStores } from "@/adapters/stretchResolveContextFromStores";
@@ -43,10 +43,6 @@ import type {
   RoundExercise,
   StretchEntry,
 } from "@/types";
-
-const ROUND_ADD_CATEGORIES = CATEGORY_ORDER.filter(
-  (c) => c !== "SW" && c !== "SC",
-);
 
 type StretchSectionKey = "warmUp" | "coolDown";
 
@@ -146,7 +142,7 @@ export default function WorkoutPlanEditor({
 
     if (pickTarget.kind === "add") {
       return getPlanAddCandidatesAllCategories({
-        categories: ROUND_ADD_CATEGORIES,
+        categories: TRAINING_CATEGORY_ORDER,
         roundExerciseIds: round.exercises.map((e) => e.exerciseId),
         availableEquipment,
         dislikedExerciseIds: dislikedIds,

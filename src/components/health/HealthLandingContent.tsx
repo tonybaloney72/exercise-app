@@ -123,10 +123,6 @@ export default function HealthLandingContent() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Health</h1>
-      </div>
-
       <div className="grid grid-cols-2 gap-2">
         {statCards.map((card, i) => (
           <TabEnterMotion key={card.slug} delay={i * 0.03}>
@@ -169,15 +165,6 @@ export default function HealthLandingContent() {
         </Link>
       </div>
 
-      <Link
-        href={routes.healthExercises}
-        className="inline-flex w-full items-center justify-between rounded-xl border border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-accent/40 hover:bg-surface-hover"
-      >
-        <span>Exercises & training</span>
-        <span className="text-muted" aria-hidden>
-          →
-        </span>
-      </Link>
     </div>
   );
 }

@@ -45,8 +45,8 @@ export default function CapacitorShellSync() {
   return (
     <div
       role="alert"
-      className="fixed inset-x-0 bottom-0 z-100 border-t border-red-500/40 bg-red-950/95 px-4 py-3 text-xs leading-snug text-red-100"
-      style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+      className="fixed inset-x-0 top-0 z-100 border-b border-red-500/40 bg-red-950/95 px-4 py-3 text-xs leading-snug text-red-100"
+      style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
     >
       <p className="font-semibold">Dev error (native WebView)</p>
       <p className="mt-1 break-words font-mono">{devError}</p>

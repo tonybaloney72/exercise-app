@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import WorkoutHistoryCalendar from "@/components/progress/WorkoutHistoryCalendar";
-import BackNavLink from "@/components/common/BackNavLink";
 import { routes } from "@/lib/appRoutes";
 import {
   buildMonthCalendarModel,
@@ -60,19 +59,13 @@ function WorkoutHistoryPageInner() {
   );
 
   return (
-    <div className="flex flex-col py-6 gap-5">
-      <div className="flex flex-col gap-3">
-        <BackNavLink fallbackHref={routes.workout} />
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            Workout history
-          </h1>
-          <p className="text-sm text-muted mt-1">
-            {totalCount === 0
-              ? "Completed workouts appear on the calendar below."
-              : `${totalCount} completed workout${totalCount === 1 ? "" : "s"} - tap a day for details.`}
-          </p>
-        </div>
+    <div className="flex flex-col gap-5 pt-3">
+      <div>
+        <p className="text-sm text-muted">
+          {totalCount === 0
+            ? "Completed workouts appear on the calendar below."
+            : `${totalCount} completed workout${totalCount === 1 ? "" : "s"} - tap a day for details.`}
+        </p>
       </div>
 
       {totalCount === 0 ? (

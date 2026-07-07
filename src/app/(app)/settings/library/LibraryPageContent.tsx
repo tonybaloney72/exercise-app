@@ -6,6 +6,7 @@ import { exercises } from "@/core/catalog";
 import { CATEGORIES, CATEGORY_ORDER } from "@/core/catalog";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
 import CategoryBadge from "@/components/common/CategoryBadge";
+import CategoryFilterChips from "@/components/common/CategoryFilterChips";
 import { EQUIPMENT_LABELS, exerciseMatchesEquipment } from "@/data/equipment";
 import EmptyState from "@/components/common/EmptyState";
 import {
@@ -71,15 +72,6 @@ export default function LibraryPageContent() {
   >(() => new Set());
   const [showUnavailable, setShowUnavailable] = useState(false);
   const [withinMyLevel, setWithinMyLevel] = useState(false);
-
-  function toggleCategory(cat: ExerciseCategory) {
-    setSelectedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(cat)) next.delete(cat);
-      else next.add(cat);
-      return next;
-    });
-  }
 
   function toggleDifficulty(level: ExpertiseLevel) {
     setSelectedDifficulties((prev) => {
@@ -210,34 +202,13 @@ export default function LibraryPageContent() {
         defaultOpen
         contentClassName="flex flex-col gap-4"
       >
-        <LibraryFilterRow label="Category">
-          <button
-            type="button"
-            onClick={() => setSelectedCategories(new Set())}
-            className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-              selectedCategories.size === 0
-                ? "bg-accent text-white"
-                : "bg-surface text-muted hover:text-foreground border border-border"
-            }`}
-          >
-            All
-          </button>
-          {CATEGORY_ORDER.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              aria-pressed={selectedCategories.has(cat)}
-              onClick={() => toggleCategory(cat)}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                selectedCategories.has(cat)
-                  ? `${CATEGORIES[cat].bgColor} ${CATEGORIES[cat].textColor}`
-                  : "bg-surface text-muted hover:text-foreground border border-border"
-              }`}
-            >
-              {CATEGORIES[cat].shortName}
-            </button>
-          ))}
-        </LibraryFilterRow>
+        <CategoryFilterChips
+          mode="multiple"
+          label="Category"
+          hint="· tap to select multiple"
+          selected={selectedCategories}
+          onSelectedChange={setSelectedCategories}
+        />
 
         <LibraryFilterRow label="Difficulty">
           <button
