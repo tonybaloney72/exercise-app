@@ -49,7 +49,7 @@ export default function CapacitorShellSync() {
       style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
     >
       <p className="font-semibold">Dev error (native WebView)</p>
-      <p className="mt-1 break-words font-mono">{devError}</p>
+      <p className="mt-1 wrap-break-word font-mono">{devError}</p>
     </div>
   );
 }

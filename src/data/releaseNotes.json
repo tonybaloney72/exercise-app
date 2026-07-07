@@ -1,5 +1,15 @@
 [
   {
+    "id": "2026-07-07-gps-route-maps",
+    "date": "2026-07-07",
+    "title": "GPS route maps",
+    "highlights": [
+      "Cardio sessions with GPS now show an interactive map with streets and parks—not just a line on a plain background. Open a session in Health → History, during a workout after recording or import, in the quick activity log, or on a completed workout summary.",
+      "Map colors follow Settings → Appearance (Auto, Light, or Dark) so the basemap matches the rest of the app.",
+      "Your route still shows as an accent-colored line with green start and red end markers; you can pan and zoom the map."
+    ]
+  },
+  {
     "id": "2026-07-07-workout-tabs-timers",
     "date": "2026-07-07",
     "title": "Workout tabs, filters & timer alerts",
@@ -18,16 +28,6 @@
       "Bottom navigation is now three tabs: Workout (today's plan and logging), Health, and Settings. Week and History live under Workout.",
       "Health brings together today's vitals, weight, calories burned, and cardio exercise charts. Open an activity to see distance and pace over time, browse sessions by day, and tap a row for full metrics and GPS route when available.",
       "Settings → Device & timers → Appearance: choose Auto (match your device), Light, or Dark."
-    ]
-  },
-  {
-    "id": "2026-07-03-progress-vitals-sleep",
-    "date": "2026-07-03",
-    "title": "More daily health on Progress",
-    "highlights": [
-      "Progress now charts resting heart rate, blood oxygen (SpO₂), sleep, and VO₂ max from Health Connect—alongside steps, active calories, and average heart rate.",
-      "Today's stat cards rotate through the new vitals and sleep when your watch or phone reports them.",
-      "Settings → Cardio & sensors shows whether background Health Connect updates are allowed so daily totals can refresh when you return to the app."
     ]
   }
 ]

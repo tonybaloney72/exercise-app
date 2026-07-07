@@ -19,7 +19,7 @@ import type { ResolvedCardioQuickLog } from "@/lib/health/resolveCardioQuickLog"
 import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
 import { hasRenderableGpsRoute } from "@/lib/geo/gpsTrackPolyline";
 import { mirrorCardioCaptureToHealth } from "@/lib/mirrorCardioToHealth";
-import GpsRoutePolyline from "@/components/cardio/GpsRoutePolyline";
+import GpsRouteMap from "@/components/cardio/GpsRouteMap";
 import { getWeightForDate } from "@/lib/weightLog";
 import type { CardioSessionCaptureInput } from "@/lib/cardioSessionLog";
 import { useWeightStore } from "@/stores/useWeightStore";
@@ -181,7 +181,7 @@ export default function CardioSessionBlock({
             compact
           />
           {hasRenderableGpsRoute(routePoints) ? (
-            <GpsRoutePolyline
+            <GpsRouteMap
               points={routePoints!}
               className="mt-3"
               ariaLabel={`${title} GPS route`}

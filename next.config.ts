@@ -15,6 +15,15 @@ const isCapacitorBuild = process.env.CAPACITOR_BUILD === "1";
 const nextConfig: NextConfig = {
   /** Android emulator / device WebViews load dev via a non-localhost hostname. */
   allowedDevOrigins: resolveCapacitorDevOrigins(),
+  /** Faster dev/build: tree-shake barrel imports (recharts is already default-optimized). */
+  experimental: {
+    optimizePackageImports: [
+      "framer-motion",
+      "@dnd-kit/core",
+      "@dnd-kit/sortable",
+      "@dnd-kit/utilities",
+    ],
+  },
   env: {
     NEXT_PUBLIC_BUILD_ID: buildId,
     NEXT_PUBLIC_APP_VERSION: packageJson.version,

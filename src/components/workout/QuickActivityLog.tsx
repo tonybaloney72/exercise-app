@@ -20,6 +20,8 @@ import { mirrorCardioCaptureToHealth } from "@/lib/mirrorCardioToHealth";
 import { getWeightForDate } from "@/lib/weightLog";
 import type { ResolvedCardioQuickLog } from "@/lib/health/resolveCardioQuickLog";
 import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
+import { hasRenderableGpsRoute } from "@/lib/geo/gpsTrackPolyline";
+import GpsRouteMap from "@/components/cardio/GpsRouteMap";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useWeightStore } from "@/stores/useWeightStore";
@@ -262,6 +264,12 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
               onTimeInputChange={setTimeInput}
               healthMeta={healthMeta}
               onResolved={applyResolved}
+            />
+          ) : null}
+          {hasRenderableGpsRoute(gpsTrack) ? (
+            <GpsRouteMap
+              points={gpsTrack!}
+              ariaLabel={`${modalTitle} GPS route`}
             />
           ) : null}
         </div>

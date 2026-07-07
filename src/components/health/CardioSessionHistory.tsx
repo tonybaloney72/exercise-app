@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import EmptyState from "@/components/common/EmptyState";
-import GpsRoutePolyline from "@/components/cardio/GpsRoutePolyline";
+import GpsRouteMap from "@/components/cardio/GpsRouteMap";
 import { hasRenderableGpsRoute } from "@/lib/geo/gpsTrackPolyline";
 import type { WorkoutLog } from "@/types";
 import {
@@ -81,7 +81,7 @@ function CardioSessionDetailSheet({
               <p className="text-xs font-medium uppercase tracking-wide text-muted">
                 Route
               </p>
-              <GpsRoutePolyline
+              <GpsRouteMap
                 points={routePoints!}
                 ariaLabel={`${session.label} GPS route`}
               />
