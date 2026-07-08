@@ -47,28 +47,28 @@ export function deferOnboardingThisSession(): void {
 
 export const ONBOARDING_TAB_TOUR = [
   {
-    label: "Today",
+    label: "Home",
     description:
-      "Your workout for the day-start a session, log quick cardio, or track body weight.",
+      "Quick capture for today—log cardio activities and body weight without starting a workout.",
   },
   {
-    label: "Week",
+    label: "Workout",
     description:
-      "See the full Sun–Sat plan, open any day, and build or adjust your week.",
+      "Today's training plan, live sessions, week view, and workout history.",
   },
   {
-    label: "Progress",
+    label: "Meals",
     description:
-      "Stats, charts, workout history, and trends including body weight over time.",
+      "Search foods and log breakfast, lunch, dinner, and snacks for the day.",
   },
   {
-    label: "Library",
+    label: "Health",
     description:
-      "Browse exercises, set defaults, favorites, and filter by gear and skill level.",
+      "Health Connect metrics, nutrition analysis, exercise trends, and body weight charts.",
   },
   {
     label: "Settings",
     description:
-      "Equipment, difficulty caps, timers, week mode (PPL vs custom), and more.",
+      "Equipment, difficulty caps, timers, week builders, library, and app preferences.",
   },
 ] as const;

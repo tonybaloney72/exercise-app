@@ -68,7 +68,7 @@ export default function WeightLogCard({ dateKey }: Props) {
       <div>
         <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
         <p className="text-xs text-muted mt-0.5 leading-relaxed">
-          Log once per day to track trends in Progress.
+          Log once per day to track trends in Health.
         </p>
       </div>
       <div className="flex gap-2 items-end">

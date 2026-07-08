@@ -111,15 +111,15 @@ export default function WeightProgressChart({
           <div>
             <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
             <p className="text-xs text-muted mt-0.5">
-              One entry per day; log on Workout to see gains and losses over time
+              One entry per day; log on Home to see gains and losses over time
             </p>
           </div>
         ) : null}
         <SurfaceCard className="border-dashed bg-surface/50 px-4 py-8">
           <EmptyState
             title="No weight logged yet."
-            description="Use the body weight field on Workout to start your trend line."
-            action={{ label: "Go to Workout", href: routes.workout }}
+            description="Use the body weight field on Home to start your trend line."
+            action={{ label: "Go to Home", href: routes.home }}
             className="text-xs"
           />
         </SurfaceCard>

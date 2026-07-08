@@ -402,7 +402,6 @@ interface WorkoutState {
   removeCardioFromWorkout: (instanceKey: string) => void;
   addCardioToWorkout: (kind: CardioActivityKind) => void;
   quickLogCardio: (
-    plan: DayPlan,
     dateKey: string,
     kind: CardioActivityKind,
     input: {
@@ -1293,7 +1292,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       };
     }),
 
-  quickLogCardio: async (plan, dateKey, kind, input) => {
+  quickLogCardio: async (dateKey, kind, input) => {
     const hasDistance =
       input.distanceMi != null && input.distanceMi > 0 && !Number.isNaN(input.distanceMi);
     const hasDuration =
@@ -1427,8 +1426,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
     }
 
     clientTrace("quickLogCardio", "branch_cardio_only_completed");
-    const dayOfWeek =
-      parseLocalDateKey(dateKey)?.getDay() ?? plan.dayOfWeek;
+    const dayOfWeek = parseLocalDateKey(dateKey)?.getDay() ?? 0;
     const nowIso = new Date().toISOString();
     const startIso = input.activityStartTime ?? nowIso;
     const endIso = input.activityEndTime ?? nowIso;

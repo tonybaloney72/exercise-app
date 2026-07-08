@@ -1,9 +1,10 @@
 /** Canonical app paths — use instead of string literals for navigation. */
 
-export const APP_HOME = "/workout";
+export const APP_HOME = "/home";
 
 export const routes = {
-  workout: APP_HOME,
+  home: APP_HOME,
+  workout: "/workout",
   workoutWeek: "/workout/week",
   workoutWeekDay: (dateKey: string) => `/workout/week/${dateKey}`,
   workoutHistory: "/workout/history",
@@ -28,6 +29,7 @@ export const routes = {
 } as const;
 
 const MAIN_TAB_ROUTES = [
+  routes.home,
   routes.workout,
   routes.meals,
   routes.health,

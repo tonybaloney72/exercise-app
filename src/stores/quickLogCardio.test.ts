@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { DayPlan } from "@/types";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
@@ -23,27 +22,6 @@ vi.mock("@/utils/saveErrorToast", () => ({
   toastSaveError: vi.fn(),
 }));
 
-const plan: DayPlan = {
-  dayOfWeek: 1,
-  name: "Test day",
-  theme: "Test",
-  hasJog: false,
-  strengthFocus: ["UP"],
-  coreGroups: [],
-  rounds: [
-    {
-      roundNumber: 1,
-      exercises: [
-        {
-          exerciseId: "UP-1",
-          category: "UP",
-          targetReps: "10",
-        },
-      ],
-    },
-  ],
-};
-
 describe("quickLogCardio", () => {
   beforeEach(() => {
     saveWorkout.mockClear();
@@ -58,7 +36,7 @@ describe("quickLogCardio", () => {
   it("saves a completed cardio-only log without starting a workout session", async () => {
     const ok = await useWorkoutStore
       .getState()
-      .quickLogCardio(plan, "2026-05-18", "jog", { distanceMi: 2 });
+      .quickLogCardio("2026-05-18", "jog", { distanceMi: 2 });
     expect(ok).toBe(true);
 
     const state = useWorkoutStore.getState();
@@ -80,11 +58,11 @@ describe("quickLogCardio", () => {
   it("appends another quick log to the same completed cardio-only day", async () => {
     await useWorkoutStore
       .getState()
-      .quickLogCardio(plan, "2026-05-18", "walk", { distanceMi: 1.2 });
+      .quickLogCardio("2026-05-18", "walk", { distanceMi: 1.2 });
 
     const ok = await useWorkoutStore
       .getState()
-      .quickLogCardio(plan, "2026-05-18", "jog", { distanceMi: 2 });
+      .quickLogCardio("2026-05-18", "jog", { distanceMi: 2 });
     expect(ok).toBe(true);
 
     const state = useWorkoutStore.getState();
@@ -125,7 +103,7 @@ describe("quickLogCardio", () => {
 
     const ok = await useWorkoutStore
       .getState()
-      .quickLogCardio(plan, "2026-05-18", "walk", { durationSeconds: 600 });
+      .quickLogCardio("2026-05-18", "walk", { durationSeconds: 600 });
     expect(ok).toBe(true);
 
     const state = useWorkoutStore.getState();

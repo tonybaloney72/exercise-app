@@ -77,3 +77,16 @@ Commit **all** of these after `npm run icons` (if they are not in git, productio
 **Verify (Android):** deploy → Chrome → `https://your-domain/icon-192.png` should show your logo, not 404. DevTools → **Application** → **Manifest** → Icons. Then remove the old shortcut and **Install app** / **Add to Home screen** again (Android caches the old icon).
 
 **Verify (iOS):** Safari → Share → **Add to Home Screen** (splash + `apple-touch-icon`).
+
+## Nutrition (FatSecret)
+
+Server-only env (Vercel + local `.env.local`):
+
+| Variable | Purpose |
+| -------- | ------- |
+| `FATSECRET_OAUTH_ONE_KEY` / `FATSECRET_OAUTH_ONE_SECRET` | Platform OAuth 1.0 (search, food detail, diary writes) |
+| `FATSECRET_PROFILE_ENCRYPTION_KEY` | Encrypt per-user FatSecret tokens in Supabase |
+
+Apply migration `20260708120000_nutrition_fatsecret_profiles.sql` before diary sync.
+
+**Barcode scanning (planned):** Premier barcode API + device camera — see [nutrition-barcode-scanning.md](./nutrition-barcode-scanning.md).

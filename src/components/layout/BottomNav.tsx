@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { routes } from "@/lib/appRoutes";
 
 const navItems = [
+  { href: routes.home, label: "Home", icon: HomeIcon },
   { href: routes.workout, label: "Workout", icon: WorkoutIcon },
   { href: routes.meals, label: "Meals", icon: MealsIcon },
   { href: routes.health, label: "Health", icon: HealthIcon },
@@ -23,7 +24,7 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium transition-colors ${
+              className={`flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors sm:text-xs ${
                 isActive ? "text-accent" : "text-muted hover:text-foreground"
               }`}
             >
@@ -34,6 +35,24 @@ export default function BottomNav() {
         })}
       </div>
     </nav>
+  );
+}
+
+function HomeIcon({ active }: { active: boolean }) {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={active ? 2.5 : 2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 10.5 12 3l9 7.5" />
+      <path d="M5 10v10h14V10" />
+    </svg>
   );
 }
 

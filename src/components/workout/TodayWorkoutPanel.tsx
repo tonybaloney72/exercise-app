@@ -26,7 +26,6 @@ type Props = {
   onSavePlan: (plan: DayPlan) => void;
   onCancelCustomize: () => void;
   onResetDay: () => void;
-  onCollapse?: () => void;
 };
 
 const btnPrimary =
@@ -52,7 +51,6 @@ export default function TodayWorkoutPanel({
   onSavePlan,
   onCancelCustomize,
   onResetDay,
-  onCollapse,
 }: Props) {
   const draftRef = useRef(plan);
 
@@ -115,26 +113,15 @@ export default function TodayWorkoutPanel({
         >
           Start workout
         </button>
-        {canCustomize || onCollapse ? (
+        {canCustomize ? (
           <WorkoutActionBar>
-            {canCustomize ? (
-              <button
-                type="button"
-                onClick={onCustomize}
-                className={`${btnSecondary} flex-1 min-w-0`}
-              >
-                Customize plan
-              </button>
-            ) : null}
-            {onCollapse ? (
-              <button
-                type="button"
-                onClick={onCollapse}
-                className={`${btnNeutral} flex-1 min-w-0`}
-              >
-                Hide workout
-              </button>
-            ) : null}
+            <button
+              type="button"
+              onClick={onCustomize}
+              className={`${btnSecondary} w-full`}
+            >
+              Customize plan
+            </button>
           </WorkoutActionBar>
         ) : null}
       </div>

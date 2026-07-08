@@ -26,7 +26,7 @@ import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useWeightStore } from "@/stores/useWeightStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
-import type { CardioActivityKind, DayPlan } from "@/types";
+import type { CardioActivityKind } from "@/types";
 
 const SHORTCUT_KINDS: CardioActivityKind[] = ["walk", "jog"];
 
@@ -36,14 +36,13 @@ type QuickLogModal =
   | { step: "log"; kind: CardioActivityKind };
 
 type Props = {
-  plan: DayPlan;
   dateKey: string;
 };
 
 const tileClass =
   "flex flex-1 flex-col items-center justify-center gap-1 rounded-xl border border-border bg-surface-hover px-2 py-3 min-h-[4.25rem] transition-colors hover:border-accent/40";
 
-export default function QuickActivityLog({ plan, dateKey }: Props) {
+export default function QuickActivityLog({ dateKey }: Props) {
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
   const weightEntries = useWeightStore((s) => s.entries);
   const quickLogCardio = useWorkoutStore((s) => s.quickLogCardio);
@@ -146,7 +145,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
         stepCount: resolvedHealth?.stepCount,
         resolution,
       });
-      const ok = await quickLogCardio(plan, dateKey, pendingKind, {
+      const ok = await quickLogCardio(dateKey, pendingKind, {
         distanceMi: hasDistance ? distanceMi : undefined,
         durationSeconds: hasDuration ? durationSeconds : undefined,
         health: resolvedHealth,
@@ -200,7 +199,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
             Log activity
           </h2>
           <p className="text-xs text-muted mt-0.5 leading-relaxed">
-            Walk, jog, or choose another activity for today&apos;s workout.
+            Walk, jog, or choose another activity to log for today.
           </p>
         </div>
         <div

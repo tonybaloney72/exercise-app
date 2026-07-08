@@ -35,8 +35,6 @@ import {
 import { useDayPlan } from "@/hooks/useDayPlan";
 import type { DayPlan } from "@/types";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
-import QuickActivityLog from "@/components/workout/QuickActivityLog";
-import WeightLogCard from "@/components/workout/WeightLogCard";
 
 function formatSessionHeaderDate(dateKey: string): string {
   const d = parseLocalDateKey(dateKey);
@@ -85,7 +83,6 @@ function TodayPageInner() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showWorkoutDetails, setShowWorkoutDetails] = useState(false);
-  const [workoutDetailOpen, setWorkoutDetailOpen] = useState(false);
 
   const devForcePreWorkout =
     process.env.NODE_ENV === "development" &&
@@ -136,7 +133,7 @@ function TodayPageInner() {
       Boolean(activeWorkout) ||
       customizing ||
       showWorkoutDetails ||
-      (showWorkoutEntry && workoutDetailOpen);
+      showWorkoutEntry;
     setHideSiblingTabs(hide);
     return () => setHideSiblingTabs(false);
   }, [
@@ -144,7 +141,6 @@ function TodayPageInner() {
     customizing,
     showWorkoutDetails,
     showWorkoutEntry,
-    workoutDetailOpen,
     setHideSiblingTabs,
   ]);
 
@@ -168,13 +164,8 @@ function TodayPageInner() {
     if (activeWorkout) {
       setShowWorkoutDetails(false);
       setCustomizing(false);
-      setWorkoutDetailOpen(true);
     }
   }, [activeWorkout?.id]);
-
-  useEffect(() => {
-    if (customizing) setWorkoutDetailOpen(true);
-  }, [customizing]);
 
   if (planLoading) {
     return <TodayPageSkeleton />;
@@ -205,8 +196,6 @@ function TodayPageInner() {
   const restBadge = restBadgeForPlan(plan);
   const cardioBadges = cardioBadgesForPlan(plan);
   const isCustomWeek = isUserCustomizedWeekSource(weekSource);
-  const editingCompletedSession =
-    Boolean(activeWorkout?.endTime) && activeWorkout?.date === todayKey;
   const showPlanEditor = customizing && canEditPlan;
   const hideStaleBanner =
     Boolean(activeWorkout) || customizing || activePastSession;
@@ -214,28 +203,13 @@ function TodayPageInner() {
     !activeWorkout ||
     activeWorkout.endTime != null ||
     activeWorkout.date === todayKey;
-  const showQuickActivityLog =
-    isTodaySession &&
-    !customizing &&
-    !showPlanEditor &&
-    !activeWorkout &&
-    !hasPausedDraftToday;
-  /** Quick cardio + body weight — hidden during workout detail, more-details review, or live session. */
-  const showQuickLogsSection =
-    showQuickActivityLog &&
-    !showWorkoutDetails &&
-    (showTodaysCompletedReview || !workoutDetailOpen);
-  const showQuickLogsBeforeReview =
-    showQuickLogsSection && !showTodaysCompletedReview;
-  const showQuickLogsAfterReview =
-    showQuickLogsSection && showTodaysCompletedReview;
 
   const todayWorkoutPanelMode: TodayWorkoutPanelMode | null =
     activeWorkout && isTodaySession
       ? "session"
       : showPlanEditor
         ? "plan-edit"
-        : showWorkoutEntry && workoutDetailOpen
+        : showWorkoutEntry
           ? "preview"
           : null;
 
@@ -277,20 +251,8 @@ function TodayPageInner() {
     if (!plan) return;
     setSaveError(null);
     setCustomizing(false);
-    setWorkoutDetailOpen(true);
     scrollTodayToTop();
     startWorkout(plan);
-  }
-
-  function handleOpenWorkoutDetail() {
-    setWorkoutDetailOpen(true);
-    scrollTodayToTop();
-  }
-
-  function handleCollapseWorkoutDetail() {
-    if (customizing || activeWorkout) return;
-    setWorkoutDetailOpen(false);
-    scrollTodayToTop();
   }
 
   return (
@@ -324,7 +286,7 @@ function TodayPageInner() {
         )}
       </TabEnterMotion>
 
-      {/* Category chips on today's plan (collapsed or expanded) */}
+      {/* Category chips on today's plan */}
       {!completedLogForUi && !activeWorkout && !customizing && (
         <TabEnterMotion delay={0.1} y={0} className="flex flex-wrap gap-2">
           {allCategories.map((cat) => (
@@ -354,16 +316,6 @@ function TodayPageInner() {
         </p>
       )}
 
-      {showWorkoutEntry && !workoutDetailOpen && !customizing && (
-        <button
-          type="button"
-          onClick={handleOpenWorkoutDetail}
-          className="w-full rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
-        >
-          View Today's Workout
-        </button>
-      )}
-
       {hasPausedDraftToday && (
         <AnimatedSection className="flex flex-col gap-3" delay={0.15}>
           <SurfaceCard className="flex flex-col gap-2 p-4">
@@ -378,7 +330,6 @@ function TodayPageInner() {
           <button
             type="button"
             onClick={() => {
-              setWorkoutDetailOpen(true);
               scrollTodayToTop();
               resumeWorkout();
             }}
@@ -417,19 +368,7 @@ function TodayPageInner() {
             scrollTodayToTop();
           }}
           onResetDay={() => void handleResetDay()}
-          onCollapse={
-            todayWorkoutPanelMode === "preview"
-              ? handleCollapseWorkoutDetail
-              : undefined
-          }
         />
-      ) : null}
-
-      {showQuickLogsBeforeReview ? (
-        <AnimatedSection className="flex flex-col gap-3" delay={0.12}>
-          <QuickActivityLog plan={plan} dateKey={todayKey} />
-          <WeightLogCard dateKey={todayKey} />
-        </AnimatedSection>
       ) : null}
 
       {/* Completed today - summary card unchanged */}
@@ -472,13 +411,6 @@ function TodayPageInner() {
       )}
 
       <StaleWorkoutSessionsBanner hidden={hideStaleBanner} />
-
-      {showQuickLogsAfterReview ? (
-        <AnimatedSection className="flex flex-col gap-3" delay={0.12}>
-          <QuickActivityLog plan={plan} dateKey={todayKey} />
-          <WeightLogCard dateKey={todayKey} />
-        </AnimatedSection>
-      ) : null}
     </div>
   );
 }
