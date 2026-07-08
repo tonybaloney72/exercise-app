@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
-import CardioActivityPickModal from "@/components/workout/CardioActivityPickModal";
+import CardioActivityPickList from "@/components/workout/CardioActivityPickList";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import {
   CARDIO_ACTIVITY_EMOJI,
@@ -28,7 +28,12 @@ import { useWeightStore } from "@/stores/useWeightStore";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import type { CardioActivityKind, DayPlan } from "@/types";
 
-const PRIMARY_KINDS: CardioActivityKind[] = ["walk", "jog"];
+const SHORTCUT_KINDS: CardioActivityKind[] = ["walk", "jog"];
+
+type QuickLogModal =
+  | null
+  | { step: "pick" }
+  | { step: "log"; kind: CardioActivityKind };
 
 type Props = {
   plan: DayPlan;
@@ -42,10 +47,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
   const weightEntries = useWeightStore((s) => s.entries);
   const quickLogCardio = useWorkoutStore((s) => s.quickLogCardio);
-  const [pendingKind, setPendingKind] = useState<CardioActivityKind | null>(
-    null,
-  );
-  const [morePickerOpen, setMorePickerOpen] = useState(false);
+  const [modal, setModal] = useState<QuickLogModal>(null);
   const [distanceInput, setDistanceInput] = useState("");
   const [timeInput, setTimeInput] = useState("");
   const [healthMeta, setHealthMeta] = useState<CardioHealthMeta | undefined>();
@@ -59,18 +61,17 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
   const [gpsTrack, setGpsTrack] = useState<readonly GpsTrackPoint[] | undefined>();
   const [saving, setSaving] = useState(false);
 
-  const moreKinds = useMemo(
+  const pickableKinds = useMemo(
     () =>
-      CARDIO_ACTIVITY_ORDER.filter(
-        (kind) =>
-          !PRIMARY_KINDS.includes(kind) &&
-          cardioKindAllowed(kind, availableEquipment),
+      CARDIO_ACTIVITY_ORDER.filter((kind) =>
+        cardioKindAllowed(kind, availableEquipment),
       ),
     [availableEquipment],
   );
 
-  const closeLogModal = useCallback(() => {
-    setPendingKind(null);
+  const pendingKind = modal?.step === "log" ? modal.kind : null;
+
+  const resetLogFields = useCallback(() => {
     setDistanceInput("");
     setTimeInput("");
     setHealthMeta(undefined);
@@ -79,9 +80,26 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     setGpsTrack(undefined);
   }, []);
 
+  const closeLogModal = useCallback(() => {
+    setModal(null);
+    resetLogFields();
+  }, [resetLogFields]);
+
   function openLogForm(kind: CardioActivityKind) {
-    setMorePickerOpen(false);
-    setPendingKind(kind);
+    if (modal?.step === "log" && modal.kind !== kind) {
+      resetLogFields();
+    }
+    setModal({ step: "log", kind });
+  }
+
+  function openActivityPicker() {
+    resetLogFields();
+    setModal({ step: "pick" });
+  }
+
+  function goToPickStep() {
+    resetLogFields();
+    setModal({ step: "pick" });
   }
 
   function applyResolved(result: ResolvedCardioQuickLog) {
@@ -162,9 +180,17 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
     }
   }
 
-  const modalTitle = pendingKind
-    ? `Log ${CARDIO_ACTIVITY_LABELS[pendingKind].toLowerCase()}`
-    : "";
+  const modalTitle =
+    modal?.step === "pick"
+      ? "Log activity"
+      : pendingKind
+        ? `Log ${CARDIO_ACTIVITY_LABELS[pendingKind].toLowerCase()}`
+        : "";
+
+  const modalHint =
+    modal?.step === "pick"
+      ? "Choose an activity to record distance and time."
+      : "Start and end your activity, then confirm distance and time.";
 
   return (
     <>
@@ -174,7 +200,7 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
             Log activity
           </h2>
           <p className="text-xs text-muted mt-0.5 leading-relaxed">
-            Walk, jog, or pick another activity for today&apos;s workout.
+            Walk, jog, or choose another activity for today&apos;s workout.
           </p>
         </div>
         <div
@@ -182,12 +208,13 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
           role="group"
           aria-label="Quick log activity"
         >
-          {PRIMARY_KINDS.map((kind) => (
+          {SHORTCUT_KINDS.map((kind) => (
             <button
               key={kind}
               type="button"
+              disabled={!cardioKindAllowed(kind, availableEquipment)}
               onClick={() => openLogForm(kind)}
-              className={tileClass}
+              className={`${tileClass} disabled:opacity-40`}
             >
               <span className="text-xl" aria-hidden>
                 {CARDIO_ACTIVITY_EMOJI[kind]}
@@ -199,63 +226,79 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
           ))}
           <button
             type="button"
-            disabled={moreKinds.length === 0}
-            onClick={() => setMorePickerOpen(true)}
+            disabled={pickableKinds.length === 0}
+            onClick={openActivityPicker}
             className={`${tileClass} disabled:opacity-40`}
-            aria-label="More activities"
+            aria-label="Log activity"
           >
             <span className="text-xl text-muted" aria-hidden>
-              ⋯
+              +
             </span>
             <span className="text-caption font-medium text-foreground">
-              More
+              Log activity
             </span>
           </button>
         </div>
       </SurfaceCard>
 
-      <CardioActivityPickModal
-        open={morePickerOpen}
-        onClose={() => setMorePickerOpen(false)}
-        onPick={openLogForm}
-        kinds={moreKinds}
-        title="Other activities"
-        hint="Hike, swim, and more."
-        placement="center"
-      />
-
       <BottomSheetModal
-        open={pendingKind != null}
+        open={modal != null}
         onClose={closeLogModal}
         title={modalTitle}
-        hint="Start and end your activity, then confirm distance and time."
+        hint={modalHint}
         ariaLabel={modalTitle}
         placement="center"
         initialFocus="none"
-        bodyClassName="px-0"
+        headerExtra={
+          modal?.step === "log" ? (
+            <div className="shrink-0 border-b border-border px-4 py-2">
+              <button
+                type="button"
+                onClick={goToPickStep}
+                disabled={saving}
+                className="text-xs font-medium text-accent hover:underline disabled:opacity-50"
+              >
+                ← Change activity
+              </button>
+            </div>
+          ) : undefined
+        }
+        bodyClassName={
+          modal?.step === "pick"
+            ? "overflow-y-auto px-2 py-3 max-h-[min(60vh,420px)]"
+            : "px-0"
+        }
         footer={
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={closeLogModal}
-              disabled={saving}
-              className="flex-1 rounded-xl border border-border py-3 text-sm font-medium text-muted hover:text-foreground"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={() => void handleSave()}
-              disabled={saving}
-              className="flex-1 rounded-xl bg-accent py-3 text-sm font-bold text-white hover:bg-accent/90 disabled:opacity-60"
-            >
-              {saving ? "Saving…" : "Save"}
-            </button>
-          </div>
+          modal?.step === "log" ? (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={closeLogModal}
+                disabled={saving}
+                className="flex-1 rounded-xl border border-border py-3 text-sm font-medium text-muted hover:text-foreground"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleSave()}
+                disabled={saving}
+                className="flex-1 rounded-xl bg-accent py-3 text-sm font-bold text-white hover:bg-accent/90 disabled:opacity-60"
+              >
+                {saving ? "Saving…" : "Save"}
+              </button>
+            </div>
+          ) : undefined
         }
       >
-        <div className="flex flex-col gap-3 p-4">
-          {pendingKind ? (
+        {modal?.step === "pick" ? (
+          <CardioActivityPickList
+            kinds={pickableKinds}
+            onPick={openLogForm}
+          />
+        ) : null}
+        {modal?.step === "log" && pendingKind ? (
+          <div className="flex flex-col gap-3 p-4">
             <CardioActivityLogFields
               kind={pendingKind}
               distanceInput={distanceInput}
@@ -265,14 +308,14 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
               healthMeta={healthMeta}
               onResolved={applyResolved}
             />
-          ) : null}
-          {hasRenderableGpsRoute(gpsTrack) ? (
-            <GpsRouteMap
-              points={gpsTrack!}
-              ariaLabel={`${modalTitle} GPS route`}
-            />
-          ) : null}
-        </div>
+            {hasRenderableGpsRoute(gpsTrack) ? (
+              <GpsRouteMap
+                points={gpsTrack!}
+                ariaLabel={`${modalTitle} GPS route`}
+              />
+            ) : null}
+          </div>
+        ) : null}
       </BottomSheetModal>
     </>
   );

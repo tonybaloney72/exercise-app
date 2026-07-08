@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFocusTrap, type FocusTrapInitialFocus } from "@/hooks/useFocusTrap";
 import { useHistoryBackToClose } from "@/hooks/useHistoryBackToClose";
@@ -56,6 +56,9 @@ export type BottomSheetModalProps = {
   initialFocus?: FocusTrapInitialFocus;
 };
 
+/** Ignore backdrop dismiss briefly after open (mobile tap-through when swapping modals). */
+const BACKDROP_CLOSE_GUARD_MS = 450;
+
 const maxWidthClass: Record<
   NonNullable<BottomSheetModalProps["maxWidth"]>,
   string
@@ -87,10 +90,18 @@ export default function BottomSheetModal({
 }: BottomSheetModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const backdropPointerDownRef = useRef(false);
+  const backdropCloseAllowedAfterRef = useRef(0);
   const centered = placement === "center";
   const keyboardInset = useKeyboardInset(open && centered);
   const historyBackEnabled =
     closeOnHistoryBack ?? (closeOnEscape && showCloseButton);
+
+  useEffect(() => {
+    if (open) {
+      backdropCloseAllowedAfterRef.current =
+        performance.now() + BACKDROP_CLOSE_GUARD_MS;
+    }
+  }, [open]);
 
   useHistoryBackToClose(open, onClose, historyBackEnabled);
 
@@ -131,7 +142,8 @@ export default function BottomSheetModal({
             if (
               closeOnBackdropClick &&
               event.target === event.currentTarget &&
-              backdropPointerDownRef.current
+              backdropPointerDownRef.current &&
+              performance.now() >= backdropCloseAllowedAfterRef.current
             ) {
               onClose();
             }
