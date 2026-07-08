@@ -7,6 +7,7 @@ import SurfaceCard, {
   surfaceCardClassName,
 } from "@/components/common/SurfaceCard";
 import { useDailyHealthFromHealth } from "@/hooks/useDailyHealthFromHealth";
+import { useNutritionDiary } from "@/hooks/useNutritionDiary";
 import { HEALTH_STAT_DISPLAY } from "@/lib/health/healthStatRoutes";
 import { routes } from "@/lib/appRoutes";
 import { formatLocalDateKey } from "@/utils/localDateKey";
@@ -85,6 +86,8 @@ export default function HealthLandingContent() {
   const loadWeight = useWeightStore((s) => s.load);
   const authMode = useAuthStore((s) => s.mode);
   const todayKey = formatLocalDateKey();
+  const canLoadDiary = authMode === "authenticated";
+  const nutritionDiary = useNutritionDiary(todayKey, canLoadDiary);
 
   useEffect(() => {
     if (authMode === "loading") return;
@@ -121,6 +124,18 @@ export default function HealthLandingContent() {
     (v) => `${Math.round(v)} kcal`,
   );
 
+  const consumedValue = useMemo(() => {
+    if (!canLoadDiary) return "—";
+    if (nutritionDiary.loading) return "…";
+    if (nutritionDiary.error) return "—";
+    return `${Math.round(nutritionDiary.data?.calories ?? 0)} kcal`;
+  }, [
+    canLoadDiary,
+    nutritionDiary.loading,
+    nutritionDiary.error,
+    nutritionDiary.data?.calories,
+  ]);
+
   return (
     <div className="flex flex-col gap-5">
       <div className="grid grid-cols-2 gap-2">
@@ -144,7 +159,7 @@ export default function HealthLandingContent() {
 
       <div className="grid grid-cols-2 gap-2">
         <Link
-          href={routes.healthCalories}
+          href={routes.healthNutrition}
           className={`${surfaceCardClassName} block p-4 transition-colors hover:border-accent/40 hover:bg-surface-hover`}
         >
           <span className="text-lg">⚡</span>
@@ -154,12 +169,12 @@ export default function HealthLandingContent() {
           <p className="text-sm leading-snug text-muted">Burned today</p>
         </Link>
         <Link
-          href={routes.healthCalories}
+          href={routes.healthNutrition}
           className={`${surfaceCardClassName} block p-4 transition-colors hover:border-accent/40 hover:bg-surface-hover`}
         >
           <span className="text-lg">🍽️</span>
           <p className="mt-2 text-xl font-bold tabular-nums text-foreground">
-            —
+            {consumedValue}
           </p>
           <p className="text-sm leading-snug text-muted">Consumed today</p>
         </Link>

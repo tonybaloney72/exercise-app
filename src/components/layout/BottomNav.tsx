@@ -6,6 +6,7 @@ import { routes } from "@/lib/appRoutes";
 
 const navItems = [
   { href: routes.workout, label: "Workout", icon: WorkoutIcon },
+  { href: routes.meals, label: "Meals", icon: MealsIcon },
   { href: routes.health, label: "Health", icon: HealthIcon },
   { href: routes.settings, label: "Settings", icon: SettingsIcon },
 ];
@@ -51,6 +52,25 @@ function WorkoutIcon({ active }: { active: boolean }) {
       <path d="M12 2L2 7l10 5 10-5-10-5z" />
       <path d="M2 17l10 5 10-5" />
       <path d="M2 12l10 5 10-5" />
+    </svg>
+  );
+}
+
+function MealsIcon({ active }: { active: boolean }) {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={active ? 2.5 : 2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 11h18" />
+      <path d="M5 7h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z" />
+      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
     </svg>
   );
 }

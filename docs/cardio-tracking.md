@@ -13,4 +13,4 @@
 
 **Current stack (APK):** Native `androidx.health.connect` via `HealthConnect` Capacitor plugin — `AggregateRequest` for steps/distance/calories/HR (no Capgo, no sample-sum fallback). Exercise sessions via `ExerciseSessionRecord`. Writes via `HealthExerciseWritePlugin`.
 
-**Next:** optional MapLibre basemap (v2); retroactive HC route on completed history rows. ME **polyline** + **HC route import** shipped (`GpsRoutePolyline`, `gps_track_points`).
+**Next:** optional MapLibre basemap (v2); retroactive HC route on completed history rows. ME **route map** + **HC route import** shipped (`GpsRouteMap`, `gps_track_points`).

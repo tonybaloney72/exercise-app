@@ -12,9 +12,11 @@ export const routes = {
 
   health: "/health",
   healthStat: (slug: string) => `/health/${slug}`,
-  healthCalories: "/health/calories",
+  healthNutrition: "/health/nutrition",
   healthExercises: "/health/exercises",
   healthExerciseKind: (kind: string) => `/health/exercises/${kind}`,
+
+  meals: "/meals",
 
   settings: "/settings",
   settingsLibrary: "/settings/library",
@@ -27,6 +29,7 @@ export const routes = {
 
 const MAIN_TAB_ROUTES = [
   routes.workout,
+  routes.meals,
   routes.health,
   routes.settings,
 ] as const;

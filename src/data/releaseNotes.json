@@ -1,5 +1,16 @@
 [
   {
+    "id": "2026-07-08-nutrition-meals-health",
+    "date": "2026-07-08",
+    "title": "Meals, nutrition tracking & Health analysis",
+    "highlights": [
+      "New Meals tab in the bottom nav: search foods (FatSecret), choose servings, and log breakfast, lunch, dinner, and snacks. Each entry shows calories, macros, and expandable details—fiber, sugar, sodium, vitamins, and more when the food provides them.",
+      "Health → Nutrition replaces the old Calories page: compare burned calories from Health Connect with consumed totals from your meal log. Range filters (Today, Week, Month, Year, All time) update both summary cards; consumed macros and micronutrients sum across the full period. Net today (burned − consumed) appears when Today is selected.",
+      "Daily trends chart plots burned vs consumed calories, or consumed protein, carbs, fat, fiber, sugar, and sodium over time. Year and All time load up to 90 days of meal-log history.",
+      "Health landing shows Burned today and Consumed today—both open Nutrition for deeper analysis. Meals links to Health with “View nutritional info on Health →”. Sign in to save your log; guest mode can browse foods but does not persist entries. Old /nutrition and /health/calories URLs redirect to the new routes."
+    ]
+  },
+  {
     "id": "2026-07-07-permissions-fixes-legal",
     "date": "2026-07-07",
     "title": "Permissions, fixes & legal updates",
@@ -18,17 +29,6 @@
       "Cardio sessions with GPS now show an interactive map with streets and parks—not just a line on a plain background. Open a session in Health → History, during a workout after recording or import, in the quick activity log, or on a completed workout summary.",
       "Map colors follow Settings → Appearance (Auto, Light, or Dark) so the basemap matches the rest of the app.",
       "Your route still shows as an accent-colored line with green start and red end markers; you can pan and zoom the map."
-    ]
-  },
-  {
-    "id": "2026-07-07-workout-tabs-timers",
-    "date": "2026-07-07",
-    "title": "Workout tabs, filters & timer alerts",
-    "highlights": [
-      "Workout and Health use header tabs—Today, Week, and History under Workout; Health and Exercises under Health. Week and History hide while you're in a live workout or customizing today's plan.",
-      "Adding an exercise to a round shows the same category filter chips as the Library. Filters reset when you close the picker; Random Pick is gone.",
-      "On Android, rest and set timers can alert you with a notification when the app is in the background—sound and vibration follow Settings → Device & timers.",
-      "Guided and Custom week builders are no longer on the main Settings screen; open them from Settings → Training."
     ]
   }
 ]
