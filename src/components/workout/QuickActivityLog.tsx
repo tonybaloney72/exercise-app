@@ -229,13 +229,13 @@ export default function QuickActivityLog({ plan, dateKey }: Props) {
             disabled={pickableKinds.length === 0}
             onClick={openActivityPicker}
             className={`${tileClass} disabled:opacity-40`}
-            aria-label="Log activity"
+            aria-label="More activities"
           >
             <span className="text-xl text-muted" aria-hidden>
-              +
+              ⋯
             </span>
             <span className="text-caption font-medium text-foreground">
-              Log activity
+              More
             </span>
           </button>
         </div>
