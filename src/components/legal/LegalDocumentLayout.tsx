@@ -1,4 +1,5 @@
 import Link from "next/link";
+import FatSecretAttributionSnippet from "@/components/nutrition/FatSecretAttributionSnippet";
 import { LEGAL_LAST_UPDATED } from "@/data/legal";
 
 type LegalDocumentLayoutProps = {
@@ -33,14 +34,17 @@ export default function LegalDocumentLayout({
           {children}
         </div>
 
-        <footer className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border py-6 text-sm text-muted">
-          <Link href="/privacy" className="hover:text-foreground">
-            Privacy Policy
-          </Link>
-          <span aria-hidden>·</span>
-          <Link href="/terms" className="hover:text-foreground">
-            Terms of Service
-          </Link>
+        <footer className="mt-10 flex flex-col gap-4 border-t border-border py-6 text-sm text-muted">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Link href="/privacy" className="hover:text-foreground">
+              Privacy Policy
+            </Link>
+            <span aria-hidden>·</span>
+            <Link href="/terms" className="hover:text-foreground">
+              Terms of Service
+            </Link>
+          </div>
+          <FatSecretAttributionSnippet className="text-xs [&_a]:text-muted [&_a]:transition-colors [&_a]:hover:text-foreground" />
         </footer>
       </div>
     </main>

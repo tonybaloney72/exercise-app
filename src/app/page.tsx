@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { resolveApiUrl } from "@/lib/apiBaseUrl";
+import FatSecretAttributionSnippet from "@/components/nutrition/FatSecretAttributionSnippet";
 import { isCapacitorBundledBuild, isNativePlatform } from "@/lib/capacitorRuntime";
 import { APP_HOME } from "@/lib/auth/constants";
 import { setGuestCookieActive } from "@/lib/auth/guestCookieClient";
@@ -126,6 +127,7 @@ export default function LandingPage() {
             Terms
           </Link>
         </p>
+        <FatSecretAttributionSnippet className="mt-3 text-center text-caption [&_a]:text-muted [&_a]:transition-colors [&_a]:hover:text-foreground" />
       </div>
     </main>
   );

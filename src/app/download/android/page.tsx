@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import FatSecretAttributionSnippet from "@/components/nutrition/FatSecretAttributionSnippet";
 import { LEGAL_APP_NAME } from "@/data/legal";
 import {
   resolveAndroidAppDownloadAbsoluteUrl,
@@ -81,6 +82,10 @@ export default function AndroidDownloadPage() {
             </p>
           </section>
         </div>
+
+        <footer className="mt-10 border-t border-border pt-6">
+          <FatSecretAttributionSnippet className="text-sm [&_a]:text-muted [&_a]:transition-colors [&_a]:hover:text-foreground" />
+        </footer>
       </div>
     </main>
   );
