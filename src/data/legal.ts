@@ -2,7 +2,7 @@
 
 export const LEGAL_CONTACT_EMAIL = "bologna.anthony@gmail.com";
 
-export const LEGAL_LAST_UPDATED = "May 18, 2026";
+export const LEGAL_LAST_UPDATED = "July 7, 2026";
 
 export const LEGAL_APP_NAME = "MyExercise";
 

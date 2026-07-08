@@ -15,7 +15,7 @@ export default function DeviceSettingsPage() {
   return (
     <SettingsSubpageLayout
       title="Device & timers"
-      hint="Theme, rest timers, sounds, and Health Connect"
+      hint="Theme, rest timers, sounds, Health Connect, location, and notifications"
     >
       <div className="flex flex-col gap-8">
         <AnimatedSection>

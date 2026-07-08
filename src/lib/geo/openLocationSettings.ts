@@ -1,15 +1,26 @@
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
+import {
+  GpsTracking,
+  isForegroundGpsTrackingAvailable,
+} from "@/lib/geo/gpsTrackingPlugin";
 
-const LOCATION_SOURCE_SETTINGS_INTENT =
-  "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
+export async function checkNativeLocationPermission(): Promise<boolean | null> {
+  if (!isNativePlatform()) return null;
+  try {
+    const { Geolocation } = await import("@capacitor/geolocation");
+    const status = await Geolocation.checkPermissions();
+    return status.location === "granted" || status.coarseLocation === "granted";
+  } catch {
+    return null;
+  }
+}
 
 /** Opens Android system location settings (GPS / network location). */
 export async function openNativeLocationSettings(): Promise<boolean> {
-  if (!isNativePlatform()) return false;
+  if (!isNativePlatform() || !isForegroundGpsTrackingAvailable()) return false;
   try {
-    const { Browser } = await import("@capacitor/browser");
-    await Browser.open({ url: LOCATION_SOURCE_SETTINGS_INTENT });
+    await GpsTracking.openLocationSettings();
     clientTrace("geo", "openLocationSettings_ok", {});
     return true;
   } catch (err) {

@@ -3,17 +3,26 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
+  checkNativeNotificationPermission,
+  openNativeAppSettings,
+  openNativeNotificationSettings,
+  requestNativeNotificationPermission,
+} from "@/lib/device/openAppSettings";
+import {
   CARDIO_HEALTH_READ_TYPES,
   checkNativeHealthAuthorization,
   openNativeHealthSettings,
 } from "@/lib/health/nativeHealth";
 import { ensureCardioHealthReadAccess } from "@/lib/health";
 import {
+  checkNativeLocationPermission,
   openNativeLocationSettings,
   requestNativeLocationPermission,
 } from "@/lib/geo/openLocationSettings";
 
 type HealthAccessState = "unknown" | "granted" | "denied";
+
+const SETTINGS_REFRESH_MS = 1500;
 
 export default function CardioPermissionsSection() {
   const [healthAccess, setHealthAccess] =
@@ -22,8 +31,12 @@ export default function CardioPermissionsSection() {
     boolean | null
   >(null);
   const [locationGranted, setLocationGranted] = useState<boolean | null>(null);
+  const [notificationsGranted, setNotificationsGranted] = useState<
+    boolean | null
+  >(null);
   const [healthBusy, setHealthBusy] = useState(false);
   const [locationBusy, setLocationBusy] = useState(false);
+  const [notificationBusy, setNotificationBusy] = useState(false);
 
   const refreshHealthAccess = useCallback(async () => {
     const status = await checkNativeHealthAuthorization({
@@ -35,9 +48,19 @@ export default function CardioPermissionsSection() {
     setBackgroundReadGranted(status?.backgroundReadGranted ?? null);
   }, []);
 
+  const refreshLocationAccess = useCallback(async () => {
+    setLocationGranted(await checkNativeLocationPermission());
+  }, []);
+
+  const refreshNotificationAccess = useCallback(async () => {
+    setNotificationsGranted(await checkNativeNotificationPermission());
+  }, []);
+
   useEffect(() => {
     void refreshHealthAccess();
-  }, [refreshHealthAccess]);
+    void refreshLocationAccess();
+    void refreshNotificationAccess();
+  }, [refreshHealthAccess, refreshLocationAccess, refreshNotificationAccess]);
 
   async function handleConnectHealth() {
     setHealthBusy(true);
@@ -64,7 +87,7 @@ export default function CardioPermissionsSection() {
       );
       return;
     }
-    window.setTimeout(() => void refreshHealthAccess(), 1500);
+    window.setTimeout(() => void refreshHealthAccess(), SETTINGS_REFRESH_MS);
   }
 
   async function handleRequestLocation() {
@@ -76,7 +99,7 @@ export default function CardioPermissionsSection() {
         toast.success("Location access granted");
       } else {
         toast.message(
-          "Location was not granted. Turn on GPS and allow location for MyExercise in system settings.",
+          "Location was not granted. Use App permissions below if you previously chose Don't ask again.",
         );
       }
     } finally {
@@ -87,8 +110,51 @@ export default function CardioPermissionsSection() {
   async function handleOpenLocationSettings() {
     const opened = await openNativeLocationSettings();
     if (!opened) {
-      toast.error("Could not open location settings.");
+      toast.error("Could not open system location settings.");
+      return;
     }
+    window.setTimeout(() => void refreshLocationAccess(), SETTINGS_REFRESH_MS);
+  }
+
+  async function handleOpenAppSettings() {
+    const opened = await openNativeAppSettings();
+    if (!opened) {
+      toast.error("Could not open MyExercise app settings.");
+      return;
+    }
+    window.setTimeout(() => {
+      void refreshLocationAccess();
+      void refreshNotificationAccess();
+    }, SETTINGS_REFRESH_MS);
+  }
+
+  async function handleRequestNotifications() {
+    setNotificationBusy(true);
+    try {
+      const granted = await requestNativeNotificationPermission();
+      setNotificationsGranted(granted);
+      if (granted) {
+        toast.success("Notifications allowed");
+      } else {
+        toast.message(
+          "Notifications were not allowed. Open notification settings below to enable timer alerts.",
+        );
+      }
+    } finally {
+      setNotificationBusy(false);
+    }
+  }
+
+  async function handleOpenNotificationSettings() {
+    const opened = await openNativeNotificationSettings();
+    if (!opened) {
+      toast.error("Could not open notification settings.");
+      return;
+    }
+    window.setTimeout(
+      () => void refreshNotificationAccess(),
+      SETTINGS_REFRESH_MS,
+    );
   }
 
   return (
@@ -141,17 +207,7 @@ export default function CardioPermissionsSection() {
               Track distance while the app is open.
             </p>
           </div>
-          {locationGranted != null ? (
-            <span
-              className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
-                locationGranted
-                  ? "bg-green-500/15 text-green-400"
-                  : "bg-amber-500/15 text-amber-400"
-              }`}
-            >
-              {locationGranted ? "Allowed" : "Denied"}
-            </span>
-          ) : null}
+          <PermissionBadge granted={locationGranted} />
         </div>
         <div className="flex flex-wrap gap-2">
           <ActionButton
@@ -162,9 +218,43 @@ export default function CardioPermissionsSection() {
           </ActionButton>
           <ActionButton
             variant="secondary"
+            onClick={() => void handleOpenAppSettings()}
+          >
+            App permissions
+          </ActionButton>
+          <ActionButton
+            variant="secondary"
             onClick={() => void handleOpenLocationSettings()}
           >
-            Open location settings
+            System location
+          </ActionButton>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface-hover/40 p-3">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <p className="text-sm font-medium text-foreground">
+              Notifications
+            </p>
+            <p className="text-xs text-muted mt-0.5">
+              Rest and set timer alerts when the app is in the background.
+            </p>
+          </div>
+          <PermissionBadge granted={notificationsGranted} />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <ActionButton
+            onClick={() => void handleRequestNotifications()}
+            disabled={notificationBusy}
+          >
+            {notificationBusy ? "Requesting…" : "Allow notifications"}
+          </ActionButton>
+          <ActionButton
+            variant="secondary"
+            onClick={() => void handleOpenNotificationSettings()}
+          >
+            Notification settings
           </ActionButton>
         </div>
       </div>
@@ -189,6 +279,27 @@ function HealthStatusBadge({ state }: { state: HealthAccessState }) {
       }`}
     >
       {state === "granted" ? "Connected" : "Not connected"}
+    </span>
+  );
+}
+
+function PermissionBadge({ granted }: { granted: boolean | null }) {
+  if (granted == null) {
+    return (
+      <span className="shrink-0 rounded-full bg-surface-hover px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted">
+        Checking…
+      </span>
+    );
+  }
+  return (
+    <span
+      className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+        granted
+          ? "bg-green-500/15 text-green-400"
+          : "bg-amber-500/15 text-amber-400"
+      }`}
+    >
+      {granted ? "Allowed" : "Denied"}
     </span>
   );
 }

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.provider.Settings;
 import androidx.core.content.ContextCompat;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -96,6 +97,18 @@ public class GpsTrackingPlugin extends Plugin {
     intent.setAction(GpsTrackingService.ACTION_STOP);
     getContext().startService(intent);
     call.resolve();
+  }
+
+  @PluginMethod
+  public void openLocationSettings(PluginCall call) {
+    try {
+      Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      getContext().startActivity(intent);
+      call.resolve();
+    } catch (Exception e) {
+      call.reject("Failed to open location settings", null, e);
+    }
   }
 
   private boolean hasTrackingPermissions() {

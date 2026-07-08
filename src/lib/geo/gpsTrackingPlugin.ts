@@ -17,6 +17,7 @@ export interface GpsTrackingPlugin {
     body?: string;
   }): Promise<void>;
   stopTracking(): Promise<void>;
+  openLocationSettings(): Promise<void>;
   addListener(
     eventName: "locationUpdate",
     listenerFunc: (event: GpsTrackingLocationUpdate) => void,

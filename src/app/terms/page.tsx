@@ -42,10 +42,25 @@ export default function TermsPage() {
         <p>
           {LEGAL_APP_NAME} is a fitness planning and logging tool only. It does
           not provide medical, physical therapy, or professional coaching advice.
-          Consult a qualified professional before starting or changing an exercise
-          program, especially if you have health conditions, injuries, or other
-          risk factors. You are responsible for exercising safely and within your
-          limits.
+          Data from Health Connect, GPS, or your device may be incomplete or
+          inaccurate. Consult a qualified professional before starting or
+          changing an exercise program, especially if you have health conditions,
+          injuries, or other risk factors. You are responsible for exercising
+          safely and within your limits, including when recording routes
+          outdoors.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold text-foreground">
+          Third-party services
+        </h2>
+        <p>
+          Some features rely on services outside {LEGAL_APP_NAME}, including
+          Health Connect (Google), map tile providers, and sign-in providers.
+          Those services have their own terms and availability. We do not
+          guarantee that Health Connect, GPS, notifications, or map views will
+          work on every device or OS version.
         </p>
       </section>
 
@@ -65,8 +80,9 @@ export default function TermsPage() {
           Your content and data
         </h2>
         <p>
-          Workout logs and settings you enter belong to you. We store them only
-          to provide the service, as described in our{" "}
+          Workout logs, settings, health metrics, and GPS routes you enter or
+          connect belong to you. We store them only to provide the service, as
+          described in our{" "}
           <a href="/privacy" className="text-accent hover:underline">
             Privacy Policy
           </a>
@@ -93,8 +109,9 @@ export default function TermsPage() {
         <p>
           To the fullest extent permitted by law, {LEGAL_OPERATOR} is not liable
           for any injury, loss, or damages arising from your use of {LEGAL_APP_NAME},
-          including reliance on suggested exercises, timers, or plans. Use the app
-          at your own risk.
+          including reliance on suggested exercises, timers, plans, Health
+          Connect metrics, GPS routes, or map displays. Use the app at your own
+          risk.
         </p>
       </section>
 

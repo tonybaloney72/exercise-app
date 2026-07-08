@@ -15,6 +15,7 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
+    registerPlugin(AppSettingsPlugin.class);
     registerPlugin(GpsTrackingPlugin.class);
     registerPlugin(HealthConnectPlugin.class);
     registerPlugin(HealthExerciseWritePlugin.class);

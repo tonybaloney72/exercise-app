@@ -56,10 +56,7 @@ export default function CardioActivityPickModal({
                 <button
                   type="button"
                   disabled={!allowed}
-                  onClick={() => {
-                    onPick(kind);
-                    onClose();
-                  }}
+                  onClick={() => onPick(kind)}
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-surface-hover disabled:opacity-40"
                 >
                   <span className="text-lg" aria-hidden>

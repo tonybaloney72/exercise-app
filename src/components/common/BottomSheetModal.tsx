@@ -86,6 +86,7 @@ export default function BottomSheetModal({
   initialFocus = "prefer-input",
 }: BottomSheetModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const backdropPointerDownRef = useRef(false);
   const centered = placement === "center";
   const keyboardInset = useKeyboardInset(open && centered);
   const historyBackEnabled =
@@ -123,7 +124,19 @@ export default function BottomSheetModal({
               ? { paddingBottom: keyboardInset + 16 }
               : undefined
           }
-          onClick={closeOnBackdropClick ? onClose : undefined}
+          onPointerDown={(event) => {
+            backdropPointerDownRef.current = event.target === event.currentTarget;
+          }}
+          onClick={(event) => {
+            if (
+              closeOnBackdropClick &&
+              event.target === event.currentTarget &&
+              backdropPointerDownRef.current
+            ) {
+              onClose();
+            }
+            backdropPointerDownRef.current = false;
+          }}
         >
           <motion.div
             ref={panelRef}

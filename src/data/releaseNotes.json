@@ -1,5 +1,16 @@
 [
   {
+    "id": "2026-07-07-permissions-fixes-legal",
+    "date": "2026-07-07",
+    "title": "Permissions, fixes & legal updates",
+    "highlights": [
+      "Settings → Device & timers → Permissions & connections: shortcuts for app permissions and notification settings, plus Allowed/Denied status for location and notifications. Opening system location settings no longer errors or locks the app.",
+      "On mobile, Log activity → More → Treadmill, Steps, Hike, or Swim no longer closes the log modal before you can enter details.",
+      "GPS route maps start with map attribution collapsed (ⓘ only) so the route isn't covered on small screens.",
+      "Privacy Policy and Terms of Service updated for Health Connect, GPS routes, maps, notifications, and diagnostic logs."
+    ]
+  },
+  {
     "id": "2026-07-07-gps-route-maps",
     "date": "2026-07-07",
     "title": "GPS route maps",
@@ -18,16 +29,6 @@
       "Adding an exercise to a round shows the same category filter chips as the Library. Filters reset when you close the picker; Random Pick is gone.",
       "On Android, rest and set timers can alert you with a notification when the app is in the background—sound and vibration follow Settings → Device & timers.",
       "Guided and Custom week builders are no longer on the main Settings screen; open them from Settings → Training."
-    ]
-  },
-  {
-    "id": "2026-07-06-health-nav-theme",
-    "date": "2026-07-06",
-    "title": "Workout, Health & Settings",
-    "highlights": [
-      "Bottom navigation is now three tabs: Workout (today's plan and logging), Health, and Settings. Week and History live under Workout.",
-      "Health brings together today's vitals, weight, calories burned, and cardio exercise charts. Open an activity to see distance and pace over time, browse sessions by day, and tap a row for full metrics and GPS route when available.",
-      "Settings → Device & timers → Appearance: choose Auto (match your device), Light, or Dark."
     ]
   }
 ]
