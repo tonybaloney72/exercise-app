@@ -69,7 +69,7 @@ function mapServing(row: RawServing): FoodServingOption | null {
   };
 }
 
-function parseFoodDetailResponse(payload: RawFoodResponse): FoodDetail | null {
+export function parseFoodDetailResponse(payload: RawFoodResponse): FoodDetail | null {
   const food = payload.food;
   const foodId = food?.food_id?.trim();
   const name = food?.food_name?.trim();

@@ -5,8 +5,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import AddFoodSheet from "@/components/nutrition/AddFoodSheet";
+import BarcodeScanSheet from "@/components/nutrition/BarcodeScanSheet";
 import { useNutritionDiary } from "@/hooks/useNutritionDiary";
+import { useAndroidNative } from "@/hooks/useAndroidNative";
 import { routes } from "@/lib/appRoutes";
+import type { FoodDetail } from "@/lib/fatsecret/foodDetail";
 import {
   FATSECRET_MEALS,
   FATSECRET_MEAL_LABELS,
@@ -25,13 +28,20 @@ type Props = {
   dateKey: string;
 };
 
+type AddSheetState = {
+  meal: FatSecretMeal;
+  initialFood?: FoodDetail;
+};
+
 const tileClass =
   "flex flex-col items-center justify-center gap-1 rounded-xl border border-border bg-surface-hover px-2 py-3 min-h-[4.25rem] transition-colors hover:border-accent/40";
 
 export default function QuickMealLog({ dateKey }: Props) {
   const authMode = useAuthStore((s) => s.mode);
   const canLog = authMode === "authenticated";
-  const [activeMeal, setActiveMeal] = useState<FatSecretMeal | null>(null);
+  const [addSheet, setAddSheet] = useState<AddSheetState | null>(null);
+  const [scanOpen, setScanOpen] = useState(false);
+  const androidNative = useAndroidNative();
   const { reload } = useNutritionDiary(dateKey, canLog);
 
   function openMeal(meal: FatSecretMeal) {
@@ -40,7 +50,16 @@ export default function QuickMealLog({ dateKey }: Props) {
       toast.error("Sign in to log meals and snacks.");
       return;
     }
-    setActiveMeal(meal);
+    setAddSheet({ meal });
+  }
+
+  function openScan() {
+    if (authMode === "loading") return;
+    if (!canLog) {
+      toast.error("Sign in to log meals and snacks.");
+      return;
+    }
+    setScanOpen(true);
   }
 
   return (
@@ -76,6 +95,17 @@ export default function QuickMealLog({ dateKey }: Props) {
           ))}
         </div>
 
+        {androidNative ? (
+          <button
+            type="button"
+            onClick={openScan}
+            disabled={authMode === "loading"}
+            className="w-full rounded-xl border border-border bg-surface-hover py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent/40 disabled:opacity-50"
+          >
+            Scan barcode
+          </button>
+        ) : null}
+
         {authMode === "guest" || authMode === "anonymous" ? (
           <p className="text-xs text-muted">
             <Link href="/login" className="font-medium text-accent hover:underline">
@@ -93,13 +123,27 @@ export default function QuickMealLog({ dateKey }: Props) {
         )}
       </SurfaceCard>
 
-      {activeMeal ? (
+      {addSheet ? (
         <AddFoodSheet
-          open={activeMeal != null}
-          meal={activeMeal}
+          key={`${addSheet.meal}-${addSheet.initialFood?.foodId ?? "search"}`}
+          open
+          meal={addSheet.meal}
           dateKey={dateKey}
-          onClose={() => setActiveMeal(null)}
+          initialFood={addSheet.initialFood ?? null}
+          onClose={() => setAddSheet(null)}
           onLogged={() => void reload()}
+        />
+      ) : null}
+
+      {scanOpen ? (
+        <BarcodeScanSheet
+          open
+          onClose={() => setScanOpen(false)}
+          onFoodResolved={(meal, food) => {
+            setScanOpen(false);
+            setAddSheet({ meal, initialFood: food });
+          }}
+          onSearchInstead={(meal) => setAddSheet({ meal })}
         />
       ) : null}
     </>

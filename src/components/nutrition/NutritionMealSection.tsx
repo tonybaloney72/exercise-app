@@ -4,11 +4,14 @@ import { useState } from "react";
 import { toast } from "sonner";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import AddFoodSheet from "@/components/nutrition/AddFoodSheet";
+import BarcodeScanSheet from "@/components/nutrition/BarcodeScanSheet";
 import NutritionLogEntry from "@/components/nutrition/NutritionLogEntry";
 import NutritionMacroSummary from "@/components/nutrition/NutritionMacroSummary";
+import { removeNutritionDiaryEntry } from "@/hooks/useNutritionDiary";
+import { useAndroidNative } from "@/hooks/useAndroidNative";
+import type { FoodDetail } from "@/lib/fatsecret/foodDetail";
 import type { FoodDiaryMealSummary } from "@/lib/fatsecret/foodDiary";
 import { FATSECRET_MEAL_LABELS } from "@/lib/nutrition/fatsecretMeals";
-import { removeNutritionDiaryEntry } from "@/hooks/useNutritionDiary";
 
 type Props = {
   summary: FoodDiaryMealSummary;
@@ -16,9 +19,15 @@ type Props = {
   onChanged: () => void;
 };
 
+type AddSheetState = {
+  initialFood?: FoodDetail;
+};
+
 export default function NutritionMealSection({ summary, dateKey, onChanged }: Props) {
-  const [addOpen, setAddOpen] = useState(false);
+  const [addSheet, setAddSheet] = useState<AddSheetState | null>(null);
+  const [scanOpen, setScanOpen] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const androidNative = useAndroidNative();
 
   async function handleRemove(entryId: string) {
     setRemovingId(entryId);
@@ -50,13 +59,24 @@ export default function NutritionMealSection({ summary, dateKey, onChanged }: Pr
               <p className="mt-0.5 text-xs text-muted">Nothing logged yet.</p>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => setAddOpen(true)}
-            className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:border-accent/40 hover:bg-accent/10"
-          >
-            Add
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            {androidNative ? (
+              <button
+                type="button"
+                onClick={() => setScanOpen(true)}
+                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-accent/40 hover:bg-accent/10"
+              >
+                Scan
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setAddSheet({})}
+              className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:border-accent/40 hover:bg-accent/10"
+            >
+              Add
+            </button>
+          </div>
         </div>
 
         {hasEntries ? (
@@ -73,13 +93,33 @@ export default function NutritionMealSection({ summary, dateKey, onChanged }: Pr
         ) : null}
       </SurfaceCard>
 
-      <AddFoodSheet
-        open={addOpen}
-        meal={summary.meal}
-        dateKey={dateKey}
-        onClose={() => setAddOpen(false)}
-        onLogged={onChanged}
-      />
+      {addSheet ? (
+        <AddFoodSheet
+          key={`${summary.meal}-${addSheet.initialFood?.foodId ?? "search"}`}
+          open
+          meal={summary.meal}
+          dateKey={dateKey}
+          initialFood={addSheet.initialFood ?? null}
+          onClose={() => setAddSheet(null)}
+          onLogged={onChanged}
+        />
+      ) : null}
+
+      {scanOpen ? (
+        <BarcodeScanSheet
+          open
+          defaultMeal={summary.meal}
+          onClose={() => setScanOpen(false)}
+          onFoodResolved={(_meal, food) => {
+            setScanOpen(false);
+            setAddSheet({ initialFood: food });
+          }}
+          onSearchInstead={() => {
+            setScanOpen(false);
+            setAddSheet({});
+          }}
+        />
+      ) : null}
     </>
   );
 }

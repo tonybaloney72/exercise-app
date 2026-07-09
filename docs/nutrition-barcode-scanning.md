@@ -1,6 +1,6 @@
 # Nutrition: barcode scanning (prep)
 
-> **Status:** Not implemented - checklist for the next coding session.  
+> **Status:** Implemented (Android app only). Web/PWA uses search instead.  
 > **User entry points (planned):** Home → Log food → **Scan**; optionally Meals / Add food sheet.
 
 ---

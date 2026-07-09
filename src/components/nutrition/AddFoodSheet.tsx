@@ -37,6 +37,8 @@ type Props = {
   dateKey: string;
   onClose: () => void;
   onLogged: () => void;
+  /** Skip search when food is already resolved (e.g. barcode scan). */
+  initialFood?: FoodDetail | null;
 };
 
 type Step = "search" | "serving";
@@ -47,6 +49,7 @@ export default function AddFoodSheet({
   dateKey,
   onClose,
   onLogged,
+  initialFood = null,
 }: Props) {
   const [step, setStep] = useState<Step>("search");
   const [query, setQuery] = useState("");
@@ -60,6 +63,35 @@ export default function AddFoodSheet({
   const [weightUnit, setWeightUnit] = useState<WeightEntryUnit>("g");
   const [saving, setSaving] = useState(false);
 
+  function resetAmountForServing(
+    serving: NonNullable<ReturnType<typeof defaultFoodServing>>,
+  ) {
+    const unit = defaultWeightEntryUnit(serving);
+    setWeightUnit(unit);
+    setAmountInput(defaultWeightEntryAmount(serving, unit));
+  }
+
+  function openServingForFoodDetail(food: FoodDetail) {
+    setSelectedFood({
+      foodId: food.foodId,
+      name: food.name,
+      brandName: food.brandName,
+      foodType: food.foodType,
+      description: null,
+      url: null,
+    });
+    setFoodDetail(food);
+    setStep("serving");
+    setLoadingDetail(false);
+    const serving = defaultFoodServing(food.servings);
+    if (serving) {
+      resetAmountForServing(serving);
+    } else {
+      setAmountInput("1");
+      setWeightUnit("g");
+    }
+  }
+
   useEffect(() => {
     if (!open) {
       setStep("search");
@@ -71,7 +103,10 @@ export default function AddFoodSheet({
       setWeightUnit("g");
       return;
     }
-  }, [open]);
+    if (initialFood) {
+      openServingForFoodDetail(initialFood);
+    }
+  }, [open, initialFood]);
 
   useEffect(() => {
     if (!open) return;
@@ -96,14 +131,6 @@ export default function AddFoodSheet({
 
     return () => window.clearTimeout(handle);
   }, [open, query]);
-
-  function resetAmountForServing(
-    serving: NonNullable<ReturnType<typeof defaultFoodServing>>,
-  ) {
-    const unit = defaultWeightEntryUnit(serving);
-    setWeightUnit(unit);
-    setAmountInput(defaultWeightEntryAmount(serving, unit));
-  }
 
   async function pickFood(food: FatSecretFoodSearchItem) {
     setSelectedFood(food);

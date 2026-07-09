@@ -1,5 +1,14 @@
 [
   {
+    "id": "2026-07-09-barcode-scanning",
+    "date": "2026-07-09",
+    "title": "Scan barcodes to log food",
+    "highlights": [
+      "Android app: scan a product barcode from Home or Meals to look up food in FatSecret and jump straight to the serving step. Uses Google Play barcode scanning-no camera permission prompt.",
+      "Can't scan? Tap Type barcode instead and enter the UPC digits manually. If FatSecret doesn't have that product, use Search by name as before."
+    ]
+  },
+  {
     "id": "2026-07-09-meal-log-serving-entry",
     "date": "2026-07-09",
     "title": "Easier meal logging",
@@ -14,17 +23,6 @@
     "title": "Health Connect fixes",
     "highlights": [
       "Importing from Health Connect only asks for read access-you won't be prompted to allow writing just to pull in a workout. MyExercise also no longer writes very short accidental exercise entries back to Health Connect."
-    ]
-  },
-  {
-    "id": "2026-07-08-home-nav-quick-log",
-    "date": "2026-07-08",
-    "title": "Home tab & quick logging",
-    "highlights": [
-      "New Home tab (5-tab nav: Home · Workout · Meals · Health · Settings). After sign-in you land on Home-the daily capture hub for cardio quick log, body weight, and quick food logging.",
-      "Log food on Home: tap Breakfast, Lunch, Dinner, or Snacks to open the same add-food flow as Meals. Full diary editing stays on the Meals tab.",
-      "Workout tab is training-only again: today’s plan and Start workout show immediately-no extra “View Today’s Workout” step. Cardio quick log and body weight moved from Workout to Home.",
-      "Weight charts and empty states point to Home for logging. Onboarding tour updated for the five-tab layout."
     ]
   }
 ]
