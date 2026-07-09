@@ -5,16 +5,27 @@ import { toast } from "sonner";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import NutritionFactsPanel from "@/components/nutrition/NutritionFactsPanel";
 import { resolveApiUrl } from "@/lib/apiBaseUrl";
-import type { FoodDetail, FoodServingOption } from "@/lib/fatsecret/foodDetail";
+import type { FoodDetail } from "@/lib/fatsecret/foodDetail";
 import type { FatSecretFoodSearchItem } from "@/lib/fatsecret/foodsSearch";
-import {
-  scaleNutrition,
-  servingScaleFactor,
-} from "@/lib/nutrition/foodNutrition";
+import { scaleNutrition } from "@/lib/nutrition/foodNutrition";
 import {
   FATSECRET_MEAL_LABELS,
   type FatSecretMeal,
 } from "@/lib/nutrition/fatsecretMeals";
+import {
+  convertGramsToWeight,
+  convertWeightToGrams,
+  defaultFoodServing,
+  defaultWeightEntryAmount,
+  defaultWeightEntryUnit,
+  formatServingSizeLine,
+  formatWeightInputAmount,
+  nutritionScaleFactorForLog,
+  resolveNumberOfUnitsForLog,
+  servingHasMetricWeight,
+  type WeightEntryUnit,
+  WEIGHT_ENTRY_UNITS,
+} from "@/lib/nutrition/servingQuantity";
 import { logFoodDiaryEntry } from "@/hooks/useNutritionDiary";
 
 type Props = {
@@ -42,10 +53,8 @@ export default function AddFoodSheet({
     useState<FatSecretFoodSearchItem | null>(null);
   const [foodDetail, setFoodDetail] = useState<FoodDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
-  const [selectedServingId, setSelectedServingId] = useState<string | null>(
-    null,
-  );
-  const [units, setUnits] = useState("1");
+  const [amountInput, setAmountInput] = useState("1");
+  const [weightUnit, setWeightUnit] = useState<WeightEntryUnit>("g");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -55,8 +64,8 @@ export default function AddFoodSheet({
       setResults([]);
       setSelectedFood(null);
       setFoodDetail(null);
-      setSelectedServingId(null);
-      setUnits("1");
+      setAmountInput("1");
+      setWeightUnit("g");
       return;
     }
   }, [open]);
@@ -85,13 +94,19 @@ export default function AddFoodSheet({
     return () => window.clearTimeout(handle);
   }, [open, query]);
 
+  function resetAmountForServing(
+    serving: NonNullable<ReturnType<typeof defaultFoodServing>>,
+  ) {
+    const unit = defaultWeightEntryUnit(serving);
+    setWeightUnit(unit);
+    setAmountInput(defaultWeightEntryAmount(serving, unit));
+  }
+
   async function pickFood(food: FatSecretFoodSearchItem) {
     setSelectedFood(food);
     setStep("serving");
     setLoadingDetail(true);
     setFoodDetail(null);
-    setSelectedServingId(null);
-    setUnits("1");
 
     try {
       const res = await fetch(
@@ -104,9 +119,13 @@ export default function AddFoodSheet({
         return;
       }
       setFoodDetail(payload);
-      setSelectedServingId(payload.servings[0]?.servingId ?? null);
-      const defaultUnits = payload.servings[0]?.numberOfUnits;
-      setUnits(defaultUnits != null ? String(defaultUnits) : "1");
+      const serving = defaultFoodServing(payload.servings);
+      if (serving) {
+        resetAmountForServing(serving);
+      } else {
+        setAmountInput("1");
+        setWeightUnit("g");
+      }
     } catch {
       toast.error("Could not load servings for that food.");
       setStep("search");
@@ -116,10 +135,20 @@ export default function AddFoodSheet({
   }
 
   async function handleSave() {
-    if (!selectedFood || !foodDetail || !selectedServingId) return;
-    const numberOfUnits = Number.parseFloat(units.trim());
-    if (!Number.isFinite(numberOfUnits) || numberOfUnits <= 0) {
-      toast.error("Enter a valid serving amount.");
+    const serving = foodDetail ? defaultFoodServing(foodDetail.servings) : null;
+    if (!selectedFood || !serving) return;
+
+    const numberOfUnits = resolveNumberOfUnitsForLog({
+      serving,
+      amountInput,
+      weightUnit,
+    });
+    if (numberOfUnits == null) {
+      toast.error(
+        servingHasMetricWeight(serving)
+          ? "Enter a valid weight."
+          : "Enter a valid serving amount.",
+      );
       return;
     }
 
@@ -129,7 +158,7 @@ export default function AddFoodSheet({
       meal,
       foodId: selectedFood.foodId,
       foodName: selectedFood.name,
-      servingId: selectedServingId,
+      servingId: serving.servingId,
       numberOfUnits,
     });
     setSaving(false);
@@ -144,35 +173,34 @@ export default function AddFoodSheet({
     onClose();
   }
 
-  const selectedServing = foodDetail?.servings.find(
-    (serving) => serving.servingId === selectedServingId,
-  );
+  const selectedServing = foodDetail
+    ? defaultFoodServing(foodDetail.servings)
+    : null;
+  const usesWeightEntry =
+    selectedServing != null && servingHasMetricWeight(selectedServing);
 
   const scaledNutrition = useMemo(() => {
     if (!selectedServing) return null;
-    const factor = servingScaleFactor(units, selectedServing.numberOfUnits);
+    const factor = nutritionScaleFactorForLog({
+      serving: selectedServing,
+      amountInput,
+      weightUnit,
+    });
+    if (factor <= 0) return null;
     return scaleNutrition(selectedServing, factor);
-  }, [selectedServing, units]);
-
-  const servingLabel = selectedServing
-    ? formatServingContext(selectedServing, units)
-    : undefined;
+  }, [selectedServing, amountInput, weightUnit]);
 
   const title =
     step === "search"
       ? `Add to ${FATSECRET_MEAL_LABELS[meal]}`
-      : (selectedFood?.name ?? "Choose serving");
+      : (selectedFood?.name ?? "Log food");
 
   return (
     <BottomSheetModal
       open={open}
       onClose={onClose}
       title={title}
-      hint={
-        step === "search"
-          ? "Search FatSecret foods to log."
-          : "Pick a serving size and amount."
-      }
+      hint={step === "search" ? "Search FatSecret foods to log." : ""}
       placement="center"
       initialFocus="none"
       headerExtra={
@@ -184,7 +212,7 @@ export default function AddFoodSheet({
               disabled={saving}
               className="text-xs font-medium text-accent hover:underline disabled:opacity-50"
             >
-              ← Change food
+              ← Back
             </button>
           </div>
         ) : undefined
@@ -208,7 +236,7 @@ export default function AddFoodSheet({
             <button
               type="button"
               onClick={() => void handleSave()}
-              disabled={saving || loadingDetail || !selectedServingId}
+              disabled={saving || loadingDetail || !selectedServing}
               className="flex-1 rounded-xl bg-accent py-3 text-sm font-bold text-white hover:bg-accent/90 disabled:opacity-60"
             >
               {saving ? "Saving…" : "Log food"}
@@ -260,49 +288,56 @@ export default function AddFoodSheet({
         </div>
       ) : loadingDetail ? (
         <p className="text-sm text-muted">Loading servings…</p>
-      ) : foodDetail ? (
+      ) : foodDetail && selectedServing ? (
         <div className="flex flex-col gap-3">
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-muted">Serving</span>
-            <select
-              value={selectedServingId ?? ""}
-              onChange={(event) => {
-                const servingId = event.target.value;
-                setSelectedServingId(servingId);
-                const serving = foodDetail.servings.find(
-                  (row) => row.servingId === servingId,
-                );
-                if (serving) {
-                  setUnits(String(serving.numberOfUnits));
-                }
-              }}
-              className="rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
-            >
-              {foodDetail.servings.map((serving) => (
-                <option key={serving.servingId} value={serving.servingId}>
-                  {formatServingLabel(serving)}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="rounded-xl border border-border bg-surface-hover px-3 py-2.5">
+            <p className="text-xs font-medium text-muted">Serving size</p>
+            <p className="text-sm font-medium text-foreground">
+              {formatServingSizeLine(selectedServing)}
+            </p>
+          </div>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-muted">
-              Amount (units)
+              {usesWeightEntry ? "Amount" : "Servings eaten"}
             </span>
-            <input
-              type="number"
-              min="0.25"
-              step="0.25"
-              value={units}
-              onChange={(event) => setUnits(event.target.value)}
-              className="rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
-            />
+            <div className="flex gap-2">
+              <input
+                type="number"
+                min="0"
+                step={usesWeightEntry ? "0.1" : "0.25"}
+                value={amountInput}
+                onChange={(event) => setAmountInput(event.target.value)}
+                className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
+              />
+              {usesWeightEntry ? (
+                <select
+                  value={weightUnit}
+                  onChange={(event) => {
+                    const nextUnit = event.target.value as WeightEntryUnit;
+                    const amount = Number.parseFloat(amountInput.trim());
+                    if (Number.isFinite(amount) && amount > 0) {
+                      const grams = convertWeightToGrams(amount, weightUnit);
+                      setAmountInput(
+                        formatWeightInputAmount(
+                          convertGramsToWeight(grams, nextUnit),
+                        ),
+                      );
+                    }
+                    setWeightUnit(nextUnit);
+                  }}
+                  className="w-20 rounded-xl border border-border bg-surface px-2 py-2.5 text-sm text-foreground"
+                >
+                  {WEIGHT_ENTRY_UNITS.map((unit) => (
+                    <option key={unit} value={unit}>
+                      {unit}
+                    </option>
+                  ))}
+                </select>
+              ) : null}
+            </div>
           </label>
           {scaledNutrition ? (
-            <NutritionFactsPanel
-              nutrition={scaledNutrition}
-              servingLabel={servingLabel}
-            />
+            <NutritionFactsPanel nutrition={scaledNutrition} />
           ) : null}
         </div>
       ) : (
@@ -310,22 +345,4 @@ export default function AddFoodSheet({
       )}
     </BottomSheetModal>
   );
-}
-
-function formatServingLabel(serving: FoodServingOption): string {
-  return `${serving.description} - ${Math.round(serving.calories)} kcal`;
-}
-
-function formatServingContext(
-  serving: FoodServingOption,
-  unitsInput: string,
-): string {
-  const units = Number.parseFloat(unitsInput);
-  const unitsLabel =
-    Number.isFinite(units) && units > 0 ? String(units) : serving.numberOfUnits;
-  const metric =
-    serving.metricServingAmount != null && serving.metricServingUnit
-      ? ` (${Math.round(serving.metricServingAmount * servingScaleFactor(unitsInput, serving.numberOfUnits))}${serving.metricServingUnit})`
-      : "";
-  return `${serving.description} · ${unitsLabel} unit${unitsLabel === "1" ? "" : "s"}${metric}`;
 }
