@@ -1,5 +1,14 @@
 [
   {
+    "id": "2026-07-09-meal-log-serving-entry",
+    "date": "2026-07-09",
+    "title": "Easier meal logging",
+    "highlights": [
+      "Add food by weight: enter grams or ounces (or pounds) and MyExercise figures out the serving for you-no more mental math on partial servings.",
+      "Serving size shows the label amount plus weight when FatSecret has it (for example, 1 1/2 cups and 39 g). Use Quick amount for common fractions like 1/2 or 1 1/2, or type a custom weight below."
+    ]
+  },
+  {
     "id": "2026-07-09-health-connect-read-write",
     "date": "2026-07-09",
     "title": "Health Connect fixes",
@@ -16,17 +25,6 @@
       "Log food on Home: tap Breakfast, Lunch, Dinner, or Snacks to open the same add-food flow as Meals. Full diary editing stays on the Meals tab.",
       "Workout tab is training-only again: today’s plan and Start workout show immediately-no extra “View Today’s Workout” step. Cardio quick log and body weight moved from Workout to Home.",
       "Weight charts and empty states point to Home for logging. Onboarding tour updated for the five-tab layout."
-    ]
-  },
-  {
-    "id": "2026-07-08-nutrition-meals-health",
-    "date": "2026-07-08",
-    "title": "Meals, nutrition tracking & Health analysis",
-    "highlights": [
-      "New Meals tab in the bottom nav: search foods (FatSecret), choose servings, and log breakfast, lunch, dinner, and snacks. Each entry shows calories, macros, and expandable details-fiber, sugar, sodium, vitamins, and more when the food provides them.",
-      "Health → Nutrition replaces the old Calories page: compare burned calories from Health Connect with consumed totals from your meal log. Range filters (Today, Week, Month, Year, All time) update both summary cards; consumed macros and micronutrients sum across the full period. Net today (burned − consumed) appears when Today is selected.",
-      "Daily trends chart plots burned vs consumed calories, or consumed protein, carbs, fat, fiber, sugar, and sodium over time. Year and All time load up to 90 days of meal-log history.",
-      "Health landing shows Burned today and Consumed today-both open Nutrition for deeper analysis. Sign in to save your log. Old /nutrition and /health/calories URLs redirect to the new routes."
     ]
   }
 ]

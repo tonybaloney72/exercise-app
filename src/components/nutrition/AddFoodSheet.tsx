@@ -13,6 +13,8 @@ import {
   type FatSecretMeal,
 } from "@/lib/nutrition/fatsecretMeals";
 import {
+  amountInputForServingMultiplier,
+  ALL_SERVING_FRACTION_CHIPS,
   convertGramsToWeight,
   convertWeightToGrams,
   defaultFoodServing,
@@ -22,6 +24,7 @@ import {
   formatWeightInputAmount,
   nutritionScaleFactorForLog,
   resolveNumberOfUnitsForLog,
+  servingFractionChipForMultiplier,
   servingHasMetricWeight,
   type WeightEntryUnit,
   WEIGHT_ENTRY_UNITS,
@@ -190,6 +193,25 @@ export default function AddFoodSheet({
     return scaleNutrition(selectedServing, factor);
   }, [selectedServing, amountInput, weightUnit]);
 
+  const activeServingMultiplier = useMemo(() => {
+    if (!selectedServing) return 0;
+    return nutritionScaleFactorForLog({
+      serving: selectedServing,
+      amountInput,
+      weightUnit,
+    });
+  }, [selectedServing, amountInput, weightUnit]);
+
+  const activeFractionChipId =
+    servingFractionChipForMultiplier(activeServingMultiplier)?.id ?? "custom";
+
+  function applyServingMultiplier(multiplier: number) {
+    if (!selectedServing) return;
+    setAmountInput(
+      amountInputForServingMultiplier(selectedServing, multiplier, weightUnit),
+    );
+  }
+
   const title =
     step === "search"
       ? `Add to ${FATSECRET_MEAL_LABELS[meal]}`
@@ -289,16 +311,36 @@ export default function AddFoodSheet({
       ) : loadingDetail ? (
         <p className="text-sm text-muted">Loading servings…</p>
       ) : foodDetail && selectedServing ? (
-        <div className="flex flex-col gap-3">
-          <div className="rounded-xl border border-border bg-surface-hover px-3 py-2.5">
-            <p className="text-xs font-medium text-muted">Serving size</p>
-            <p className="text-sm font-medium text-foreground">
-              {formatServingSizeLine(selectedServing)}
-            </p>
-          </div>
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-medium text-muted">Serving size</p>
+          <p className="text-sm font-medium text-foreground">
+            {formatServingSizeLine(selectedServing)}
+          </p>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs font-medium text-muted">Quick amount</span>
+            <select
+              value={activeFractionChipId}
+              onChange={(event) => {
+                const chipId = event.target.value;
+                if (chipId === "custom") return;
+                const chip = ALL_SERVING_FRACTION_CHIPS.find(
+                  (row) => row.id === chipId,
+                );
+                if (chip) applyServingMultiplier(chip.multiplier);
+              }}
+              className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
+            >
+              <option value="custom">Custom amount</option>
+              {ALL_SERVING_FRACTION_CHIPS.map((chip) => (
+                <option key={chip.id} value={chip.id}>
+                  {chip.label}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-muted">
-              {usesWeightEntry ? "Amount" : "Servings eaten"}
+              {usesWeightEntry ? "Amount" : "Servings"}
             </span>
             <div className="flex gap-2">
               <input

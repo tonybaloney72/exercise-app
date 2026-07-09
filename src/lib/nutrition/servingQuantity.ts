@@ -12,7 +12,9 @@ export function defaultFoodServing(
   servings: readonly FoodServingOption[],
 ): FoodServingOption | null {
   if (servings.length === 0) return null;
-  return servings.find((serving) => servingHasMetricWeight(serving)) ?? servings[0]!;
+  return (
+    servings.find((serving) => servingHasMetricWeight(serving)) ?? servings[0]!
+  );
 }
 
 export function servingHasMetricWeight(serving: FoodServingOption): boolean {
@@ -33,8 +35,7 @@ function formatServingMetric(serving: FoodServingOption): string | null {
   ) {
     return null;
   }
-  const amount =
-    Math.round(serving.metricServingAmount * 10) / 10;
+  const amount = Math.round(serving.metricServingAmount * 10) / 10;
   return `${amount} ${serving.metricServingUnit}`;
 }
 
@@ -161,5 +162,65 @@ export function nutritionScaleFactorForLog(options: {
 }): number {
   const numberOfUnits = resolveNumberOfUnitsForLog(options);
   if (numberOfUnits == null) return 0;
-  return servingScaleFactor(String(numberOfUnits), options.serving.numberOfUnits);
+  return servingScaleFactor(
+    String(numberOfUnits),
+    options.serving.numberOfUnits,
+  );
+}
+
+export type ServingFractionChip = {
+  id: string;
+  label: string;
+  multiplier: number;
+};
+
+export const ALL_SERVING_FRACTION_CHIPS: readonly ServingFractionChip[] = [
+  { id: "quarter", label: "1/4", multiplier: 0.25 },
+  { id: "third", label: "1/3", multiplier: 1 / 3 },
+  { id: "half", label: "1/2", multiplier: 0.5 },
+  { id: "two-thirds", label: "2/3", multiplier: 2 / 3 },
+  { id: "three-quarters", label: "3/4", multiplier: 0.75 },
+  { id: "one", label: "1", multiplier: 1 },
+  { id: "one-half", label: "1 1/2", multiplier: 1.5 },
+  { id: "two", label: "2", multiplier: 2 },
+];
+
+export function servingFractionChipForMultiplier(
+  multiplier: number,
+): ServingFractionChip | null {
+  return (
+    ALL_SERVING_FRACTION_CHIPS.find((chip) =>
+      servingMultipliersMatch(multiplier, chip.multiplier),
+    ) ?? null
+  );
+}
+
+export function amountInputForServingMultiplier(
+  serving: FoodServingOption,
+  multiplier: number,
+  unit: WeightEntryUnit,
+): string {
+  if (!Number.isFinite(multiplier) || multiplier <= 0) {
+    return formatWeightInputAmount(1);
+  }
+
+  if (servingHasMetricWeight(serving)) {
+    const fullServingAmount = Number.parseFloat(
+      defaultWeightEntryAmount(serving, unit),
+    );
+    if (!Number.isFinite(fullServingAmount) || fullServingAmount <= 0) {
+      return formatWeightInputAmount(multiplier);
+    }
+    return formatWeightInputAmount(fullServingAmount * multiplier);
+  }
+
+  return formatWeightInputAmount(multiplier);
+}
+
+function servingMultipliersMatch(
+  activeMultiplier: number,
+  chipMultiplier: number,
+): boolean {
+  if (!Number.isFinite(activeMultiplier) || activeMultiplier <= 0) return false;
+  return Math.abs(activeMultiplier - chipMultiplier) < 0.02;
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { FoodServingOption } from "@/lib/fatsecret/foodDetail";
 import {
+  amountInputForServingMultiplier,
   convertWeightToGrams,
   defaultWeightEntryAmount,
   formatServingSizeLine,
@@ -98,5 +99,22 @@ describe("defaultWeightEntryAmount", () => {
       servingMetricGrams(chickenServing)!,
       5,
     );
+  });
+});
+
+describe("amountInputForServingMultiplier", () => {
+  it("scales gram weight for fractional servings", () => {
+    expect(
+      amountInputForServingMultiplier(cheeriosServing, 0.5, "g"),
+    ).toBe("19.5");
+    expect(amountInputForServingMultiplier(cheeriosServing, 1.5, "g")).toBe(
+      "58.5",
+    );
+  });
+
+  it("scales ounce weight for fractional servings", () => {
+    expect(
+      amountInputForServingMultiplier(chickenServing, 0.25, "oz"),
+    ).toBe("1");
   });
 });
