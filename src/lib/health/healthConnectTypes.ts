@@ -88,3 +88,25 @@ export type Vo2MaxReading = {
   value: number;
   time: string;
 };
+
+export type HealthDayRecordType =
+  | "steps"
+  | "heartRate"
+  | "restingHeartRate"
+  | "oxygenSaturation"
+  | "sleep"
+  | "vo2Max";
+
+export type HealthDayRecord = {
+  startTime: string;
+  endTime?: string;
+  value: number;
+  unit: string;
+  sourceName?: string;
+};
+
+export type HealthDayRecordsResult = {
+  records: HealthDayRecord[];
+  dateKey: string;
+  recordType: HealthDayRecordType;
+};

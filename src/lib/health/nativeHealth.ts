@@ -3,6 +3,9 @@ import type {
   AuthorizationStatus,
   ExerciseRouteFetchResult,
   HealthDataType,
+  HealthDayRecord,
+  HealthDayRecordType,
+  HealthDayRecordsResult,
   SleepDayTotals,
   Vo2MaxReading,
   Workout,
@@ -291,6 +294,24 @@ export async function queryNativeVo2MaxHistory(options: {
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
     );
     return readings ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function queryNativeDayRecords(options: {
+  dateKey: string;
+  isToday: boolean;
+  recordType: HealthDayRecordType;
+}): Promise<HealthDayRecord[]> {
+  if (!isAndroidNative()) return [];
+  try {
+    const result = await runTimedNativeCall(
+      "queryDayRecords",
+      () => HealthConnectNative.queryDayRecords(options),
+      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
+    );
+    return result.records ?? [];
   } catch {
     return [];
   }

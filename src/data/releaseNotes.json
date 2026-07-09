@@ -4,8 +4,8 @@
     "date": "2026-07-09",
     "title": "Scan barcodes to log food",
     "highlights": [
-      "Android app: scan a product barcode from Home or Meals to look up food in FatSecret and jump straight to the serving step. Uses Google Play barcode scanning-no camera permission prompt.",
-      "Can't scan? Tap Type barcode instead and enter the UPC digits manually. If FatSecret doesn't have that product, use Search by name as before."
+      "Android app: pick a meal first, then search by name or scan a barcode in the same add-food sheet-no separate scan step or meal picker.",
+      "Can't scan? Tap Type barcode instead and enter the UPC digits manually. If FatSecret doesn't have that product, search by name as before."
     ]
   },
   {

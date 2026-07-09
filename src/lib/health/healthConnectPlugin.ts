@@ -5,6 +5,8 @@ import type {
   ExerciseRouteFetchResult,
   HealthConnectRangeMetric,
   HealthDataType,
+  HealthDayRecordType,
+  HealthDayRecordsResult,
   SleepDayTotals,
   Vo2MaxReading,
   Workout,
@@ -47,6 +49,11 @@ type HealthConnectNativePlugin = {
     startDate: string;
     endDate: string;
   }): Promise<{ readings: Vo2MaxReading[] }>;
+  queryDayRecords(options: {
+    dateKey: string;
+    isToday: boolean;
+    recordType: HealthDayRecordType;
+  }): Promise<HealthDayRecordsResult>;
   requestExerciseRoute(options: {
     platformId: string;
   }): Promise<ExerciseRouteFetchResult>;

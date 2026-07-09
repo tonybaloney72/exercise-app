@@ -77,7 +77,7 @@ export default function HealthNutritionPage() {
   const summaryNet = useMemo(() => {
     if (range !== "today") return null;
     if (summaryBurned == null || summaryConsumed == null) return null;
-    return summaryBurned - summaryConsumed;
+    return summaryConsumed - summaryBurned;
   }, [range, summaryBurned, summaryConsumed]);
 
   const totalsTitle =
@@ -140,7 +140,7 @@ export default function HealthNutritionPage() {
 
       {summaryNet != null ? (
         <SurfaceCard className="p-4">
-          <p className="text-sm text-muted">Net today (burned − consumed)</p>
+          <p className="text-sm text-muted">Net today (consumed − burned)</p>
           <p className="mt-1 text-xl font-bold tabular-nums text-foreground">
             {summaryNet >= 0 ? "+" : ""}
             {summaryNet} kcal

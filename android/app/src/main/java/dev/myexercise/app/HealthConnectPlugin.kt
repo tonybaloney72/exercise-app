@@ -15,6 +15,7 @@ import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.ActivityCallback
 import com.getcapacitor.annotation.CapacitorPlugin
 import dev.myexercise.app.health.HealthConnectRepository
+import dev.myexercise.app.health.HealthDayRecords
 import dev.myexercise.app.health.HealthConnectScopes
 import java.time.Duration
 import java.time.Instant
@@ -203,6 +204,37 @@ class HealthConnectPlugin : Plugin() {
         )
       } catch (e: Exception) {
         call.reject(e.message ?: "Failed to read local day total", null, e)
+      }
+    }
+  }
+
+  @PluginMethod
+  fun queryDayRecords(call: PluginCall) {
+    val dateKey = call.getString("dateKey")
+    if (dateKey.isNullOrBlank()) {
+      call.reject("dateKey is required")
+      return
+    }
+    val recordType = call.getString("recordType")
+    if (recordType.isNullOrBlank()) {
+      call.reject("recordType is required")
+      return
+    }
+    val isToday = call.getBoolean("isToday", false) ?: false
+    pluginScope.launch {
+      val client = getClientOrReject(call) ?: return@launch
+      try {
+        val result =
+          HealthDayRecords.queryDayRecords(
+            context.applicationContext,
+            client,
+            recordType,
+            dateKey,
+            isToday,
+          )
+        call.resolve(result)
+      } catch (e: Exception) {
+        call.reject(e.message ?: "Failed to read day records", null, e)
       }
     }
   }

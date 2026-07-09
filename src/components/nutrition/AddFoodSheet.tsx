@@ -30,6 +30,14 @@ import {
   WEIGHT_ENTRY_UNITS,
 } from "@/lib/nutrition/servingQuantity";
 import { logFoodDiaryEntry } from "@/hooks/useNutritionDiary";
+import { useAndroidNative } from "@/hooks/useAndroidNative";
+import { fetchFoodByBarcode } from "@/lib/nutrition/barcodeLookup";
+import {
+  BarcodeScanCancelledError,
+  BarcodeScanUnavailableError,
+  isBarcodeScanCancelled,
+  scanProductBarcode,
+} from "@/lib/nutrition/barcodeScan";
 
 type Props = {
   open: boolean;
@@ -62,6 +70,10 @@ export default function AddFoodSheet({
   const [amountInput, setAmountInput] = useState("1");
   const [weightUnit, setWeightUnit] = useState<WeightEntryUnit>("g");
   const [saving, setSaving] = useState(false);
+  const [barcodeBusy, setBarcodeBusy] = useState(false);
+  const [manualBarcodeOpen, setManualBarcodeOpen] = useState(false);
+  const [manualBarcode, setManualBarcode] = useState("");
+  const androidNative = useAndroidNative();
 
   function resetAmountForServing(
     serving: NonNullable<ReturnType<typeof defaultFoodServing>>,
@@ -101,6 +113,9 @@ export default function AddFoodSheet({
       setFoodDetail(null);
       setAmountInput("1");
       setWeightUnit("g");
+      setBarcodeBusy(false);
+      setManualBarcodeOpen(false);
+      setManualBarcode("");
       return;
     }
     if (initialFood) {
@@ -131,6 +146,54 @@ export default function AddFoodSheet({
 
     return () => window.clearTimeout(handle);
   }, [open, query]);
+
+  async function lookupBarcodeFood(code: string) {
+    const result = await fetchFoodByBarcode(code);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    openServingForFoodDetail(result.food);
+  }
+
+  async function handleScanBarcode() {
+    setBarcodeBusy(true);
+    try {
+      const code = await scanProductBarcode();
+      await lookupBarcodeFood(code);
+    } catch (err) {
+      if (err instanceof BarcodeScanCancelledError || isBarcodeScanCancelled(err)) {
+        return;
+      }
+      if (err instanceof BarcodeScanUnavailableError) {
+        toast.error(err.message);
+        return;
+      }
+      toast.error(
+        err instanceof Error ? err.message : "Barcode scan failed.",
+      );
+    } finally {
+      setBarcodeBusy(false);
+    }
+  }
+
+  async function handleManualBarcodeLookup() {
+    const code = manualBarcode.trim();
+    if (!code) {
+      toast.error("Enter a barcode number.");
+      return;
+    }
+    setBarcodeBusy(true);
+    try {
+      await lookupBarcodeFood(code);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Barcode lookup failed.",
+      );
+    } finally {
+      setBarcodeBusy(false);
+    }
+  }
 
   async function pickFood(food: FatSecretFoodSearchItem) {
     setSelectedFood(food);
@@ -249,7 +312,13 @@ export default function AddFoodSheet({
       open={open}
       onClose={onClose}
       title={title}
-      hint={step === "search" ? "Search FatSecret foods to log." : ""}
+      hint={
+        step === "search"
+          ? androidNative
+            ? "Search by name or scan a barcode."
+            : "Search FatSecret foods to log."
+          : ""
+      }
       placement="center"
       initialFocus="none"
       headerExtra={
@@ -301,7 +370,8 @@ export default function AddFoodSheet({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search foods…"
-            className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
+            disabled={barcodeBusy}
+            className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground disabled:opacity-50"
             autoFocus
           />
           {searching ? <p className="text-sm text-muted">Searching…</p> : null}
@@ -314,7 +384,8 @@ export default function AddFoodSheet({
                 <button
                   type="button"
                   onClick={() => void pickFood(food)}
-                  className="flex w-full flex-col gap-0.5 rounded-xl border border-border bg-surface-hover px-3 py-2.5 text-left transition-colors hover:border-accent/40"
+                  disabled={barcodeBusy}
+                  className="flex w-full flex-col gap-0.5 rounded-xl border border-border bg-surface-hover px-3 py-2.5 text-left transition-colors hover:border-accent/40 disabled:opacity-50"
                 >
                   <span className="text-sm font-medium text-foreground">
                     {food.name}
@@ -334,6 +405,52 @@ export default function AddFoodSheet({
               </li>
             ))}
           </ul>
+          {androidNative ? (
+            <div className="flex flex-col gap-2 border-t border-border pt-3">
+              <p className="text-xs font-medium text-muted">Or scan a barcode</p>
+              <button
+                type="button"
+                onClick={() => void handleScanBarcode()}
+                disabled={barcodeBusy}
+                className="w-full rounded-xl border border-border bg-surface-hover py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-accent/40 disabled:opacity-50"
+              >
+                {barcodeBusy ? "Looking up…" : "Scan barcode"}
+              </button>
+              {manualBarcodeOpen ? (
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted">
+                    Barcode number
+                  </span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={manualBarcode}
+                    onChange={(event) => setManualBarcode(event.target.value)}
+                    placeholder="e.g. 0041570054161"
+                    disabled={barcodeBusy}
+                    className="rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground disabled:opacity-50"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void handleManualBarcodeLookup()}
+                    disabled={barcodeBusy}
+                    className="rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium text-foreground hover:border-accent/40 disabled:opacity-50"
+                  >
+                    Look up barcode
+                  </button>
+                </label>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setManualBarcodeOpen(true)}
+                  disabled={barcodeBusy}
+                  className="self-start text-xs font-medium text-accent hover:underline disabled:opacity-50"
+                >
+                  Type barcode instead
+                </button>
+              )}
+            </div>
+          ) : null}
         </div>
       ) : loadingDetail ? (
         <p className="text-sm text-muted">Loading servings…</p>

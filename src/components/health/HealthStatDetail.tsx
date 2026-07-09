@@ -5,6 +5,9 @@ import BackNavLink from "@/components/common/BackNavLink";
 import DailyStepsProgressChart from "@/components/progress/DailyStepsProgressChart";
 import DailyHealthMetricProgressChart from "@/components/progress/DailyHealthMetricProgressChart";
 import WeightProgressChart from "@/components/progress/WeightProgressChart";
+import HealthTodayDetail, {
+  HealthTodayWeightDetail,
+} from "@/components/health/HealthTodayDetail";
 import { useDailyHealthFromHealth } from "@/hooks/useDailyHealthFromHealth";
 import {
   filterEntriesByHealthRange,
@@ -35,7 +38,7 @@ export default function HealthStatDetail({ slug }: { slug: HealthStatSlug }) {
   const display = healthStatDisplayForSlug(slug)!;
   const dailyHealth = useDailyHealthFromHealth();
   const loading = dailyHealth.loading && dailyHealth.available;
-  const [range, setRange] = useState<HealthRangePresetId>("week");
+  const [range, setRange] = useState<HealthRangePresetId>("today");
 
   const filteredSteps = useMemo(
     () => filterStepsSeries(dailyHealth.stepsChartSeries, range),
@@ -70,7 +73,14 @@ export default function HealthStatDetail({ slug }: { slug: HealthStatSlug }) {
         <HealthRangeSwitcher value={range} onChange={setRange} />
       </div>
 
-      {slug === "weight" ? (
+      {range === "today" && slug === "weight" ? (
+        <HealthTodayWeightDetail />
+      ) : range === "today" ? (
+        <HealthTodayDetail
+          slug={slug}
+          unavailableReason={dailyHealth.unavailableReason}
+        />
+      ) : slug === "weight" ? (
         <WeightProgressChart variant="health" healthRange={range} />
       ) : slug === "steps" ? (
         <DailyStepsProgressChart
