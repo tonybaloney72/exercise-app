@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildHealthRecordLogEntries,
   buildHourlyHealthSeries,
+  buildHourlySeriesFromTotals,
   hourlySeriesHasData,
 } from "@/lib/health/healthTodayDetail";
 import type { HealthDayRecord } from "@/lib/health/healthConnectTypes";
@@ -64,6 +65,19 @@ describe("buildHourlyHealthSeries", () => {
 
     const hour14 = series.find((row) => row.hour === 14);
     expect(hour14?.value).toBe(70);
+  });
+});
+
+describe("buildHourlySeriesFromTotals", () => {
+  it("maps native hourly totals to chart points", () => {
+    const series = buildHourlySeriesFromTotals([
+      { hour: 7, value: 1405 },
+      { hour: 13, value: 316 },
+    ]);
+    expect(series).toHaveLength(2);
+    expect(series[0]?.hour).toBe(7);
+    expect(series[0]?.value).toBe(1405);
+    expect(series[1]?.value).toBe(316);
   });
 });
 

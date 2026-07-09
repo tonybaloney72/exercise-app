@@ -58,6 +58,21 @@ export function healthTodayAggregationForSlug(
   return SLUG_AGGREGATION[slug] ?? "avg";
 }
 
+/** Stats whose today chart uses HC hourly aggregates (deduped across sources). */
+export function healthTodayUsesHourlyAggregates(slug: HealthStatSlug): boolean {
+  return slug === "steps";
+}
+
+export function buildHourlySeriesFromTotals(
+  hours: ReadonlyArray<{ hour: number; value: number }>,
+): HourlyHealthChartPoint[] {
+  return hours.map((row) => ({
+    hour: row.hour,
+    xLabel: formatHealthHourLabel(row.hour),
+    value: Math.max(0, Math.round(row.value)),
+  }));
+}
+
 function formatHealthHourLabel(hour: number): string {
   const date = new Date();
   date.setHours(hour, 0, 0, 0);

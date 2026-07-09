@@ -110,3 +110,14 @@ export type HealthDayRecordsResult = {
   dateKey: string;
   recordType: HealthDayRecordType;
 };
+
+export type HealthHourlyTotalPoint = {
+  hour: number;
+  value: number;
+};
+
+export type HealthHourlyTotalsResult = {
+  hours: HealthHourlyTotalPoint[];
+  dateKey: string;
+  dataType: HealthConnectRangeMetric;
+};

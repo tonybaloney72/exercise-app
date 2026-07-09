@@ -7,6 +7,7 @@ import type {
   HealthDataType,
   HealthDayRecordType,
   HealthDayRecordsResult,
+  HealthHourlyTotalsResult,
   SleepDayTotals,
   Vo2MaxReading,
   Workout,
@@ -54,6 +55,11 @@ type HealthConnectNativePlugin = {
     isToday: boolean;
     recordType: HealthDayRecordType;
   }): Promise<HealthDayRecordsResult>;
+  queryHourlyTotals(options: {
+    dateKey: string;
+    isToday: boolean;
+    dataType: HealthConnectRangeMetric;
+  }): Promise<HealthHourlyTotalsResult>;
   requestExerciseRoute(options: {
     platformId: string;
   }): Promise<ExerciseRouteFetchResult>;

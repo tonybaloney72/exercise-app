@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { queryNativeDayRecords } from "@/lib/health/nativeHealth";
+import {
+  queryNativeDayRecords,
+  queryNativeHourlyTotals,
+} from "@/lib/health/nativeHealth";
 import type { HealthDayRecord } from "@/lib/health/healthConnectTypes";
 import {
   buildHealthRecordLogEntries,
   buildHourlyHealthSeries,
+  buildHourlySeriesFromTotals,
   healthTodayAggregationForSlug,
   healthTodayRecordTypeForSlug,
+  healthTodayUsesHourlyAggregates,
   hourlySeriesHasData,
 } from "@/lib/health/healthTodayDetail";
 import type { HealthStatSlug } from "@/lib/health/healthStatRoutes";
@@ -16,10 +21,14 @@ import { formatLocalDateKey } from "@/utils/localDateKey";
 
 export function useHealthTodayDetail(slug: HealthStatSlug) {
   const [records, setRecords] = useState<HealthDayRecord[]>([]);
+  const [hourlyTotals, setHourlyTotals] = useState<
+    ReadonlyArray<{ hour: number; value: number }>
+  >([]);
   const [loading, setLoading] = useState(true);
   const [nativeAvailable, setNativeAvailable] = useState(false);
 
   const recordType = healthTodayRecordTypeForSlug(slug);
+  const usesHourlyAggregates = healthTodayUsesHourlyAggregates(slug);
   const todayKey = formatLocalDateKey();
 
   useEffect(() => {
@@ -36,34 +45,48 @@ export function useHealthTodayDetail(slug: HealthStatSlug) {
         if (!cancelled) {
           setNativeAvailable(false);
           setRecords([]);
+          setHourlyTotals([]);
           setLoading(false);
         }
         return;
       }
 
-      const rows = await queryNativeDayRecords({
-        dateKey: todayKey,
-        isToday: true,
-        recordType,
-      });
+      const [rows, totals] = await Promise.all([
+        queryNativeDayRecords({
+          dateKey: todayKey,
+          isToday: true,
+          recordType,
+        }),
+        usesHourlyAggregates
+          ? queryNativeHourlyTotals({
+              dateKey: todayKey,
+              isToday: true,
+              dataType: "steps",
+            })
+          : Promise.resolve([]),
+      ]);
       if (cancelled) return;
       setNativeAvailable(true);
       setRecords(rows);
+      setHourlyTotals(totals);
       setLoading(false);
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [recordType, todayKey]);
+  }, [recordType, todayKey, usesHourlyAggregates]);
 
   const hourlySeries = useMemo(() => {
     if (!recordType) return [];
+    if (usesHourlyAggregates) {
+      return buildHourlySeriesFromTotals(hourlyTotals);
+    }
     return buildHourlyHealthSeries(records, {
       aggregation: healthTodayAggregationForSlug(slug),
       slug,
     });
-  }, [records, recordType, slug]);
+  }, [hourlyTotals, records, recordType, slug, usesHourlyAggregates]);
 
   const logEntries = useMemo(
     () => buildHealthRecordLogEntries(records, slug),
@@ -77,5 +100,6 @@ export function useHealthTodayDetail(slug: HealthStatSlug) {
     logEntries,
     hasChartData: hourlySeriesHasData(hourlySeries),
     hasLogData: logEntries.length > 0,
+    usesHourlyAggregates,
   };
 }

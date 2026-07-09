@@ -6,6 +6,8 @@ import type {
   HealthDayRecord,
   HealthDayRecordType,
   HealthDayRecordsResult,
+  HealthHourlyTotalPoint,
+  HealthHourlyTotalsResult,
   SleepDayTotals,
   Vo2MaxReading,
   Workout,
@@ -294,6 +296,24 @@ export async function queryNativeVo2MaxHistory(options: {
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
     );
     return readings ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function queryNativeHourlyTotals(options: {
+  dateKey: string;
+  isToday: boolean;
+  dataType: "steps";
+}): Promise<HealthHourlyTotalPoint[]> {
+  if (!isAndroidNative()) return [];
+  try {
+    const result = await runTimedNativeCall(
+      "queryHourlyTotals",
+      () => HealthConnectNative.queryHourlyTotals(options),
+      NATIVE_HEALTH_SILENT_TIMEOUT_MS,
+    );
+    return result.hours ?? [];
   } catch {
     return [];
   }

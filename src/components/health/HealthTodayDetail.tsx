@@ -25,7 +25,8 @@ type TodayStatConfig = {
 
 const TODAY_STAT_CONFIG: Partial<Record<HealthStatSlug, TodayStatConfig>> = {
   steps: {
-    subtitle: "Steps by hour from Health Connect.",
+    subtitle:
+      "Steps by hour from Health Connect (deduplicated across your devices).",
     yLabel: "steps",
     chartType: "bar",
     emptyDetail: "No step records for today yet.",
