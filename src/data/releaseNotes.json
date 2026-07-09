@@ -1,28 +1,29 @@
 [
   {
+    "id": "2026-07-09-passive-calories-bmr",
+    "date": "2026-07-09",
+    "title": "Passive calories on Nutrition",
+    "highlights": [
+      "Health → Nutrition now estimates resting burn (BMR) from your body profile, then shows passive, active, total burned, and net calories for the day.",
+      "Set sex at birth, date of birth, and height once under Settings → Body & weight. Daily weight still updates the estimate as you log it."
+    ]
+  },
+  {
+    "id": "2026-07-09-health-today-logs",
+    "date": "2026-07-09",
+    "title": "Cleaner Health today details",
+    "highlights": [
+      "Steps and sleep Today views no longer list overlapping copies of the same session from your watch and phone.",
+      "Sleep charts use the deduped session too, so hourly bars stay within a realistic range instead of stacking duplicate nights."
+    ]
+  },
+  {
     "id": "2026-07-09-barcode-scanning",
     "date": "2026-07-09",
     "title": "Scan barcodes to log food",
     "highlights": [
       "Android app: pick a meal first, then search by name or scan a barcode in the same add-food sheet-no separate scan step or meal picker.",
       "Can't scan? Tap Type barcode instead and enter the UPC digits manually. If FatSecret doesn't have that product, search by name as before."
-    ]
-  },
-  {
-    "id": "2026-07-09-meal-log-serving-entry",
-    "date": "2026-07-09",
-    "title": "Easier meal logging",
-    "highlights": [
-      "Add food by weight: enter grams or ounces (or pounds) and MyExercise figures out the serving for you-no more mental math on partial servings.",
-      "Serving size shows the label amount plus weight when FatSecret has it (for example, 1 1/2 cups and 39 g). Use Quick amount for common fractions like 1/2 or 1 1/2, or type a custom weight below."
-    ]
-  },
-  {
-    "id": "2026-07-09-health-connect-read-write",
-    "date": "2026-07-09",
-    "title": "Health Connect fixes",
-    "highlights": [
-      "Importing from Health Connect only asks for read access-you won't be prompted to allow writing just to pull in a workout. MyExercise also no longer writes very short accidental exercise entries back to Health Connect."
     ]
   }
 ]

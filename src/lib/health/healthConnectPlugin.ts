@@ -1,4 +1,4 @@
-import { Capacitor, registerPlugin } from "@capacitor/core";
+import { registerPlugin } from "@capacitor/core";
 import type {
   AuthorizationStatus,
   AvailabilityResult,
@@ -74,7 +74,3 @@ type HealthConnectNativePlugin = {
 export const HealthConnectNative = registerPlugin<HealthConnectNativePlugin>(
   "HealthConnect",
 );
-
-export function isAndroidNative(): boolean {
-  return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
-}

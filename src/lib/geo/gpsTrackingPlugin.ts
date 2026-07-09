@@ -1,4 +1,5 @@
-import { Capacitor, registerPlugin, type PluginListenerHandle } from "@capacitor/core";
+import { registerPlugin, type PluginListenerHandle } from "@capacitor/core";
+import { isAndroidNative } from "@/lib/capacitorRuntime";
 
 export type GpsTrackingLocationUpdate = {
   latitude: number;
@@ -33,5 +34,5 @@ export const GpsTracking = registerPlugin<GpsTrackingPlugin>("GpsTracking", {
 });
 
 export function isForegroundGpsTrackingAvailable(): boolean {
-  return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
+  return isAndroidNative();
 }

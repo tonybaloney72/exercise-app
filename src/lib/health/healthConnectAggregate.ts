@@ -1,9 +1,7 @@
 import type { HealthConnectRangeMetric } from "@/lib/health/healthConnectTypes";
 import type { HealthDataType } from "@/lib/health/healthConnectTypes";
-import {
-  HealthConnectNative,
-  isAndroidNative,
-} from "@/lib/health/healthConnectPlugin";
+import { HealthConnectNative } from "@/lib/health/healthConnectPlugin";
+import { isAndroidNative } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 
 function toRangeMetric(dataType: HealthDataType): HealthConnectRangeMetric | null {

@@ -12,13 +12,10 @@ import type {
   Vo2MaxReading,
   Workout,
 } from "@/lib/health/healthConnectTypes";
-import {
-  HealthConnectNative,
-  isAndroidNative,
-} from "@/lib/health/healthConnectPlugin";
+import { HealthConnectNative } from "@/lib/health/healthConnectPlugin";
 import { withTimeout } from "@/lib/async/withTimeout";
 import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
-import { isNativePlatform } from "@/lib/capacitorRuntime";
+import { isAndroidNative, isNativePlatform } from "@/lib/capacitorRuntime";
 
 const NATIVE_HEALTH_SILENT_TIMEOUT_MS = 10_000;
 /** Permission UI - user may need time to read Health Connect screens. */

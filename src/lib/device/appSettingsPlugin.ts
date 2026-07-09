@@ -1,4 +1,5 @@
-import { Capacitor, registerPlugin } from "@capacitor/core";
+import { registerPlugin } from "@capacitor/core";
+import { isAndroidNative } from "@/lib/capacitorRuntime";
 
 export interface AppSettingsPlugin {
   openAppSettings(): Promise<void>;
@@ -11,5 +12,5 @@ export const AppSettingsNative = registerPlugin<AppSettingsPlugin>("AppSettings"
 });
 
 export function isAndroidAppSettingsAvailable(): boolean {
-  return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
+  return isAndroidNative();
 }
