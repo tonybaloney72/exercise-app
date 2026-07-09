@@ -233,6 +233,9 @@ function pickUserSettingsFields(
     expertiseByGroup: state.expertiseByGroup,
     releaseNotesSeenIds: state.releaseNotesSeenIds,
     suggestRepIncreases: state.suggestRepIncreases,
+    bodySexAtBirth: state.bodySexAtBirth,
+    bodyBirthDate: state.bodyBirthDate,
+    bodyHeightIn: state.bodyHeightIn,
   };
 }
 

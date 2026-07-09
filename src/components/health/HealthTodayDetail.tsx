@@ -25,8 +25,7 @@ type TodayStatConfig = {
 
 const TODAY_STAT_CONFIG: Partial<Record<HealthStatSlug, TodayStatConfig>> = {
   steps: {
-    subtitle:
-      "Steps by hour from Health Connect (deduplicated across your devices).",
+    subtitle: "Steps by hour.",
     yLabel: "steps",
     chartType: "bar",
     emptyDetail: "No step records for today yet.",
@@ -85,10 +84,7 @@ type Props = {
   unavailableReason?: DailyHealthUnavailableReason | null;
 };
 
-export default function HealthTodayDetail({
-  slug,
-  unavailableReason,
-}: Props) {
+export default function HealthTodayDetail({ slug, unavailableReason }: Props) {
   const config = TODAY_STAT_CONFIG[slug];
   const display = healthStatDisplayForSlug(slug);
   const { loading, nativeAvailable, hourlySeries, logEntries, hasChartData } =

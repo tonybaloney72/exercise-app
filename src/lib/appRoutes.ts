@@ -26,6 +26,7 @@ export const routes = {
   settingsBuildCustom: "/settings/build-custom",
   settingsDevice: "/settings/device",
   settingsApp: "/settings/app",
+  settingsBody: "/settings/body",
 } as const;
 
 const MAIN_TAB_ROUTES = [

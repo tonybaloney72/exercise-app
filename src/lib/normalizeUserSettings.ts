@@ -56,6 +56,11 @@ import {
   resolveThemeMode,
   sanitizeThemeMode,
 } from "@/lib/themeMode";
+import {
+  sanitizeBodyBirthDate,
+  sanitizeBodyHeightIn,
+  sanitizeBodySexAtBirth,
+} from "@/lib/bodyProfile";
 import type { UserSettings } from "@/types";
 
 const EMPTY_RELEASE_NOTES_SEEN: string[] = [];
@@ -251,6 +256,18 @@ export function normalizeUserSettings(
       : {}),
     suggestRepIncreases:
       partial.suggestRepIncreases ?? DEFAULT_SETTINGS.suggestRepIncreases,
+    bodySexAtBirth:
+      partial.bodySexAtBirth !== undefined
+        ? sanitizeBodySexAtBirth(partial.bodySexAtBirth)
+        : DEFAULT_SETTINGS.bodySexAtBirth,
+    bodyBirthDate:
+      partial.bodyBirthDate !== undefined
+        ? sanitizeBodyBirthDate(partial.bodyBirthDate)
+        : DEFAULT_SETTINGS.bodyBirthDate,
+    bodyHeightIn:
+      partial.bodyHeightIn !== undefined
+        ? sanitizeBodyHeightIn(partial.bodyHeightIn)
+        : DEFAULT_SETTINGS.bodyHeightIn,
     themeMode,
   };
 }

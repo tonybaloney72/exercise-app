@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildWeightChartSeries,
+  getWeightForDateOrNearestPrior,
   mergeWeightEntries,
   normalizeWeightDateKey,
   sanitizeWeightLog,
@@ -81,5 +82,14 @@ describe("weightLog", () => {
     ]);
     expect(log).toEqual([{ date: "2026-05-10", weightLb: 180.5 }]);
     expect(normalizeWeightDateKey(" 2026-05-10 ")).toBe("2026-05-10");
+  });
+
+  it("finds nearest prior weight when the day is missing", () => {
+    const log = [
+      { date: "2026-07-01", weightLb: 180 },
+      { date: "2026-07-08", weightLb: 178 },
+    ];
+    expect(getWeightForDateOrNearestPrior(log, "2026-07-09")?.weightLb).toBe(178);
+    expect(getWeightForDateOrNearestPrior(log, "2026-07-05")?.weightLb).toBe(180);
   });
 });

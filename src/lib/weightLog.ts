@@ -70,6 +70,21 @@ export function getWeightForDate(
   return log.find((e) => e.date === dateKey);
 }
 
+/** Exact day match, else most recent logged weight on or before `dateKey`. */
+export function getWeightForDateOrNearestPrior(
+  log: readonly WeightLogEntry[],
+  dateKey: string,
+): WeightLogEntry | undefined {
+  const exact = getWeightForDate(log, dateKey);
+  if (exact) return exact;
+  let best: WeightLogEntry | undefined;
+  for (const entry of log) {
+    if (entry.date > dateKey) continue;
+    if (!best || entry.date > best.date) best = entry;
+  }
+  return best;
+}
+
 export function upsertWeightEntry(
   log: WeightLogEntry[],
   dateKey: string,

@@ -312,6 +312,9 @@ export type RoundDensity = "compact" | "standard" | "full";
 
 export type ThemeMode = "auto" | "light" | "dark";
 
+/** Used for BMR formulas (Mifflin–St Jeor). */
+export type BodySexAtBirth = "male" | "female";
+
 export interface UserSettings {
   restBetweenRounds: number;
   weekStartDate?: string;
@@ -388,6 +391,12 @@ export interface UserSettings {
    * targets (Today post-workout only).
    */
   suggestRepIncreases: boolean;
+  /** Sex at birth for passive calorie (BMR) estimates. */
+  bodySexAtBirth?: BodySexAtBirth | null;
+  /** `YYYY-MM-DD` local birth date for age-based BMR. */
+  bodyBirthDate?: string | null;
+  /** Standing height in inches for BMR. */
+  bodyHeightIn?: number | null;
 }
 
 /** Body weight for a local calendar day (stored in pounds). */

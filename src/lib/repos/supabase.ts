@@ -178,6 +178,9 @@ interface SettingsRow {
   progression_families_enabled?: boolean;
   release_notes_seen_ids?: string[] | null;
   suggest_rep_increases?: boolean;
+  body_sex_at_birth?: string | null;
+  body_birth_date?: string | null;
+  body_height_in?: number | null;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -439,6 +442,9 @@ function rowToSettings(row: SettingsRow): UserSettings {
         )
       : [],
     suggestRepIncreases: row.suggest_rep_increases ?? false,
+    bodySexAtBirth: row.body_sex_at_birth ?? null,
+    bodyBirthDate: row.body_birth_date ?? null,
+    bodyHeightIn: row.body_height_in ?? null,
   } as Partial<UserSettings> & { darkMode?: boolean });
 }
 
@@ -483,6 +489,9 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     expertise_by_group_customized: true,
     release_notes_seen_ids: s.releaseNotesSeenIds,
     suggest_rep_increases: s.suggestRepIncreases,
+    body_sex_at_birth: s.bodySexAtBirth ?? null,
+    body_birth_date: s.bodyBirthDate ?? null,
+    body_height_in: s.bodyHeightIn ?? null,
   };
 }
 

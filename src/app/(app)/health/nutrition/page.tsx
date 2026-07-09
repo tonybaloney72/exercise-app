@@ -8,6 +8,7 @@ import HealthRangeSwitcher from "@/components/health/HealthRangeSwitcher";
 import NutritionMacroSummary from "@/components/nutrition/NutritionMacroSummary";
 import NutritionTotalsPanel from "@/components/nutrition/NutritionTotalsPanel";
 import NutritionTrendChart from "@/components/nutrition/NutritionTrendChart";
+import { useBodyBmr } from "@/hooks/useBodyBmr";
 import { useDailyHealthFromHealth } from "@/hooks/useDailyHealthFromHealth";
 import { useNutritionDiaryRange } from "@/hooks/useNutritionDiaryRange";
 import { routes } from "@/lib/appRoutes";
@@ -25,13 +26,15 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { formatLocalDateKey } from "@/utils/localDateKey";
 
 function rangeLabel(range: HealthRangePresetId, prefix: string): string {
-  if (range === "today") return `${prefix} today`;
+  if (range === "today") return prefix;
   const preset = HEALTH_RANGE_PRESETS.find((row) => row.id === range);
   return `${prefix} (${preset?.label.toLowerCase() ?? range})`;
 }
 
 export default function HealthNutritionPage() {
   const dailyHealth = useDailyHealthFromHealth();
+  const { profileComplete, bmrDaily, bmrSoFarToday, sumBmrForDateKeys } =
+    useBodyBmr();
   const authMode = useAuthStore((s) => s.mode);
   const canLoadDiary = authMode === "authenticated";
   const healthLoading = dailyHealth.loading && dailyHealth.available;
@@ -59,7 +62,7 @@ export default function HealthNutritionPage() {
     [range, diaryRange.byDate],
   );
 
-  const summaryBurned = useMemo(() => {
+  const summaryActive = useMemo(() => {
     if (range === "today") {
       const value = dailyHealth.todayActiveKcal;
       return value != null ? Math.round(value) : null;
@@ -68,6 +71,23 @@ export default function HealthNutritionPage() {
     return Math.round(filteredBurned.reduce((sum, row) => sum + row.value, 0));
   }, [range, dailyHealth.todayActiveKcal, filteredBurned]);
 
+  const summaryPassive = useMemo(() => {
+    if (!profileComplete) return null;
+    if (range === "today") return bmrDaily;
+    return sumBmrForDateKeys(chartDateKeys);
+  }, [
+    bmrDaily,
+    chartDateKeys,
+    profileComplete,
+    range,
+    sumBmrForDateKeys,
+  ]);
+
+  const summaryTotalBurned = useMemo(() => {
+    if (summaryActive == null && summaryPassive == null) return null;
+    return (summaryActive ?? 0) + (summaryPassive ?? 0);
+  }, [summaryActive, summaryPassive]);
+
   const summaryConsumed = useMemo(() => {
     if (!canLoadDiary || consumedLoading) return null;
     if (consumedTotals.calories <= 0) return null;
@@ -75,13 +95,11 @@ export default function HealthNutritionPage() {
   }, [canLoadDiary, consumedLoading, consumedTotals.calories]);
 
   const summaryNet = useMemo(() => {
-    if (range !== "today") return null;
-    if (summaryBurned == null || summaryConsumed == null) return null;
-    return summaryConsumed - summaryBurned;
-  }, [range, summaryBurned, summaryConsumed]);
+    if (summaryConsumed == null || summaryTotalBurned == null) return null;
+    return summaryConsumed - summaryTotalBurned;
+  }, [summaryConsumed, summaryTotalBurned]);
 
-  const totalsTitle =
-    range === "today" ? "Today's consumed totals" : "Consumed totals";
+  const totalsTitle = "Consumed totals";
 
   const todayDiary =
     range === "today" ? diaryRange.byDate.get(formatLocalDateKey()) : null;
@@ -96,12 +114,40 @@ export default function HealthNutritionPage() {
 
       <div className="grid grid-cols-2 gap-2">
         <SurfaceCard className="p-4">
-          <p className="text-sm text-muted">{rangeLabel(range, "Burned")}</p>
+          <p className="text-sm text-muted">
+            {rangeLabel(range, "Passive (BMR)")}
+          </p>
+          <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
+            {!profileComplete
+              ? "-"
+              : summaryPassive != null
+                ? `${summaryPassive} kcal`
+                : "-"}
+          </p>
+          {profileComplete ? (
+            range === "today" && bmrSoFarToday != null && bmrDaily != null ? (
+              <p className="mt-1 text-xs text-muted">
+                ~{bmrSoFarToday} kcal so far today
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-muted">Resting burn estimate</p>
+            )
+          ) : (
+            <Link
+              href={routes.settingsBody}
+              className="mt-1 inline-block text-xs font-medium text-accent hover:underline"
+            >
+              Set up body profile
+            </Link>
+          )}
+        </SurfaceCard>
+        <SurfaceCard className="p-4">
+          <p className="text-sm text-muted">{rangeLabel(range, "Active")}</p>
           <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
             {healthLoading
               ? "…"
-              : summaryBurned != null
-                ? `${summaryBurned} kcal`
+              : summaryActive != null
+                ? `${summaryActive} kcal`
                 : "-"}
           </p>
         </SurfaceCard>
@@ -136,11 +182,24 @@ export default function HealthNutritionPage() {
             </p>
           )}
         </SurfaceCard>
+        <SurfaceCard className="p-4">
+          <p className="text-sm text-muted">{rangeLabel(range, "Total burned")}</p>
+          <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
+            {healthLoading && summaryPassive == null
+              ? "…"
+              : summaryTotalBurned != null
+                ? `${summaryTotalBurned} kcal`
+                : "-"}
+          </p>
+          {summaryPassive != null || summaryActive != null ? (
+            <p className="mt-1 text-xs text-muted">Passive + active</p>
+          ) : null}
+        </SurfaceCard>
       </div>
 
       {summaryNet != null ? (
         <SurfaceCard className="p-4">
-          <p className="text-sm text-muted">Net today (consumed − burned)</p>
+          <p className="text-sm text-muted">Net (consumed − total burned)</p>
           <p className="mt-1 text-xl font-bold tabular-nums text-foreground">
             {summaryNet >= 0 ? "+" : ""}
             {summaryNet} kcal

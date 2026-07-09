@@ -162,5 +162,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   expertiseByGroup: { ...DEFAULT_EXPERTISE_BY_GROUP },
   releaseNotesSeenIds: [],
   suggestRepIncreases: false,
+  bodySexAtBirth: null,
+  bodyBirthDate: null,
+  bodyHeightIn: null,
 };
 

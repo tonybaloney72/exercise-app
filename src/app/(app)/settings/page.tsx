@@ -47,6 +47,11 @@ export default function SettingsPage() {
             hint="Week layout, difficulty, and equipment"
           />
           <SettingsLinkRow
+            href={routes.settingsBody}
+            title="Body & weight"
+            hint="Height, age, sex, and daily weight for calorie estimates"
+          />
+          <SettingsLinkRow
             href={routes.settingsDevice}
             title="Device & timers"
             hint="Theme, rest timers, and Health Connect"
