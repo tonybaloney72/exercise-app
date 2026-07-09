@@ -403,7 +403,9 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
                     {labelParts.join(" · ")}
                   </span>
                   {recordedBy ? (
-                    <span className="mt-0.5 block text-muted">{recordedBy}</span>
+                    <span className="mt-0.5 block text-muted">
+                      {recordedBy}
+                    </span>
                   ) : null}
                 </button>
               </li>
@@ -415,7 +417,7 @@ export default function CardioActivityRecorder({ kind, onResolved }: Props) {
               onClick={() => void handleSkipSessionPick()}
               className="text-xs font-medium text-muted hover:text-foreground"
             >
-              Skip — use time window samples instead
+              Skip - use time window samples instead
             </button>
           </li>
         </ul>

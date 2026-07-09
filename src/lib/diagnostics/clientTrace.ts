@@ -45,7 +45,7 @@ function persistBuffer(): void {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(buffer));
   } catch {
-    // Quota or private mode — in-memory buffer still works this session.
+    // Quota or private mode - in-memory buffer still works this session.
   }
 }
 

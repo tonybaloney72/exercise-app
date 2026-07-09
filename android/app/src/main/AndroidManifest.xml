@@ -19,7 +19,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!--
-      Health Connect — declared at app level; runtime grants use androidx.health.connect.
+      Health Connect - declared at app level; runtime grants use androidx.health.connect.
     -->
 
     <!-- Activity: steps, distance, calories, floors (Progress tiles + cardio enrich) -->

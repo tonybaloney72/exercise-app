@@ -103,8 +103,14 @@ function prepareExportTree() {
 
 function restoreExportTree() {
   fs.rmSync(backupPath("src/app/(app)/layout.tsx"), { force: true });
-  restoreFile("src/app/(app)/layout.tsx", ".capacitor-backup/layout.server.tsx");
-  restoreFile("src/app/(app)/layout.client.tsx", ".capacitor-backup/layout.client.tsx");
+  restoreFile(
+    "src/app/(app)/layout.tsx",
+    ".capacitor-backup/layout.server.tsx",
+  );
+  restoreFile(
+    "src/app/(app)/layout.client.tsx",
+    ".capacitor-backup/layout.client.tsx",
+  );
   restoreFile("src/proxy.ts", ".capacitor-backup/proxy.ts");
   for (const { from, backup } of [...dirBackups].reverse()) {
     restoreDir(from, backup);
@@ -169,7 +175,7 @@ try {
       !fs.existsSync(backupPath("src/proxy.ts"))
     ) {
       console.error(
-        "Capacitor export: restore incomplete — run: node scripts/capacitor-restore.mjs",
+        "Capacitor export: restore incomplete - run: node scripts/capacitor-restore.mjs",
       );
       process.exit(1);
     }

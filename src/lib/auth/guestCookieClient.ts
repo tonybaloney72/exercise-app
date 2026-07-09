@@ -9,13 +9,13 @@ function secureSuffix(): string {
     : "";
 }
 
-/** Set guest mode cookie from the client (bundled Capacitor — no `/api/auth/guest`). */
+/** Set guest mode cookie from the client (bundled Capacitor - no `/api/auth/guest`). */
 export function setGuestCookieActive(): void {
   if (typeof document === "undefined") return;
   document.cookie = `${GUEST_COOKIE_NAME}=1; path=/; max-age=${GUEST_COOKIE_MAX_AGE_SECONDS}; samesite=lax${secureSuffix()}`;
 }
 
-/** Clear guest cookie from the client (bundled Capacitor — no `/api/auth/guest` DELETE). */
+/** Clear guest cookie from the client (bundled Capacitor - no `/api/auth/guest` DELETE). */
 export function clearGuestCookie(): void {
   if (typeof document === "undefined") return;
   document.cookie = `${GUEST_COOKIE_NAME}=; path=/; max-age=0; samesite=lax${secureSuffix()}`;

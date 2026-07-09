@@ -87,7 +87,7 @@ function dedupePerSourceDailyTotals(perSourceTotals: number[]): number {
 
   const maxVal = Math.max(...perSourceTotals);
   const minVal = Math.min(...perSourceTotals);
-  // Samsung Health + phone pedometer track the same steps — match HC UI dedupe.
+  // Samsung Health + phone pedometer track the same steps - match HC UI dedupe.
   if (minVal / maxVal >= 0.85) {
     return Math.round(maxVal);
   }
@@ -127,7 +127,7 @@ export function aggregatedBucketTotal(
     return Math.round(maxVal);
   }
 
-  // Daily cumulative bucket + jog-sized bucket (e.g. 3378 + 2411) — do not sum.
+  // Daily cumulative bucket + jog-sized bucket (e.g. 3378 + 2411) - do not sum.
   if (values.length === 2 && maxVal >= 2000 && minVal / maxVal >= 0.65) {
     return Math.round(maxVal);
   }

@@ -22,7 +22,7 @@ function formatCardioResultLine(line: {
   durationSeconds?: number;
 }): string {
   if (line.skipped) return "Skipped";
-  if (!line.completed) return "—";
+  if (!line.completed) return "-";
   const parts = [
     line.distanceMi != null ? `${line.distanceMi} mi` : null,
     line.durationSeconds != null

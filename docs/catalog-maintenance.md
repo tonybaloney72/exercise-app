@@ -7,7 +7,7 @@ The live catalog lives under **`src/core/catalog/`**:
 - `src/core/catalog/data/hybridCalisthenicsExercises.ts`
 - `src/core/catalog/categories.ts` (display metadata)
 
-App code should import via **`@/core/catalog`** (or `@/core`) — not the data files directly.
+App code should import via **`@/core/catalog`** (or `@/core`) - not the data files directly.
 
 ## After changing exercise ids or categories
 
@@ -25,8 +25,8 @@ If you skip this step, new or renamed exercises may show up with wrong/missing c
 
 ## Related catalog scripts
 
-| Command | When |
-| ------- | ---- |
-| `npm run audit:catalog` | Inventory / QA pass on the catalog |
-| `npm run catalog:enrich` | Automated metadata patches — **also run `generate:category-index` afterward** if ids/categories changed |
-| `npm run generate:category-index` | Any manual or scripted catalog id/category edit |
+| Command                           | When                                                                                                    |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `npm run audit:catalog`           | Inventory / QA pass on the catalog                                                                      |
+| `npm run catalog:enrich`          | Automated metadata patches - **also run `generate:category-index` afterward** if ids/categories changed |
+| `npm run generate:category-index` | Any manual or scripted catalog id/category edit                                                         |

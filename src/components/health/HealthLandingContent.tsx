@@ -22,7 +22,7 @@ function formatStatValue(
   format: (value: number) => string = (v) => v.toLocaleString(),
 ): string {
   if (loading) return "…";
-  if (value == null) return "—";
+  if (value == null) return "-";
   return format(value);
 }
 
@@ -125,9 +125,9 @@ export default function HealthLandingContent() {
   );
 
   const consumedValue = useMemo(() => {
-    if (!canLoadDiary) return "—";
+    if (!canLoadDiary) return "-";
     if (nutritionDiary.loading) return "…";
-    if (nutritionDiary.error) return "—";
+    if (nutritionDiary.error) return "-";
     return `${Math.round(nutritionDiary.data?.calories ?? 0)} kcal`;
   }, [
     canLoadDiary,
@@ -179,7 +179,6 @@ export default function HealthLandingContent() {
           <p className="text-sm leading-snug text-muted">Consumed today</p>
         </Link>
       </div>
-
     </div>
   );
 }

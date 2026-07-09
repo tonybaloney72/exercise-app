@@ -48,7 +48,7 @@ export default function WeightProgressChart({
   variant = "legacy",
   healthRange = "week",
 }: {
-  /** `health` — range controlled by parent (`/health/weight`). */
+  /** `health` - range controlled by parent (`/health/weight`). */
   variant?: "legacy" | "health";
   healthRange?: HealthRangePresetId;
 } = {}) {
@@ -109,7 +109,9 @@ export default function WeightProgressChart({
       <div className="flex flex-col gap-3">
         {variant === "legacy" ? (
           <div>
-            <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
+            <h2 className="text-sm font-semibold text-foreground">
+              Body weight
+            </h2>
             <p className="text-xs text-muted mt-0.5">
               One entry per day; log on Home to see gains and losses over time
             </p>
@@ -132,7 +134,9 @@ export default function WeightProgressChart({
       {variant === "legacy" ? (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-foreground">Body weight</h2>
+            <h2 className="text-sm font-semibold text-foreground">
+              Body weight
+            </h2>
           </div>
           <div
             className="flex flex-wrap gap-1.5"
@@ -177,10 +181,7 @@ export default function WeightProgressChart({
             height={PROGRESS_LINE_CHART_HEIGHT}
             minWidth={0}
           >
-            <LineChart
-              data={series}
-              margin={PROGRESS_CHART_MARGIN.compact}
-            >
+            <LineChart data={series} margin={PROGRESS_CHART_MARGIN.compact}>
               <CartesianGrid {...PROGRESS_CARTESIAN_GRID} />
               <XAxis
                 dataKey="index"

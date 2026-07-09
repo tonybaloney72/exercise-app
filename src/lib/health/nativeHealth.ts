@@ -16,7 +16,7 @@ import { clientTrace, clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 
 const NATIVE_HEALTH_SILENT_TIMEOUT_MS = 10_000;
-/** Permission UI — user may need time to read Health Connect screens. */
+/** Permission UI - user may need time to read Health Connect screens. */
 const NATIVE_HEALTH_INTERACTIVE_TIMEOUT_MS = 120_000;
 
 const HEALTH_CONNECT_SETTINGS_INTENT =
@@ -119,12 +119,7 @@ export async function testNativeHealthBridge(): Promise<HealthBridgeTestResult> 
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    clientTrace(
-      "health-native",
-      "bridge_test_failed",
-      { message },
-      "error",
-    );
+    clientTrace("health-native", "bridge_test_failed", { message }, "error");
     return { ok: false, error: message };
   }
 }
@@ -273,8 +268,12 @@ export async function queryNativeLatestVo2Max(): Promise<
       () => HealthConnectNative.queryLatestVo2Max(),
       NATIVE_HEALTH_SILENT_TIMEOUT_MS,
     );
-    if (result.value == null || !Number.isFinite(result.value)) return undefined;
-    return { value: result.value, time: result.time ?? new Date().toISOString() };
+    if (result.value == null || !Number.isFinite(result.value))
+      return undefined;
+    return {
+      value: result.value,
+      time: result.time ?? new Date().toISOString(),
+    };
   } catch {
     return undefined;
   }
@@ -336,7 +335,11 @@ async function fallbackOpenHealthConnectSettings(): Promise<boolean> {
     await Browser.open({
       url: "https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata",
     });
-    clientTrace("health-native", "openHealthConnectSettings_fallback_store", {});
+    clientTrace(
+      "health-native",
+      "openHealthConnectSettings_fallback_store",
+      {},
+    );
     return true;
   } catch (err) {
     clientTrace(

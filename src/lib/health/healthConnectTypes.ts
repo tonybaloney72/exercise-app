@@ -27,7 +27,7 @@ export interface AuthorizationStatus {
   writeDenied: HealthDataType[];
   historyReadGranted?: boolean;
   backgroundReadGranted?: boolean;
-  /** Granted in HC Settings or via per-session route consent — not bulk-requestable. */
+  /** Granted in HC Settings or via per-session route consent - not bulk-requestable. */
   exerciseRoutesReadGranted?: boolean;
 }
 

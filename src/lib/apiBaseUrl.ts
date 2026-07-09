@@ -2,7 +2,7 @@ import { isCapacitorBundledBuild } from "@/lib/capacitorRuntime";
 
 /**
  * Origin for same-origin fetches (`/api/*`).
- * Bundled Capacitor builds have no Next server — calls go to production (or override).
+ * Bundled Capacitor builds have no Next server - calls go to production (or override).
  */
 export function resolveAppOrigin(): string {
   if (!isCapacitorBundledBuild()) return "";

@@ -1,6 +1,6 @@
 # Nutrition: barcode scanning (prep)
 
-> **Status:** Not implemented — checklist for the next coding session.  
+> **Status:** Not implemented - checklist for the next coding session.  
 > **User entry points (planned):** Home → Log food → **Scan**; optionally Meals / Add food sheet.
 
 ---
@@ -13,40 +13,40 @@ Scan a product barcode (UPC/EAN), resolve it to a FatSecret food, then reuse the
 
 ## FatSecret API (Premier)
 
-| Item | Detail |
-|------|--------|
-| Method | `food.find_id_for_barcode.v2` (REST: `GET …/food/barcode/find-by-id/v2`) |
-| Tier | **Premier exclusive** — confirm your app has barcode enabled in the [FatSecret developer console](https://platform.fatsecret.com/) |
-| Input | **GTIN-13** string (13 digits, zero-padded left). UPC-A / EAN-13 / EAN-8 supported; UPC-E must convert to UPC-A first |
-| Success | Same shape as `food.get.v2` — full food + servings (reuse `parseFoodDetailResponse` in `src/lib/fatsecret/foodDetail.ts`) |
-| Not found | API error **211** — show “No food for this barcode” + fallback to manual search |
-| Auth today | Platform **OAuth 1.0** consumer signing via `fatsecretSignedRequest` (same as `foods.search`, `food.get.v2`) — verify barcode works on your Premier Free key before building UI |
+| Item       | Detail                                                                                                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Method     | `food.find_id_for_barcode.v2` (REST: `GET …/food/barcode/find-by-id/v2`)                                                                                                        |
+| Tier       | **Premier exclusive** - confirm your app has barcode enabled in the [FatSecret developer console](https://platform.fatsecret.com/)                                              |
+| Input      | **GTIN-13** string (13 digits, zero-padded left). UPC-A / EAN-13 / EAN-8 supported; UPC-E must convert to UPC-A first                                                           |
+| Success    | Same shape as `food.get.v2` - full food + servings (reuse `parseFoodDetailResponse` in `src/lib/fatsecret/foodDetail.ts`)                                                       |
+| Not found  | API error **211** - show “No food for this barcode” + fallback to manual search                                                                                                 |
+| Auth today | Platform **OAuth 1.0** consumer signing via `fatsecretSignedRequest` (same as `foods.search`, `food.get.v2`) - verify barcode works on your Premier Free key before building UI |
 
 ### Server work (next session)
 
-1. **`src/lib/nutrition/barcodeGtin.ts`** — normalize scanned digits → GTIN-13 (`normalizeBarcodeToGtin13`)
-2. **`src/lib/fatsecret/foodBarcode.ts`** — `findFoodByBarcode(gtin13)` calling `food.find_id_for_barcode.v2`
-3. **`src/app/api/nutrition/barcode/route.ts`** — `GET ?code=…` → `{ food: FoodDetail }` or 404  
+1. **`src/lib/nutrition/barcodeGtin.ts`** - normalize scanned digits → GTIN-13 (`normalizeBarcodeToGtin13`)
+2. **`src/lib/fatsecret/foodBarcode.ts`** - `findFoodByBarcode(gtin13)` calling `food.find_id_for_barcode.v2`
+3. **`src/app/api/nutrition/barcode/route.ts`** - `GET ?code=…` → `{ food: FoodDetail }` or 404
    - Use `requireNutritionApiAccess()` (same as search)
    - Validate length / digits only
-4. **Tests** — GTIN padding (UPC-A 12 → 13), parser reuse, 211 → friendly error
+4. **Tests** - GTIN padding (UPC-A 12 → 13), parser reuse, 211 → friendly error
 
 ---
 
 ## Client / device
 
-| Platform | Approach |
-|----------|----------|
-| **Android (Capacitor)** | Add a barcode plugin, e.g. `@capacitor-mlkit/barcode-scanning` or `@capawesome/capacitor-barcode-scanner` — **not in repo yet** |
-| **Web / PWA** | Optional fallback: `BarcodeDetector` where supported, or manual entry of barcode digits |
-| **Permissions** | Camera — mirror patterns in `CardioPermissionsSection` (check / request / open settings) |
+| Platform                | Approach                                                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Android (Capacitor)** | Add a barcode plugin, e.g. `@capacitor-mlkit/barcode-scanning` or `@capawesome/capacitor-barcode-scanner` - **not in repo yet** |
+| **Web / PWA**           | Optional fallback: `BarcodeDetector` where supported, or manual entry of barcode digits                                         |
+| **Permissions**         | Camera - mirror patterns in `CardioPermissionsSection` (check / request / open settings)                                        |
 
 ### UI work (next session)
 
-1. **`QuickMealLog`** — fifth tile or row: **Scan barcode** (opens scanner sheet)
-2. **`BarcodeScanSheet`** (new) — camera view → on scan → `GET /api/nutrition/barcode` → jump to serving step
-3. **Refactor `AddFoodSheet`** (optional) — extract shared “serving + log” step so scan bypasses search; or open sheet at serving step with preloaded `FoodDetail`
-4. **Meals tab** — same Scan entry on add-food (optional parity)
+1. **`QuickMealLog`** - fifth tile or row: **Scan barcode** (opens scanner sheet)
+2. **`BarcodeScanSheet`** (new) - camera view → on scan → `GET /api/nutrition/barcode` → jump to serving step
+3. **Refactor `AddFoodSheet`** (optional) - extract shared “serving + log” step so scan bypasses search; or open sheet at serving step with preloaded `FoodDetail`
+4. **Meals tab** - same Scan entry on add-food (optional parity)
 
 ---
 
@@ -85,13 +85,13 @@ No new env vars expected for barcode unless FatSecret requires a separate scope 
 
 ## Related code (today)
 
-| Area | Path |
-|------|------|
-| Quick meal tiles | `src/components/home/QuickMealLog.tsx` |
-| Add food flow | `src/components/nutrition/AddFoodSheet.tsx` |
-| Food detail parse | `src/lib/fatsecret/foodDetail.ts` |
-| Text search API | `src/app/api/nutrition/search/route.ts` |
-| OAuth 1 signing | `src/lib/fatsecret/oauth1.ts` |
+| Area                   | Path                                                   |
+| ---------------------- | ------------------------------------------------------ |
+| Quick meal tiles       | `src/components/home/QuickMealLog.tsx`                 |
+| Add food flow          | `src/components/nutrition/AddFoodSheet.tsx`            |
+| Food detail parse      | `src/lib/fatsecret/foodDetail.ts`                      |
+| Text search API        | `src/app/api/nutrition/search/route.ts`                |
+| OAuth 1 signing        | `src/lib/fatsecret/oauth1.ts`                          |
 | Permissions UI pattern | `src/components/settings/CardioPermissionsSection.tsx` |
 
 ---

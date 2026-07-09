@@ -36,8 +36,7 @@ const CATEGORY_MUSCLE_GROUPS = {
 /** @type {Array<{ pattern: RegExp; muscles: string[]; unless?: RegExp }>} */
 const NAME_MUSCLE_RULES = [
   {
-    pattern:
-      /\b(diamond push|close grip push|tricep push|bench dip)\b/i,
+    pattern: /\b(diamond push|close grip push|tricep push|bench dip)\b/i,
     muscles: ["Triceps"],
   },
   {
@@ -61,7 +60,8 @@ const NAME_MUSCLE_RULES = [
     muscles: ["Lats", "Rhomboids", "Biceps", "Rear Deltoids"],
   },
   {
-    pattern: /\b(bench|push-up|pushup|push up|chest press|pec fly|fly\b|chest fly)\b/i,
+    pattern:
+      /\b(bench|push-up|pushup|push up|chest press|pec fly|fly\b|chest fly)\b/i,
     muscles: ["Chest", "Triceps"],
   },
   {
@@ -86,17 +86,22 @@ const NAME_MUSCLE_RULES = [
       /\b(deadlift|rdl|romanian|good morning|hamstring curl|nordic curl|hyperextension)\b/i,
     muscles: ["Hamstrings", "Glutes", "Spinal Erectors"],
   },
-  { pattern: /\b(calf raise|heel raise|tibialis)\b/i, muscles: ["Calves", "Tibialis"] },
+  {
+    pattern: /\b(calf raise|heel raise|tibialis)\b/i,
+    muscles: ["Calves", "Tibialis"],
+  },
   {
     pattern: /\b(hip thrust|glute bridge|kickback|fire hydrant|clamshell)\b/i,
     muscles: ["Glutes", "Hamstrings"],
   },
   {
-    pattern: /\b(oblique|wood chop|twist|side bend|pallof|bicycle crunch|russian twist)\b/i,
+    pattern:
+      /\b(oblique|wood chop|twist|side bend|pallof|bicycle crunch|russian twist)\b/i,
     muscles: ["Obliques"],
   },
   {
-    pattern: /\b(plank|hollow|dead bug|vacuum|leg raise|toes to bar|knee raise)\b/i,
+    pattern:
+      /\b(plank|hollow|dead bug|vacuum|leg raise|toes to bar|knee raise)\b/i,
     muscles: ["Abs", "Hip Flexors"],
   },
   {
@@ -144,7 +149,7 @@ function inferMusclesFromName(name, category) {
     }
   }
 
-  // HC uses Pectoralis Major; catalog uses Chest — keep both when chest work is implied.
+  // HC uses Pectoralis Major; catalog uses Chest - keep both when chest work is implied.
   if (set.has("Chest") && category === "UP") {
     set.add("Pectoralis Major");
   }

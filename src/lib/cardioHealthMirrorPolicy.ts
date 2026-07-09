@@ -7,7 +7,7 @@ type CardioMirrorResolution =
   | "gps"
   | "timer_only";
 
-/** ME-originated captures only — skip re-writing sessions already imported from HC. */
+/** ME-originated captures only - skip re-writing sessions already imported from HC. */
 export function shouldMirrorCardioCaptureToHealth(options: {
   healthSource?: CardioActivitySource;
   resolution?: CardioMirrorResolution | null;
@@ -22,7 +22,7 @@ export function shouldMirrorCardioCaptureToHealth(options: {
   return true;
 }
 
-/** Cardio logged from HC already exists there — exclude from ME health writes. */
+/** Cardio logged from HC already exists there - exclude from ME health writes. */
 export function isMeOriginatedCardioRow(
   row: Pick<ExerciseLog, "activitySource">,
 ): boolean {

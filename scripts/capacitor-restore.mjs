@@ -1,6 +1,6 @@
 /**
  * Restore src tree if `build:capacitor` failed mid-flight and left `.capacitor-backup/`.
- * Safe to run anytime — no-op when backup folder is absent.
+ * Safe to run anytime - no-op when backup folder is absent.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -44,16 +44,26 @@ if (fs.existsSync(p("src/app/(app)/layout.tsx"))) {
 }
 
 restoreFile("src/app/(app)/layout.tsx", ".capacitor-backup/layout.server.tsx");
-restoreFile("src/app/(app)/layout.client.tsx", ".capacitor-backup/layout.client.tsx");
+restoreFile(
+  "src/app/(app)/layout.client.tsx",
+  ".capacitor-backup/layout.client.tsx",
+);
 restoreFile("src/proxy.ts", ".capacitor-backup/proxy.ts");
 restoreDir("src/app/(auth)/auth/callback", ".capacitor-backup/auth-callback");
 restoreDir("src/app/api", ".capacitor-backup/app-api");
 
 fs.rmSync(backupRoot, { recursive: true, force: true });
 
-if (!fs.existsSync(p("src/app/api/version/route.ts")) || !fs.existsSync(p("src/proxy.ts"))) {
-  console.error("Capacitor restore: incomplete — check git status and restore manually.");
+if (
+  !fs.existsSync(p("src/app/api/version/route.ts")) ||
+  !fs.existsSync(p("src/proxy.ts"))
+) {
+  console.error(
+    "Capacitor restore: incomplete - check git status and restore manually.",
+  );
   process.exit(1);
 }
 
-console.log("Capacitor restore: OK (api routes, proxy, server layout restored).");
+console.log(
+  "Capacitor restore: OK (api routes, proxy, server layout restored).",
+);

@@ -15,11 +15,11 @@ Plan and log workouts in the browser, as an installed PWA, or in the **Android A
 
 ## What it does
 
-- **Today** — Today's workout, session logging (reps/timed sets), warm-up/cool-down, optional cardio, finish summary
-- **Weekly** — Sun–Sat overview; preview, continue, or backfill any day
-- **Library** — Exercise catalog; per-exercise defaults, favorites, dislikes
-- **Progress** — Streaks, adherence, cardio mileage, pace/speed, daily steps & active kcal (Health Connect), charts, exercise history, calendar
-- **Settings** — Equipment, program modes, week builder, timers, theme, default stretches, **Cardio & sensors** (Android APK)
+- **Today** - Today's workout, session logging (reps/timed sets), warm-up/cool-down, optional cardio, finish summary
+- **Weekly** - Sun–Sat overview; preview, continue, or backfill any day
+- **Library** - Exercise catalog; per-exercise defaults, favorites, dislikes
+- **Progress** - Streaks, adherence, cardio mileage, pace/speed, daily steps & active kcal (Health Connect), charts, exercise history, calendar
+- **Settings** - Equipment, program modes, week builder, timers, theme, default stretches, **Cardio & sensors** (Android APK)
 
 **Android APK only:** Health Connect import (steps, active calories, heart rate, exercise sessions), Start/End cardio with **foreground GPS** distance tracking, mirror writes back to Health Connect. Web and guest mode use manual cardio entry and timers.
 
@@ -44,19 +44,19 @@ Plan changes apply to **today and upcoming days** in the current week; past days
 | ------------- | ---------------------------------------------------------- |
 | **Auth & DB** | Supabase (Auth, Postgres, RLS, Edge Functions)             |
 | **Client**    | `@supabase/ssr`, `@supabase/supabase-js`                   |
-| **Repos**     | `src/lib/repos/` — Supabase or `localStorage` by auth mode |
+| **Repos**     | `src/lib/repos/` - Supabase or `localStorage` by auth mode |
 
 ### Native (Android APK)
 
-Capacitor 8 remote WebView shell (production site or bundled static export — see [docs/capacitor-android.md](docs/capacitor-android.md)).
+Capacitor 8 remote WebView shell (production site or bundled static export - see [docs/capacitor-android.md](docs/capacitor-android.md)).
 
-| Capacitor plugin                                    | Purpose                                          |
-| --------------------------------------------------- | ------------------------------------------------ |
-| `@capacitor/geolocation`                            | GPS fallback when foreground service unavailable |
-| `HealthConnect` (custom)                            | Health Connect read — aggregates, exercise sessions |
-| `@capacitor/haptics`                                | Exercise complete feedback                       |
-| `@capacitor/app`, `@capacitor/browser`              | Deep links, native Google OAuth                  |
-| `@capacitor/splash-screen`, `@capacitor/status-bar` | Launch & system chrome                           |
+| Capacitor plugin                                    | Purpose                                             |
+| --------------------------------------------------- | --------------------------------------------------- |
+| `@capacitor/geolocation`                            | GPS fallback when foreground service unavailable    |
+| `HealthConnect` (custom)                            | Health Connect read - aggregates, exercise sessions |
+| `@capacitor/haptics`                                | Exercise complete feedback                          |
+| `@capacitor/app`, `@capacitor/browser`              | Deep links, native Google OAuth                     |
+| `@capacitor/splash-screen`, `@capacitor/status-bar` | Launch & system chrome                              |
 
 **Custom Android (Java/Kotlin):**
 
@@ -89,7 +89,7 @@ Capacitor 8 remote WebView shell (production site or bundled static export — s
 - Node.js 20+
 - npm
 - Supabase project (optional for guest-only local dev)
-- Android Studio + JDK 17+ (optional — only for APK builds/emulator)
+- Android Studio + JDK 17+ (optional - only for APK builds/emulator)
 
 ### Environment
 
@@ -136,10 +136,10 @@ Android details: [docs/capacitor-android.md](docs/capacitor-android.md).
 
 ## Data flow (short)
 
-- **Signed-in** — `src/lib/repos/` → Supabase (RLS per user)
-- **Guest** — `localStorage` repos; optional migration on first login
-- **Plans** — Generator + catalog (`src/core/`, `src/lib/planGenerator.ts`) or custom week
-- **Cardio (APK)** — GPS track → `gps_track_points` + `actual_distance_mi`; Health Connect enrich via `src/lib/health/resolveCardioQuickLog.ts`
+- **Signed-in** - `src/lib/repos/` → Supabase (RLS per user)
+- **Guest** - `localStorage` repos; optional migration on first login
+- **Plans** - Generator + catalog (`src/core/`, `src/lib/planGenerator.ts`) or custom week
+- **Cardio (APK)** - GPS track → `gps_track_points` + `actual_distance_mi`; Health Connect enrich via `src/lib/health/resolveCardioQuickLog.ts`
 
 Guest vs account: [docs/guest-vs-account.md](docs/guest-vs-account.md).
 
@@ -167,7 +167,7 @@ public/          # PWA assets, downloads/myexercise.apk
 | ----------------------------------------------------- | ------------------------------------------- |
 | [deployment.md](docs/deployment.md)                   | Vercel env, version checks, feedback digest |
 | [capacitor-android.md](docs/capacitor-android.md)     | APK build, OAuth deep link, emulator dev    |
-| [ROADMAP.md](ROADMAP.md)                              | Product backlog & shipped history             |
+| [ROADMAP.md](ROADMAP.md)                              | Product backlog & shipped history           |
 | [supabase-migrations.md](docs/supabase-migrations.md) | Database schema                             |
 | [guest-vs-account.md](docs/guest-vs-account.md)       | Guest cookie vs signed-in sync              |
 | [catalog-maintenance.md](docs/catalog-maintenance.md) | Exercise catalog tooling                    |

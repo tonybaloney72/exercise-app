@@ -404,7 +404,7 @@ object HealthConnectRepository {
     } catch (e: CancellationException) {
       throw e
     } catch (_: Exception) {
-      // Permission or empty aggregate — session still returned without totals.
+      // Permission or empty aggregate - session still returned without totals.
     }
 
     if (caloriesAggregate == null) {

@@ -81,11 +81,14 @@ function workoutDurationSeconds(workout: Workout): number {
   if (workout.duration > 0) return Math.round(workout.duration);
   const start = Date.parse(workout.startDate);
   const end = Date.parse(workout.endDate);
-  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return 0;
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)
+    return 0;
   return Math.round((end - start) / 1000);
 }
 
-export function mapWorkoutToImportedSession(workout: Workout): ImportedCardioSession {
+export function mapWorkoutToImportedSession(
+  workout: Workout,
+): ImportedCardioSession {
   const distanceMi =
     workout.totalDistance != null && workout.totalDistance > 0
       ? Math.round(metersToMiles(workout.totalDistance) * 100) / 100
@@ -123,7 +126,9 @@ export async function enrichImportedSessionWithRoute(
 
 async function hasCardioHealthReadAccess(): Promise<boolean> {
   if (!isNativePlatform()) {
-    clientTrace("health-cardio", "hasReadAccess_skip", { reason: "not_native" });
+    clientTrace("health-cardio", "hasReadAccess_skip", {
+      reason: "not_native",
+    });
     return false;
   }
   const status = await checkNativeHealthAuthorization({
@@ -146,7 +151,7 @@ export async function ensureCardioHealthReadAccess(): Promise<boolean> {
     await ensureExerciseSessionWriteAccess();
     return true;
   }
-  // Skip isAvailable() — it can hang on some devices; requestAuthorization opens HC directly.
+  // Skip isAvailable() - it can hang on some devices; requestAuthorization opens HC directly.
   const status = await requestNativeHealthAuthorization({
     read: CARDIO_HEALTH_READ_TYPES,
     write: [],
@@ -165,7 +170,9 @@ export async function importRecentCardioSessions(
   limit = 8,
 ): Promise<ImportedCardioSession[]> {
   const endDate = new Date();
-  const startDate = new Date(endDate.getTime() - lookbackHours * 60 * 60 * 1000);
+  const startDate = new Date(
+    endDate.getTime() - lookbackHours * 60 * 60 * 1000,
+  );
   const workouts = await queryWorkoutsOverlappingWindow(startDate, endDate, {
     limit: 40,
   });
@@ -318,7 +325,8 @@ export async function enrichCardioHealthMeta(
     return {
       ...base,
       stepCount: fetched.stepCount ?? base?.stepCount,
-      activeCaloriesKcal: fetched.activeCaloriesKcal ?? base?.activeCaloriesKcal,
+      activeCaloriesKcal:
+        fetched.activeCaloriesKcal ?? base?.activeCaloriesKcal,
       avgHeartRateBpm: fetched.avgHeartRateBpm ?? base?.avgHeartRateBpm,
       distanceMi: fetched.distanceMi ?? base?.distanceMi,
       healthSourceName:
@@ -549,8 +557,7 @@ export async function fetchVo2MaxHistory(
     .sort((a, b) => a.dateKey.localeCompare(b.dateKey));
 }
 
-/** Read-only check — does not open the Health Connect permission UI. */
+/** Read-only check - does not open the Health Connect permission UI. */
 export async function checkCardioHealthReadAccess(): Promise<boolean> {
   return hasCardioHealthReadAccess();
 }
-

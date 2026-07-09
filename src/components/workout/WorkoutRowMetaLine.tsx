@@ -9,7 +9,7 @@ import ExpandChevron from "./ExpandChevron";
 import { WORKOUT_COMPLETION_CHECKBOX_WIDTH_CLASS } from "./WorkoutCompletionCheckbox";
 
 interface WorkoutRowMetaLineProps {
-  /** Leading control (e.g. completion checkbox) — row 1 only, vertically centered. */
+  /** Leading control (e.g. completion checkbox) - row 1 only, vertically centered. */
   leading?: ReactNode;
   name: ReactNode;
   nameClassName?: string;

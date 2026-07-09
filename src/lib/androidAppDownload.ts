@@ -11,8 +11,7 @@ export type AndroidAppDownloadEnvironment = PullToRefreshEnvironment & {
 function readAndroidAppDownloadEnvironment(): AndroidAppDownloadEnvironment {
   return {
     ...readPullToRefreshEnvironment(),
-    userAgent:
-      typeof navigator !== "undefined" ? navigator.userAgent : "",
+    userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
   };
 }
 
@@ -26,13 +25,12 @@ function isAndroidDownloadDevPreview(
   return nodeEnv === "development";
 }
 
-/** Android browser tab, installed PWA, or dev preview — not the native APK shell. */
+/** Android browser tab, installed PWA, or dev preview - not the native APK shell. */
 export function shouldShowAndroidAppDownload(
   env: AndroidAppDownloadEnvironment = readAndroidAppDownloadEnvironment(),
   options: { isDevelopment?: boolean } = {},
 ): boolean {
-  const isDevelopment =
-    options.isDevelopment ?? isAndroidDownloadDevPreview();
+  const isDevelopment = options.isDevelopment ?? isAndroidDownloadDevPreview();
 
   if (env.isNativePlatform()) return false;
   if (isDevelopment) return true;

@@ -98,19 +98,23 @@ export default function HealthNutritionPage() {
         <SurfaceCard className="p-4">
           <p className="text-sm text-muted">{rangeLabel(range, "Burned")}</p>
           <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
-            {healthLoading ? "…" : summaryBurned != null ? `${summaryBurned} kcal` : "—"}
+            {healthLoading
+              ? "…"
+              : summaryBurned != null
+                ? `${summaryBurned} kcal`
+                : "-"}
           </p>
         </SurfaceCard>
         <SurfaceCard className="p-4">
           <p className="text-sm text-muted">{rangeLabel(range, "Consumed")}</p>
           <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
             {!canLoadDiary
-              ? "—"
+              ? "-"
               : consumedLoading
                 ? "…"
                 : summaryConsumed != null
                   ? `${summaryConsumed} kcal`
-                  : "—"}
+                  : "-"}
           </p>
           {canLoadDiary && !consumedLoading && summaryConsumed != null ? (
             <NutritionMacroSummary
@@ -127,7 +131,9 @@ export default function HealthNutritionPage() {
               Log food
             </Link>
           ) : (
-            <p className="mt-1 text-xs text-muted">Sign in to track consumed nutrition.</p>
+            <p className="mt-1 text-xs text-muted">
+              Sign in to track consumed nutrition.
+            </p>
           )}
         </SurfaceCard>
       </div>
@@ -144,14 +150,20 @@ export default function HealthNutritionPage() {
 
       {canLoadDiary && !consumedLoading && summaryConsumed != null ? (
         <NutritionTotalsPanel title={totalsTitle} nutrition={consumedTotals}>
-          {range === "today" && todayDiary && todayDiary.meals.some((m) => m.entries.length > 0) ? (
+          {range === "today" &&
+          todayDiary &&
+          todayDiary.meals.some((m) => m.entries.length > 0) ? (
             <>
-              <h3 className="pt-1 text-sm font-semibold text-foreground">Meals</h3>
+              <h3 className="pt-1 text-sm font-semibold text-foreground">
+                Meals
+              </h3>
               {todayDiary.meals.map((meal) =>
                 meal.entries.length > 0 ? (
                   <div key={meal.meal} className="flex flex-col gap-0.5">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted">{FATSECRET_MEAL_LABELS[meal.meal]}</span>
+                      <span className="text-muted">
+                        {FATSECRET_MEAL_LABELS[meal.meal]}
+                      </span>
                       <span className="tabular-nums text-foreground">
                         {Math.round(meal.calories)} kcal
                       </span>

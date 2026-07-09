@@ -38,12 +38,13 @@ export default function AddFoodSheet({
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<FatSecretFoodSearchItem[]>([]);
-  const [selectedFood, setSelectedFood] = useState<FatSecretFoodSearchItem | null>(
-    null,
-  );
+  const [selectedFood, setSelectedFood] =
+    useState<FatSecretFoodSearchItem | null>(null);
   const [foodDetail, setFoodDetail] = useState<FoodDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
-  const [selectedServingId, setSelectedServingId] = useState<string | null>(null);
+  const [selectedServingId, setSelectedServingId] = useState<string | null>(
+    null,
+  );
   const [units, setUnits] = useState("1");
   const [saving, setSaving] = useState(false);
 
@@ -70,7 +71,9 @@ export default function AddFoodSheet({
 
     const handle = window.setTimeout(() => {
       setSearching(true);
-      void fetch(resolveApiUrl(`/api/nutrition/search?q=${encodeURIComponent(trimmed)}`))
+      void fetch(
+        resolveApiUrl(`/api/nutrition/search?q=${encodeURIComponent(trimmed)}`),
+      )
         .then((res) => res.json())
         .then((payload: { foods?: FatSecretFoodSearchItem[] }) => {
           setResults(payload.foods ?? []);
@@ -91,7 +94,9 @@ export default function AddFoodSheet({
     setUnits("1");
 
     try {
-      const res = await fetch(resolveApiUrl(`/api/nutrition/foods/${food.foodId}`));
+      const res = await fetch(
+        resolveApiUrl(`/api/nutrition/foods/${food.foodId}`),
+      );
       const payload = (await res.json()) as FoodDetail | { error?: string };
       if (!res.ok || !("foodId" in payload)) {
         toast.error("Could not load servings for that food.");
@@ -156,7 +161,7 @@ export default function AddFoodSheet({
   const title =
     step === "search"
       ? `Add to ${FATSECRET_MEAL_LABELS[meal]}`
-      : selectedFood?.name ?? "Choose serving";
+      : (selectedFood?.name ?? "Choose serving");
 
   return (
     <BottomSheetModal
@@ -222,9 +227,7 @@ export default function AddFoodSheet({
             className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
             autoFocus
           />
-          {searching ? (
-            <p className="text-sm text-muted">Searching…</p>
-          ) : null}
+          {searching ? <p className="text-sm text-muted">Searching…</p> : null}
           {!searching && query.trim().length >= 2 && results.length === 0 ? (
             <p className="text-sm text-muted">No foods found.</p>
           ) : null}
@@ -239,11 +242,16 @@ export default function AddFoodSheet({
                   <span className="text-sm font-medium text-foreground">
                     {food.name}
                     {food.brandName ? (
-                      <span className="font-normal text-muted"> · {food.brandName}</span>
+                      <span className="font-normal text-muted">
+                        {" "}
+                        · {food.brandName}
+                      </span>
                     ) : null}
                   </span>
                   {food.description ? (
-                    <span className="text-xs text-muted">{food.description}</span>
+                    <span className="text-xs text-muted">
+                      {food.description}
+                    </span>
                   ) : null}
                 </button>
               </li>
@@ -278,7 +286,9 @@ export default function AddFoodSheet({
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-muted">Amount (units)</span>
+            <span className="text-xs font-medium text-muted">
+              Amount (units)
+            </span>
             <input
               type="number"
               min="0.25"
@@ -303,7 +313,7 @@ export default function AddFoodSheet({
 }
 
 function formatServingLabel(serving: FoodServingOption): string {
-  return `${serving.description} — ${Math.round(serving.calories)} kcal`;
+  return `${serving.description} - ${Math.round(serving.calories)} kcal`;
 }
 
 function formatServingContext(

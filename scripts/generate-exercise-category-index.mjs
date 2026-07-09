@@ -39,7 +39,7 @@ const out = `import type { ExerciseCategory } from "@/types";
 
 /**
  * Slim id → category map for progress stats.
- * GENERATED — do not edit by hand. Run: npm run generate:category-index
+ * GENERATED - do not edit by hand. Run: npm run generate:category-index
  * See docs/catalog-maintenance.md
  */
 export const exerciseCategoryById: Record<string, ExerciseCategory> = {
@@ -47,5 +47,9 @@ ${lines.join("\n")}
 };
 `;
 
-writeFileSync(join(ROOT, "src/core/catalog/data/exerciseCategoryIndex.ts"), out, "utf8");
+writeFileSync(
+  join(ROOT, "src/core/catalog/data/exerciseCategoryIndex.ts"),
+  out,
+  "utf8",
+);
 console.log(`Wrote exerciseCategoryIndex.ts (${sorted.length} ids)`);

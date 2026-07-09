@@ -85,7 +85,7 @@ public class MainActivity extends BridgeActivity {
               Toast
                 .makeText(
                   MainActivity.this,
-                  "Download started — check Notifications",
+                  "Download started - check Notifications",
                   Toast.LENGTH_LONG
                 )
                 .show();

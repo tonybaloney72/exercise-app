@@ -102,7 +102,7 @@ function categoriesInPlan(plan: DayPlan): Set<ExerciseCategory> {
   return cats;
 }
 
-/** Strength + cardio slots already on the plan — skip the same ids in warm-up picks. */
+/** Strength + cardio slots already on the plan - skip the same ids in warm-up picks. */
 function prescribedExerciseIdsInPlan(plan: DayPlan): ReadonlySet<string> {
   const ids = new Set<string>();
   for (const round of plan.rounds) {
@@ -177,7 +177,10 @@ function pickThemedStretchesForDay(
   return dedupeStretchEntries(parts).slice(0, targetCount);
 }
 
-function effectiveWarmUpCount(plan: DayPlan, ctx: StretchResolveContext): number {
+function effectiveWarmUpCount(
+  plan: DayPlan,
+  ctx: StretchResolveContext,
+): number {
   let count = ctx.warmUpStretchCount;
   if (isLightRecoveryDay(plan)) {
     count = Math.max(1, Math.ceil(count * 0.6));
@@ -185,7 +188,10 @@ function effectiveWarmUpCount(plan: DayPlan, ctx: StretchResolveContext): number
   return count;
 }
 
-function deriveWarmUp(plan: DayPlan, ctx: StretchResolveContext): StretchEntry[] {
+function deriveWarmUp(
+  plan: DayPlan,
+  ctx: StretchResolveContext,
+): StretchEntry[] {
   const count = effectiveWarmUpCount(plan, ctx);
   return pickThemedStretchesForDay(
     plan,

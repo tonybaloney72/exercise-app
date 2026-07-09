@@ -1,4 +1,4 @@
-/** Canonical app paths — use instead of string literals for navigation. */
+/** Canonical app paths - use instead of string literals for navigation. */
 
 export const APP_HOME = "/home";
 

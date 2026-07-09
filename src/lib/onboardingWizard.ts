@@ -49,26 +49,26 @@ export const ONBOARDING_TAB_TOUR = [
   {
     label: "Home",
     description:
-      "Quick capture for today—log cardio activities and body weight without starting a workout.",
+      "Your daily hub-quick-log cardio, body weight, and meals or snacks. Sign in to save nutrition entries.",
   },
   {
     label: "Workout",
     description:
-      "Today's training plan, live sessions, week view, and workout history.",
+      "Today's training plan, live sessions, and sub-tabs for Week and History.",
   },
   {
     label: "Meals",
     description:
-      "Search foods and log breakfast, lunch, dinner, and snacks for the day.",
+      "Full meal diary: search foods, edit servings, and review everything logged today.",
   },
   {
     label: "Health",
     description:
-      "Health Connect metrics, nutrition analysis, exercise trends, and body weight charts.",
+      "Health Connect metrics, burned vs consumed nutrition, trends, and exercise charts.",
   },
   {
     label: "Settings",
     description:
-      "Equipment, difficulty caps, timers, week builders, library, and app preferences.",
+      "Equipment, skill caps, timers, week builders, exercise library, and app preferences.",
   },
 ] as const;

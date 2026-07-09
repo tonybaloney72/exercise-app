@@ -1,6 +1,6 @@
 /** Shared touch-friendly control styles (settings pills, small actions). */
 
-/** Prefer `flex flex-col gap-*` and symmetric `py-*` — avoid `space-y-*` (margin-based) and lone `pt-*` for section spacing. */
+/** Prefer `flex flex-col gap-*` and symmetric `py-*` - avoid `space-y-*` (margin-based) and lone `pt-*` for section spacing. */
 
 const uiChoicePillBase =
   "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors min-h-9";
@@ -32,4 +32,3 @@ export function uiChoicePillSolidClass(active: boolean): string {
       : "bg-background text-muted hover:text-foreground disabled:opacity-40"
   }`;
 }
-

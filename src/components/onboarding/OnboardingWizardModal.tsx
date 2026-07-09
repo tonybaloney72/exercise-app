@@ -68,10 +68,13 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
   );
 
   const finishDefaults = () =>
-    finish({
-      equipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
-      expertiseByGroup: { ...DEFAULT_EXPERTISE_BY_GROUP },
-    });
+    finish(
+      {
+        equipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
+        expertiseByGroup: { ...DEFAULT_EXPERTISE_BY_GROUP },
+      },
+      routes.home,
+    );
 
   const finishWithDraft = (navigateTo?: string) =>
     finish({ equipment, expertiseByGroup }, navigateTo);
@@ -143,13 +146,23 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
       case "welcome":
         return {
           title: "Welcome",
-          hint: "A quick setup helps us tailor your library and weekly plan. Takes about a minute.",
+          hint: "A quick setup tailors your exercise library and weekly plan. Takes about a minute.",
           body: (
             <div className="flex flex-col gap-4 text-sm text-foreground leading-relaxed">
               <p>
-                You&apos;ll pick your skill level by muscle group, the equipment
-                you have, and see how the main tabs work. The default week is a
-                6-day push / pull / legs split-you can change that anytime.
+                You&apos;ll set skill level by muscle group, pick your
+                equipment, and tour the five tabs:{" "}
+                <span className="font-medium">Home</span>,{" "}
+                <span className="font-medium">Workout</span>,{" "}
+                <span className="font-medium">Meals</span>,{" "}
+                <span className="font-medium">Health</span>, and{" "}
+                <span className="font-medium">Settings</span>.
+              </p>
+              <p className="text-muted">
+                Home is for quick daily logging; Workout is your training plan.
+                Sign in with an account to sync workouts and save your meal log.
+                The default week is a 6-day push / pull / legs split-you can
+                change that anytime under Settings → Training.
               </p>
             </div>
           ),
@@ -177,7 +190,7 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
       case "tour":
         return {
           title: "Around the app",
-          hint: "Five tabs at the bottom-here’s what each one is for.",
+          hint: "Five tabs along the bottom-here's what each one is for.",
           body: (
             <ul className="flex flex-col gap-3">
               {ONBOARDING_TAB_TOUR.map((tab) => (
@@ -199,7 +212,7 @@ export default function OnboardingWizardModal({ onDeferred }: Props) {
       case "week":
         return {
           title: "Your week",
-          hint: "Default is 6-day push / pull / legs. Custom weeks let you guide or hand-pick exercises.",
+          hint: "Default is 6-day push / pull / legs. Custom weeks are under Settings → Training when you want more control.",
           body: (
             <div className="flex flex-col gap-4 text-sm leading-relaxed">
               <div className="rounded-xl border border-accent/30 bg-accent/10 px-3 py-3">
@@ -308,10 +321,10 @@ function stepFooter(args: {
             Build guided week
           </Link>
           <Link
-            href="/settings"
+            href={routes.settings}
             onClick={(e) => {
               e.preventDefault();
-              void finishWithDraft("/settings");
+              void finishWithDraft(routes.settings);
             }}
             className="rounded-xl border border-border bg-surface-hover px-4 py-2.5 text-center text-sm font-medium text-foreground hover:border-accent/40"
           >
@@ -332,7 +345,7 @@ function stepFooter(args: {
             <button
               type="button"
               disabled={saving}
-              onClick={() => void finishWithDraft()}
+              onClick={() => void finishWithDraft(routes.home)}
               className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white hover:bg-accent/90 disabled:opacity-50"
             >
               {saving ? "Saving…" : "Finish with P/P/L"}

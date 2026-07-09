@@ -14,7 +14,7 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Full `getUser()` refreshes the session (document loads, auth routes).
-  // Soft tab navigation uses `getSession()` — local JWT read, no Auth round-trip.
+  // Soft tab navigation uses `getSession()` - local JWT read, no Auth round-trip.
   const useSessionOnly = shouldUseSessionOnlyAuth(request, pathname);
   let user: { id: string } | null = null;
   if (useSessionOnly) {

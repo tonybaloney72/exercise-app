@@ -10,7 +10,7 @@ type Props = {
   className?: string;
 };
 
-/** Expandable micronutrient list — macros are shown elsewhere. */
+/** Expandable micronutrient list - macros are shown elsewhere. */
 export default function NutritionDetailsDisclosure({
   nutrition,
   className = "",
@@ -29,7 +29,9 @@ export default function NutritionDetailsDisclosure({
       >
         {open ? "Hide details" : "More details"}
       </button>
-      {open ? <NutritionNutrientGrid nutrition={nutrition} className="mt-1.5" /> : null}
+      {open ? (
+        <NutritionNutrientGrid nutrition={nutrition} className="mt-1.5" />
+      ) : null}
     </div>
   );
 }

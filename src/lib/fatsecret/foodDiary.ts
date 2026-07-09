@@ -116,7 +116,10 @@ function mapDiaryEntry(
     name,
     description: row.food_entry_description?.trim() || name,
     meal,
-    numberOfUnits: parseDecimal(row.number_of_units, fallback?.numberOfUnits ?? 1),
+    numberOfUnits: parseDecimal(
+      row.number_of_units,
+      fallback?.numberOfUnits ?? 1,
+    ),
     ...parseFatSecretNutritionRaw(row),
   };
 }
@@ -194,13 +197,14 @@ export async function createFoodDiaryEntry(args: {
 
   const rows = extractRawDiaryEntries(payload);
   const created =
-    rows.map((row) => mapDiaryEntry(row, fallback)).find((entry) => entry != null) ??
-    null;
+    rows
+      .map((row) => mapDiaryEntry(row, fallback))
+      .find((entry) => entry != null) ?? null;
   if (created) {
     return created;
   }
 
-  // Create often succeeds with a sparse response — reload the diary for this date.
+  // Create often succeeds with a sparse response - reload the diary for this date.
   const diary = await getFoodDiaryForDate({
     userOAuth: args.userOAuth,
     dateKey: args.dateKey,

@@ -10,10 +10,7 @@ export function filterCompletedWorkouts(history: WorkoutLog[]): WorkoutLog[] {
 
 function hasLoggedCardioSession(workout: WorkoutLog): boolean {
   return resolveWorkoutCardioExercises(workout).some(
-    (row) =>
-      row.completed &&
-      !row.skipped &&
-      isMeaningfulCardioRow(row),
+    (row) => row.completed && !row.skipped && isMeaningfulCardioRow(row),
   );
 }
 
@@ -38,7 +35,9 @@ function hasStrengthOrStretchProgress(workout: WorkoutLog): boolean {
 
 /** Quick-log cardio saved without starting warm-up, rounds, or cool-down. */
 export function isCardioOnlyQuickLogWorkout(workout: WorkoutLog): boolean {
-  return hasLoggedCardioSession(workout) && !hasStrengthOrStretchProgress(workout);
+  return (
+    hasLoggedCardioSession(workout) && !hasStrengthOrStretchProgress(workout)
+  );
 }
 
 export function finalizeCardioOnlyQuickLogWorkout(
@@ -62,7 +61,7 @@ export function findCompletedWorkoutForDate(
   );
 }
 
-/** Completed strength/stretch session — excludes cardio-only quick logs. */
+/** Completed strength/stretch session - excludes cardio-only quick logs. */
 export function findCompletedStrengthWorkoutForDate(
   workoutHistory: WorkoutLog[],
   dateKey: string,
@@ -73,7 +72,7 @@ export function findCompletedStrengthWorkoutForDate(
 }
 
 /**
- * Workouts that should appear on Progress cardio charts — includes finished
+ * Workouts that should appear on Progress cardio charts - includes finished
  * workouts and in-progress days with at least one completed quick-log cardio row.
  */
 export function filterWorkoutsForCardioProgress(
@@ -157,9 +156,14 @@ export function shouldAutoRestoreInProgressFromHistory(
   workoutHistory: WorkoutLog[],
   todayKey: string,
 ): WorkoutLog | null {
-  if (findCompletedStrengthWorkoutForDate(workoutHistory, todayKey)) return null;
+  if (findCompletedStrengthWorkoutForDate(workoutHistory, todayKey))
+    return null;
   const inProgress = findInProgressWorkoutForDate(workoutHistory, todayKey);
-  if (!inProgress || inProgress.paused || isCardioOnlyQuickLogWorkout(inProgress)) {
+  if (
+    !inProgress ||
+    inProgress.paused ||
+    isCardioOnlyQuickLogWorkout(inProgress)
+  ) {
     return null;
   }
   return inProgress;

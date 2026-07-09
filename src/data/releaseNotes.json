@@ -4,9 +4,9 @@
     "date": "2026-07-08",
     "title": "Home tab & quick logging",
     "highlights": [
-      "New Home tab (5-tab nav: Home · Workout · Meals · Health · Settings). After sign-in you land on Home—the daily capture hub for cardio quick log, body weight, and quick food logging.",
+      "New Home tab (5-tab nav: Home · Workout · Meals · Health · Settings). After sign-in you land on Home-the daily capture hub for cardio quick log, body weight, and quick food logging.",
       "Log food on Home: tap Breakfast, Lunch, Dinner, or Snacks to open the same add-food flow as Meals. Full diary editing stays on the Meals tab.",
-      "Workout tab is training-only again: today’s plan and Start workout show immediately—no extra “View Today’s Workout” step. Cardio quick log and body weight moved from Workout to Home.",
+      "Workout tab is training-only again: today’s plan and Start workout show immediately-no extra “View Today’s Workout” step. Cardio quick log and body weight moved from Workout to Home.",
       "Weight charts and empty states point to Home for logging. Onboarding tour updated for the five-tab layout."
     ]
   },
@@ -15,10 +15,10 @@
     "date": "2026-07-08",
     "title": "Meals, nutrition tracking & Health analysis",
     "highlights": [
-      "New Meals tab in the bottom nav: search foods (FatSecret), choose servings, and log breakfast, lunch, dinner, and snacks. Each entry shows calories, macros, and expandable details—fiber, sugar, sodium, vitamins, and more when the food provides them.",
+      "New Meals tab in the bottom nav: search foods (FatSecret), choose servings, and log breakfast, lunch, dinner, and snacks. Each entry shows calories, macros, and expandable details-fiber, sugar, sodium, vitamins, and more when the food provides them.",
       "Health → Nutrition replaces the old Calories page: compare burned calories from Health Connect with consumed totals from your meal log. Range filters (Today, Week, Month, Year, All time) update both summary cards; consumed macros and micronutrients sum across the full period. Net today (burned − consumed) appears when Today is selected.",
       "Daily trends chart plots burned vs consumed calories, or consumed protein, carbs, fat, fiber, sugar, and sodium over time. Year and All time load up to 90 days of meal-log history.",
-      "Health landing shows Burned today and Consumed today—both open Nutrition for deeper analysis. Sign in to save your log. Old /nutrition and /health/calories URLs redirect to the new routes."
+      "Health landing shows Burned today and Consumed today-both open Nutrition for deeper analysis. Sign in to save your log. Old /nutrition and /health/calories URLs redirect to the new routes."
     ]
   },
   {
