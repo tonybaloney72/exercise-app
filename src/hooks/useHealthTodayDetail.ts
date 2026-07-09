@@ -15,6 +15,7 @@ import {
   healthTodayUsesHourlyAggregates,
   hourlySeriesHasData,
 } from "@/lib/health/healthTodayDetail";
+import { dedupeOverlappingHealthDayRecords } from "@/lib/health/healthTodayRecordDedupe";
 import type { HealthStatSlug } from "@/lib/health/healthStatRoutes";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { formatLocalDateKey } from "@/utils/localDateKey";
@@ -77,20 +78,25 @@ export function useHealthTodayDetail(slug: HealthStatSlug) {
     };
   }, [recordType, todayKey, usesHourlyAggregates]);
 
+  const displayRecords = useMemo(
+    () => dedupeOverlappingHealthDayRecords(records, slug),
+    [records, slug],
+  );
+
   const hourlySeries = useMemo(() => {
     if (!recordType) return [];
     if (usesHourlyAggregates) {
       return buildHourlySeriesFromTotals(hourlyTotals);
     }
-    return buildHourlyHealthSeries(records, {
+    return buildHourlyHealthSeries(displayRecords, {
       aggregation: healthTodayAggregationForSlug(slug),
       slug,
     });
-  }, [hourlyTotals, records, recordType, slug, usesHourlyAggregates]);
+  }, [displayRecords, hourlyTotals, recordType, slug, usesHourlyAggregates]);
 
   const logEntries = useMemo(
-    () => buildHealthRecordLogEntries(records, slug),
-    [records, slug],
+    () => buildHealthRecordLogEntries(displayRecords, slug),
+    [displayRecords, slug],
   );
 
   return {
