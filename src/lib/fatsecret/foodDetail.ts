@@ -1,6 +1,9 @@
 import { fatsecretSignedRequest } from "@/lib/fatsecret/oauth1";
 import { normalizeFatSecretList } from "@/lib/fatsecret/normalize";
-import type { FoodNutrition } from "@/lib/nutrition/foodNutrition";
+import type {
+  FatSecretNutritionRaw,
+  FoodNutrition,
+} from "@/lib/nutrition/foodNutrition";
 import { parseFatSecretNutritionRaw } from "@/lib/nutrition/foodNutrition";
 
 export type FoodServingOption = FoodNutrition & {
@@ -19,28 +22,9 @@ export type FoodDetail = {
   servings: FoodServingOption[];
 };
 
-type RawServing = {
+type RawServing = FatSecretNutritionRaw & {
   serving_id?: string;
   serving_description?: string;
-  calories?: string;
-  protein?: string;
-  carbohydrate?: string;
-  fat?: string;
-  saturated_fat?: string;
-  polyunsaturated_fat?: string;
-  monounsaturated_fat?: string;
-  trans_fat?: string;
-  cholesterol?: string;
-  sodium?: string;
-  potassium?: string;
-  fiber?: string;
-  sugar?: string;
-  added_sugars?: string;
-  vitamin_a?: string;
-  vitamin_c?: string;
-  vitamin_d?: string;
-  calcium?: string;
-  iron?: string;
   number_of_units?: string;
   metric_serving_amount?: string;
   metric_serving_unit?: string;

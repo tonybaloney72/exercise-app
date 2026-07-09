@@ -31,7 +31,9 @@ async function loadProfileRow(
   const supabase = createServiceClient();
   const { data, error } = await supabase
     .from(TABLE)
-    .select("user_id, auth_token, auth_secret_encrypted, created_at, updated_at")
+    .select(
+      "user_id, auth_token, auth_secret_encrypted, created_at, updated_at",
+    )
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -58,7 +60,9 @@ async function saveProfileRow(
   const { data, error } = await supabase
     .from(TABLE)
     .upsert(row, { onConflict: "user_id" })
-    .select("user_id, auth_token, auth_secret_encrypted, created_at, updated_at")
+    .select(
+      "user_id, auth_token, auth_secret_encrypted, created_at, updated_at",
+    )
     .single();
 
   if (error || !data) {
@@ -68,7 +72,9 @@ async function saveProfileRow(
   return data;
 }
 
-async function provisionFatSecretProfile(userId: string): Promise<FatSecretProfileAuth> {
+async function provisionFatSecretProfile(
+  userId: string,
+): Promise<FatSecretProfileAuth> {
   try {
     return await fatsecretCreateProfile(userId);
   } catch (error) {
@@ -110,7 +116,7 @@ export async function ensureNutritionFatSecretProfile(
 }
 
 /** OAuth 1.0 delegated credentials for diary/profile API calls (Step 3+). */
-// fallow-ignore-next-line unused-export
+
 export async function getFatSecretUserOAuth(
   userId: string,
 ): Promise<FatSecretProfileAuth | null> {

@@ -3,6 +3,34 @@ import type { WorkoutType } from "@/lib/health/healthConnectTypes";
 import { isNativePlatform } from "@/lib/capacitorRuntime";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 
+/** Minimum span before mirroring an exercise session to Health Connect. */
+export const MIN_HEALTH_EXERCISE_WRITE_SECONDS = 120;
+
+export function exerciseSessionDurationSeconds(
+  startDate: string | Date,
+  endDate: string | Date,
+): number | null {
+  const startMs =
+    typeof startDate === "string" ? Date.parse(startDate) : startDate.getTime();
+  const endMs =
+    typeof endDate === "string" ? Date.parse(endDate) : endDate.getTime();
+  if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs < startMs) {
+    return null;
+  }
+  return Math.round((endMs - startMs) / 1000);
+}
+
+export function shouldWriteExerciseSessionToHealth(
+  startDate: string | Date,
+  endDate: string | Date,
+): boolean {
+  const durationSeconds = exerciseSessionDurationSeconds(startDate, endDate);
+  return (
+    durationSeconds != null &&
+    durationSeconds >= MIN_HEALTH_EXERCISE_WRITE_SECONDS
+  );
+}
+
 export type SaveExerciseSessionOptions = {
   workoutType: WorkoutType;
   startDate: string;
@@ -49,6 +77,20 @@ export async function saveExerciseSessionToHealth(
   options: SaveExerciseSessionOptions,
 ): Promise<void> {
   if (!isNativePlatform()) return;
+
+  if (
+    !shouldWriteExerciseSessionToHealth(options.startDate, options.endDate)
+  ) {
+    clientTrace("health-write", "exercise_session_skip", {
+      reason: "duration_too_short",
+      workoutType: options.workoutType,
+      durationSeconds: exerciseSessionDurationSeconds(
+        options.startDate,
+        options.endDate,
+      ),
+    });
+    return;
+  }
 
   try {
     await HealthExerciseWrite.saveExerciseSession({

@@ -3,6 +3,7 @@ import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import {
   ensureExerciseSessionWriteAccess,
   saveExerciseSessionToHealth,
+  shouldWriteExerciseSessionToHealth,
 } from "@/lib/health/healthExerciseWrite";
 import {
   exerciseWorkoutTypeForLog,
@@ -30,6 +31,14 @@ export async function writeCompletedWorkoutToHealth(
   if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs < startMs) {
     clientTrace("health-write", "completed_workout_skip", {
       reason: "invalid_times",
+      workoutId: log.id,
+    });
+    return;
+  }
+
+  if (!shouldWriteExerciseSessionToHealth(log.startTime, log.endTime)) {
+    clientTrace("health-write", "completed_workout_skip", {
+      reason: "duration_too_short",
       workoutId: log.id,
     });
     return;

@@ -7,7 +7,10 @@ import {
   type FatSecretMeal,
 } from "@/lib/nutrition/fatsecretMeals";
 import { localDateKeyToFatSecretDateInt } from "@/lib/nutrition/fatsecretDateInt";
-import type { FoodNutrition } from "@/lib/nutrition/foodNutrition";
+import type {
+  FatSecretNutritionRaw,
+  FoodNutrition,
+} from "@/lib/nutrition/foodNutrition";
 import {
   parseFatSecretNutritionRaw,
   sumNutrition,
@@ -33,7 +36,7 @@ export type FoodDiaryDay = {
   meals: FoodDiaryMealSummary[];
 } & FoodNutrition;
 
-type RawDiaryEntry = {
+type RawDiaryEntry = FatSecretNutritionRaw & {
   food_entry_id?: string;
   food_id?: string;
   serving_id?: string;
@@ -41,25 +44,6 @@ type RawDiaryEntry = {
   food_entry_description?: string;
   meal?: string;
   number_of_units?: string;
-  calories?: string;
-  protein?: string;
-  carbohydrate?: string;
-  fat?: string;
-  saturated_fat?: string;
-  polyunsaturated_fat?: string;
-  monounsaturated_fat?: string;
-  trans_fat?: string;
-  cholesterol?: string;
-  sodium?: string;
-  potassium?: string;
-  fiber?: string;
-  sugar?: string;
-  added_sugars?: string;
-  vitamin_a?: string;
-  vitamin_c?: string;
-  vitamin_d?: string;
-  calcium?: string;
-  iron?: string;
 };
 
 type RawDiaryResponse = {

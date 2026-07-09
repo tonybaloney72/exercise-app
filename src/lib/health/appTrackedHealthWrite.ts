@@ -4,6 +4,7 @@ import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
 import {
   ensureExerciseSessionWriteAccess,
   saveExerciseSessionToHealth,
+  shouldWriteExerciseSessionToHealth,
 } from "@/lib/health/healthExerciseWrite";
 import { clientTrace } from "@/lib/diagnostics/clientTrace";
 import {
@@ -35,14 +36,23 @@ export async function writeAppTrackedCardioToHealth(
   const workoutType = cardioKindToWorkoutType(input.kind);
   if (!workoutType) return;
 
+  const isoStart = input.startDate.toISOString();
+  const isoEnd = input.endDate.toISOString();
+  if (!shouldWriteExerciseSessionToHealth(isoStart, isoEnd)) {
+    clientTrace("health-write", "app_tracked_cardio_skip", {
+      reason: "duration_too_short",
+      kind: input.kind,
+      durationSeconds: input.durationSeconds,
+    });
+    return;
+  }
+
   await requestNativeHealthAuthorization({
     read: [],
     write: [...CARDIO_HEALTH_WRITE_TYPES, "weight"],
   });
   await ensureExerciseSessionWriteAccess();
 
-  const isoStart = input.startDate.toISOString();
-  const isoEnd = input.endDate.toISOString();
   const activeKcal = resolveActiveCaloriesForWrite({
     kind: input.kind,
     durationSeconds: input.durationSeconds,

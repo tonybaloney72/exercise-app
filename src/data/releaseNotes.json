@@ -1,5 +1,13 @@
 [
   {
+    "id": "2026-07-09-health-connect-read-write",
+    "date": "2026-07-09",
+    "title": "Health Connect fixes",
+    "highlights": [
+      "Importing from Health Connect only asks for read access-you won't be prompted to allow writing just to pull in a workout. MyExercise also no longer writes very short accidental exercise entries back to Health Connect."
+    ]
+  },
+  {
     "id": "2026-07-08-home-nav-quick-log",
     "date": "2026-07-08",
     "title": "Home tab & quick logging",
@@ -19,17 +27,6 @@
       "Health → Nutrition replaces the old Calories page: compare burned calories from Health Connect with consumed totals from your meal log. Range filters (Today, Week, Month, Year, All time) update both summary cards; consumed macros and micronutrients sum across the full period. Net today (burned − consumed) appears when Today is selected.",
       "Daily trends chart plots burned vs consumed calories, or consumed protein, carbs, fat, fiber, sugar, and sodium over time. Year and All time load up to 90 days of meal-log history.",
       "Health landing shows Burned today and Consumed today-both open Nutrition for deeper analysis. Sign in to save your log. Old /nutrition and /health/calories URLs redirect to the new routes."
-    ]
-  },
-  {
-    "id": "2026-07-07-permissions-fixes-legal",
-    "date": "2026-07-07",
-    "title": "Permissions, fixes & legal updates",
-    "highlights": [
-      "Settings → Device & timers → Permissions & connections: shortcuts for app permissions and notification settings, plus Allowed/Denied status for location and notifications. Opening system location settings no longer errors or locks the app.",
-      "Workout quick log: Walk and Jog open the log form directly; More opens the full picker in one modal, with Change activity to switch without closing.",
-      "GPS route maps start with map attribution collapsed (ⓘ only) so the route isn't covered on small screens.",
-      "Privacy Policy and Terms of Service updated for Health Connect, GPS routes, maps, notifications, and diagnostic logs."
     ]
   }
 ]
