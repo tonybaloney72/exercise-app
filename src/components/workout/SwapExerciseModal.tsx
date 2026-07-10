@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import CategoryFilterChips from "@/components/common/CategoryFilterChips";
-import { TRAINING_CATEGORY_ORDER } from "@/core/catalog";
 import { formatLaterRoundWarning } from "@/lib/exerciseSwap";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -17,6 +16,16 @@ interface SwapExerciseModalProps {
   hasSwap: boolean;
   /** Add vs replace an existing slot (affects title and confirm copy). */
   mode?: "swap" | "add";
+  /**
+   * Category chip selected when the sheet opens.
+   * Swap: prescribed slot category. Add: omit for All.
+   */
+  initialCategory?: ExerciseCategory | null;
+  /**
+   * When set, show category filter chips (training add/swap).
+   * Omit for stretch swap (SW/SC-only pools).
+   */
+  categoryFilters?: readonly ExerciseCategory[];
   /** Exercise id → round numbers after the current round where it already appears. */
   laterRoundByExerciseId?: ReadonlyMap<string, readonly number[]>;
   onClose: () => void;
@@ -32,15 +41,17 @@ export default function SwapExerciseModal({
   candidates,
   hasSwap,
   mode = "swap",
+  initialCategory = null,
+  categoryFilters,
   laterRoundByExerciseId,
   onClose,
   onPick,
   onClearSwap,
-  emptyPoolMessage = "No other exercises in this category for this round.",
+  emptyPoolMessage = "No other exercises available for this round.",
 }: SwapExerciseModalProps) {
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] =
-    useState<ExerciseCategory | null>(null);
+    useState<ExerciseCategory | null>(initialCategory);
   const byExerciseId = useExerciseSettingsStore((s) => s.byExerciseId);
   const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
   const [pendingLaterRound, setPendingLaterRound] = useState<{
@@ -54,8 +65,10 @@ export default function SwapExerciseModal({
       setQuery("");
       setSelectedCategory(null);
       setPendingLaterRound(null);
+      return;
     }
-  }, [open]);
+    setSelectedCategory(initialCategory ?? null);
+  }, [open, initialCategory]);
 
   const categoryFiltered = useMemo(() => {
     if (!selectedCategory) return candidates;
@@ -117,7 +130,7 @@ export default function SwapExerciseModal({
   const hint =
     mode === "add"
       ? "Filter by category or search by name."
-      : `Same category as prescribed · planned: ${plannedName}`;
+      : `Filter by category or search by name · planned: ${plannedName}`;
   const confirmVerb = mode === "add" ? "add" : "swap to";
 
   return (
@@ -185,10 +198,10 @@ export default function SwapExerciseModal({
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
               autoComplete="off"
             />
-            {mode === "add" ? (
+            {categoryFilters && categoryFilters.length > 0 ? (
               <CategoryFilterChips
                 mode="single"
-                categories={TRAINING_CATEGORY_ORDER}
+                categories={categoryFilters}
                 selected={selectedCategory}
                 onSelectedChange={setSelectedCategory}
               />

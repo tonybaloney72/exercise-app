@@ -52,12 +52,13 @@ import { settingsHydrationKey } from "@/lib/settingsHydration";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
   getSwapCandidates,
+  getSwapCandidatesAllCategories,
   pickRandomSwap,
   swapCandidatePrefsFromStores,
 } from "@/lib/exerciseSwap";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { exerciseMap } from "@/core/catalog";
+import { exerciseMap, TRAINING_CATEGORY_ORDER } from "@/core/catalog";
 import {
   applyClampedTargetDuration,
   mapRoundExercises,
@@ -929,8 +930,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         if (slotIndex < 0 || slotIndex >= r.exercises.length) return r;
         const logs = r.exercises;
         const log = logs[slotIndex];
-        const candidates = getSwapCandidates(
-          category,
+        const candidates = getSwapCandidatesAllCategories(
+          TRAINING_CATEGORY_ORDER,
           log.exerciseId,
           logs,
           slotIndex,

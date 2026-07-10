@@ -6,7 +6,7 @@ import { buildRoundExcludeIds } from "@/lib/roundExclude";
 import type { Exercise, ExerciseCategory, ExerciseEquipment } from "@/types";
 
 /** Same-category alternatives for customizing a prescribed slot (plan editor). */
-export function getPlanSlotCandidates(options: {
+function getPlanSlotCandidates(options: {
   category: ExerciseCategory;
   plannedExerciseId: string;
   roundExerciseIds: string[];
@@ -72,6 +72,39 @@ export function getPlanAddCandidatesAllCategories(options: {
     for (const exercise of getPlanAddCandidates({
       category,
       roundExerciseIds: options.roundExerciseIds,
+      availableEquipment: options.availableEquipment,
+      dislikedExerciseIds: options.dislikedExerciseIds,
+      expertiseFilter: options.expertiseFilter,
+    })) {
+      if (seen.has(exercise.id)) continue;
+      seen.add(exercise.id);
+      merged.push(exercise);
+    }
+  }
+  return merged.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Swap pool across training categories for the plan editor.
+ * Expertise is capped per candidate category (via getReplacementCandidates).
+ */
+export function getPlanSlotCandidatesAllCategories(options: {
+  categories: readonly ExerciseCategory[];
+  plannedExerciseId: string;
+  roundExerciseIds: string[];
+  slotIndex: number;
+  availableEquipment: ExerciseEquipment[];
+  dislikedExerciseIds?: ReadonlySet<string>;
+  expertiseFilter?: ExpertiseFilter | null;
+}): Exercise[] {
+  const seen = new Set<string>();
+  const merged: Exercise[] = [];
+  for (const category of options.categories) {
+    for (const exercise of getPlanSlotCandidates({
+      category,
+      plannedExerciseId: options.plannedExerciseId,
+      roundExerciseIds: options.roundExerciseIds,
+      slotIndex: options.slotIndex,
       availableEquipment: options.availableEquipment,
       dislikedExerciseIds: options.dislikedExerciseIds,
       expertiseFilter: options.expertiseFilter,

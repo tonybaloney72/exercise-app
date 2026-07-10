@@ -21,7 +21,7 @@ import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import {
   getPlanAddCandidatesAllCategories,
-  getPlanSlotCandidates,
+  getPlanSlotCandidatesAllCategories,
 } from "@/lib/planSlotCandidates";
 import { getStretchCandidates } from "@/lib/planStretchCandidates";
 import { laterRoundOccurrencesByExerciseId } from "@/lib/exerciseSwap";
@@ -152,8 +152,8 @@ export default function WorkoutPlanEditor({
 
     const slot = round.exercises[pickTarget.slotIndex];
     if (!slot) return [];
-    return getPlanSlotCandidates({
-      category: slot.category,
+    return getPlanSlotCandidatesAllCategories({
+      categories: TRAINING_CATEGORY_ORDER,
       plannedExerciseId: slot.exerciseId,
       roundExerciseIds: round.exercises.map((e) => e.exerciseId),
       slotIndex: pickTarget.slotIndex,
@@ -582,6 +582,14 @@ export default function WorkoutPlanEditor({
         mode={pickTarget?.kind === "add" ? "add" : "swap"}
         plannedName={plannedNameForModal}
         candidates={pickCandidates}
+        initialCategory={
+          pickTarget?.kind === "swap"
+            ? (draft.rounds[pickTarget.roundIndex]?.exercises[
+                pickTarget.slotIndex
+              ]?.category ?? null)
+            : null
+        }
+        categoryFilters={TRAINING_CATEGORY_ORDER}
         laterRoundByExerciseId={laterRoundByExerciseIdForSwap}
         hasSwap={pickTarget?.kind === "swap"}
         emptyPoolMessage={

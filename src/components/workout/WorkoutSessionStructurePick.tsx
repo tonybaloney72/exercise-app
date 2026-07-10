@@ -99,6 +99,7 @@ export default function WorkoutSessionStructurePick({
         mode="add"
         plannedName="Exercise"
         candidates={candidates}
+        categoryFilters={TRAINING_CATEGORY_ORDER}
         laterRoundByExerciseId={new Map()}
         hasSwap={false}
         onClose={onClosePick}

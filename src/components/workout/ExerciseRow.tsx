@@ -2,14 +2,14 @@
 
 import { useMemo, useState } from "react";
 import WorkoutCompletionCheckbox from "@/components/workout/WorkoutCompletionCheckbox";
-import { exerciseMap } from "@/core/catalog";
+import { exerciseMap, TRAINING_CATEGORY_ORDER } from "@/core/catalog";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import {
   effectiveExerciseId,
-  getSwapCandidates,
+  getSwapCandidatesAllCategories,
   laterRoundOccurrencesByExerciseId,
 } from "@/lib/exerciseSwap";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
@@ -100,15 +100,14 @@ export default function ExerciseRow({
 
   const swapCandidates = useMemo(
     () =>
-      getSwapCandidates(
-        roundExercise.category,
+      getSwapCandidatesAllCategories(
+        TRAINING_CATEGORY_ORDER,
         roundExercise.exerciseId,
         roundExercises,
         slotIndex,
         swapPrefs,
       ),
     [
-      roundExercise.category,
       roundExercise.exerciseId,
       roundExercises,
       slotIndex,
@@ -404,6 +403,8 @@ export default function ExerciseRow({
         open={swapOpen}
         plannedName={plannedExercise.name}
         candidates={swapCandidates}
+        initialCategory={roundExercise.category}
+        categoryFilters={TRAINING_CATEGORY_ORDER}
         laterRoundByExerciseId={laterRoundByExerciseId}
         hasSwap={Boolean(log.swappedWith)}
         onClose={() => setSwapOpen(false)}

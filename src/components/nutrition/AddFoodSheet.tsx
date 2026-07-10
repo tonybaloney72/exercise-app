@@ -69,11 +69,14 @@ export default function AddFoodSheet({
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [amountInput, setAmountInput] = useState("1");
   const [weightUnit, setWeightUnit] = useState<WeightEntryUnit>("g");
-  const [saving, setSaving] = useState(false);
+  const [saveAction, setSaveAction] = useState<"log" | "addAnother" | null>(
+    null,
+  );
   const [barcodeBusy, setBarcodeBusy] = useState(false);
   const [manualBarcodeOpen, setManualBarcodeOpen] = useState(false);
   const [manualBarcode, setManualBarcode] = useState("");
   const androidNative = useAndroidNative();
+  const saving = saveAction != null;
 
   function resetAmountForServing(
     serving: NonNullable<ReturnType<typeof defaultFoodServing>>,
@@ -104,18 +107,23 @@ export default function AddFoodSheet({
     }
   }
 
+  function resetToSearch() {
+    setStep("search");
+    setQuery("");
+    setResults([]);
+    setSelectedFood(null);
+    setFoodDetail(null);
+    setAmountInput("1");
+    setWeightUnit("g");
+    setSaveAction(null);
+    setBarcodeBusy(false);
+    setManualBarcodeOpen(false);
+    setManualBarcode("");
+  }
+
   useEffect(() => {
     if (!open) {
-      setStep("search");
-      setQuery("");
-      setResults([]);
-      setSelectedFood(null);
-      setFoodDetail(null);
-      setAmountInput("1");
-      setWeightUnit("g");
-      setBarcodeBusy(false);
-      setManualBarcodeOpen(false);
-      setManualBarcode("");
+      resetToSearch();
       return;
     }
     if (initialFood) {
@@ -227,9 +235,11 @@ export default function AddFoodSheet({
     }
   }
 
-  async function handleSave() {
+  async function saveEntry(
+    action: "log" | "addAnother",
+  ): Promise<boolean> {
     const serving = foodDetail ? defaultFoodServing(foodDetail.servings) : null;
-    if (!selectedFood || !serving) return;
+    if (!selectedFood || !serving) return false;
 
     const numberOfUnits = resolveNumberOfUnitsForLog({
       serving,
@@ -242,10 +252,10 @@ export default function AddFoodSheet({
           ? "Enter a valid weight."
           : "Enter a valid serving amount.",
       );
-      return;
+      return false;
     }
 
-    setSaving(true);
+    setSaveAction(action);
     const result = await logFoodDiaryEntry({
       dateKey,
       meal,
@@ -254,16 +264,26 @@ export default function AddFoodSheet({
       servingId: serving.servingId,
       numberOfUnits,
     });
-    setSaving(false);
+    setSaveAction(null);
 
     if (!result.ok) {
       toast.error(result.error);
-      return;
+      return false;
     }
 
     toast.success("Food logged");
     onLogged();
+    return true;
+  }
+
+  async function handleLog() {
+    if (!(await saveEntry("log"))) return;
     onClose();
+  }
+
+  async function handleAddAnother() {
+    if (!(await saveEntry("addAnother"))) return;
+    resetToSearch();
   }
 
   const selectedServing = foodDetail
@@ -342,22 +362,32 @@ export default function AddFoodSheet({
       }
       footer={
         step === "serving" ? (
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => void handleAddAnother()}
+                disabled={saving || loadingDetail || !selectedServing}
+                className="flex-1 rounded-xl border border-border py-3 text-sm font-medium text-foreground hover:border-accent/40 disabled:opacity-60"
+              >
+                {saveAction === "addAnother" ? "Adding…" : "Add Another"}
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleLog()}
+                disabled={saving || loadingDetail || !selectedServing}
+                className="flex-1 rounded-xl bg-accent py-3 text-sm font-bold text-white hover:bg-accent/90 disabled:opacity-60"
+              >
+                {saveAction === "log" ? "Logging…" : "Log"}
+              </button>
+            </div>
             <button
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="flex-1 rounded-xl border border-border py-3 text-sm font-medium text-muted hover:text-foreground"
+              className="w-full rounded-xl border border-border py-2.5 text-sm font-medium text-muted hover:text-foreground disabled:opacity-60"
             >
               Cancel
-            </button>
-            <button
-              type="button"
-              onClick={() => void handleSave()}
-              disabled={saving || loadingDetail || !selectedServing}
-              className="flex-1 rounded-xl bg-accent py-3 text-sm font-bold text-white hover:bg-accent/90 disabled:opacity-60"
-            >
-              {saving ? "Saving…" : "Log food"}
             </button>
           </div>
         ) : undefined

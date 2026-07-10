@@ -23,6 +23,7 @@ export type SwapCandidatePrefs = {
 /**
  * Same-category alternatives for swapping. Excludes the prescribed exercise for
  * this slot, any exercise already used in the round, and user-disliked exercises.
+ * Expertise is capped by the candidate's category (same as `planCategory` here).
  */
 export function getSwapCandidates(
   planCategory: ExerciseCategory,
@@ -45,6 +46,42 @@ export function getSwapCandidates(
     dislikedExerciseIds: prefs.dislikedExerciseIds,
     expertiseFilter: prefs.expertiseFilter,
   });
+}
+
+/**
+ * Swap pool across training categories (UI + store validation).
+ * Expertise is capped per candidate category, not the prescribed slot.
+ */
+export function getSwapCandidatesAllCategories(
+  categories: readonly ExerciseCategory[],
+  plannedExerciseId: string,
+  roundExercises: ExerciseLog[],
+  slotIndex: number,
+  prefs: SwapCandidatePrefs,
+): Exercise[] {
+  const exclude = buildRoundExcludeIds({
+    plannedExerciseId,
+    slotIndex,
+    slotExerciseIds: roundExercises.map((e) => effectiveExerciseId(e)),
+    excludeEffectiveAtSlot: true,
+  });
+
+  const seen = new Set<string>();
+  const merged: Exercise[] = [];
+  for (const category of categories) {
+    for (const exercise of getReplacementCandidates({
+      category,
+      excludeExerciseIds: exclude,
+      availableEquipment: prefs.availableEquipment,
+      dislikedExerciseIds: prefs.dislikedExerciseIds,
+      expertiseFilter: prefs.expertiseFilter,
+    })) {
+      if (seen.has(exercise.id)) continue;
+      seen.add(exercise.id);
+      merged.push(exercise);
+    }
+  }
+  return merged;
 }
 
 export type RoundExerciseIds = {
