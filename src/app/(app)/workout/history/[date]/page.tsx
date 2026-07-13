@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import WorkoutDayReview from "@/components/workout/WorkoutDayReview";
 import WorkoutSession from "@/components/workout/WorkoutSession";
+import WorkoutPlanPreview from "@/components/workout/WorkoutPlanPreview";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import BackNavLink from "@/components/common/BackNavLink";
 import { routes } from "@/lib/appRoutes";
@@ -38,12 +39,15 @@ function formatPageTitle(dateKey: string): string {
 
 export default function WorkoutHistoryDayPage() {
   const params = useParams();
+  const router = useRouter();
   const dateKey = typeof params.date === "string" ? params.date : "";
   const {
     workoutHistory,
     updateCompletedWorkoutNotes,
     activeWorkout,
     startEditingCompletedWorkout,
+    startWorkoutForDate,
+    continueInProgressWorkout,
   } = useWorkoutStore();
   const { plan: prescribedPlan } = useDayPlan(dateKey);
 
@@ -101,18 +105,17 @@ export default function WorkoutHistoryDayPage() {
   }
 
   if (!log || !reviewPlan) {
-    const logHref = routes.workoutHistoryLog(dateKey);
     return (
       <div className="flex flex-col py-8 gap-4">
         <BackNavLink />
         <h1 className="text-2xl font-bold text-foreground">
           {formatPageTitle(dateKey)}
         </h1>
-        <SurfaceCard className="flex flex-col px-4 py-6 text-center gap-3">
-          <p className="text-sm text-foreground">
-            No completed workout found for this day.
-          </p>
-          {when === "today" ? (
+        {when === "today" ? (
+          <SurfaceCard className="flex flex-col px-4 py-6 text-center gap-3">
+            <p className="text-sm text-foreground">
+              No completed workout found for this day.
+            </p>
             <p className="text-sm text-muted">
               <Link
                 href={routes.workout}
@@ -122,34 +125,70 @@ export default function WorkoutHistoryDayPage() {
               </Link>{" "}
               to start or continue today&apos;s workout.
             </p>
-          ) : when === "past" ? (
-            <>
-              {inProgressLog || activeWorkout?.date === dateKey ? (
+          </SurfaceCard>
+        ) : when === "past" ? (
+          <div className="flex flex-col gap-4">
+            {inProgressLog || activeWorkout?.date === dateKey ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (!prescribedPlan) {
+                    router.push(routes.workoutHistoryLog(dateKey));
+                    return;
+                  }
+                  const ok = continueInProgressWorkout(prescribedPlan, dateKey);
+                  if (ok) router.push(routes.workoutHistoryLog(dateKey));
+                }}
+                className="w-full rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90"
+              >
+                Continue logging
+              </button>
+            ) : backfillEligibility.ok ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (!prescribedPlan) {
+                    router.push(routes.workoutHistoryLog(dateKey));
+                    return;
+                  }
+                  const ok = startWorkoutForDate(prescribedPlan, dateKey);
+                  if (ok) router.push(routes.workoutHistoryLog(dateKey));
+                }}
+                className="w-full rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90"
+              >
+                Start workout
+              </button>
+            ) : (
+              <SurfaceCard className="px-4 py-3 text-center">
+                <p className="text-xs text-muted">{backfillEligibility.reason}</p>
+              </SurfaceCard>
+            )}
+            {prescribedPlan ? (
+              <>
                 <Link
-                  href={logHref}
-                  className="inline-block rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-white hover:bg-accent/90"
+                  href={routes.workoutWeekDay(dateKey)}
+                  className="flex w-full items-center justify-center rounded-xl border border-accent/40 bg-accent/10 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
                 >
-                  Continue logging
+                  Edit Day
                 </Link>
-              ) : backfillEligibility.ok ? (
-                <Link
-                  href={logHref}
-                  className="inline-block rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-white hover:bg-accent/90"
-                >
-                  Log workout for this day
-                </Link>
-              ) : (
-                <p className="text-xs text-muted">
-                  {backfillEligibility.reason}
-                </p>
-              )}
-            </>
-          ) : (
+                <WorkoutPlanPreview
+                  plan={prescribedPlan}
+                  showTargetMuscleList={false}
+                />
+              </>
+            ) : (
+              <p className="text-sm text-muted text-center">
+                Loading this day&apos;s plan…
+              </p>
+            )}
+          </div>
+        ) : (
+          <SurfaceCard className="flex flex-col px-4 py-6 text-center gap-3">
             <p className="text-xs text-muted">
               This day is in the future - no log yet.
             </p>
-          )}
-        </SurfaceCard>
+          </SurfaceCard>
+        )}
       </div>
     );
   }
@@ -170,7 +209,18 @@ export default function WorkoutHistoryDayPage() {
             href={routes.workoutWeekDay(dateKey)}
             className="font-medium text-accent hover:underline"
           >
-            Weekly
+            Edit Day
+          </Link>
+          .
+        </p>
+      ) : when === "past" ? (
+        <p className="text-xs text-muted px-1">
+          To change the prescribed plan for this day, open{" "}
+          <Link
+            href={routes.workoutWeekDay(dateKey)}
+            className="font-medium text-accent hover:underline"
+          >
+            Edit Day
           </Link>
           .
         </p>

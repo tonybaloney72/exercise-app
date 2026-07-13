@@ -47,6 +47,17 @@ export default function TimersDeviceSettingsSection() {
         }
       />
       <SettingsSwitch
+        title="Complete exercise when set timer stops"
+        description="When you stop or close a set timer (including warm-up and cool-down), mark that exercise done and fill Did with time elapsed. Reset does not complete."
+        checked={settings.completeExerciseOnSetTimerStop}
+        onChange={() =>
+          settings.updateSettings({
+            completeExerciseOnSetTimerStop:
+              !settings.completeExerciseOnSetTimerStop,
+          })
+        }
+      />
+      <SettingsSwitch
         title="Timer sounds"
         description="Play a short chime when a set timer, rest timer, or similar countdown finishes."
         checked={settings.timerSoundsEnabled}

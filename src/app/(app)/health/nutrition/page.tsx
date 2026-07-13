@@ -73,15 +73,20 @@ export default function HealthNutritionPage() {
 
   const summaryPassive = useMemo(() => {
     if (!profileComplete) return null;
-    if (range === "today") return bmrDaily;
+    if (range === "today") return bmrSoFarToday;
     return sumBmrForDateKeys(chartDateKeys);
   }, [
-    bmrDaily,
+    bmrSoFarToday,
     chartDateKeys,
     profileComplete,
     range,
     sumBmrForDateKeys,
   ]);
+
+  const summaryPassiveFullDay = useMemo(() => {
+    if (!profileComplete || range !== "today") return null;
+    return bmrDaily;
+  }, [bmrDaily, profileComplete, range]);
 
   const summaryTotalBurned = useMemo(() => {
     if (summaryActive == null && summaryPassive == null) return null;
@@ -121,13 +126,15 @@ export default function HealthNutritionPage() {
             {!profileComplete
               ? "-"
               : summaryPassive != null
-                ? `${summaryPassive} kcal`
+                ? range === "today"
+                  ? `~${summaryPassive} kcal`
+                  : `${summaryPassive} kcal`
                 : "-"}
           </p>
           {profileComplete ? (
-            range === "today" && bmrSoFarToday != null && bmrDaily != null ? (
+            range === "today" && summaryPassiveFullDay != null ? (
               <p className="mt-1 text-xs text-muted">
-                ~{bmrSoFarToday} kcal so far today
+                {summaryPassiveFullDay} kcal/day
               </p>
             ) : (
               <p className="mt-1 text-xs text-muted">Resting burn estimate</p>
@@ -188,11 +195,15 @@ export default function HealthNutritionPage() {
             {healthLoading && summaryPassive == null
               ? "…"
               : summaryTotalBurned != null
-                ? `${summaryTotalBurned} kcal`
+                ? range === "today"
+                  ? `~${summaryTotalBurned} kcal`
+                  : `${summaryTotalBurned} kcal`
                 : "-"}
           </p>
           {summaryPassive != null || summaryActive != null ? (
-            <p className="mt-1 text-xs text-muted">Passive + active</p>
+            <p className="mt-1 text-xs text-muted">
+              {range === "today" ? "So far + active" : "Passive + active"}
+            </p>
           ) : null}
         </SurfaceCard>
       </div>

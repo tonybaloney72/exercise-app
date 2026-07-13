@@ -130,17 +130,13 @@ function TodayPageInner() {
 
   useEffect(() => {
     const hide =
-      Boolean(activeWorkout) ||
-      customizing ||
-      showWorkoutDetails ||
-      showWorkoutEntry;
+      Boolean(activeWorkout) || customizing || showWorkoutDetails;
     setHideSiblingTabs(hide);
     return () => setHideSiblingTabs(false);
   }, [
     activeWorkout,
     customizing,
     showWorkoutDetails,
-    showWorkoutEntry,
     setHideSiblingTabs,
   ]);
 
@@ -306,7 +302,7 @@ function TodayPageInner() {
       {showGuestCustomizeGate && (
         <AccountFeatureGate
           feature="customizeDay"
-          title="Customize today's plan"
+          title="Edit Day"
         />
       )}
 

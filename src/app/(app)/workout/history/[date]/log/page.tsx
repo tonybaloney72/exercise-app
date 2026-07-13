@@ -118,10 +118,8 @@ export default function WorkoutHistoryBackfillLogPage() {
 
   useEffect(() => {
     if (!plan || !canAccessLogPage || sessionForThisDay) return;
-    if (inProgressLog) {
-      handleBegin();
-    }
-  }, [plan, canAccessLogPage, sessionForThisDay, inProgressLog, handleBegin]);
+    handleBegin();
+  }, [plan, canAccessLogPage, sessionForThisDay, handleBegin]);
 
   useEffect(() => {
     if (completedLog) {
@@ -209,23 +207,13 @@ export default function WorkoutHistoryBackfillLogPage() {
           Log workout · {formatPageTitle(dateKey)}
         </h1>
         <SurfaceCard className="px-4 py-4">
-          <p className="text-sm text-muted">
-            You&apos;ll log against the prescribed plan for that training week.
-            Progress saves as you go; complete when finished.
-          </p>
+          <p className="text-sm text-muted">Starting session…</p>
         </SurfaceCard>
         {startError && (
           <p className="text-sm text-red-400 text-center" role="alert">
             {startError}
           </p>
         )}
-        <button
-          type="button"
-          onClick={handleBegin}
-          className="w-full rounded-xl bg-accent py-3 text-sm font-bold text-white transition-colors hover:bg-accent/90"
-        >
-          Begin logging
-        </button>
       </div>
     );
   }

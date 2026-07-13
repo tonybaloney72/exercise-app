@@ -60,6 +60,8 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "HC-186": "SW-48",
   "HC-139": "UP-5",
   "PC-12": "PC-31",
+  // Duplicate heel taps (keep Alternate Heel Touches)
+  "CR-7": "CR-8",
 };
 
 /** Ids that redirect to a canonical entry; excluded from generator / swap pools. */

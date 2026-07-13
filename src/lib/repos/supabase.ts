@@ -147,7 +147,9 @@ interface SettingsRow {
   timer_sounds_enabled?: boolean;
   timer_vibration_enabled?: boolean;
   keep_screen_awake?: boolean;
+  write_workouts_to_health_connect?: boolean;
   rest_timer_auto_start?: boolean;
+  complete_exercise_on_set_timer_stop?: boolean;
   available_equipment?: unknown;
   program_focus?: string;
   training_priority_customized?: boolean;
@@ -395,8 +397,12 @@ function rowToSettings(row: SettingsRow): UserSettings {
       : {}),
     restTimerAutoStart: row.rest_timer_auto_start ?? true,
     timerSoundsEnabled: row.timer_sounds_enabled ?? true,
+    completeExerciseOnSetTimerStop:
+      row.complete_exercise_on_set_timer_stop ?? false,
     timerVibrationEnabled: row.timer_vibration_enabled ?? true,
     keepScreenAwake: row.keep_screen_awake ?? false,
+    writeWorkoutsToHealthConnect:
+      row.write_workouts_to_health_connect ?? true,
     availableEquipment: sanitizeAvailableEquipment(row.available_equipment),
     trainingPriorityPreset: sanitizeTrainingPriorityPreset(row.program_focus),
     trainingPriorityCustomized: row.training_priority_customized ?? false,
@@ -457,8 +463,10 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     theme_mode: s.themeMode,
     rest_timer_auto_start: s.restTimerAutoStart,
     timer_sounds_enabled: s.timerSoundsEnabled,
+    complete_exercise_on_set_timer_stop: s.completeExerciseOnSetTimerStop,
     timer_vibration_enabled: s.timerVibrationEnabled,
     keep_screen_awake: s.keepScreenAwake,
+    write_workouts_to_health_connect: s.writeWorkoutsToHealthConnect,
     available_equipment: s.availableEquipment,
     program_focus: s.trainingPriorityPreset,
     training_priority_customized: s.trainingPriorityCustomized,

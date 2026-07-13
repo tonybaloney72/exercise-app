@@ -264,6 +264,11 @@ export default function ExerciseRow({
         <SetTimerPill
           seconds={effectiveTargetSec}
           title={`Start set timer (${effectiveTargetSec}s)`}
+          target={{
+            kind: "round",
+            roundNumber,
+            exerciseId: plannedId,
+          }}
         />
       ) : (
         <p className="text-xs leading-snug text-muted tabular-nums">

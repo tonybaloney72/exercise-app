@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import type { SetTimerTarget } from "@/stores/useFloatingTimerStore";
 import SetTimerPill from "./SetTimerPill";
 import WorkoutRowOverflowMenu, {
   type WorkoutRowMenuItem,
@@ -36,6 +37,7 @@ interface WorkoutRowMetaLineProps {
   showTimerPill?: boolean;
   timerSeconds?: number;
   timerTitle?: string;
+  timerTarget?: SetTimerTarget;
 }
 
 function NameBlock({
@@ -105,6 +107,7 @@ export default function WorkoutRowMetaLine({
   showTimerPill = false,
   timerSeconds = 45,
   timerTitle,
+  timerTarget,
 }: WorkoutRowMetaLineProps) {
   const trimmedDetail = detailText?.trim() ?? "";
   const inlineDetail =
@@ -175,7 +178,11 @@ export default function WorkoutRowMetaLine({
           ) : null}
           {showTimerPillRow ? (
             <div className="mt-0.5 flex flex-wrap items-center gap-1.5 pl-5 md:pl-7">
-              <SetTimerPill seconds={timerSeconds} title={timerTitle} />
+              <SetTimerPill
+                seconds={timerSeconds}
+                title={timerTitle}
+                target={timerTarget}
+              />
               {trimmedDetail ? (
                 <p className="min-w-0 text-xs leading-snug text-muted">
                   {trimmedDetail}
@@ -223,7 +230,11 @@ export default function WorkoutRowMetaLine({
           {detailRow}
           {showTimerPillRow ? (
             <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-              <SetTimerPill seconds={timerSeconds} title={timerTitle} />
+              <SetTimerPill
+                seconds={timerSeconds}
+                title={timerTitle}
+                target={timerTarget}
+              />
               {trimmedDetail ? (
                 <p className="min-w-0 text-xs leading-snug text-muted">
                   {trimmedDetail}

@@ -36,7 +36,9 @@ export default function CountdownRing({
   return (
     <svg
       viewBox="0 0 100 100"
-      className={`shrink-0 -rotate-90 ${className}`}
+      width="100%"
+      height="100%"
+      className={`block size-full -rotate-90 ${className}`}
       aria-hidden
     >
       <circle

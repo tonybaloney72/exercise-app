@@ -1,19 +1,30 @@
 "use client";
 
-import { useFloatingTimerStore } from "@/stores/useFloatingTimerStore";
+import {
+  useFloatingTimerStore,
+  type SetTimerTarget,
+} from "@/stores/useFloatingTimerStore";
 
 interface SetTimerPillProps {
   seconds: number;
   title?: string;
+  /** When set, stop/close can mark this exercise complete (if the setting is on). */
+  target?: SetTimerTarget;
 }
 
 /** Compact control to start the floating set timer. */
-export default function SetTimerPill({ seconds, title }: SetTimerPillProps) {
+export default function SetTimerPill({
+  seconds,
+  title,
+  target,
+}: SetTimerPillProps) {
   const label = title ?? `Start set timer (${seconds}s)`;
   return (
     <button
       type="button"
-      onClick={() => useFloatingTimerStore.getState().startSetCountdown(seconds)}
+      onClick={() =>
+        useFloatingTimerStore.getState().startSetCountdown(seconds, target)
+      }
       className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-2.5 py-1 text-sm font-semibold text-white shadow-md shadow-accent/25 transition-transform active:scale-95"
       title={label}
       aria-label={label}

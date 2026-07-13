@@ -120,7 +120,7 @@ export default function TodayWorkoutPanel({
               onClick={onCustomize}
               className={`${btnSecondary} w-full`}
             >
-              Customize plan
+              Edit Day
             </button>
           </WorkoutActionBar>
         ) : null}
@@ -129,8 +129,8 @@ export default function TodayWorkoutPanel({
       {isOptionalRestDay(plan) && !isFullRestDay(plan) ? (
         <p className="text-sm text-muted leading-snug rounded-lg border border-border bg-surface-hover/40 px-3 py-2">
           {REST_DAY_DESCRIPTIONS.stretches}{" "}
-          <span className="font-medium text-foreground">Customize plan</span> to
-          add optional exercises, stretches, or cardio.
+          <span className="font-medium text-foreground">Edit Day</span> to add
+          optional exercises, stretches, or cardio.
         </p>
       ) : null}
 

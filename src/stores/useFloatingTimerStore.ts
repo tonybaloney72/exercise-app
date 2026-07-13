@@ -7,9 +7,14 @@ import {
   completeTimerCountdown,
   resetTimerCompletionTracking,
 } from "@/lib/timerBackgroundAlert";
+import {
+  applySetTimerStopCompletion,
+  type SetTimerTarget,
+} from "@/lib/setTimerCompleteOnStop";
 import { displayCountdownSeconds } from "@/utils/time";
 
 export type TimerMode = "idle" | "rest" | "stopwatch" | "setTimer";
+export type { SetTimerTarget };
 type TimerPresentation = "fullscreen" | "minimized";
 
 interface FloatingTimerState {
@@ -36,9 +41,14 @@ interface FloatingTimerState {
   stopwatchBaseSeconds: number;
   /** True once the user has started the current timer session (running or paused). */
   hasStarted: boolean;
+  /** Set-timer only: which exercise to complete when the user stops/closes. */
+  setTimerTarget: SetTimerTarget | null;
 
   startRest: (totalSeconds: number, autoStart?: boolean) => void;
-  startSetCountdown: (totalSeconds: number) => void;
+  startSetCountdown: (
+    totalSeconds: number,
+    target?: SetTimerTarget | null,
+  ) => void;
   startStopwatch: (autoStart?: boolean) => void;
   pause: () => void;
   resume: () => void;
@@ -78,6 +88,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   stopwatchStartedAtMs: null,
   stopwatchBaseSeconds: 0,
   hasStarted: false,
+  setTimerTarget: null,
 
   startRest: (totalSeconds, autoStart = true) => {
     primeTimerAudio();
@@ -95,10 +106,11 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       stopwatchStartedAtMs: null,
       stopwatchBaseSeconds: 0,
       hasStarted: autoStart,
+      setTimerTarget: null,
     });
   },
 
-  startSetCountdown: (totalSeconds) => {
+  startSetCountdown: (totalSeconds, target = null) => {
     primeTimerAudio();
     resetTimerCompletionTracking();
     const seconds = Math.max(0, Math.floor(totalSeconds));
@@ -114,6 +126,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       stopwatchStartedAtMs: null,
       stopwatchBaseSeconds: 0,
       hasStarted: true,
+      setTimerTarget: target ?? null,
     });
   },
 
@@ -131,6 +144,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
         stopwatchBaseSeconds: base,
         stopwatchStartedAtMs: autoStart ? Date.now() : null,
         hasStarted: autoStart,
+        setTimerTarget: null,
       };
     }),
 
@@ -236,7 +250,14 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
     }),
 
   stop: () => {
-    const { mode, seconds } = get();
+    const { mode, seconds, restTotalSeconds, setTimerTarget } = get();
+    if (mode === "setTimer" && setTimerTarget) {
+      applySetTimerStopCompletion({
+        target: setTimerTarget,
+        restTotalSeconds,
+        secondsLeft: seconds,
+      });
+    }
     resetTimerCompletionTracking();
     void cancelTimerBackgroundNotification();
     set({
@@ -248,6 +269,7 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
       lastStopwatchSeconds:
         mode === "stopwatch" && seconds > 0 ? seconds : null,
       hasStarted: false,
+      setTimerTarget: null,
       ...clearClockFields(),
     });
   },

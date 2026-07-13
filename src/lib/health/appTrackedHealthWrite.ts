@@ -3,6 +3,7 @@ import { computeCardioSpeedMetersPerSecond } from "@/lib/health/cardioPaceMetric
 import { cardioKindToWorkoutType } from "@/lib/health/cardioKindMap";
 import {
   ensureExerciseSessionWriteAccess,
+  isWorkoutHealthWriteEnabled,
   saveExerciseSessionToHealth,
   shouldWriteExerciseSessionToHealth,
 } from "@/lib/health/healthExerciseWrite";
@@ -47,11 +48,26 @@ export async function writeAppTrackedCardioToHealth(
     return;
   }
 
+  if (!isWorkoutHealthWriteEnabled()) {
+    clientTrace("health-write", "app_tracked_cardio_skip", {
+      reason: "user_disabled",
+      kind: input.kind,
+    });
+    return;
+  }
+
   await requestNativeHealthAuthorization({
     read: [],
     write: [...CARDIO_HEALTH_WRITE_TYPES, "weight"],
   });
-  await ensureExerciseSessionWriteAccess();
+  const canWriteSession = await ensureExerciseSessionWriteAccess();
+  if (!canWriteSession) {
+    clientTrace("health-write", "app_tracked_cardio_skip", {
+      reason: "write_permission_denied_or_disabled",
+      kind: input.kind,
+    });
+    return;
+  }
 
   const activeKcal = resolveActiveCaloriesForWrite({
     kind: input.kind,

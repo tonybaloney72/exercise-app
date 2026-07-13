@@ -75,6 +75,8 @@ export default function WeeklyDayPage() {
   const {
     workoutHistory,
     startWorkout,
+    startWorkoutForDate,
+    continueInProgressWorkout,
     updateCompletedWorkoutNotes,
     startEditingCompletedWorkout,
     activeWorkout,
@@ -89,17 +91,21 @@ export default function WeeklyDayPage() {
   useEnsureHistoryLoaded();
 
   const parsed = parseLocalDateKey(dateKey);
+  const when = compareDateKeyToToday(dateKey);
   const inWeek = isDateKeyInCurrentCalendarWeek(dateKey);
-  const planKey = parsed && inWeek ? dateKey : "";
+  /** Past days from prior weeks (e.g. Sat → Sun) are allowed; future outside this week is not. */
+  const canOpenDay =
+    !!parsed && (when === "past" || when === "today" || inWeek);
+  const planKey = canOpenDay ? dateKey : "";
   const { plan, loading: planLoading, error: planError } = useDayPlan(planKey);
 
-  const weekDates = useMemo(
-    () =>
-      getWeekDateKeys()
-        .map((key) => parseLocalDateKey(key))
-        .filter((d): d is Date => d != null),
-    [],
-  );
+  const weekDates = useMemo(() => {
+    const d = parseLocalDateKey(dateKey);
+    if (!d) return [];
+    return getWeekDateKeys(d)
+      .map((key) => parseLocalDateKey(key))
+      .filter((day): day is Date => day != null);
+  }, [dateKey]);
   const { weekByDow } = useTrainingWeekPlans(weekDates);
 
   const canCustomize = mode === "authenticated" && !!planKey;
@@ -108,14 +114,11 @@ export default function WeeklyDayPage() {
   const isCustomWeek =
     programMode === "custom" || isUserCustomizedWeekSource(weekSource);
 
-  const when = compareDateKeyToToday(dateKey);
-
   const logForDay = useMemo(
     () => findCompletedWorkoutForDate(workoutHistory, dateKey),
     [workoutHistory, dateKey],
   );
 
-  const backfillLogHref = routes.workoutHistoryLog(dateKey);
   const backfillEligibility = useMemo(
     () =>
       getBackfillEligibility({
@@ -160,13 +163,19 @@ export default function WeeklyDayPage() {
     );
   }
 
-  if (!inWeek) {
+  if (!canOpenDay) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 px-2">
         <p className="text-sm text-foreground text-center px-2">
-          Only the current calendar week can be opened here.
+          {when === "future"
+            ? "Future weeks open from Weekly when that week starts."
+            : "Could not open this day."}
         </p>
-        <BackNavLink fallbackHref={routes.workoutWeek} />
+        <BackNavLink
+          fallbackHref={
+            inWeek ? routes.workoutWeek : routes.workoutHistoryDay(dateKey)
+          }
+        />
       </div>
     );
   }
@@ -236,7 +245,11 @@ export default function WeeklyDayPage() {
   return (
     <div className="flex flex-col py-6 gap-5">
       <div className="flex flex-col gap-3">
-        <BackNavLink fallbackHref={routes.workoutWeek} />
+        <BackNavLink
+          fallbackHref={
+            inWeek ? routes.workoutWeek : routes.workoutHistory
+          }
+        />
         <motion.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
@@ -274,13 +287,16 @@ export default function WeeklyDayPage() {
               ? REST_DAY_DESCRIPTIONS.full_rest
               : REST_DAY_DESCRIPTIONS.stretches}{" "}
             Use{" "}
-            <span className="font-medium text-foreground">Edit workout</span> to
+            <span className="font-medium text-foreground">Edit Day</span> to
             add optional exercises, stretches, or cardio.
           </p>
         </SurfaceCard>
       )}
 
-      {canCustomize && showCustomizeSlot && !showPlanEditor && (
+      {canCustomize &&
+        showCustomizeSlot &&
+        !showPlanEditor &&
+        when !== "past" && (
         <button
           type="button"
           onClick={() => {
@@ -289,14 +305,17 @@ export default function WeeklyDayPage() {
           }}
           className="w-full rounded-xl border border-accent/40 bg-accent/10 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
         >
-          Edit workout
+          Edit Day
         </button>
       )}
 
-      {mode === "guest" && showCustomizeSlot && !customizing && (
+      {mode === "guest" &&
+        showCustomizeSlot &&
+        !customizing &&
+        when !== "past" && (
         <AccountFeatureGate
           feature="customizeDay"
-          title="Customize this day's workout"
+          title="Edit Day"
         />
       )}
 
@@ -352,30 +371,61 @@ export default function WeeklyDayPage() {
       {when !== "future" && !logForDay && (
         <>
           {when === "past" ? (
-            <SurfaceCard className="flex flex-col px-4 py-3 text-center gap-3">
-              <p className="text-sm text-muted">
-                No workout was logged on this day.
-              </p>
+            <div className="flex flex-col gap-4">
               {inProgressLog || activeWorkout?.date === dateKey ? (
-                <Link
-                  href={backfillLogHref}
-                  className="inline-block rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-white hover:bg-accent/90"
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!plan) return;
+                    const ok = continueInProgressWorkout(plan, dateKey);
+                    if (ok) router.push(routes.workoutHistoryLog(dateKey));
+                  }}
+                  className="w-full rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
                 >
                   Continue logging
-                </Link>
+                </button>
               ) : backfillEligibility.ok ? (
-                <Link
-                  href={backfillLogHref}
-                  className="inline-block rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-white hover:bg-accent/90"
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!plan) return;
+                    const ok = startWorkoutForDate(plan, dateKey);
+                    if (ok) router.push(routes.workoutHistoryLog(dateKey));
+                  }}
+                  className="w-full rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
                 >
-                  Log workout for this day
-                </Link>
+                  Start workout
+                </button>
               ) : (
-                <p className="text-xs text-muted">
-                  {backfillEligibility.reason}
-                </p>
+                <SurfaceCard className="px-4 py-3 text-center">
+                  <p className="text-xs text-muted">
+                    {backfillEligibility.reason}
+                  </p>
+                </SurfaceCard>
               )}
-            </SurfaceCard>
+              {canCustomize && showCustomizeSlot && !showPlanEditor ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSaveError(null);
+                    setCustomizing(true);
+                  }}
+                  className="w-full rounded-xl border border-accent/40 bg-accent/10 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
+                >
+                  Edit Day
+                </button>
+              ) : null}
+              {mode === "guest" && showCustomizeSlot && !customizing ? (
+                <AccountFeatureGate feature="customizeDay" title="Edit Day" />
+              ) : null}
+              {!showPlanEditor ? (
+                <WorkoutPlanPreview
+                  plan={plan}
+                  weekByDow={weekByDow}
+                  showTargetMuscleList={false}
+                />
+              ) : null}
+            </div>
           ) : continueWorkoutHere ? (
             <SurfaceCard className="border-accent/30 bg-accent/10 px-4 py-3">
               <p className="text-sm text-foreground">

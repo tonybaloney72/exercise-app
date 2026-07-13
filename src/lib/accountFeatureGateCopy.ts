@@ -9,7 +9,7 @@ export const ACCOUNT_FEATURE_COPY: Record<
   { title: string; description: string; benefits: string[] }
 > = {
   customizeDay: {
-    title: "Customize workouts",
+    title: "Edit Day",
     description:
       "Change rounds, exercises, stretches, and cardio for a specific day and save that plan for your training week.",
     benefits: [

@@ -256,6 +256,12 @@ export function normalizeUserSettings(
       : {}),
     suggestRepIncreases:
       partial.suggestRepIncreases ?? DEFAULT_SETTINGS.suggestRepIncreases,
+    completeExerciseOnSetTimerStop:
+      partial.completeExerciseOnSetTimerStop ??
+      DEFAULT_SETTINGS.completeExerciseOnSetTimerStop,
+    writeWorkoutsToHealthConnect:
+      partial.writeWorkoutsToHealthConnect ??
+      DEFAULT_SETTINGS.writeWorkoutsToHealthConnect,
     bodySexAtBirth:
       partial.bodySexAtBirth !== undefined
         ? sanitizeBodySexAtBirth(partial.bodySexAtBirth)

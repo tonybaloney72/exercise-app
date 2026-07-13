@@ -394,6 +394,10 @@ function StretchRow({
         <SetTimerPill
           seconds={effectiveTargetSec}
           title={`Start stretch timer (${effectiveTargetSec}s)`}
+          target={{
+            kind: stretchCategory === "SC" ? "coolDown" : "warmUp",
+            exerciseId,
+          }}
         />
       ) : (
         <p className="text-xs leading-snug text-muted tabular-nums">

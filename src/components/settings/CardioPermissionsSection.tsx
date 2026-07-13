@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
+import SettingsSwitch from "@/components/settings/SettingsSwitch";
 import {
   checkNativeNotificationPermission,
   openNativeAppSettings,
@@ -14,17 +15,23 @@ import {
   openNativeHealthSettings,
 } from "@/lib/health/nativeHealth";
 import { ensureCardioHealthReadAccess } from "@/lib/health";
+import { ensureExerciseSessionWriteAccess } from "@/lib/health/healthExerciseWrite";
 import {
   checkNativeLocationPermission,
   openNativeLocationSettings,
   requestNativeLocationPermission,
 } from "@/lib/geo/openLocationSettings";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 
 type HealthAccessState = "unknown" | "granted" | "denied";
 
 const SETTINGS_REFRESH_MS = 1500;
 
 export default function CardioPermissionsSection() {
+  const writeWorkoutsToHealthConnect = useSettingsStore(
+    (s) => s.writeWorkoutsToHealthConnect,
+  );
+  const updateSettings = useSettingsStore((s) => s.updateSettings);
   const [healthAccess, setHealthAccess] =
     useState<HealthAccessState>("unknown");
   const [backgroundReadGranted, setBackgroundReadGranted] = useState<
@@ -35,6 +42,7 @@ export default function CardioPermissionsSection() {
     boolean | null
   >(null);
   const [healthBusy, setHealthBusy] = useState(false);
+  const [writeBusy, setWriteBusy] = useState(false);
   const [locationBusy, setLocationBusy] = useState(false);
   const [notificationBusy, setNotificationBusy] = useState(false);
 
@@ -76,6 +84,28 @@ export default function CardioPermissionsSection() {
       }
     } finally {
       setHealthBusy(false);
+    }
+  }
+
+  async function handleToggleWorkoutWrite() {
+    const next = !writeWorkoutsToHealthConnect;
+    if (!next) {
+      await updateSettings({ writeWorkoutsToHealthConnect: false });
+      return;
+    }
+    setWriteBusy(true);
+    try {
+      await updateSettings({ writeWorkoutsToHealthConnect: true });
+      const granted = await ensureExerciseSessionWriteAccess();
+      if (granted) {
+        toast.success("Workout writes to Health Connect enabled");
+      } else {
+        toast.message(
+          "Permission was not granted. Turn this on again later or allow write access in Health Connect settings.",
+        );
+      }
+    } finally {
+      setWriteBusy(false);
     }
   }
 
@@ -194,6 +224,20 @@ export default function CardioPermissionsSection() {
           >
             Open Health Connect settings
           </ActionButton>
+        </div>
+        <div className="mt-1 border-t border-border pt-3">
+          <SettingsSwitch
+            title="Save finished workouts to Health Connect"
+            description={
+              writeBusy
+                ? "Requesting write permission…"
+                : "When off, we will not ask again after you finish a workout. Turn on to allow saving sessions (and re-prompt for permission if needed)."
+            }
+            checked={writeWorkoutsToHealthConnect}
+            onChange={() => {
+              if (!writeBusy) void handleToggleWorkoutWrite();
+            }}
+          />
         </div>
       </div>
 

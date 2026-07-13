@@ -650,20 +650,6 @@ const catalogExercises: Exercise[] = [
 
   // ── Core – Rotational/Obliques (CR) - Rehab Hero & Healthline ──
   {
-    id: "CR-7",
-    name: "Heel Tap",
-    category: "CR",
-    equipment: ["bodyweight"],
-    expertiseLevel: "intermediate",
-    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
-    defaultReps: "12 each side",
-    notes:
-      "Crunch up slightly, reach hand to same-side heel in a side-crunch motion. Healthline / Rehab Hero.",
-    source: "Healthline",
-    videoUrl: "https://www.rehabhero.ca/exercise/heel-taps",
-    isTimeBased: false,
-  },
-  {
     id: "CR-8",
     name: "Alternate Heel Touches",
     category: "CR",
@@ -4213,7 +4199,7 @@ const catalogExercises: Exercise[] = [
     defaultReps: "10 each direction",
     notes: "Hands on hips, roll hips in large circles, then reverse direction",
     source: "Live to Move Physical Therapy & Wellness",
-    videoUrl: "https://www.youtube.com/watch?v=qkrJXGVj_OQ",
+    videoUrl: "https://www.youtube.com/watch?v=Wh1Kg2iqBiw",
     isTimeBased: false,
     secondaryCategory: "LB",
   },
@@ -4228,7 +4214,7 @@ const catalogExercises: Exercise[] = [
     notes:
       "Deep lunge, place hands inside front foot, rotate and reach to ceiling, return",
     source: "Your House Fitness",
-    videoUrl: "https://www.youtube.com/watch?v=kk8RnOLzngc",
+    videoUrl: "https://www.youtube.com/watch?v=kIElAa1Aa9A&t=131",
     isTimeBased: false,
     secondaryCategory: "LB",
   },
@@ -4287,7 +4273,7 @@ const catalogExercises: Exercise[] = [
     notes:
       "On all fours, lift knee out to the side (open), then cross under body (close); switch legs",
     source: "YouTube",
-    videoUrl: "https://www.youtube.com/watch?v=2HTZGZ4fZ7E",
+    videoUrl: "https://www.youtube.com/watch?v=YSdMpn_EJOw",
     isTimeBased: false,
     secondaryCategory: "LB",
   },

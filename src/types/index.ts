@@ -327,6 +327,11 @@ export interface UserSettings {
   restTimerAutoStart: boolean;
   /** Web Audio chimes when a timer completes (set/rest). */
   timerSoundsEnabled: boolean;
+  /**
+   * When true, stopping or closing a set timer (rounds, warm-up, cool-down)
+   * marks that exercise complete and fills “Did” with elapsed seconds.
+   */
+  completeExerciseOnSetTimerStop: boolean;
   /** `navigator.vibrate` when a timer or exercise/stretch is marked complete. */
   timerVibrationEnabled: boolean;
   /**
@@ -334,6 +339,12 @@ export interface UserSettings {
    * does not dim or lock. Uses more battery; browser may still deny the request.
    */
   keepScreenAwake: boolean;
+  /**
+   * When true, finishing a workout may prompt for Health Connect write access
+   * and mirror the session. Set false when the user denies (or turns this off)
+   * so we do not re-prompt after every workout.
+   */
+  writeWorkoutsToHealthConnect: boolean;
   /**
    * Equipment the user can use when browsing the library and building routines.
    * Exercises with an `equipment` tag require at least one matching entry.
