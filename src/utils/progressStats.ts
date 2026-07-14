@@ -1,6 +1,7 @@
 import type { TrainingWeekDays } from "@/lib/repos";
 import type { DayPlan, ExerciseCategory, ExerciseLog, WorkoutLog } from "@/types";
 import { exerciseCategoryById } from "@/core/catalog";
+import { effectiveExerciseId } from "@/utils/exerciseLogDefaults";
 import { formatLocalDateKey, parseLocalDateKey } from "@/utils/localDateKey";
 import { getSundayOfWeekContaining } from "@/utils/weekCalendar";
 import {
@@ -75,7 +76,7 @@ function countCompletedTraining(
   counts: Record<ExerciseCategory, number>,
 ): void {
   if (!ex.completed || ex.skipped) return;
-  const cat = exerciseCategoryById[ex.exerciseId];
+  const cat = exerciseCategoryById[effectiveExerciseId(ex)];
   if (!cat || !TRAINING_CATEGORIES.has(cat)) return;
   counts[cat] = (counts[cat] ?? 0) + 1;
 }

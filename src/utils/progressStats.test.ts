@@ -1,6 +1,83 @@
 import { describe, expect, it } from "vitest";
-import { weekToDatePlanAdherence } from "@/utils/progressStats";
+import {
+  trainingCategoryTotals,
+  weekToDatePlanAdherence,
+} from "@/utils/progressStats";
 import type { DayPlan, WorkoutLog } from "@/types";
+
+describe("trainingCategoryTotals", () => {
+  it("attributes swapped-in exercises to the substitute category", () => {
+    const history: WorkoutLog[] = [
+      {
+        id: "w1",
+        date: "2026-07-14",
+        dayOfWeek: 2,
+        warmUpCompleted: false,
+        warmUpExercises: [],
+        coolDownCompleted: false,
+        coolDownExercises: [],
+        cardioExercises: [],
+        rounds: [
+          {
+            roundNumber: 1,
+            exercises: [
+              {
+                exerciseId: "UPL-8",
+                swappedWith: "CR-1",
+                completed: true,
+                skipped: false,
+              },
+              {
+                exerciseId: "UPL-10",
+                completed: true,
+                skipped: false,
+              },
+            ],
+          },
+        ],
+        notes: "",
+      },
+    ];
+
+    expect(trainingCategoryTotals(history)).toEqual([
+      { category: "UPL", value: 1 },
+      { category: "CR", value: 1 },
+    ]);
+  });
+
+  it("does not count a swap against the prescribed category", () => {
+    const history: WorkoutLog[] = [
+      {
+        id: "w1",
+        date: "2026-07-14",
+        dayOfWeek: 2,
+        warmUpCompleted: false,
+        warmUpExercises: [],
+        coolDownCompleted: false,
+        coolDownExercises: [],
+        cardioExercises: [],
+        rounds: [
+          {
+            roundNumber: 1,
+            exercises: [
+              {
+                exerciseId: "UPL-8",
+                swappedWith: "CR-1",
+                completed: true,
+                skipped: false,
+              },
+            ],
+          },
+        ],
+        notes: "",
+      },
+    ];
+
+    expect(trainingCategoryTotals(history)).toEqual([
+      { category: "CR", value: 1 },
+    ]);
+  });
+});
 
 describe("weekToDatePlanAdherence", () => {
   it("uses log slot count when workout had more exercises than the week plan", () => {
