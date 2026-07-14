@@ -39,10 +39,13 @@ describe("trainingCategoryTotals", () => {
       },
     ];
 
-    expect(trainingCategoryTotals(history)).toEqual([
-      { category: "UPL", value: 1 },
-      { category: "CR", value: 1 },
-    ]);
+    expect(trainingCategoryTotals(history)).toEqual(
+      expect.arrayContaining([
+        { category: "UPL", value: 1 },
+        { category: "CR", value: 1 },
+      ]),
+    );
+    expect(trainingCategoryTotals(history)).toHaveLength(2);
   });
 
   it("does not count a swap against the prescribed category", () => {

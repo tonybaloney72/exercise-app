@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { APP_HOME } from "@/lib/auth/constants";
 import {
   buildNativeOAuthCallbackUrl,
   isNativeOAuthCallbackUrl,
@@ -9,7 +10,7 @@ const APP_ID = "dev.myexercise.app";
 
 describe("buildNativeOAuthCallbackUrl", () => {
   it("builds deep link without next for default home", () => {
-    expect(buildNativeOAuthCallbackUrl("/workout", APP_ID)).toBe(
+    expect(buildNativeOAuthCallbackUrl(APP_HOME, APP_ID)).toBe(
       "dev.myexercise.app://auth/callback",
     );
   });
@@ -37,7 +38,7 @@ describe("parseNativeOAuthCallbackUrl", () => {
         "dev.myexercise.app://auth/callback?code=abc123",
         APP_ID,
       ),
-    ).toEqual({ code: "abc123", next: "/workout" });
+    ).toEqual({ code: "abc123", next: APP_HOME });
   });
 
   it("rejects unrelated deep links", () => {

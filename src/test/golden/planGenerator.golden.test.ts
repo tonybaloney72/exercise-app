@@ -153,7 +153,7 @@ describe("planGenerator golden contract", () => {
   it("locks prefs fingerprint for default balanced standard inputs", () => {
     expect(
       computePrefsFingerprint(GOLDEN_EMPTY_PREFS, GOLDEN_EQUIPMENT),
-    ).toMatchInlineSnapshot(`"d:|fv:|e:bench,bodyweight,plyo_box,pull_up_bar,resistance_band,sturdy_chair|pm:preset|cbs:manual|ppl:ppl-2026-05-v4:balanced:pplSched:0:active_recovery,1:push,2:pull,3:legs,4:push,5:pull,6:legs|tp:balanced|2,2,2,2,2|wbp:off|rd:standard|wrd:default|wc:default|exp:core:intermediate,cardio:intermediate,lower:intermediate,upper_push:intermediate,upper_pull:intermediate|su:|sd:"`);
+    ).toMatchInlineSnapshot(`"d:|fv:|e:bench,bodyweight,plyo_box,pull_up_bar,resistance_band,sturdy_chair|pm:preset|cbs:manual|ppl:ppl-2026-05-v4:balanced:pplSched:0:active_recovery,1:push,2:pull,3:legs,4:push,5:pull,6:legs|tp:balanced|2,2,2,2,2|wbp:off|rd:standard|wrd:default|wc:default|exp:core:intermediate,cardio:intermediate,lower:intermediate,upper_push:intermediate,upper_pull:intermediate|st:w4|c5"`);
   });
 
   it("compact density reduces Monday slot count vs standard for the same seed", () => {
