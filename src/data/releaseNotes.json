@@ -1,5 +1,15 @@
 [
   {
+    "id": "2026-07-15-usual-foods-and-swap-focus",
+    "date": "2026-07-15",
+    "title": "Faster meal logging & fairer training focus",
+    "highlights": [
+      "When you add food to a meal, Usual shows foods you often eat for that meal—so breakfast staples stay on breakfast, not dinner.",
+      "Star a food as a favorite while logging; the ★ mark shows on Usual items for meals where you actually eat that food.",
+      "Training Focus on Health → Exercises now counts the exercise you completed after a swap, not the one that was originally planned."
+    ]
+  },
+  {
     "id": "2026-07-13-timer-complete-and-hc-write",
     "date": "2026-07-13",
     "title": "Timer auto-complete & Health Connect writes",
@@ -15,15 +25,6 @@
     "highlights": [
       "When logging a meal item, use Add Another to save and jump straight back to search or barcode scan for the same meal-no need to reopen the sheet.",
       "Tap Log when you're done to save and close."
-    ]
-  },
-  {
-    "id": "2026-07-10-swap-any-category",
-    "date": "2026-07-10",
-    "title": "Swap across categories",
-    "highlights": [
-      "Swapping an exercise now works like adding one: category pills let you browse the full training library, starting on the prescribed category.",
-      "Pick All or another category when you want a different movement for that slot. Stretch swaps stay warm-up / cool-down only."
     ]
   }
 ]

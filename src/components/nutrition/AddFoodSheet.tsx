@@ -31,6 +31,7 @@ import {
 } from "@/lib/nutrition/servingQuantity";
 import { logFoodDiaryEntry } from "@/hooks/useNutritionDiary";
 import { useAndroidNative } from "@/hooks/useAndroidNative";
+import type { UsualFoodItem } from "@/lib/fatsecret/foodUsual";
 import { fetchFoodByBarcode } from "@/lib/nutrition/barcodeLookup";
 import {
   BarcodeScanCancelledError,
@@ -38,6 +39,10 @@ import {
   isBarcodeScanCancelled,
   scanProductBarcode,
 } from "@/lib/nutrition/barcodeScan";
+import {
+  fetchUsualFoods,
+  setFoodFavorite,
+} from "@/lib/nutrition/usualFoodsClient";
 
 type Props = {
   open: boolean;
@@ -75,8 +80,14 @@ export default function AddFoodSheet({
   const [barcodeBusy, setBarcodeBusy] = useState(false);
   const [manualBarcodeOpen, setManualBarcodeOpen] = useState(false);
   const [manualBarcode, setManualBarcode] = useState("");
+  const [usualFoods, setUsualFoods] = useState<UsualFoodItem[]>([]);
+  const [usualLoading, setUsualLoading] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => new Set());
+  const [favoriteBusy, setFavoriteBusy] = useState(false);
   const androidNative = useAndroidNative();
   const saving = saveAction != null;
+  const showUsual =
+    step === "search" && !initialFood && query.trim().length < 2;
 
   function resetAmountForServing(
     serving: NonNullable<ReturnType<typeof defaultFoodServing>>,
@@ -119,17 +130,39 @@ export default function AddFoodSheet({
     setBarcodeBusy(false);
     setManualBarcodeOpen(false);
     setManualBarcode("");
+    setFavoriteBusy(false);
   }
 
   useEffect(() => {
     if (!open) {
       resetToSearch();
+      setUsualFoods([]);
+      setFavoriteIds(new Set());
+      setUsualLoading(false);
       return;
     }
     if (initialFood) {
       openServingForFoodDetail(initialFood);
     }
-  }, [open, initialFood]);
+    setUsualLoading(true);
+    void fetchUsualFoods(meal)
+      .then((result) => {
+        if (!result.ok) {
+          setUsualFoods([]);
+          setFavoriteIds(new Set());
+          return;
+        }
+        setUsualFoods(result.foods);
+        setFavoriteIds(
+          new Set(
+            result.foods
+              .filter((food) => food.isFavorite)
+              .map((food) => food.foodId),
+          ),
+        );
+      })
+      .finally(() => setUsualLoading(false));
+  }, [open, initialFood, meal]);
 
   useEffect(() => {
     if (!open) return;
@@ -233,6 +266,57 @@ export default function AddFoodSheet({
     } finally {
       setLoadingDetail(false);
     }
+  }
+
+  async function pickUsualFood(food: UsualFoodItem) {
+    await pickFood({
+      foodId: food.foodId,
+      name: food.name,
+      brandName: food.brandName,
+      foodType: food.foodType,
+      description: food.description,
+      url: null,
+    });
+  }
+
+  async function toggleFavorite() {
+    if (!selectedFood || favoriteBusy) return;
+    const nextFavorite = !favoriteIds.has(selectedFood.foodId);
+    const serving = foodDetail ? defaultFoodServing(foodDetail.servings) : null;
+    setFavoriteBusy(true);
+    const result = await setFoodFavorite({
+      foodId: selectedFood.foodId,
+      favorite: nextFavorite,
+      servingId: serving?.servingId ?? null,
+      numberOfUnits: serving?.numberOfUnits ?? null,
+    });
+    setFavoriteBusy(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    setFavoriteIds((current) => {
+      const next = new Set(current);
+      if (nextFavorite) next.add(selectedFood.foodId);
+      else next.delete(selectedFood.foodId);
+      return next;
+    });
+    setUsualFoods((current) => {
+      if (nextFavorite) {
+        // Only star rows already in this meal's Usual (most-eaten); don't append.
+        return current.map((row) =>
+          row.foodId === selectedFood.foodId
+            ? { ...row, isFavorite: true }
+            : row,
+        );
+      }
+      return current.map((row) =>
+        row.foodId === selectedFood.foodId
+          ? { ...row, isFavorite: false }
+          : row,
+      );
+    });
+    toast.success(nextFavorite ? "Added to favorites" : "Removed from favorites");
   }
 
   async function saveEntry(
@@ -404,40 +488,8 @@ export default function AddFoodSheet({
             className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground disabled:opacity-50"
             autoFocus
           />
-          {searching ? <p className="text-sm text-muted">Searching…</p> : null}
-          {!searching && query.trim().length >= 2 && results.length === 0 ? (
-            <p className="text-sm text-muted">No foods found.</p>
-          ) : null}
-          <ul className="flex flex-col gap-1">
-            {results.map((food) => (
-              <li key={food.foodId}>
-                <button
-                  type="button"
-                  onClick={() => void pickFood(food)}
-                  disabled={barcodeBusy}
-                  className="flex w-full flex-col gap-0.5 rounded-xl border border-border bg-surface-hover px-3 py-2.5 text-left transition-colors hover:border-accent/40 disabled:opacity-50"
-                >
-                  <span className="text-sm font-medium text-foreground">
-                    {food.name}
-                    {food.brandName ? (
-                      <span className="font-normal text-muted">
-                        {" "}
-                        · {food.brandName}
-                      </span>
-                    ) : null}
-                  </span>
-                  {food.description ? (
-                    <span className="text-xs text-muted">
-                      {food.description}
-                    </span>
-                  ) : null}
-                </button>
-              </li>
-            ))}
-          </ul>
           {androidNative ? (
-            <div className="flex flex-col gap-2 border-t border-border pt-3">
-              <p className="text-xs font-medium text-muted">Or scan a barcode</p>
+            <div className="flex flex-col gap-2">
               <button
                 type="button"
                 onClick={() => void handleScanBarcode()}
@@ -481,11 +533,97 @@ export default function AddFoodSheet({
               )}
             </div>
           ) : null}
+          {showUsual ? (
+            <div className="flex flex-col gap-1.5">
+              <p className="px-1 text-xs font-medium text-muted">Usual</p>
+              {usualLoading ? (
+                <p className="px-1 text-sm text-muted">Loading…</p>
+              ) : usualFoods.length === 0 ? (
+                <p className="px-1 text-sm text-muted">
+                  Foods you eat often and favorites will show up here.
+                </p>
+              ) : (
+                <ul className="flex flex-col gap-1">
+                  {usualFoods.map((food) => (
+                    <li key={food.foodId}>
+                      <button
+                        type="button"
+                        onClick={() => void pickUsualFood(food)}
+                        disabled={barcodeBusy}
+                        className="flex w-full flex-col gap-0.5 rounded-xl border border-border bg-surface-hover px-3 py-2.5 text-left transition-colors hover:border-accent/40 disabled:opacity-50"
+                      >
+                        <span className="text-sm font-medium text-foreground">
+                          {food.isFavorite ? "★ " : null}
+                          {food.name}
+                          {food.brandName ? (
+                            <span className="font-normal text-muted">
+                              {" "}
+                              · {food.brandName}
+                            </span>
+                          ) : null}
+                        </span>
+                        {food.description ? (
+                          <span className="text-xs text-muted">
+                            {food.description}
+                          </span>
+                        ) : null}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : null}
+          {searching ? <p className="text-sm text-muted">Searching…</p> : null}
+          {!searching && query.trim().length >= 2 && results.length === 0 ? (
+            <p className="text-sm text-muted">No foods found.</p>
+          ) : null}
+          <ul className="flex flex-col gap-1">
+            {results.map((food) => (
+              <li key={food.foodId}>
+                <button
+                  type="button"
+                  onClick={() => void pickFood(food)}
+                  disabled={barcodeBusy}
+                  className="flex w-full flex-col gap-0.5 rounded-xl border border-border bg-surface-hover px-3 py-2.5 text-left transition-colors hover:border-accent/40 disabled:opacity-50"
+                >
+                  <span className="text-sm font-medium text-foreground">
+                    {food.name}
+                    {food.brandName ? (
+                      <span className="font-normal text-muted">
+                        {" "}
+                        · {food.brandName}
+                      </span>
+                    ) : null}
+                  </span>
+                  {food.description ? (
+                    <span className="text-xs text-muted">
+                      {food.description}
+                    </span>
+                  ) : null}
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
       ) : loadingDetail ? (
         <p className="text-sm text-muted">Loading servings…</p>
       ) : foodDetail && selectedServing ? (
         <div className="flex flex-col gap-1">
+          <div className="mb-1 flex justify-end">
+            <button
+              type="button"
+              onClick={() => void toggleFavorite()}
+              disabled={saving || favoriteBusy}
+              className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:border-accent/40 disabled:opacity-50"
+            >
+              {favoriteBusy
+                ? "Updating…"
+                : favoriteIds.has(selectedFood?.foodId ?? "")
+                  ? "★ Favorited"
+                  : "☆ Favorite"}
+            </button>
+          </div>
           <p className="text-xs font-medium text-muted">Serving size</p>
           <p className="text-sm font-medium text-foreground">
             {formatServingSizeLine(selectedServing)}

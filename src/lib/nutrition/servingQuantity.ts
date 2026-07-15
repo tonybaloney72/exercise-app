@@ -1,4 +1,7 @@
-import type { FoodServingOption } from "@/lib/fatsecret/foodDetail";
+import {
+  isLoggableFoodServing,
+  type FoodServingOption,
+} from "@/lib/fatsecret/foodDetail";
 import { servingScaleFactor } from "@/lib/nutrition/foodNutrition";
 
 const GRAMS_PER_OUNCE = 28.349523125;
@@ -11,9 +14,10 @@ export const WEIGHT_ENTRY_UNITS: readonly WeightEntryUnit[] = ["g", "oz", "lb"];
 export function defaultFoodServing(
   servings: readonly FoodServingOption[],
 ): FoodServingOption | null {
-  if (servings.length === 0) return null;
+  const loggable = servings.filter(isLoggableFoodServing);
+  if (loggable.length === 0) return null;
   return (
-    servings.find((serving) => servingHasMetricWeight(serving)) ?? servings[0]!
+    loggable.find((serving) => servingHasMetricWeight(serving)) ?? loggable[0]!
   );
 }
 

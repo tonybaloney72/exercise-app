@@ -18,9 +18,9 @@ Scan a product barcode (UPC/EAN), resolve it to a FatSecret food, then reuse the
 | Method     | `food.find_id_for_barcode.v2` (REST: `GET …/food/barcode/find-by-id/v2`)                                                                                                        |
 | Tier       | **Premier exclusive** - confirm your app has barcode enabled in the [FatSecret developer console](https://platform.fatsecret.com/)                                              |
 | Input      | **GTIN-13** string (13 digits, zero-padded left). UPC-A / EAN-13 / EAN-8 supported; UPC-E must convert to UPC-A first                                                           |
-| Success    | Same shape as `food.get.v2` - full food + servings (reuse `parseFoodDetailResponse` in `src/lib/fatsecret/foodDetail.ts`)                                                       |
+| Success    | Same shape as `food.get.v5` - full food + servings (reuse `parseFoodDetailResponse` in `src/lib/fatsecret/foodDetail.ts`)                                                       |
 | Not found  | API error **211** - show “No food for this barcode” + fallback to manual search                                                                                                 |
-| Auth today | Platform **OAuth 1.0** consumer signing via `fatsecretSignedRequest` (same as `foods.search`, `food.get.v2`) - verify barcode works on your Premier Free key before building UI |
+| Auth today | Platform **OAuth 1.0** consumer signing via `fatsecretSignedRequest` (same as `foods.search`, `food.get.v5`) - verify barcode works on your Premier Free key before building UI |
 
 ### Server work (next session)
 

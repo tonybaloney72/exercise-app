@@ -42,6 +42,16 @@ type RawFoodResponse = {
   };
 };
 
+/**
+ * food.get.v5 may include derived branded servings (e.g. 100 g) with
+ * serving_id "0". Those are display-only and cannot be logged via food_entry.create.
+ */
+export function isLoggableFoodServing(serving: {
+  servingId: string;
+}): boolean {
+  return serving.servingId !== "0";
+}
+
 function parseDecimal(value: string | undefined, fallback = 0): number {
   if (!value) return fallback;
   const parsed = Number.parseFloat(value);
@@ -51,7 +61,8 @@ function parseDecimal(value: string | undefined, fallback = 0): number {
 function mapServing(row: RawServing): FoodServingOption | null {
   const servingId = row.serving_id?.trim();
   const description = row.serving_description?.trim();
-  if (!servingId || !description) return null;
+  // Keep "0" (v5 standardized) but reject empty / missing ids.
+  if (servingId == null || servingId === "" || !description) return null;
 
   const metricAmountRaw = row.metric_serving_amount?.trim();
   const metricAmount =
@@ -90,7 +101,7 @@ export function parseFoodDetailResponse(payload: RawFoodResponse): FoodDetail | 
 
 export async function getFoodDetail(foodId: string): Promise<FoodDetail | null> {
   const payload = await fatsecretSignedRequest<RawFoodResponse>({
-    method: "food.get.v2",
+    method: "food.get.v5",
     params: { food_id: foodId },
   });
 
