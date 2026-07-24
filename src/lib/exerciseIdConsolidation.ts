@@ -22,6 +22,7 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   // B - duplicate HC rows (keep first of pair)
   "HC-062": "HC-061",
   "HC-077": "HC-076",
+  "HC-083": "HC-143", // Bent-over Dumbbell Row → Dumbbell Bent-Over Row
   "HC-175": "HC-174",
   "HC-190": "HC-189",
   "HC-228": "HC-227",
@@ -86,6 +87,7 @@ export const REMOVED_HYBRID_EXERCISE_IDS = new Set<string>([
   "HC-264",
   "HC-062",
   "HC-077",
+  "HC-083",
   "HC-175",
   "HC-190",
   "HC-228",

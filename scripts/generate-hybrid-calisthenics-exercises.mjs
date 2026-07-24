@@ -216,8 +216,8 @@ const PAGES = {
   Lats: {
     Bodyweight: ["Pullup", "Row", "Elbow Press", "Front Lever Raise"],
     "Resistance Bands": ["Band Row", "Band Lat Pulldown"],
-    Dumbbell: ["Bent-over Dumbbell Row"],
-    Barbell: ["Barbell Bent-over Row"],
+    Dumbbell: ["Dumbbell Bent-Over Row"],
+    Barbell: ["Barbell Bent-Over Row"],
     Machine: ["Lat Pulldown", "Machine Row", "Lat Pullover Machine"],
     Cable: ["Cable Lat Pulldown", "Cable Row", "Cable Lat Pushdown"],
   },
@@ -237,12 +237,12 @@ const PAGES = {
       "Band Pull-apart",
     ],
     Dumbbell: [
-      "Bent-over Dumbbell Row",
+      "Dumbbell Bent-Over Row",
       "Dumbbell Reverse Fly",
       "Dumbbell Y-raise",
       "Dumbbell Shrug",
     ],
-    Barbell: ["Barbell Bent-over Row", "Barbell Shrug"],
+    Barbell: ["Barbell Bent-Over Row", "Barbell Shrug"],
     Machine: [
       "T Bar Row",
       "Machine Reverse Fly",
@@ -254,8 +254,8 @@ const PAGES = {
   Rhomboids: {
     Bodyweight: ["Pullup", "Row", "Elbow Press", "Ring Reverse Fly"],
     "Resistance Bands": ["Band Row", "Band Reverse Fly", "Band Pull-apart"],
-    Dumbbell: ["Bent-over Dumbbell Row", "Dumbbell Reverse Fly"],
-    Barbell: ["Barbell Bent-over Row"],
+    Dumbbell: ["Dumbbell Bent-Over Row", "Dumbbell Reverse Fly"],
+    Barbell: ["Barbell Bent-Over Row"],
     Machine: ["T Bar Row", "Machine Reverse Fly", "Machine Row"],
     Cable: ["Cable Row", "Cable Reverse Fly"],
   },

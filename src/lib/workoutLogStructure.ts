@@ -16,6 +16,7 @@ import {
   type RoundCopyPrefs,
 } from "@/lib/dayPlanRoundCopy";
 import { MAX_DAY_ROUNDS } from "@/lib/dayRoundLimits";
+import { effectiveExerciseId } from "@/lib/exerciseSwap";
 import type {
   CardioActivityKind,
   ExerciseCategory,
@@ -108,9 +109,10 @@ function renumberRoundLogs(rounds: RoundLog[]): RoundLog[] {
 
 function roundExercisesFromLogs(logs: ExerciseLog[]): RoundExercise[] {
   return logs.map((ex) => {
-    const meta = exerciseMap[ex.exerciseId];
+    const id = effectiveExerciseId(ex);
+    const meta = exerciseMap[id];
     return {
-      exerciseId: ex.exerciseId,
+      exerciseId: id,
       targetReps: ex.targetPrescription ?? meta?.defaultReps ?? "",
       category: (meta?.category ?? "CB") as ExerciseCategory,
     };
@@ -125,7 +127,7 @@ function freshExerciseLogsFromCopy(
 ): ExerciseLog[] {
   if (mode === "repeat") {
     return sourceLogs.map((ex) => ({
-      exerciseId: ex.exerciseId,
+      exerciseId: effectiveExerciseId(ex),
       completed: false,
       skipped: false,
       targetPrescription: ex.targetPrescription,
@@ -153,7 +155,7 @@ function usedExerciseIdsInWorkout(
   rounds.forEach((round, index) => {
     if (index === skipRoundIndex) return;
     for (const ex of round.exercises) {
-      used.add(ex.exerciseId);
+      used.add(effectiveExerciseId(ex));
     }
   });
   return used;

@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync } from "fs";
 const REMOVED_HC = new Set([
   "HC-131", "HC-178", "HC-192", "HC-122", "HC-132", "HC-185", "HC-176", "HC-084",
   "HC-241", "HC-244", "HC-299", "HC-263", "HC-264",
-  "HC-062", "HC-077", "HC-175", "HC-190", "HC-228", "HC-277", "HC-279", "HC-282",
+  "HC-062", "HC-077", "HC-083", "HC-175", "HC-190", "HC-228", "HC-277", "HC-279", "HC-282",
   "HC-284", "HC-286", "HC-288", "HC-292", "HC-295",
 ]);
 

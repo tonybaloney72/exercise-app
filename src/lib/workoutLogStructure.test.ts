@@ -121,4 +121,48 @@ describe("workoutLogStructure", () => {
     });
     expect(next.rounds[1]?.exercises).toHaveLength(2);
   });
+
+  it("applyRoundCopyFromPriorInWorkout copies swapped exercises as seen", () => {
+    const prefs = {
+      availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
+      dislikedExerciseIds: new Set<string>(),
+    };
+    let log = insertEmptyRoundAt(emptyLog(), 1);
+    log = {
+      ...log,
+      rounds: log.rounds.map((r, i) =>
+        i === 0
+          ? {
+              ...r,
+              exercises: [
+                {
+                  exerciseId: "CB-1",
+                  swappedWith: "CB-3",
+                  completed: false,
+                  skipped: false,
+                  targetPrescription: "10",
+                },
+                {
+                  exerciseId: "CB-2",
+                  completed: false,
+                  skipped: false,
+                  targetPrescription: "8",
+                },
+              ],
+            }
+          : r,
+      ),
+    };
+    const next = applyRoundCopyFromPriorInWorkout(log, 2, "repeat", prefs);
+    expect(next.rounds[1]?.exercises.map((e) => e.exerciseId)).toEqual([
+      "CB-3",
+      "CB-2",
+    ]);
+    expect(next.rounds[1]?.exercises.every((e) => e.swappedWith == null)).toBe(
+      true,
+    );
+    expect(
+      next.rounds[1]?.exercises.map((e) => e.targetPrescription),
+    ).toEqual(["10", "8"]);
+  });
 });

@@ -9,6 +9,86 @@ import { fileURLToPath, pathToFileURL } from "url";
 
 /** @typedef {{ pattern: RegExp; note: string }} NoteRule */
 
+/**
+ * Exact notes keyed by exercise name. Checked before pattern rules so each
+ * curated exercise keeps its own cue instead of sharing a family template.
+ * @type {Record<string, string>}
+ */
+const NOTE_BY_NAME = {
+  "Band Biceps Curl":
+    "Stand on the band; curl hands toward shoulders with elbows pinned at your sides, lower slowly.",
+  "Band Hammer Curl":
+    "Neutral grip on the band; curl without swinging, elbows stay at your sides.",
+  "Band Resisted Lying Hamstring Curl":
+    "Lie face down; curl heels toward glutes against the band, keep hips down, lower slowly.",
+  "Band Resisted Sitting Hamstring Curl":
+    "Seated; curl heels under against the band, keep hips planted, control the return.",
+  "Band Reverse Curl":
+    "Overhand grip on the band; curl with elbows pinned, emphasize forearms and brachialis.",
+  "Barbell Curl":
+    "Underhand grip on the bar; curl with elbows fixed at your sides and lower under control.",
+  "Barbell Drag Curl":
+    "Drag the bar up along your torso; elbows travel back while the bar stays close to the body.",
+  "Barbell Reverse Curl":
+    "Overhand grip on the bar; curl with elbows pinned, emphasize forearms and brachialis.",
+  "Barbell Reverse Wrist Curl":
+    "Forearms supported on a bench, palms down on the bar; extend wrists through full range under control.",
+  "Barbell Wrist Curl":
+    "Forearms supported on a bench, palms up on the bar; curl by flexing wrists through full range.",
+  "Cable Curl":
+    "Curl the cable handle with elbows fixed at your sides; control the return against the stack.",
+  "Cable Hammer Curl":
+    "Neutral-grip cable curl; elbows fixed, no swing, squeeze at the top.",
+  "Cable Reverse Curl":
+    "Overhand cable curl; elbows pinned, emphasize forearms and brachialis.",
+  "Cable Reverse Wrist Curl":
+    "Forearms braced, palms down on the handle; extend wrists against the cable through full range.",
+  "Cable Wrist Curl":
+    "Forearms braced, palms up on the handle; flex wrists against the cable through full range.",
+  "Dumbbell Drag Curl":
+    "Drag dumbbells up along your torso; elbows travel back while weights stay close to the body.",
+  "Dumbbell Hammer Curl":
+    "Neutral grip; curl without swinging, elbows stay at your sides.",
+  "Dumbbell Preacher Curl":
+    "Upper arms on the pad; curl through full range and lower slowly without bouncing at the bottom.",
+  "Dumbbell Reverse Curl":
+    "Overhand grip; curl with elbows pinned, emphasize forearms and brachialis.",
+  "Dumbbell Reverse Wrist Curl":
+    "Forearms supported, palms down holding dumbbells; extend wrists through full range under control.",
+  "Dumbbell Spider Curl":
+    "Chest on incline bench, arms hanging; curl dumbbells up and lower without swinging.",
+  "Dumbbell Wrist Curl":
+    "Forearms supported, palms up holding dumbbells; curl by flexing wrists through full range.",
+  "Face away Cable Curl":
+    "Face away from the stack so the cable pulls elbows back; curl from a long biceps stretch.",
+  "High Cable Curl":
+    "Arms start high from the cable; curl hands toward shoulders, keep upper arms steady.",
+  "Incline Dumbbell Curl":
+    "On an incline bench; let arms hang for a stretch, curl without swinging the torso.",
+  "Lying Cable Hamstring Curl":
+    "Lie face down; curl heels toward glutes against the cable, hips down, control the eccentric.",
+  "Lying Hamstring Curl Machine":
+    "Lie face down on the machine; curl heels toward glutes, keep hips pressed down.",
+  "Nordic Curl":
+    "Kneel with ankles secured; lower torso forward under control, then pull back with hamstrings.",
+  "Pelican Curl":
+    "On rings, lean into a deep biceps stretch with arms extended; curl rings toward shoulders with control.",
+  "Preacher Curl Machine":
+    "Upper arms on the pad; curl through full range and lower slowly without bouncing.",
+  "Reverse Ring Curl":
+    "On rings with overhand grip; curl by flexing elbows, control the descent.",
+  "Ring Curl":
+    "On rings with underhand grip; curl by flexing elbows, control the descent.",
+  "Sitting Hamstring Curl Machine":
+    "Seated on the machine; curl heels under the pad, keep hips planted, control the return.",
+  "Standing Cable Hamstring Curl":
+    "Stand tall; curl one heel toward the glute against the cable, keep hips square.",
+  "Standing Dumbbell Curl":
+    "Stand tall; curl dumbbells with elbows at your sides, avoid swinging the torso.",
+  "Zottman Curl":
+    "Curl palms-up, rotate to palms-down at the top, then lower with an overhand grip.",
+};
+
 /** @type {NoteRule[]} */
 const NOTE_RULES = [
   {
@@ -120,7 +200,7 @@ const NOTE_RULES = [
     note: "Lower until upper arms are roughly parallel; press up without flaring elbows wide.",
   },
   {
-    pattern: /pullup|chin up|commando pullup|pelican curl/i,
+    pattern: /pullup|chin up|commando pullup/i,
     note: "Full hang to start; pull until chin clears the bar, lower with control.",
   },
   {
@@ -217,8 +297,8 @@ const NOTE_RULES = [
   },
   {
     pattern:
-      /curl|zottman|spider curl|preacher curl|face away cable curl|high cable curl|ring curl|reverse ring curl|pelican curl/i,
-    note: "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      /reverse wrist curl|wrist extension|wrist flexion|band wrist|barbell wrist|cable wrist|dumbbell wrist|reverse wrist|wrist curl/i,
+    note: "Forearms supported; flex or extend wrists through full range under control.",
   },
   {
     pattern:
@@ -227,13 +307,48 @@ const NOTE_RULES = [
   },
   {
     pattern:
-      /reverse curl|band reverse curl|barbell reverse curl|dumbbell reverse curl|cable reverse curl/i,
+      /reverse curl|band reverse curl|barbell reverse curl|dumbbell reverse curl|cable reverse curl|reverse ring curl/i,
     note: "Overhand grip; curl with elbows pinned, emphasize forearms and brachialis.",
   },
   {
-    pattern:
-      /wrist curl|wrist extension|wrist flexion|band wrist|barbell wrist|cable wrist|dumbbell wrist|reverse wrist/i,
-    note: "Forearms supported; flex or extend wrists through full range under control.",
+    pattern: /drag curl/i,
+    note: "Drag the load up along the torso; elbows travel back while the weight stays close to the body.",
+  },
+  {
+    pattern: /spider curl/i,
+    note: "Chest supported, arms hanging; curl through full range and lower without swinging.",
+  },
+  {
+    pattern: /preacher curl/i,
+    note: "Upper arms on the pad; curl through full range and lower slowly without bouncing.",
+  },
+  {
+    pattern: /zottman/i,
+    note: "Curl palms-up, rotate to palms-down at the top, then lower with an overhand grip.",
+  },
+  {
+    pattern: /face away cable curl/i,
+    note: "Face away from the stack so the cable pulls elbows back; curl from a long biceps stretch.",
+  },
+  {
+    pattern: /high cable curl/i,
+    note: "Arms start high from the cable; curl hands toward shoulders, keep upper arms steady.",
+  },
+  {
+    pattern: /incline.*curl/i,
+    note: "On an incline; let arms hang for a stretch, curl without swinging the torso.",
+  },
+  {
+    pattern: /pelican curl/i,
+    note: "On rings, lean into a deep biceps stretch; curl rings toward shoulders with control.",
+  },
+  {
+    pattern: /ring curl/i,
+    note: "On rings; curl by flexing elbows through full range, control the descent.",
+  },
+  {
+    pattern: /\bcurl\b/i,
+    note: "Curl with elbows fixed at your sides; full range up and controlled lower on the way down.",
   },
   {
     pattern: /pronation|supination|band pronation|band supination/i,
@@ -341,13 +456,40 @@ const CATEGORY_FALLBACK = {
   SW: "Move slowly through range; prioritize control over speed.",
 };
 
+const STALE_ELBOW_CURL_NOTE =
+  "Curl with elbows fixed; full range up and controlled lower on the way down.";
+
 export function isGenericHcNote(notes) {
   return (
     typeof notes === "string" &&
     (notes.includes("Muscle focus:") ||
       notes.includes("Reference: Hybrid Calisthenics exercise library") ||
-      notes.includes("Perform with controlled tempo; see the linked video"))
+      notes.includes("Perform with controlled tempo; see the linked video") ||
+      notes === STALE_ELBOW_CURL_NOTE)
   );
+}
+
+/**
+ * Prefer the longest matched substring so specific rules beat broad ones
+ * (e.g. "hammer curl" wins over "curl") regardless of rule list order.
+ * @param {string} name
+ * @returns {string | null}
+ */
+function noteFromBestPattern(name) {
+  let bestNote = null;
+  let bestLen = -1;
+
+  for (const { pattern, note } of NOTE_RULES) {
+    const match = name.match(pattern);
+    if (!match) continue;
+    const len = match[0].length;
+    if (len > bestLen) {
+      bestLen = len;
+      bestNote = note;
+    }
+  }
+
+  return bestNote;
 }
 
 /**
@@ -355,9 +497,11 @@ export function isGenericHcNote(notes) {
  * @param {string} [category]
  */
 export function generateHcNote(name, category = "UP") {
-  for (const { pattern, note } of NOTE_RULES) {
-    if (pattern.test(name)) return note;
-  }
+  if (NOTE_BY_NAME[name]) return NOTE_BY_NAME[name];
+
+  const fromPattern = noteFromBestPattern(name);
+  if (fromPattern) return fromPattern;
+
   return (
     CATEGORY_FALLBACK[category] ??
     "Controlled tempo; full range of motion on every rep."
@@ -442,8 +586,13 @@ function enrichHybridCatalog() {
 
     let out = block;
 
-    if (notes && isGenericHcNote(notes)) {
-      const newNote = generateHcNote(name, category ?? "UP");
+    const newNote = generateHcNote(name, category ?? "UP");
+    const shouldUpdateNotes =
+      NOTE_BY_NAME[name] != null
+        ? notes !== newNote
+        : Boolean(notes && isGenericHcNote(notes) && notes !== newNote);
+
+    if (shouldUpdateNotes) {
       out = setField(out, "notes", newNote);
       noteChanges += 1;
     }

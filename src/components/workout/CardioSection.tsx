@@ -55,6 +55,7 @@ export default function CardioSection({
         onClose={() => setAddOpen(false)}
         onPick={(kind) => {
           onAddCardio(kind);
+          setAddOpen(false);
           setIsOpen(true);
         }}
       />

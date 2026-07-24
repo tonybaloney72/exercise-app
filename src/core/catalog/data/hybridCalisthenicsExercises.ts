@@ -178,7 +178,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Stand on the band; curl hands toward shoulders with elbows pinned at your sides, lower slowly.",
     source: "LGN Lyfestile",
     videoUrl: "https://www.youtube.com/watch?v=20xtfGZ37nw",
     isTimeBased: false,
@@ -329,7 +329,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Neutral grip on the band; curl without swinging, elbows stay at your sides.",
     source: "ConquerHer Fitness",
     videoUrl: "https://www.youtube.com/watch?v=nXHTK7s0CFM",
     isTimeBased: false,
@@ -720,7 +720,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Lie face down; curl heels toward glutes against the band, keep hips down, lower slowly.",
     source: "Testosterone Nation",
     videoUrl: "https://www.youtube.com/watch?v=LtTcXXgeRYo",
     isTimeBased: false,
@@ -743,7 +743,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Seated; curl heels under against the band, keep hips planted, control the return.",
     source: "Clench Fitness",
     videoUrl: "https://www.youtube.com/watch?v=9nEyLG-mjxg",
     isTimeBased: false,
@@ -878,7 +878,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Overhand grip on the band; curl with elbows pinned, emphasize forearms and brachialis.",
     source: "66 Days Fitness Coaching",
     videoUrl: "https://www.youtube.com/watch?v=3gjEi1TxyHs",
     isTimeBased: false,
@@ -1303,7 +1303,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Underhand grip on the bar; curl with elbows fixed at your sides and lower under control.",
     source: "Testosterone Nation",
     videoUrl: "https://www.youtube.com/watch?v=ZQWL7omZh94",
     isTimeBased: false,
@@ -1325,7 +1325,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Drag the bar up along your torso; elbows travel back while the bar stays close to the body.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=ZHa0OAcn7Bc",
     isTimeBased: false,
@@ -1430,7 +1430,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Overhand grip on the bar; curl with elbows pinned, emphasize forearms and brachialis.",
     source: "Capital University Athletics",
     videoUrl: "https://www.youtube.com/watch?v=ahDqj6yPy5M",
     isTimeBased: false,
@@ -1452,7 +1452,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Forearms supported on a bench, palms down on the bar; extend wrists through full range under control.",
     source: "A2Z ",
     videoUrl: "https://www.youtube.com/watch?v=NcDp9dkWr7g",
     isTimeBased: false,
@@ -1646,7 +1646,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Forearms supported on a bench, palms up on the bar; curl by flexing wrists through full range.",
     source: "Andres Suarez",
     videoUrl: "https://www.youtube.com/watch?v=jPsOEeTt_Js",
     isTimeBased: false,
@@ -1674,29 +1674,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     videoUrl: "https://www.youtube.com/watch?v=NcMjGCO_-J0",
     isTimeBased: false,
   },
-  {
-    id: "HC-083",
-    name: "Bent-over Dumbbell Row",
-    category: "UPL",
-    equipment: ["dumbbell"],
-    expertiseLevel: "novice",
-    muscleGroups: [
-      "Biceps",
-      "Brachialis",
-      "Forearms",
-      "Lats",
-      "Rear Deltoids",
-      "Rhomboids",
-      "Traps",
-    ],
-    defaultReps: "10",
-    notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
-    source: "The Strength Center",
-    videoUrl: "https://www.youtube.com/watch?v=IOOLhrkN_NI",
-    isTimeBased: false,
-  },
-
   {
     id: "HC-085",
     name: "Cable Chest Fly",
@@ -1770,7 +1747,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Curl the cable handle with elbows fixed at your sides; control the return against the stack.",
     source: "Colossus Fitness",
     videoUrl: "https://www.youtube.com/watch?v=2MUEL4nL6hA",
     isTimeBased: false,
@@ -1901,7 +1878,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Neutral-grip cable curl; elbows fixed, no swing, squeeze at the top.",
     source: "Kraken Fitness",
     videoUrl: "https://www.youtube.com/watch?v=p1XzMk3gsU0",
     isTimeBased: false,
@@ -2250,7 +2227,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Overhand cable curl; elbows pinned, emphasize forearms and brachialis.",
     source: "ChadMollickDotCom",
     videoUrl: "https://www.youtube.com/watch?v=HwB-DevuJjU",
     isTimeBased: false,
@@ -2296,7 +2273,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Forearms braced, palms down on the handle; extend wrists against the cable through full range.",
     source: "Fit Prabh",
     videoUrl: "https://www.youtube.com/watch?v=LNckss7fzx4",
     isTimeBased: false,
@@ -2443,7 +2420,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Forearms braced, palms up on the handle; flex wrists against the cable through full range.",
     source: "BrooklynFitness ",
     videoUrl: "https://www.youtube.com/watch?v=PVEDWd2FjHM",
     isTimeBased: false,
@@ -2841,7 +2818,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Drag dumbbells up along your torso; elbows travel back while weights stay close to the body.",
     source: "My PT Hub",
     videoUrl: "https://www.youtube.com/watch?v=5PdEraHkF1A",
     isTimeBased: false,
@@ -2923,8 +2900,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Traps",
     ],
     defaultReps: "10",
-    notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+    notes: "Neutral grip; curl without swinging, elbows stay at your sides.",
     source: "Daily Workout Builder",
     videoUrl: "https://www.youtube.com/watch?v=VqoFbCmRyyk",
     isTimeBased: false,
@@ -3039,7 +3015,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-154",
     name: "Dumbbell Preacher Curl",
     category: "UPL",
-    equipment: ["dumbbell"],
+    equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Biceps",
@@ -3052,7 +3028,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Upper arms on the pad; curl through full range and lower slowly without bouncing at the bottom.",
     source: "Luke Selway | Strength Coaching Online",
     videoUrl: "https://www.youtube.com/watch?v=Mg0NnlF5NZQ",
     isTimeBased: false,
@@ -3095,7 +3071,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Overhand grip; curl with elbows pinned, emphasize forearms and brachialis.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=hUA-fIpM7nA",
     isTimeBased: false,
@@ -3141,7 +3117,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Forearms supported, palms down holding dumbbells; extend wrists through full range under control.",
     source: "Blue Collar Fitness",
     videoUrl: "https://www.youtube.com/watch?v=cRLJ86m00cU",
     isTimeBased: false,
@@ -3242,7 +3218,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Chest on incline bench, arms hanging; curl dumbbells up and lower without swinging.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=ke2shAeQ0O8",
     isTimeBased: false,
@@ -3376,7 +3352,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Forearms supported, palms up holding dumbbells; curl by flexing wrists through full range.",
     source: "Kraken Fitness",
     videoUrl: "https://www.youtube.com/watch?v=M8TpHw5aYgA",
     isTimeBased: false,
@@ -3462,7 +3438,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Face away from the stack so the cable pulls elbows back; curl from a long biceps stretch.",
     source: "Kaitlin Daur",
     videoUrl: "https://www.youtube.com/watch?v=eajnajdu6lw",
     isTimeBased: false,
@@ -3660,7 +3636,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Arms start high from the cable; curl hands toward shoulders, keep upper arms steady.",
     source: "High Performance Muscle",
     videoUrl: "https://www.youtube.com/watch?v=xaMJYDzqTZg",
     isTimeBased: false,
@@ -3763,7 +3739,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "On an incline bench; let arms hang for a stretch, curl without swinging the torso.",
     source: "TylerPath",
     videoUrl: "https://www.youtube.com/watch?v=XhIsIcjIbCw",
     isTimeBased: false,
@@ -3934,7 +3910,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Lie face down; curl heels toward glutes against the cable, hips down, control the eccentric.",
     source: "Hammer Fitness",
     videoUrl: "https://www.youtube.com/watch?v=Atl5qhOfJpQ",
     isTimeBased: false,
@@ -3957,7 +3933,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Lie face down on the machine; curl heels toward glutes, keep hips pressed down.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=d6sg829PgNs",
     isTimeBased: false,
@@ -4153,7 +4129,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Kneel with ankles secured; lower torso forward under control, then pull back with hamstrings.",
     source: "Wittenberg University Strength and Conditioning",
     videoUrl: "https://www.youtube.com/watch?v=7o_-YMUdLdM",
     isTimeBased: false,
@@ -4203,7 +4179,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Full hang to start; pull until chin clears the bar, lower with control.",
+      "On rings, lean into a deep biceps stretch with arms extended; curl rings toward shoulders with control.",
     source: "The Bodyweight Process",
     videoUrl: "https://www.youtube.com/watch?v=YCSZNJkrYag",
     isTimeBased: false,
@@ -4326,7 +4302,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Upper arms on the pad; curl through full range and lower slowly without bouncing.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=S4dDLfp3e8w",
     isTimeBased: false,
@@ -4497,7 +4473,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "On rings with overhand grip; curl by flexing elbows, control the descent.",
     source: "Nick Ball Training",
     videoUrl: "https://www.youtube.com/watch?v=adTY0XNPpWc",
     isTimeBased: false,
@@ -4519,7 +4495,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "On rings with underhand grip; curl by flexing elbows, control the descent.",
     source: "Get Fit With Viktor",
     videoUrl: "https://www.youtube.com/watch?v=jNeKcCxoWBk",
     isTimeBased: false,
@@ -4831,7 +4807,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Seated on the machine; curl heels under the pad, keep hips planted, control the return.",
     source: "Andy Tait",
     videoUrl: "https://www.youtube.com/watch?v=UgKMi-g4RM8",
     isTimeBased: false,
@@ -4998,7 +4974,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Stand tall; curl one heel toward the glute against the cable, keep hips square.",
     source: "Propel Fitness Center",
     videoUrl: "https://www.youtube.com/watch?v=bkwW1flKchc",
     isTimeBased: false,
@@ -5020,7 +4996,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Stand tall; curl dumbbells with elbows at your sides, avoid swinging the torso.",
     source: "Chris McCarthy",
     videoUrl: "https://www.youtube.com/watch?v=6DeLZ6cbgWQ",
     isTimeBased: false,
@@ -5617,9 +5593,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Curl with elbows fixed; full range up and controlled lower on the way down.",
+      "Curl palms-up, rotate to palms-down at the top, then lower with an overhand grip.",
     source: "ScottHermanFitness",
-    videoUrl: "https://www.youtube.com/watch?v=ZrpRBgswtHs",
+    videoUrl: "https://www.youtube.com/watch?v=ZrpRBgswtHs&t=36s",
     isTimeBased: false,
   },
 ];
