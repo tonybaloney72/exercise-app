@@ -32,6 +32,10 @@ import {
   prepareCompleteWorkout,
 } from "@/use-cases/workout/completeWorkout";
 import {
+  seedDefaultWeightIfUnset,
+  seedDefaultWeightsFromWorkout,
+} from "@/lib/applySeedDefaultExerciseWeight";
+import {
   buildEmptyCardioLogs,
   CARDIO_KIND_TO_EXERCISE_ID,
   resolveCardioActivities,
@@ -69,6 +73,7 @@ import {
 } from "@/lib/activeWorkoutMutations";
 import {
   clearExerciseMetrics,
+  effectiveExerciseId,
   hydrateWorkoutLog,
 } from "@/utils/exerciseLogDefaults";
 import { scaledDefaultTimerSeconds } from "@/lib/prescriptionScaling";
@@ -308,6 +313,11 @@ interface WorkoutState {
   toggleCoolDownStretch: (exerciseId: string) => void;
   toggleExercise: (roundNumber: number, exerciseId: string) => void;
   setActualReps: (roundNumber: number, exerciseId: string, reps: number | undefined) => void;
+  setActualWeight: (
+    roundNumber: number,
+    exerciseId: string,
+    weightLb: number | undefined,
+  ) => void;
   setActualDuration: (
     roundNumber: number,
     exerciseId: string,
@@ -466,6 +476,10 @@ function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
         skipped: false,
         targetPrescription,
         loggingMode: resolved.defaultSetMode,
+        weightLb:
+          resolved.defaultWeightLb != null && resolved.defaultWeightLb > 0
+            ? resolved.defaultWeightLb
+            : undefined,
         targetDurationSeconds: seedTimerTargetSecondsFromResolved(
           resolved,
           meta
@@ -820,7 +834,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
       };
     }),
 
-  toggleExercise: (roundNumber, exerciseId) =>
+  toggleExercise: (roundNumber, exerciseId) => {
     set((state) => {
       if (!state.activeWorkout) return state;
       const rounds = mapRoundExercises(
@@ -830,7 +844,15 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         toggleExerciseCompletion,
       );
       return { activeWorkout: { ...state.activeWorkout, rounds } };
-    }),
+    });
+    const workout = get().activeWorkout;
+    const log = workout?.rounds
+      .find((r) => r.roundNumber === roundNumber)
+      ?.exercises.find((ex) => ex.exerciseId === exerciseId);
+    if (log?.completed && !log.skipped && log.weightLb != null) {
+      void seedDefaultWeightIfUnset(effectiveExerciseId(log), log.weightLb);
+    }
+  },
 
   setActualReps: (roundNumber, exerciseId, reps) =>
     set((state) => {
@@ -840,6 +862,22 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
         roundNumber,
         exerciseId,
         (ex) => ({ ...ex, actualReps: reps ?? undefined }),
+      );
+      return { activeWorkout: { ...state.activeWorkout, rounds } };
+    }),
+
+  setActualWeight: (roundNumber, exerciseId, weightLb) =>
+    set((state) => {
+      if (!state.activeWorkout) return state;
+      const rounds = mapRoundExercises(
+        state.activeWorkout.rounds,
+        roundNumber,
+        exerciseId,
+        (ex) => ({
+          ...ex,
+          weightLb:
+            weightLb != null && weightLb > 0 ? weightLb : undefined,
+        }),
       );
       return { activeWorkout: { ...state.activeWorkout, rounds } };
     }),
@@ -1686,6 +1724,9 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
 
     if (result.ok) {
       clearWorkoutCompleting(inProgress.id);
+      void seedDefaultWeightsFromWorkout(result.completed).catch(() => {
+        // Library default seed is best-effort; workout already saved.
+      });
       void writeCompletedWorkoutToHealth(result.completed).catch(() => {
         // Optional mirror to Health Connect; in-app completion already succeeded.
       });

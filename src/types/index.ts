@@ -99,6 +99,11 @@ export interface ExerciseSettingsValues {
   defaultTimerSeconds?: number | null;
   /** Rep target for reps mode; omit or null when mode is timer. */
   defaultTargetReps?: number | null;
+  /**
+   * Working load (lb) for loadable exercises. Used as the default when starting
+   * a set and for double-progression suggestions.
+   */
+  defaultWeightLb?: number | null;
   /** When true, rep-increase suggestions are suppressed for this exercise. */
   repSuggestionIgnored?: boolean;
   /** Local date key (`YYYY-MM-DD`); suggestions resume after this day. */
@@ -215,6 +220,11 @@ export interface ExerciseLog {
   completed: boolean;
   actualReps?: number;
   /**
+   * Working load used for this set (pounds). Optional; only for loadable
+   * equipment (dumbbell, kettlebell, barbell plates, etc.).
+   */
+  weightLb?: number;
+  /**
    * Logged time performed (timer mode), when different from the planned countdown.
    * Optional override - if omitted when completing, we default from `targetDurationSeconds` / prescription.
    */
@@ -315,6 +325,35 @@ export type ThemeMode = "auto" | "light" | "dark";
 /** Used for BMR formulas (Mifflin–St Jeor). */
 export type BodySexAtBirth = "male" | "female";
 
+/**
+ * Equipment kinds that carry discrete load inventory (dumbbells, plates, etc.).
+ * Cable/machine stacks are continuous and not inventoried here.
+ */
+export type WeightInventoryKind =
+  | "dumbbell"
+  | "kettlebell"
+  | "barbell"
+  | "medicine_ball";
+
+/** One owned denomination (e.g. a 15 lb dumbbell, or a 45 lb plate). */
+export type WeightInventoryEntry = {
+  /** Mass in pounds (canonical; matches body-weight logging). */
+  weightLb: number;
+  /**
+   * How many of this denomination the user owns.
+   * Dumbbells: usually pairs (2). Plates: total plates of that size.
+   */
+  count?: number;
+};
+
+/**
+ * Owned free-weight inventory by equipment kind.
+ * For `barbell`, entries are plate denominations (not the bar itself).
+ */
+export type WeightInventory = Partial<
+  Record<WeightInventoryKind, WeightInventoryEntry[]>
+>;
+
 export interface UserSettings {
   restBetweenRounds: number;
   weekStartDate?: string;
@@ -402,6 +441,11 @@ export interface UserSettings {
    * targets (Today post-workout only).
    */
   suggestRepIncreases: boolean;
+  /**
+   * Free-weight masses the user owns (lb). Used for load progression suggestions.
+   * Keys are loadable equipment kinds; values are sorted unique denominations.
+   */
+  weightInventory: WeightInventory;
   /** Sex at birth for passive calorie (BMR) estimates. */
   bodySexAtBirth?: BodySexAtBirth | null;
   /** `YYYY-MM-DD` local birth date for age-based BMR. */

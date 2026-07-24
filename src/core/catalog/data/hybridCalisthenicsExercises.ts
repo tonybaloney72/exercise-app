@@ -32,7 +32,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
+      "Seated at the machine; curl ribs toward hips against the pad, exhale on the effort, avoid pulling on the neck.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=mnRhbUB3Fjs",
     isTimeBased: false,
@@ -54,7 +54,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press leg out against resistance; control the return without letting weight slam.",
+      "Seated at the machine with pads on the outside of the knees; press knees apart against the resistance, control the return.",
     source: "Forma Gym",
     videoUrl: "https://www.youtube.com/watch?v=dL92FqMJqVY",
     isTimeBased: false,
@@ -76,7 +76,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Squeeze legs together against resistance; smooth motion, full controlled range.",
+      "Seated at the machine with pads on the inside of the knees; squeeze knees together against the resistance, control the release.",
     source: "Colossus Fitness",
     videoUrl: "https://www.youtube.com/watch?v=MLBm7i341Rw",
     isTimeBased: false,
@@ -199,7 +199,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Band anchored behind you; press the handles forward from chest level, extending fully without locking the elbows hard.",
     source: "LGN Lyfestile",
     videoUrl: "https://www.youtube.com/watch?v=T0UJ0W-_yIE",
     isTimeBased: false,
@@ -218,7 +218,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Stand on the band with feet hip-width; hinge and grip the handles, then drive hips forward to stand tall.",
     source: "LGN Lyfestile",
     videoUrl: "https://www.youtube.com/watch?v=zTSKROuBMNY",
     isTimeBased: false,
@@ -241,7 +241,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
+      "Elbow pinned at 90 degrees at your side; rotate the forearm outward against the band, keeping the elbow still.",
     source: "Gear Up Physical Therapy and Wellness",
     videoUrl: "https://www.youtube.com/watch?v=dS9ORQCnWsE",
     isTimeBased: false,
@@ -264,7 +264,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward face with elbows high; externally rotate at the end of the rep.",
+      "Anchor the band at face height; pull toward your face leading with the elbows, finishing with hands by your ears.",
     source: "Men's Health",
     videoUrl: "https://www.youtube.com/watch?v=CSP7YpPv3ds",
     isTimeBased: false,
@@ -284,7 +284,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms to shoulder height with soft elbows; lower without swinging.",
+      "Stand on the band; raise both hands to shoulder height with soft elbows, lower under control.",
     source: "STRAFFR",
     videoUrl: "https://www.youtube.com/watch?v=9cDGMzxXVcU",
     isTimeBased: false,
@@ -307,7 +307,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
+      "Band around the ankles, hinge slightly forward; kick one leg back and out on a diagonal to target glute med.",
     source: "Paragon Training Methods",
     videoUrl: "https://www.youtube.com/watch?v=Z62kaaLCWfE",
     isTimeBased: false,
@@ -351,7 +351,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press leg out against resistance; control the return without letting weight slam.",
+      "Band around the ankles or knees; lift one leg out to the side against the band, keep your torso still.",
     source: "Incline Strength & Fitness",
     videoUrl: "https://www.youtube.com/watch?v=z_gJepa56CU",
     isTimeBased: false,
@@ -373,7 +373,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Squeeze legs together against resistance; smooth motion, full controlled range.",
+      "Band anchored to the side; pull the working leg across your body against the band, control the return.",
     source: "PersonalBestOz",
     videoUrl: "https://www.youtube.com/watch?v=WMtrDM8HsX0",
     isTimeBased: false,
@@ -396,7 +396,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
+      "Elbow pinned at 90 degrees at your side; rotate the forearm inward against the band, keeping the elbow still.",
     source: "Gear Up Physical Therapy and Wellness",
     videoUrl: "https://www.youtube.com/watch?v=w8R0nUp347M",
     isTimeBased: false,
@@ -419,7 +419,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
+      "Band around the ankles on all fours or standing; extend one leg straight back, squeeze the glute at the top.",
     source: "AZ PRIVATE GYM",
     videoUrl: "https://www.youtube.com/watch?v=pOZtZYVJphw",
     isTimeBased: false,
@@ -441,7 +441,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
+      "Anchor the band overhead; pull the handles down to chest level, driving elbows down and back.",
     source: "Neil & Linds - RWND Fit",
     videoUrl: "https://www.youtube.com/watch?v=8zv8Pray4-w",
     isTimeBased: false,
@@ -462,7 +462,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
+      "Stand on the band; raise arms out to the sides to shoulder height, leading with the elbows.",
     source: "Evan Harrison",
     videoUrl: "https://www.youtube.com/watch?v=__0jIbOwnfI",
     isTimeBased: false,
@@ -476,7 +476,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
-      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
+      "Anchor the band overhead to one side; crunch ribs toward the opposite hip, keeping the motion in the obliques.",
     source: "Joe Leone",
     videoUrl: "https://www.youtube.com/watch?v=6kv9jZSCQnM",
     isTimeBased: false,
@@ -497,7 +497,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
+      "Stand on the band; press hands overhead from shoulder height, avoiding an arch in the lower back.",
     source: "LGN Lyfestile",
     videoUrl: "https://www.youtube.com/watch?v=1-VfJqjYquQ",
     isTimeBased: false,
@@ -517,7 +517,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Keep upper arms still; extend elbows fully, lower weight with control.",
+      "Band anchored low behind you; lower the handle behind your head with elbows pointed forward, then extend.",
     source: "FitnessBlender",
     videoUrl: "https://www.youtube.com/watch?v=Yi_zNoIsNcc",
     isTimeBased: false,
@@ -531,7 +531,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
-      "Press band or cable straight out from chest; resist rotation and hold a tall posture.",
+      "Band anchored to your side at chest height; press straight out in front of you, resisting the pull to rotate.",
     source: "Queens University of Charlotte Sports Performance",
     videoUrl: "https://www.youtube.com/watch?v=99evyH71IWs",
     isTimeBased: false,
@@ -552,7 +552,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
+      "Band anchored behind you at chest height; sweep the handle across your body in a hugging arc.",
     source: "PT LevelUp",
     videoUrl: "https://www.youtube.com/watch?v=Z169-oD7Pl4",
     isTimeBased: false,
@@ -574,7 +574,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rotate forearm slowly against band resistance; keep elbow stable at your side.",
+      "Elbow pinned at your side holding a bar or handle on the band; rotate the palm downward against the resistance.",
     source: "CHC Wellness SEK",
     videoUrl: "https://www.youtube.com/watch?v=uxLwKX9BIkQ",
     isTimeBased: false,
@@ -619,7 +619,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rise onto toes with control; pause at top, lower heels below platform if available.",
+      "Band over the knees while seated, knees bent; rise onto your toes against the band, pause at the top.",
     source: "PRIME Physical Performance",
     videoUrl: "https://www.youtube.com/watch?v=DU0s3wT5o7Q",
     isTimeBased: false,
@@ -633,7 +633,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
+      "Anchor the band behind you; crunch ribs toward hips against the resistance, exhale at the top.",
     source: "RADCENTRE",
     videoUrl: "https://www.youtube.com/watch?v=aHPw6OxR_ns",
     isTimeBased: false,
@@ -647,7 +647,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Glutes", "Hip Flexors", "Obliques", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
-      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
+      "Band anchored behind you, long step forward; lower into a deep lunge against the band's pull, drive back up.",
     source: "freeweight forge",
     videoUrl: "https://www.youtube.com/watch?v=IUGYDf1mWuk",
     isTimeBased: false,
@@ -661,7 +661,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Obliques"],
     defaultReps: "10",
     notes:
-      "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
+      "Hang from the bar with a band looped around your feet; raise your legs against the band, control the descent.",
     source: "Dayton Burnett",
     videoUrl: "https://www.youtube.com/watch?v=C5bgqCmcvds",
     isTimeBased: false,
@@ -683,7 +683,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Extend knees to straight; pause at top, lower without dropping the weight.",
+      "Band looped behind the ankle while seated; extend the knee straight against the band, lower slowly.",
     source: "Bodylastics",
     videoUrl: "https://www.youtube.com/watch?v=Nt3CMsVgKZU",
     isTimeBased: false,
@@ -697,7 +697,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
+      "Lying on your back with the band looped around your feet; raise legs against the band, keep your lower back down.",
     source: "Taylor Catrett",
     videoUrl: "https://www.youtube.com/watch?v=2pfCs_Vr4Jc",
     isTimeBased: false,
@@ -810,7 +810,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rise onto toes with control; pause at top, lower heels below platform if available.",
+      "Stand on the band with legs straight; rise onto your toes against the resistance, lower heels slowly.",
     source: "GB",
     videoUrl: "https://www.youtube.com/watch?v=U7PlGgKwuZA",
     isTimeBased: false,
@@ -833,7 +833,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Stand on the band with legs nearly straight; hinge at the hips with a soft knee bend, drive hips forward to finish.",
     source: "Resistbnd",
     videoUrl: "https://www.youtube.com/watch?v=uGJU-oOmJ7E",
     isTimeBased: false,
@@ -856,7 +856,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Dorsiflex against resistance; lift toes toward shins, pause, lower slowly.",
+      "Band anchored in front of your foot; pull your toes up toward your shin against the band, lower slowly.",
     source: "Aubin Grove, Kwinana & Harrisdale Physiotherapy",
     videoUrl: "https://www.youtube.com/watch?v=WkmxXN4yq8M",
     isTimeBased: false,
@@ -902,7 +902,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
+      "Band anchored in front of you; hinge slightly and open your arms wide to shoulder height, squeeze the rear delts.",
     source: "ScottHermanFitness",
     videoUrl: "https://www.youtube.com/watch?v=cyihFNmsq-A",
     isTimeBased: false,
@@ -924,7 +924,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Anchor the band in front of you; pull the handles to your ribs, squeezing shoulder blades together.",
     source: "Get Healthy U - with Chris Freytag",
     videoUrl: "https://www.youtube.com/watch?v=LSkyinhmA8k",
     isTimeBased: false,
@@ -946,7 +946,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
+      "Stand on the band holding the handles at your sides; shrug shoulders straight up, pause, lower slowly.",
     source: "Nick Forgione",
     videoUrl: "https://www.youtube.com/watch?v=OjHqkDWGXlw",
     isTimeBased: false,
@@ -968,7 +968,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rotate forearm slowly against band resistance; keep elbow stable at your side.",
+      "Elbow pinned at your side holding a bar or handle on the band; rotate the palm upward against the resistance.",
     source: "Aubin Grove, Kwinana & Harrisdale Physiotherapy",
     videoUrl: "https://www.youtube.com/watch?v=katrOeSo9xg",
     isTimeBased: false,
@@ -988,7 +988,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Keep upper arms still; extend elbows fully, lower weight with control.",
+      "Anchor the band overhead; push down until arms are straight, keeping elbows pinned at your sides.",
     source: "Shape Bands",
     videoUrl: "https://www.youtube.com/watch?v=PkGesjlH7RQ",
     isTimeBased: false,
@@ -1012,7 +1012,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Stand on the band; pull the handles straight up along your body to chest height, elbows leading.",
     source: "freeweight forge",
     videoUrl: "https://www.youtube.com/watch?v=4engp4e6KzU",
     isTimeBased: false,
@@ -1026,7 +1026,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
-      "Chop diagonally across the body; rotate through the torso, not the arms alone.",
+      "Band anchored high to one side; pull it diagonally down across your body, rotating through the torso.",
     source: "Kade Jungkurth",
     videoUrl: "https://www.youtube.com/watch?v=lZfTfU7CfRE",
     isTimeBased: false,
@@ -1048,7 +1048,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Forearms supported; flex or extend wrists through full range under control.",
+      "Forearm supported on your thigh, palm down; extend the wrist up against the band, lower slowly.",
     source: "Movement Physio",
     videoUrl: "https://www.youtube.com/watch?v=zOlFpUujHAE",
     isTimeBased: false,
@@ -1070,7 +1070,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Forearms supported; flex or extend wrists through full range under control.",
+      "Forearm supported on your thigh, palm up; curl the wrist up against the band, lower slowly.",
     source: "Aubin Grove, Kwinana & Harrisdale Physiotherapy",
     videoUrl: "https://www.youtube.com/watch?v=GHh-MfStFKY",
     isTimeBased: false,
@@ -1093,7 +1093,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Stand on the band, feet shoulder-width; hinge with a flat back and drive hips forward to lockout.",
     source: "Bullett Performance Training",
     videoUrl: "https://www.youtube.com/watch?v=K-cdF3zbZTU",
     isTimeBased: false,
@@ -1114,7 +1114,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Body in one line; lower chest toward floor, press back up without sagging hips.",
+      "Band looped across your upper back and anchored under your hands; lower into a pushup against the added resistance.",
     source: "E3 Rehab",
     videoUrl: "https://www.youtube.com/watch?v=8cTohcawjCM",
     isTimeBased: false,
@@ -1134,7 +1134,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Protract shoulder blades forward; reach through full range without shrugging.",
+      "Band anchored in front of you; reach both hands forward and protract the shoulder blades, return with control.",
     source: "Rude Rock Human Performance",
     videoUrl: "https://www.youtube.com/watch?v=vK6NOfS9wW8",
     isTimeBased: false,
@@ -1157,7 +1157,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Stand on the band with a slight knee bend; push hips back keeping the band close to your legs, then drive forward.",
     source: "Groundwork Rehab & Fitness",
     videoUrl: "https://www.youtube.com/watch?v=pNp2f8l82Zg",
     isTimeBased: false,
@@ -1178,7 +1178,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Body in one line; lower chest toward floor, press back up without sagging hips.",
+      "Band looped across your upper back; at the top of the pushup, push further to protract your shoulder blades.",
     source: "Fitness Pain Free",
     videoUrl: "https://www.youtube.com/watch?v=2FEV7sdZZW0",
     isTimeBased: false,
@@ -1192,7 +1192,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Brace core; roll or crunch through a controlled range without sagging the lower back.",
+      "Kneeling with hands on the loaded bar; roll it forward keeping the core braced, then pull back without sagging the lower back.",
     source: "Danielle Marie Fitness",
     videoUrl: "https://www.youtube.com/watch?v=lpXOnRMBp5A",
     isTimeBased: false,
@@ -1235,7 +1235,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Flat bench, grip just outside shoulder width; lower the bar to mid-chest, press up without bouncing off the chest.",
     source: "OPEX Fitness",
     videoUrl: "https://www.youtube.com/watch?v=ejI1Nlsul9k",
     isTimeBased: false,
@@ -1258,7 +1258,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rise onto toes with control; pause at top, lower heels below platform if available.",
+      "Bar on your back, knees bent in a seated-style stance; rise onto your toes, pause, then lower heels down.",
     source: "MVMNT Exercise Library",
     videoUrl: "https://www.youtube.com/watch?v=xXYXbL89KfM",
     isTimeBased: false,
@@ -1281,7 +1281,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Hinge forward with a flat back; pull the bar to your lower ribs, squeeze shoulder blades, lower with control.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=p9RihhjmJsw",
     isTimeBased: false,
@@ -1345,7 +1345,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms to shoulder height with soft elbows; lower without swinging.",
+      "Grip the bar at hip width; raise it to shoulder height with straight arms, lower without swinging the torso.",
     source: "ScottHermanFitness",
     videoUrl: "https://www.youtube.com/watch?v=Ofo2DQdT7DA",
     isTimeBased: false,
@@ -1366,7 +1366,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Bench set to a slight incline; lower the bar to the upper chest, press up along the same path.",
     source: "Elite Performance",
     videoUrl: "https://www.youtube.com/watch?v=L9UKMQw1Nss",
     isTimeBased: false,
@@ -1388,7 +1388,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
+      "Bar at the collarbone, grip just outside the shoulders; press straight overhead, bracing the core to avoid arching.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=4LBVP2Oe7fg",
     isTimeBased: false,
@@ -1408,7 +1408,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Keep upper arms still; extend elbows fully, lower weight with control.",
+      "Bar overhead with a narrow grip; lower it behind your head by bending the elbows, then extend back up.",
     source: "Zach Erickson",
     videoUrl: "https://www.youtube.com/watch?v=w4NSd3kug5Q",
     isTimeBased: false,
@@ -1475,7 +1475,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Soft knee bend, bar close to the thighs; push hips back until you feel a hamstring stretch, then drive forward.",
     source: "Sennergy Health Training",
     videoUrl: "https://www.youtube.com/watch?v=g5u75sgpn04",
     isTimeBased: false,
@@ -1497,7 +1497,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
+      "Bar held at arm's length in front of your thighs; shrug shoulders straight up, pause, lower without rolling forward.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=zfAHfyTB_Ao",
     isTimeBased: false,
@@ -1517,7 +1517,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Keep upper arms still; extend elbows fully, lower weight with control.",
+      "Lying on a bench with the bar over your forehead; bend elbows to lower it toward your head, then extend.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=l3rHYPtMUo8",
     isTimeBased: false,
@@ -1562,7 +1562,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rise onto toes with control; pause at top, lower heels below platform if available.",
+      "Bar on your back, legs straight; rise onto your toes, pause at the top, then lower heels below the platform.",
     source: "ScottHermanFitness",
     videoUrl: "https://www.youtube.com/watch?v=3UWi44yN-wM",
     isTimeBased: false,
@@ -1586,7 +1586,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Legs nearly straight, bar close to the shins; hinge at the hips with a flat back, then stand tall.",
     source: "Bodybuilding.com",
     videoUrl: "https://www.youtube.com/watch?v=VFIKI6ihCmc",
     isTimeBased: false,
@@ -1600,7 +1600,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Rotate torso side to side with control; keep chest up and core braced throughout.",
+      "Bar loaded on one end, held at chest height; rotate the torso side to side while keeping the hips relatively square.",
     source: "Shaun Fitt",
     videoUrl: "https://www.youtube.com/watch?v=gFrIasgk5tE",
     isTimeBased: false,
@@ -1624,7 +1624,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Grip the bar with hands close together; pull it straight up along your body to chest height, elbows leading and out.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=um3VVzqunPU",
     isTimeBased: false,
@@ -1669,7 +1669,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rise onto toes with control; pause at top, lower heels below platform if available.",
+      "Knees bent slightly; rise onto your toes to target the soleus, pause, then lower heels down.",
     source: "Runna",
     videoUrl: "https://www.youtube.com/watch?v=NcMjGCO_-J0",
     isTimeBased: false,
@@ -1690,7 +1690,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
+      "Cables set at chest height on both sides; sweep the handles together in front of your chest with a slight elbow bend.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=I-Ue34qLxc4",
     isTimeBased: false,
@@ -1711,7 +1711,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Standing between cable towers; press the handles forward from chest height with a slight forward lean.",
     source: "Elite Performance",
     videoUrl: "https://www.youtube.com/watch?v=A12UEw70jio",
     isTimeBased: false,
@@ -1725,7 +1725,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
+      "Kneel below the cable stack; crunch ribs toward hips by flexing the spine, hips stay still.",
     source: "Kade Howell",
     videoUrl: "https://www.youtube.com/watch?v=dkGwcfo9zto",
     isTimeBased: false,
@@ -1770,7 +1770,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
+      "Elbow pinned at 90 degrees at your side; rotate the forearm outward against the cable, control the return.",
     source: "Ultimate Strength and Nutrition",
     videoUrl: "https://www.youtube.com/watch?v=6xGIVNYBIwE",
     isTimeBased: false,
@@ -1793,7 +1793,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward face with elbows high; externally rotate at the end of the rep.",
+      "Rope attachment at face height; pull toward your face leading with the elbows, externally rotating at the finish.",
     source: "Elite Performance",
     videoUrl: "https://www.youtube.com/watch?v=vQCi5Xzhoyw",
     isTimeBased: false,
@@ -1813,7 +1813,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms to shoulder height with soft elbows; lower without swinging.",
+      "Cable set low behind you; raise the handle to shoulder height with a soft elbow, lower slowly.",
     source: "Elite Performance",
     videoUrl: "https://www.youtube.com/watch?v=NdQE5Fhfqn4",
     isTimeBased: false,
@@ -1833,7 +1833,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms to shoulder height with soft elbows; lower without swinging.",
+      "Start with the cable behind your hip for a stretch, raise it overhead through the full range, lower with control.",
     source: "Elite Performance",
     videoUrl: "https://www.youtube.com/watch?v=NdQE5Fhfqn4",
     isTimeBased: false,
@@ -1856,7 +1856,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
+      "Cuff on the ankle, hinge slightly forward; kick the leg back and out on a diagonal against the cable.",
     source: "Lean4ever_",
     videoUrl: "https://www.youtube.com/watch?v=_bWqrQp7wJY",
     isTimeBased: false,
@@ -1900,7 +1900,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press leg out against resistance; control the return without letting weight slam.",
+      "Cuff attached at the ankle; sweep the leg outward against the cable, keep the standing leg stable.",
     source: "LIVESTRONG",
     videoUrl: "https://www.youtube.com/watch?v=pvnR8CDb4BU",
     isTimeBased: false,
@@ -1922,7 +1922,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Squeeze legs together against resistance; smooth motion, full controlled range.",
+      "Cuff attached at the ankle; sweep the leg across your body against the cable, keep the standing leg stable.",
     source: "Just Raw Skill",
     videoUrl: "https://www.youtube.com/watch?v=EHq78mQYLbI",
     isTimeBased: false,
@@ -1945,7 +1945,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull or curl with shoulders packed; squeeze at the peak, control the return.",
+      "Elbow pinned at 90 degrees at your side; rotate the forearm inward against the cable, control the return.",
     source: "Devin Riley",
     videoUrl: "https://www.youtube.com/watch?v=S_d3qeTMtl4",
     isTimeBased: false,
@@ -1968,7 +1968,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
+      "Cuff attached at the ankle; kick the leg straight back against the cable, squeeze the glute at the top.",
     source: "Tashana Charles",
     videoUrl: "https://www.youtube.com/watch?v=A9aN_L4vexk",
     isTimeBased: false,
@@ -1990,7 +1990,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
+      "Wide bar overhead on the cable; pull down to upper chest, lean slightly back, drive elbows down.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=bNmvKpJSWKM",
     isTimeBased: false,
@@ -2034,7 +2034,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
+      "Cable set low at your side; raise the handle out to shoulder height across your body, leading with the elbow.",
     source: "Aakash Wadhwani",
     videoUrl: "https://www.youtube.com/watch?v=lMJUXEvcMkQ",
     isTimeBased: false,
@@ -2056,7 +2056,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Extend knees to straight; pause at top, lower without dropping the weight.",
+      "Cuff attached at the ankle while seated; extend the knee straight against the cable, control the return.",
     source: "York Performance",
     videoUrl: "https://www.youtube.com/watch?v=SAnhEcQPLJY",
     isTimeBased: false,
@@ -2070,7 +2070,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Obliques"],
     defaultReps: "10",
     notes:
-      "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
+      "Cuff attached at the ankle, standing tall; raise the leg forward against the cable, keep the torso upright.",
     source: "Simmi ",
     videoUrl: "https://www.youtube.com/watch?v=V6r-SQmBr8U",
     isTimeBased: false,
@@ -2084,7 +2084,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
-      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
+      "Kneel side-on to the cable stack; crunch ribs toward the opposite hip, rotating through the obliques.",
     source: "Live Lean TV Daily Exercises",
     videoUrl: "https://www.youtube.com/watch?v=xUulEXD1AQc",
     isTimeBased: false,
@@ -2104,7 +2104,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
+      "Cable set low behind or beside you; press the handle overhead in line with your ear, control the descent.",
     source: "Repetitions Fitness RPT",
     videoUrl: "https://www.youtube.com/watch?v=-hVwoRumVCo",
     isTimeBased: false,
@@ -2118,7 +2118,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
-      "Press band or cable straight out from chest; resist rotation and hold a tall posture.",
+      "Cable anchored to your side at chest height; press the handle straight out, resisting rotation toward the stack.",
     source: "Warbird Academy",
     videoUrl: "https://www.youtube.com/watch?v=ma2OjgP5XDc",
     isTimeBased: false,
@@ -2139,7 +2139,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
+      "Cable anchored behind you at chest height; sweep the handle across your body in a hugging arc, control the return.",
     source: "Sam Johnston",
     videoUrl: "https://www.youtube.com/watch?v=y8XQibXDnNo",
     isTimeBased: false,
@@ -2159,7 +2159,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Protract shoulder blades forward; reach through full range without shrugging.",
+      "Cable set at chest height; reach the handle forward and protract the shoulder blades, control the return.",
     source: "Strength Coach Phil",
     videoUrl: "https://www.youtube.com/watch?v=JtCyUP4CjA8",
     isTimeBased: false,
@@ -2182,7 +2182,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rise onto toes with control; pause at top, lower heels below platform if available.",
+      "Cable attached at the shoulders or hips with knees bent; rise onto your toes against the resistance, pause at the top.",
     source: "Hybrid Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=w4nmA7p4EoY",
     isTimeBased: false,
@@ -2205,7 +2205,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rise onto toes with control; pause at top, lower heels below platform if available.",
+      "Cable attached at the shoulders or hips with legs straight; rise onto your toes against the resistance, lower slowly.",
     source: "Hybrid Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=Kx5fAImDxeQ",
     isTimeBased: false,
@@ -2251,7 +2251,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
+      "Cables crossed in front of you; hinge slightly and sweep the handles out wide to shoulder height.",
     source: "Hailey Happens Fitness",
     videoUrl: "https://www.youtube.com/watch?v=yt096xH6b4g",
     isTimeBased: false,
@@ -2295,7 +2295,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Seated with feet on the platform; pull the handle to your torso, squeeze shoulder blades, control the return.",
     source: "Max Euceda",
     videoUrl: "https://www.youtube.com/watch?v=vwHG9Jfu4sw",
     isTimeBased: false,
@@ -2317,7 +2317,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
+      "Cable handle at arm's length; shrug shoulders straight up, pause at the top, lower under control.",
     source: "BPI Sports",
     videoUrl: "https://www.youtube.com/watch?v=Wab3-dsZohU",
     isTimeBased: false,
@@ -2340,7 +2340,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Dorsiflex against resistance; lift toes toward shins, pause, lower slowly.",
+      "Cable anchored low in front of your foot; pull your toes up toward your shin against the cable, lower slowly.",
     source: "8letic Fitness Club",
     videoUrl: "https://www.youtube.com/watch?v=3oEqmZCbVuo",
     isTimeBased: false,
@@ -2360,7 +2360,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Keep upper arms still; extend elbows fully, lower weight with control.",
+      "Cable set high overhead with a bar or rope; push down until arms are straight, elbows pinned at your sides.",
     source: "TylerPath",
     videoUrl: "https://www.youtube.com/watch?v=DofcfjlgOTs",
     isTimeBased: false,
@@ -2384,7 +2384,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Cable set low in front of you; pull the handle straight up along your body to chest height, elbows leading.",
     source: "Renaissance Periodization",
     videoUrl: "https://www.youtube.com/watch?v=qr3ziolhjvQ",
     isTimeBased: false,
@@ -2398,7 +2398,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
-      "Chop diagonally across the body; rotate through the torso, not the arms alone.",
+      "Cable anchored high to one side; pull it diagonally down across your body, rotating through the torso.",
     source: "QuanBFit",
     videoUrl: "https://www.youtube.com/watch?v=KG4Bf-1U_BY",
     isTimeBased: false,
@@ -2440,7 +2440,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Triceps",
     ],
     defaultReps: "10",
-    notes: "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
+    notes: "Cables set low and crossed in front of you; raise both arms in a Y shape overhead, thumbs pointing up.",
     source: "Bradley Bowden",
     videoUrl: "https://www.youtube.com/watch?v=Zy0M8JMLnD0",
     isTimeBased: false,
@@ -2462,7 +2462,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Hands just inside shoulder width on the bar; lower to the lower chest with elbows tucked, press up to emphasize triceps.",
     source: "JayCutlerTV",
     videoUrl: "https://www.youtube.com/watch?v=qcYGEGqfScw",
     isTimeBased: false,
@@ -2483,7 +2483,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Press dumbbells together at the lower chest; keep elbows tucked and press up to emphasize triceps.",
     source: "Be Fit",
     videoUrl: "https://www.youtube.com/watch?v=C5cq0Yvecu0",
     isTimeBased: false,
@@ -2504,7 +2504,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Body in one line; lower chest toward floor, press back up without sagging hips.",
+      "Hands close together under your chest; lower with elbows tucked to your sides, press back up to emphasize triceps.",
     source: "Atomic Athlete",
     videoUrl: "https://www.youtube.com/watch?v=2cdIRe5tcqI",
     isTimeBased: false,
@@ -2528,7 +2528,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Full hang to start; pull until chin clears the bar, lower with control.",
+      "Hang with hands staggered on the bar; pull up bringing your head to one side of the bar, alternating sides.",
     source: "Major Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=XWppPUTlSwE",
     isTimeBased: false,
@@ -2551,7 +2551,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "30 sec each side",
     notes:
-      "Stack shoulders over elbow or wrist; lift hips in a straight line and breathe steadily.",
+      "Top leg supported on a bench, bottom leg hovering; hold a straight line from shoulders to ankles.",
     source: "[P]rehab",
     videoUrl: "https://www.youtube.com/watch?v=AiYzzRoXOEY",
     isTimeBased: true,
@@ -2593,7 +2593,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Keep upper arms still; extend elbows fully, lower weight with control.",
+      "Handles crossed overhead from two stacks; push down and out in an X pattern, keeping elbows tucked.",
     source: "Rachel Gregory",
     videoUrl: "https://www.youtube.com/watch?v=KweUYETA8RU",
     isTimeBased: false,
@@ -2607,7 +2607,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
+      "Lying on your back with knees bent; curl shoulder blades off the floor by flexing the spine, avoid pulling on the neck.",
     source: "Howcast",
     videoUrl: "https://www.youtube.com/watch?v=MKmrqcoCZ-M",
     isTimeBased: false,
@@ -2631,7 +2631,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Bar over midfoot, flat back; drive through the floor to stand, keeping the bar close to your legs.",
     source: "Davis Diley",
     videoUrl: "https://www.youtube.com/watch?v=vfKwjT5-86k",
     isTimeBased: false,
@@ -2652,7 +2652,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Set the bench or stance for a decline angle; press the handles up and in toward the lower chest.",
     source: "Coach Joey",
     videoUrl: "https://www.youtube.com/watch?v=lYHVBZ-XqT8",
     isTimeBased: false,
@@ -2673,7 +2673,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Body in one line; lower chest toward floor, press back up without sagging hips.",
+      "Feet elevated on a bench or box; lower chest toward the floor with control, press back up without sagging hips.",
     source: "Hybrid Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=QBlYp-EwHlo",
     isTimeBased: false,
@@ -2687,7 +2687,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Glutes", "Hip Flexors", "Obliques", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
-      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
+      "Take a long step forward; lower until the back knee nearly touches the floor, then push back to standing.",
     source: "Sears",
     videoUrl: "https://www.youtube.com/watch?v=5cnJKhhw2as",
     isTimeBased: false,
@@ -2730,7 +2730,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Upper back on bench; drive hips up, squeeze glutes at top, lower under control.",
+      "Upper back on a bench, one dumbbell on your hips, one foot planted; drive that hip up, squeeze the glute at the top.",
     source: "Kenssey",
     videoUrl: "https://www.youtube.com/watch?v=Rtor33qMmhQ",
     isTimeBased: false,
@@ -2751,7 +2751,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Flat bench, dumbbells at chest level; press up and slightly in, lower until upper arms are parallel to the floor.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=WbCEvFA0NJs",
     isTimeBased: false,
@@ -2774,7 +2774,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rise onto toes with control; pause at top, lower heels below platform if available.",
+      "Dumbbells at your sides, knees bent; rise onto your toes to target the soleus, pause, then lower heels down.",
     source: "Bía Coaching",
     videoUrl: "https://www.youtube.com/watch?v=4atz03A80dg",
     isTimeBased: false,
@@ -2796,7 +2796,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Hinge forward with a flat back; row the dumbbells to your ribs, squeezing shoulder blades together.",
     source: "The Strength Center",
     videoUrl: "https://www.youtube.com/watch?v=IOOLhrkN_NI",
     isTimeBased: false,
@@ -2839,7 +2839,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
+      "Lying on a bench with dumbbells over your chest; lower them out to the sides with a slight elbow bend, then squeeze back together.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=rk8YayRoTRQ",
     isTimeBased: false,
@@ -2859,7 +2859,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms to shoulder height with soft elbows; lower without swinging.",
+      "Dumbbells at your thighs; raise one or both to shoulder height with soft elbows, avoid swinging.",
     source: "Kraken Fitness",
     videoUrl: "https://www.youtube.com/watch?v=h9xfpTrAvkE",
     isTimeBased: false,
@@ -2879,7 +2879,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms to shoulder height with soft elbows; lower without swinging.",
+      "Start with the dumbbell behind your hip for a stretch, raise it overhead through the full range, lower with control.",
     source: "Tom Houpt",
     videoUrl: "https://www.youtube.com/watch?v=JXYIr4FcUHw",
     isTimeBased: false,
@@ -2921,7 +2921,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Bench set to a slight incline; press dumbbells up and in from the upper chest, control the descent.",
     source: "Taylored Physical Therapy",
     videoUrl: "https://www.youtube.com/watch?v=G1mCi5idEbk",
     isTimeBased: false,
@@ -2942,7 +2942,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
+      "Dumbbells at your sides; raise both arms out to shoulder height with a slight elbow bend, lower slowly.",
     source: "National Academy of Sports Medicine (NASM)",
     videoUrl: "https://www.youtube.com/watch?v=XPPfnSEATJA",
     isTimeBased: false,
@@ -2986,7 +2986,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
+      "Dumbbells at shoulder height; press straight overhead until arms lock out, lower with control.",
     source: "Testosterone Nation",
     videoUrl: "https://www.youtube.com/watch?v=b132W5N8Jrg",
     isTimeBased: false,
@@ -3006,7 +3006,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Keep upper arms still; extend elbows fully, lower weight with control.",
+      "Dumbbell held overhead with both hands; lower it behind your head by bending the elbows, then extend.",
     source: "SquatCouple",
     videoUrl: "https://www.youtube.com/watch?v=AYqg9S5FrUU",
     isTimeBased: false,
@@ -3095,7 +3095,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
+      "Hinge forward holding dumbbells; raise arms out to the sides to shoulder height, squeezing shoulder blades together.",
     source: "BUILT BY FITNESS",
     videoUrl: "https://www.youtube.com/watch?v=xvEkgGUrGPM",
     isTimeBased: false,
@@ -3140,7 +3140,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Dumbbells in front of the thighs with a soft knee bend; hinge back until you feel a hamstring stretch, then drive forward.",
     source: "Denvyr | Tall Girl Nutritionist",
     videoUrl: "https://www.youtube.com/watch?v=5WxMW-Fu5KU",
     isTimeBased: false,
@@ -3162,7 +3162,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
+      "Dumbbells at your sides; shrug shoulders straight up toward your ears, pause, lower slowly.",
     source: "Gym And Fitness",
     videoUrl: "https://www.youtube.com/watch?v=j2-RccWDhDo",
     isTimeBased: false,
@@ -3196,7 +3196,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Keep upper arms still; extend elbows fully, lower weight with control.",
+      "Lying on a bench with dumbbells over your forehead; bend elbows to lower them toward your head, then extend.",
     source: "J&J Body Fitness",
     videoUrl: "https://www.youtube.com/watch?v=KiTJ7qJP2t8",
     isTimeBased: false,
@@ -3263,7 +3263,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rise onto toes with control; pause at top, lower heels below platform if available.",
+      "Dumbbells at your sides, legs straight; rise onto your toes, pause at the top, then lower heels below the platform.",
     source: "Hybrid Calisthenics",
     videoUrl: "https://www.youtube.com/shorts/ADITZCcUyVo",
     isTimeBased: false,
@@ -3286,7 +3286,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Legs nearly straight, dumbbells close to the shins; hinge at the hips with a flat back, then stand tall.",
     source: "Live Lean TV Daily Exercises",
     videoUrl: "https://www.youtube.com/watch?v=R6KXyhU4nTY",
     isTimeBased: false,
@@ -3306,7 +3306,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Protract shoulder blades forward; reach through full range without shrugging.",
+      "Holding light dumbbells, rotate the torso and drive one fist upward in an uppercut arc, alternate sides.",
     source: "Snap Fitness Clayton",
     videoUrl: "https://www.youtube.com/watch?v=ZpIx4drJXdU",
     isTimeBased: false,
@@ -3330,7 +3330,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Dumbbells in front of your thighs; pull them straight up along your body to chest height, elbows leading.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=29-4QWdqd-g",
     isTimeBased: false,
@@ -3373,7 +3373,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Triceps",
     ],
     defaultReps: "10",
-    notes: "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
+    notes: "Hinged slightly forward holding light dumbbells; raise both arms in a Y shape overhead, thumbs pointing up.",
     source: "Jeremy Daniels",
     videoUrl: "https://www.youtube.com/watch?v=9hI-RFziBz8",
     isTimeBased: false,
@@ -3394,7 +3394,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
+      "Lean away from the working arm while holding a support; raise the dumbbell out to the side for an extended range.",
     source: "Valhalla Strength YYC",
     videoUrl: "https://www.youtube.com/watch?v=4wI9d3O6Cks",
     isTimeBased: false,
@@ -3460,7 +3460,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward face with elbows high; externally rotate at the end of the rep.",
+      "Band anchored at face height; pull the ends apart toward your face, elbows finishing high and wide.",
     source: "ATHLEAN-X™",
     videoUrl: "https://www.youtube.com/watch?v=ljgqer1ZpXg",
     isTimeBased: false,
@@ -3507,7 +3507,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Extend leg back from hip; squeeze glute at end range, avoid arching the lower back.",
+      "Foot braced on the machine pad; drive the leg straight back, squeeze the glute, control the return.",
     source: "Exercise Demo QR Codes",
     videoUrl: "https://www.youtube.com/watch?v=m5TPll_PZbI",
     isTimeBased: false,
@@ -3548,7 +3548,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Bar on upper back; hinge at hips with a flat back, then drive hips forward to stand.",
+      "Bar across your upper back; hinge at the hips with a flat back until you feel a hamstring stretch, then stand tall.",
     source: "ABC News",
     videoUrl: "https://www.youtube.com/watch?v=7GPVy6nYcWo",
     isTimeBased: false,
@@ -3592,7 +3592,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "30 sec",
     notes:
-      "Control the eccentric; use padding under knees and progress range gradually.",
+      "Kneeling with feet anchored, hands on the floor in front; slide your body forward by extending the hips, then pull back with the hamstrings.",
     source: "ATH Sport",
     videoUrl: "https://www.youtube.com/watch?v=lLUniqm00KM",
     isTimeBased: true,
@@ -3613,7 +3613,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Body in one line; lower chest toward floor, press back up without sagging hips.",
+      "Kick up into a handstand against a wall; bend elbows to lower your head toward the floor, press back to lockout.",
     source: "yvguo",
     videoUrl: "https://www.youtube.com/watch?v=eWvKVjSpIW8",
     isTimeBased: false,
@@ -3672,7 +3672,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Upper back on bench; drive hips up, squeeze glutes at top, lower under control.",
+      "Upper back on a bench, feet planted; drive hips up until your torso is level with your knees, squeeze at the top.",
     source: "Nuffield Health",
     videoUrl: "https://www.youtube.com/watch?v=RR0oZhhUVWo",
     isTimeBased: false,
@@ -3695,7 +3695,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Upper back on bench; drive hips up, squeeze glutes at top, lower under control.",
+      "Seated at the machine with the pad on your hips; drive hips up against the resistance, squeeze glutes at the top.",
     source: "Ascend Kinetics Fitness",
     videoUrl: "https://www.youtube.com/watch?v=m8g9VogoxMo",
     isTimeBased: false,
@@ -3717,7 +3717,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Set the bench to an incline under the cable stack; press the handles up and forward from the upper chest.",
     source: "Unite Coaching",
     videoUrl: "https://www.youtube.com/watch?v=5pC1skpc7e0",
     isTimeBased: false,
@@ -3765,7 +3765,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Hang from a low bar with your body straight; pull your chest to the bar while keeping legs and hips locked in a line.",
     source: "PractiCali_Calisthenics",
     videoUrl: "https://www.youtube.com/watch?v=vKKGdwyA8Lc",
     isTimeBased: false,
@@ -3807,7 +3807,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
+      "Seated at the machine with a wide grip on the bar; pull down to upper chest without leaning back excessively.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=bNmvKpJSWKM",
     isTimeBased: false,
@@ -3829,7 +3829,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull to upper chest; lean slightly back and drive elbows down, not behind the neck.",
+      "Seated with elbows on the pads; pull the bar down in an arc from overhead to your thighs, feeling it in the lats.",
     source: "Arsenal Strength",
     videoUrl: "https://www.youtube.com/watch?v=1AtgcEMZ2cQ",
     isTimeBased: false,
@@ -3851,7 +3851,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Extend knees to straight; pause at top, lower without dropping the weight.",
+      "Seated at the machine with pads on the shins; extend the knees to straight, pause, then lower without dropping the weight.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=N32sIi1ktv4",
     isTimeBased: false,
@@ -3887,7 +3887,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
+      "Lying on your back with legs straight; raise them to vertical without arching, lower under control.",
     source: "Health",
     videoUrl: "https://www.youtube.com/watch?v=qvi8aM02_GY",
     isTimeBased: false,
@@ -3954,7 +3954,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Arc arms wide in a hugging motion; slight elbow bend, squeeze chest at the top.",
+      "Seated at the machine with arms on the pads; bring the handles together in front of your chest, control the release.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=VJ33rNSn3UI",
     isTimeBased: false,
@@ -3975,7 +3975,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Seated at the machine with handles at chest height; press forward until arms extend, control the return.",
     source: "PureGym",
     videoUrl: "https://www.youtube.com/watch?v=sqNwDkUU_Ps",
     isTimeBased: false,
@@ -3996,7 +3996,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Seated at the machine set to a decline angle; press the handles down and forward from the lower chest.",
     source: "Ben Jones Fitness",
     videoUrl: "https://www.youtube.com/watch?v=MchdwQ855Ls",
     isTimeBased: false,
@@ -4017,7 +4017,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press weight away with control; keep feet planted and avoid bouncing at the bottom.",
+      "Seated at the machine set to an incline angle; press the handles up and forward from the upper chest.",
     source: "Virtual Trainer - Jhonbafit",
     videoUrl: "https://www.youtube.com/watch?v=hkU6fSHcslw",
     isTimeBased: false,
@@ -4038,7 +4038,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
+      "Seated at the machine with pads against the upper arms; raise elbows out to shoulder height, lower under control.",
     source: "Etage Athletic Club",
     videoUrl: "https://www.youtube.com/watch?v=Zi9nYtLsuz0",
     isTimeBased: false,
@@ -4060,7 +4060,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Press overhead in line with ears; brace core and avoid excessive lower-back arch.",
+      "Seated at the machine with handles at shoulder height; press straight up without arching the back.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=PM1hB_2xNBU",
     isTimeBased: false,
@@ -4084,7 +4084,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
+      "Seated facing the pad with handles in front of you; sweep arms out wide to shoulder height, squeeze the rear delts.",
     source: "Rapid Fitness",
     videoUrl: "https://www.youtube.com/watch?v=TJgaFyUSBaY",
     isTimeBased: false,
@@ -4106,7 +4106,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Seated at the machine with your chest against the pad; pull the handles to your torso, squeeze shoulder blades together.",
     source: "James Gardner Personal Training",
     videoUrl: "https://www.youtube.com/watch?v=Kh2WA2Y1M0k",
     isTimeBased: false,
@@ -4143,7 +4143,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10 each side",
     notes:
-      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
+      "Lying on your back; curl ribs toward one hip using the obliques, alternate sides with control.",
     source: "IgnasFit",
     videoUrl: "https://www.youtube.com/watch?v=AcvfBd9C2kA",
     isTimeBased: false,
@@ -4157,7 +4157,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Rotate torso side to side with control; keep chest up and core braced throughout.",
+      "Seated at the machine with the pad against your torso; rotate side to side against the resistance, control the return.",
     source: "Klub 20 Gym Beaconsfield",
     videoUrl: "https://www.youtube.com/watch?v=4LoAmWp_h9g",
     isTimeBased: false,
@@ -4215,7 +4215,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Obliques"],
     defaultReps: "10",
     notes:
-      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
+      "From a deep lunge position, pulse the back leg up and down a few inches to burn out the quad and glute.",
     source: "The Wong Way",
     videoUrl: "https://www.youtube.com/watch?v=0twbwdI5ZMg",
     isTimeBased: false,
@@ -4237,7 +4237,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Body in one line; lower chest toward floor, press back up without sagging hips.",
+      "Hips piked high, hands under shoulders; bend elbows to lower your head toward the floor, then press back up.",
     source: "cory robinson",
     videoUrl: "https://www.youtube.com/watch?v=D_Ed8Ltoomc",
     isTimeBased: false,
@@ -4258,7 +4258,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "30 sec",
     notes:
-      "Hold a rigid plank from shoulders to heels; keep ribs down and glutes engaged.",
+      "Hold a straight line on your hands and toes from shoulders to heels, bracing the core.",
     source: "Children's Hospital Colorado",
     videoUrl: "https://www.youtube.com/watch?v=pvIjsG5Svck",
     isTimeBased: true,
@@ -4280,7 +4280,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "5",
     notes:
-      "Hold a rigid plank from shoulders to heels; keep ribs down and glutes engaged.",
+      "From a high plank, push your hips up and back into an inverted V, then return to plank.",
     source: "Dr. Kira Steele",
     videoUrl: "https://www.youtube.com/watch?v=UPxe-ciAovo",
     isTimeBased: false,
@@ -4323,7 +4323,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Body in one line; lower chest toward floor, press back up without sagging hips.",
+      "Hands turned in and placed by your hips, torso leaned forward; lower with elbows tracking back, press up.",
     source: "Andry Strong",
     videoUrl: "https://www.youtube.com/watch?v=C90o5ImqzJ0",
     isTimeBased: false,
@@ -4345,7 +4345,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Full hang to start; pull until chin clears the bar, lower with control.",
+      "Full hang from an overhand grip; pull until your chin clears the bar, lower with control.",
     source: "Summerfunfitness",
     videoUrl: "https://www.youtube.com/watch?v=l6-aIZTbAR0",
     isTimeBased: false,
@@ -4366,7 +4366,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Body in one line; lower chest toward floor, press back up without sagging hips.",
+      "Hands under shoulders, body in one line; lower chest toward the floor, press back up without sagging hips.",
     source: "Pierre Dalati",
     videoUrl: "https://www.youtube.com/watch?v=_YrJc-kTYA0",
     isTimeBased: false,
@@ -4390,7 +4390,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
+      "Stand on the band or anchor it in front of you; hinge slightly and raise arms out wide, squeeze the rear delts.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=LsT-bR_zxLo",
     isTimeBased: false,
@@ -4451,7 +4451,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Control the eccentric; use padding under knees and progress range gradually.",
+      "Kneeling with a bench or pad behind your knees; lean back from the knees, then return by contracting the quads.",
     source: "Movementgems",
     videoUrl: "https://www.youtube.com/watch?v=GtBxjoLlHyA",
     isTimeBased: false,
@@ -4518,7 +4518,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward face with elbows high; externally rotate at the end of the rep.",
+      "Lean back holding the rings at face height; pull your face toward the rings, elbows high and wide.",
     source: "Nick Halverson",
     videoUrl: "https://www.youtube.com/watch?v=s-lbVHmOnpk",
     isTimeBased: false,
@@ -4542,7 +4542,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge slightly; open arms wide to shoulder height, squeeze rear delts, lower slowly.",
+      "Leaning back holding the rings out to the sides; sweep arms down and together, then reverse to open wide.",
     source: "calisthenicsCOM",
     videoUrl: "https://www.youtube.com/watch?v=sb3SNc2mkpU",
     isTimeBased: false,
@@ -4563,7 +4563,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Brace core; roll or crunch through a controlled range without sagging the lower back.",
+      "Kneeling or standing with hands on the rings; roll or press them forward keeping the core braced, then return.",
     source: "Bill Maeda ",
     videoUrl: "https://www.youtube.com/watch?v=nlL-zfAuQ0Q",
     isTimeBased: false,
@@ -4585,7 +4585,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Body angled under the rings, feet planted; pull your chest to the rings, keeping the body in a straight line.",
     source: "CrossFit",
     videoUrl: "https://www.youtube.com/watch?v=sEAOZc77wk8",
     isTimeBased: false,
@@ -4606,7 +4606,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Triceps",
     ],
     defaultReps: "10",
-    notes: "Raise arms in a Y shape; thumbs up, squeeze upper back at the top.",
+    notes: "Leaning back holding the rings; raise your arms out into a Y shape overhead, squeeze the upper back.",
     source: "Team Training Day",
     videoUrl: "https://www.youtube.com/watch?v=WVczdS3d9nE",
     isTimeBased: false,
@@ -4626,7 +4626,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Keep upper arms still; extend elbows fully, lower weight with control.",
+      "Facing away from the rings with arms overhead; bend elbows to lower into a stretch, then press back to lockout.",
     source: "SquatCouple",
     videoUrl: "https://www.youtube.com/watch?v=AYqg9S5FrUU",
     isTimeBased: false,
@@ -4648,7 +4648,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Hang from a bar at an angle with your body straight; pull your chest toward the bar, squeeze shoulder blades together.",
     source: "Sail North",
     videoUrl: "https://www.youtube.com/watch?v=Nlxm8A9Gc4E",
     isTimeBased: false,
@@ -4672,7 +4672,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
+      "Seated with feet flat; lift toes toward your shins while heels stay down, pause, lower slowly.",
     source: "Arbilla Exercise Physiology",
     videoUrl: "https://www.youtube.com/watch?v=DB1QegPQQeg",
     isTimeBased: false,
@@ -4693,7 +4693,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each side",
     notes:
-      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
+      "Lying on your side; raise the top arm straight up to shoulder height, lower with control.",
     source: "Martyn Pace",
     videoUrl: "https://www.youtube.com/watch?v=agPq9Z3uPFs",
     isTimeBased: false,
@@ -4716,7 +4716,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each arm",
     notes:
-      "Elbow at side, forearm rotates through range; move slowly, no momentum.",
+      "Lying on your side, elbow tucked at your ribs; rotate the dumbbell upward by externally rotating the shoulder, lower slowly.",
     source: "MidwestOrtho",
     videoUrl: "https://www.youtube.com/watch?v=v5bPOsQbq7g",
     isTimeBased: false,
@@ -4739,7 +4739,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each arm",
     notes:
-      "Elbow at side, forearm rotates through range; move slowly, no momentum.",
+      "Lying on your side, elbow tucked at your ribs; rotate the dumbbell down and across your body, control the return.",
     source: "Sapien Rehab and Performance",
     videoUrl: "https://www.youtube.com/watch?v=PSJLb2nH1K0",
     isTimeBased: false,
@@ -4762,7 +4762,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Raise legs with control; keep lower back stable and avoid swinging or momentum.",
+      "Lying on your side; lift the top leg straight up with control, keep hips stacked and toes forward.",
     source: "3v",
     videoUrl: "https://www.youtube.com/watch?v=jgh6sGwtTwk",
     isTimeBased: false,
@@ -4843,7 +4843,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Glutes", "Hip Flexors", "Obliques", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
-      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
+      "Bar racked on your back in the Smith machine; step into a long lunge and lower until the back knee nears the floor.",
     source: "FusionFitRx_CPT Personal & Online Training",
     videoUrl: "https://www.youtube.com/watch?v=ngxMg0nuPyY",
     isTimeBased: false,
@@ -4862,7 +4862,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Bar on upper back; hinge at hips with a flat back, then drive hips forward to stand.",
+      "Bar fixed in the Smith machine track across your upper back; hinge at the hips with a flat back, then stand tall.",
     source: "Naomi Kong",
     videoUrl: "https://www.youtube.com/watch?v=8Tp_Hx1jdSc",
     isTimeBased: false,
@@ -4929,7 +4929,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Bar fixed in the Smith machine track; hinge with legs nearly straight, then drive hips forward to stand.",
     source: "Hypertrophy Dad",
     videoUrl: "https://www.youtube.com/watch?v=FrjJpcsHzQM",
     isTimeBased: false,
@@ -5019,7 +5019,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Rise onto toes with control; pause at top, lower heels below platform if available.",
+      "Legs straight, bodyweight only; rise onto your toes, pause at the top, then lower heels below the platform if available.",
     source: "VersAbility",
     videoUrl: "https://www.youtube.com/watch?v=WX1zyGuTLCA",
     isTimeBased: false,
@@ -5042,7 +5042,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Hinge at hips with flat back; drive hips forward to stand, control the descent.",
+      "Wide stance with toes turned out, hands inside the knees; drive through the floor keeping the chest tall.",
     source: "NatLifting",
     videoUrl: "https://www.youtube.com/watch?v=RX_UkyjMhp4",
     isTimeBased: false,
@@ -5065,7 +5065,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Pull toward the torso; squeeze shoulder blades together and control the return.",
+      "Chest against the pad, grip the T-bar handles; pull the weight to your torso, squeeze shoulder blades together.",
     source: "Jesse James East",
     videoUrl: "https://www.youtube.com/watch?v=Nm3M-4fmprk",
     isTimeBased: false,
@@ -5088,7 +5088,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Dorsiflex against resistance; lift toes toward shins, pause, lower slowly.",
+      "Foot strapped into the machine; dorsiflex by lifting the toes toward your shin, pause, then lower.",
     source: "Home Gym Reviews",
     videoUrl: "https://www.youtube.com/watch?v=aor9rapicfk",
     isTimeBased: false,
@@ -5108,7 +5108,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Lower until upper arms are roughly parallel; press up without flaring elbows wide.",
+      "Seated at the machine with upper arms against the pad; extend the elbows until arms are straight, control the return.",
     source: "TylerPath",
     videoUrl: "https://www.youtube.com/watch?v=NNyuuN2sJb0",
     isTimeBased: false,
@@ -5128,7 +5128,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Lower until upper arms are roughly parallel; press up without flaring elbows wide.",
+      "Seated at the machine with elbows braced on the pads; press the handles down until arms are straight, control the return.",
     source: "KevTheTrainer",
     videoUrl: "https://www.youtube.com/watch?v=LBpNVgVTLqY",
     isTimeBased: false,
@@ -5150,7 +5150,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Elevate shoulders straight up; pause briefly, lower without rolling forward.",
+      "Hang from the bar or rings; without bending the elbows, pull your body up by depressing the shoulder blades.",
     source: "Calisthenics Chris The Bodyweight BodyBuilder",
     videoUrl: "https://www.youtube.com/watch?v=zVARrISE_XY",
     isTimeBased: false,
@@ -5171,7 +5171,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "5 each side",
     notes:
-      "Raise arms out to the sides to shoulder height; lead with elbows, not hands.",
+      "Back against a wall; slide arms up and out along the wall to shoulder height, keeping contact with the wall.",
     source: "Rehab Hero",
     videoUrl: "https://www.youtube.com/watch?v=32vhy2hpgaY",
     isTimeBased: false,
@@ -5206,7 +5206,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "30 sec",
     notes:
-      "Protract shoulder blades forward; reach through full range without shrugging.",
+      "Back against a wall, arms in a goal-post position; slide arms overhead while keeping contact with the wall.",
     source: "Claire DeFitt",
     videoUrl: "https://www.youtube.com/watch?v=kFkohmjibdc",
     isTimeBased: true,
@@ -5267,7 +5267,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "30 sec each side",
     notes:
-      "Stack shoulders over elbow or wrist; lift hips in a straight line and breathe steadily.",
+      "Top leg supported on a bench with weight added at the hips; hold a straight line from shoulders to ankles.",
     source: "Sustain Physical Therapy and Performance",
     videoUrl: "https://www.youtube.com/watch?v=0_haQMgNxh8",
     isTimeBased: true,
@@ -5304,7 +5304,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Curl ribs toward hips; exhale on the effort and avoid pulling on the neck.",
+      "Hold a dumbbell at your chest; curl shoulder blades off the floor by flexing the spine, avoid yanking the neck.",
     source: "Kraken Fitness",
     videoUrl: "https://www.youtube.com/watch?v=Yg6GsyZoqK0",
     isTimeBased: false,
@@ -5340,7 +5340,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Glutes", "Hip Flexors", "Obliques", "Quadriceps"],
     defaultReps: "10 each leg",
     notes:
-      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
+      "Holding dumbbells at your sides, take a long step forward; lower until the back knee nearly touches the floor.",
     source: "Grown Strong",
     videoUrl: "https://www.youtube.com/watch?v=UlmDIw7ekBE",
     isTimeBased: false,
@@ -5421,7 +5421,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Long step; lower until back knee nears floor, front shin stays relatively vertical.",
+      "Holding dumbbells at your sides, step forward into a lunge; lower the back knee toward the floor, then push back up.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=mJilHWIBWO8",
     isTimeBased: false,
@@ -5435,7 +5435,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
-      "Rotate torso side to side with control; keep chest up and core braced throughout.",
+      "Seated with feet off the floor, holding a dumbbell; rotate the torso side to side, tapping the weight down each side.",
     source: "Drago Boxing",
     videoUrl: "https://www.youtube.com/watch?v=9DI8kQeK5cU",
     isTimeBased: false,
@@ -5458,7 +5458,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
+      "Seated with a dumbbell across your knees; lift toes toward your shins while heels stay down, lower slowly.",
     source: "FeRRUM Athletic Company",
     videoUrl: "https://www.youtube.com/watch?v=b_xNeXBvMlo",
     isTimeBased: false,
@@ -5479,7 +5479,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "30 sec each side",
     notes:
-      "Stack shoulders over elbow or wrist; lift hips in a straight line and breathe steadily.",
+      "Forearm or hand under your shoulder, dumbbell resting on the hip; hold a straight line from shoulders to feet.",
     source: "Boss Lifting",
     videoUrl: "https://www.youtube.com/watch?v=GIDLif1n0bM",
     isTimeBased: true,
@@ -5547,7 +5547,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
+      "Back against a wall holding a dumbbell on your thighs; lift toes toward your shins, heels staying planted.",
     source: "Do Better Fitness",
     videoUrl: "https://www.youtube.com/watch?v=awSgbYEXPY8",
     isTimeBased: false,
@@ -5570,7 +5570,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Back against wall or seated; lift toes toward shins with heels down to target tibialis.",
+      "Back against a wall, bar resting on your thighs or hips; lift toes toward your shins, heels staying planted.",
     source: "Strength Coach Phil",
     videoUrl: "https://www.youtube.com/watch?v=AFBbyAdNvg8",
     isTimeBased: false,

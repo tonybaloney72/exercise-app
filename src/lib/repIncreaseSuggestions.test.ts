@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { exerciseMap } from "@/core/catalog";
 import {
+  buildLoadProgressionSuggestion,
   evaluateRepIncreaseSuggestions,
   REP_INCREASE_BUMP,
   REP_INCREASE_MARGIN,
@@ -241,5 +242,90 @@ describe("evaluateRepIncreaseSuggestions", () => {
         },
       }),
     ).toEqual([]);
+  });
+
+  it("suggests a load jump when at rep ceiling with heavier inventory", () => {
+    const curlId = "HC-148"; // Dumbbell Hammer Curl
+    const today = "2026-07-02";
+    const dates = ["2026-06-25", today];
+    const history = dates.map((date, i) =>
+      workoutOn(date, `w-curl-${i}`, [
+        {
+          exerciseId: curlId,
+          completed: true,
+          skipped: false,
+          actualReps: 14,
+          weightLb: 5,
+          targetPrescription: "12",
+          loggingMode: "reps",
+        },
+      ]),
+    );
+    const completed = history[history.length - 1]!;
+
+    const suggestions = evaluateRepIncreaseSuggestions({
+      history,
+      completedWorkout: completed,
+      todayKey: today,
+      exerciseSettings: {
+        [curlId]: {
+          defaultSetMode: "reps",
+          defaultTargetReps: 12,
+          defaultWeightLb: 5,
+        },
+      },
+      weightInventory: {
+        dumbbell: [{ weightLb: 5 }, { weightLb: 10 }, { weightLb: 15 }],
+      },
+      enabled: true,
+    });
+
+    expect(suggestions).toHaveLength(1);
+    expect(suggestions[0]).toMatchObject({
+      exerciseId: curlId,
+      mode: "load",
+      currentTarget: 12,
+      suggestedTarget: 8,
+      currentWeightLb: 5,
+      suggestedWeightLb: 10,
+    });
+  });
+
+  it("buildLoadProgressionSuggestion returns null when below ceiling or no next weight", () => {
+    const curlId = "HC-148";
+    const meta = exerciseMap[curlId];
+    expect(
+      buildLoadProgressionSuggestion({
+        exerciseId: curlId,
+        meta,
+        stored: { defaultSetMode: "reps", defaultTargetReps: 10, defaultWeightLb: 5 },
+        finalLog: {
+          exerciseId: curlId,
+          completed: true,
+          skipped: false,
+          weightLb: 5,
+        },
+        current: { mode: "reps", target: 10 },
+        weightInventory: { dumbbell: [{ weightLb: 5 }, { weightLb: 10 }] },
+        reason: "t",
+      }),
+    ).toBeNull();
+
+    expect(
+      buildLoadProgressionSuggestion({
+        exerciseId: curlId,
+        meta,
+        stored: { defaultSetMode: "reps", defaultTargetReps: 12, defaultWeightLb: 50 },
+        finalLog: {
+          exerciseId: curlId,
+          completed: true,
+          skipped: false,
+          weightLb: 50,
+        },
+        current: { mode: "reps", target: 12 },
+        weightInventory: { dumbbell: [{ weightLb: 50 }] },
+        reason: "t",
+      }),
+    ).toBeNull();
   });
 });

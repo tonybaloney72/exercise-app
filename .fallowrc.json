@@ -15,7 +15,8 @@
     "scripts/lib/semver-version-code.mjs",
     "scripts/catalog-low-end-reps.mjs",
     "scripts/catalog-overlap-report.mjs",
-    "scripts/enrich-hc-notes.mjs"
+    "scripts/enrich-hc-notes.mjs",
+    "scripts/lib/hc-notes-by-name.mjs"
   ],
   "ignoreDependencies": [
     "@capacitor/android",

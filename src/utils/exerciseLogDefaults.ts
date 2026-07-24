@@ -59,6 +59,7 @@ export function clearExerciseMetrics(log: ExerciseLog): ExerciseLog {
     ...log,
     actualReps: undefined,
     actualDuration: undefined,
+    weightLb: undefined,
   };
 }
 
@@ -68,48 +69,38 @@ export function clearExerciseMetrics(log: ExerciseLog): ExerciseLog {
  */
 function ensureExerciseMetrics(log: ExerciseLog): ExerciseLog {
   if (!log.completed || log.skipped) return log;
-  if (log.actualReps != null || log.actualDuration != null) return log;
 
-  const id = effectiveExerciseId(log);
-  const prescription = resolvePrescriptionText(log);
-  const mode = effectiveLoggingMode(log);
+  let next =
+    log.actualReps != null || log.actualDuration != null
+      ? log
+      : fillMissingRepsOrDuration(log);
 
-  if (mode === "timer") {
-    if (
-      log.targetDurationSeconds != null &&
-      log.targetDurationSeconds > 0
-    ) {
-      return { ...log, actualDuration: log.targetDurationSeconds };
-    }
-    const parsed = metricsFromPrescription(prescription, true);
-    if (parsed.actualDuration != null) {
-      return { ...log, ...parsed };
-    }
-    const meta = exerciseMap[id];
-    const stored = useExerciseSettingsStore.getState().byExerciseId[id];
-    const resolved = resolveExerciseSettings(
-      meta ?? {
-        id,
-        isTimeBased: false,
-        category: "UP",
-        name: "",
-        defaultReps: "",
-        notes: "",
-      },
-      stored,
-    );
-    if (
-      resolved.defaultSetMode === "timer" &&
-      resolved.defaultTimerSeconds != null &&
-      resolved.defaultTimerSeconds > 0
-    ) {
-      return { ...log, actualDuration: resolved.defaultTimerSeconds };
-    }
-    return { ...log, actualDuration: DEFAULT_TIMER_SECONDS_FALLBACK };
+  if (next.weightLb == null) {
+    const id = effectiveExerciseId(next);
+    const w = useExerciseSettingsStore.getState().byExerciseId[id]
+      ?.defaultWeightLb;
+    if (w != null && w > 0) next = { ...next, weightLb: w };
   }
 
+  return next;
+}
+
+function fillMissingRepsOrDuration(log: ExerciseLog): ExerciseLog {
+  const id = effectiveExerciseId(log);
+  const mode = effectiveLoggingMode(log);
+  if (mode === "timer") return fillTimerActual(log, id);
+  return fillRepsActual(log, id);
+}
+
+function fillTimerActual(log: ExerciseLog, id: string): ExerciseLog {
+  if (log.targetDurationSeconds != null && log.targetDurationSeconds > 0) {
+    return { ...log, actualDuration: log.targetDurationSeconds };
+  }
+  const parsed = metricsFromPrescription(resolvePrescriptionText(log), true);
+  if (parsed.actualDuration != null) return { ...log, ...parsed };
+
+  const stored = useExerciseSettingsStore.getState().byExerciseId[id];
   const meta = exerciseMap[id];
-  const st = useExerciseSettingsStore.getState().byExerciseId[id];
   const resolved = resolveExerciseSettings(
     meta ?? {
       id,
@@ -119,21 +110,39 @@ function ensureExerciseMetrics(log: ExerciseLog): ExerciseLog {
       defaultReps: "",
       notes: "",
     },
-    st,
+    stored,
   );
   if (
-    mode === "reps" &&
-    resolved.defaultTargetReps != null &&
-    resolved.defaultTargetReps > 0
+    resolved.defaultSetMode === "timer" &&
+    resolved.defaultTimerSeconds != null &&
+    resolved.defaultTimerSeconds > 0
   ) {
+    return { ...log, actualDuration: resolved.defaultTimerSeconds };
+  }
+  return { ...log, actualDuration: DEFAULT_TIMER_SECONDS_FALLBACK };
+}
+
+function fillRepsActual(log: ExerciseLog, id: string): ExerciseLog {
+  const stored = useExerciseSettingsStore.getState().byExerciseId[id];
+  const meta = exerciseMap[id];
+  const resolved = resolveExerciseSettings(
+    meta ?? {
+      id,
+      isTimeBased: false,
+      category: "UP",
+      name: "",
+      defaultReps: "",
+      notes: "",
+    },
+    stored,
+  );
+  if (resolved.defaultTargetReps != null && resolved.defaultTargetReps > 0) {
     return { ...log, actualReps: resolved.defaultTargetReps };
   }
-
-  const parsed = metricsFromPrescription(prescription, false);
+  const parsed = metricsFromPrescription(resolvePrescriptionText(log), false);
   if (parsed.actualReps != null || parsed.actualDuration != null) {
     return { ...log, ...parsed };
   }
-
   return { ...log, actualReps: 1 };
 }
 

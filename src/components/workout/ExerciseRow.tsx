@@ -21,6 +21,16 @@ import {
   parseRepTargetHint,
   resolveExerciseSettings,
 } from "@/utils/effectiveExerciseSettings";
+import {
+  exerciseSupportsLoadMeta,
+  formatLoadPrescription,
+  inventoryKindForExercise,
+  sanitizeWeightLb,
+} from "@/lib/exerciseLoad";
+import {
+  formatInventoryWeightLb,
+  listInventoryWeightsLb,
+} from "@/lib/weightInventory";
 import { formatLoggedDuration } from "@/utils/time";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
 import SwapExerciseModal from "./SwapExerciseModal";
@@ -65,6 +75,7 @@ export default function ExerciseRow({
     skipExercise,
     unskipExercise,
     setActualReps,
+    setActualWeight,
     setActualDuration,
     setTargetDuration,
     setRoundExerciseLoggingMode,
@@ -83,6 +94,7 @@ export default function ExerciseRow({
   }, [activeWorkout?.rounds, roundNumber]);
 
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const weightInventory = useSettingsStore((s) => s.weightInventory);
   const authMode = useAuthStore((s) => s.mode);
   const preferenceMap = useExercisePreferencesStore((s) => s.byExerciseId);
   const setPreference = useExercisePreferencesStore((s) => s.setPreference);
@@ -151,14 +163,21 @@ export default function ExerciseRow({
 
   const prescriptionLine = useMemo(() => {
     if (!plannedExercise || !effectiveExercise) return "";
+    let repsOrTimer = "";
     if (mode === "reps") {
       const r = resolveExerciseSettings(effectiveExercise, stored);
       if (r.defaultTargetReps != null) {
-        return String(r.defaultTargetReps);
+        repsOrTimer = String(r.defaultTargetReps);
+      } else {
+        repsOrTimer = resolvePrescriptionText(log) || roundExercise.targetReps;
       }
-      return resolvePrescriptionText(log) || roundExercise.targetReps;
+    } else {
+      repsOrTimer = `Timer · ${effectiveTargetSec}s`;
     }
-    return `Timer · ${effectiveTargetSec}s`;
+    const load =
+      log.weightLb ??
+      resolveExerciseSettings(effectiveExercise, stored).defaultWeightLb;
+    return formatLoadPrescription(repsOrTimer, load);
   }, [
     plannedExercise,
     effectiveExercise,
@@ -168,6 +187,15 @@ export default function ExerciseRow({
     effectiveTargetSec,
     stored,
   ]);
+
+  const supportsLoad = exerciseSupportsLoadMeta(effectiveExercise);
+
+  const inventoryWeights = useMemo(() => {
+    if (!effectiveExercise) return [] as number[];
+    const kind = inventoryKindForExercise(effectiveExercise.equipment);
+    if (!kind) return [] as number[];
+    return listInventoryWeightsLb(weightInventory ?? {}, kind);
+  }, [effectiveExercise, weightInventory]);
 
   const actualRepsPlaceholder = useMemo(() => {
     if (!effectiveExercise || mode !== "reps") return "-";
@@ -280,7 +308,7 @@ export default function ExerciseRow({
   const completedFieldId = `completed-${roundNumber}-${plannedId}`;
 
   const inlineCompletedInput = showInlineCompleted ? (
-    <div className="flex items-center gap-1.5">
+    <div className="flex flex-wrap items-center gap-1.5">
       <label htmlFor={completedFieldId} className="text-xs text-muted">
         Did
       </label>
@@ -326,6 +354,43 @@ export default function ExerciseRow({
           mode === "reps" ? "Completed reps" : "Completed duration in seconds"
         }
       />
+      {supportsLoad ? (
+        <>
+          <span className="text-xs text-muted">@</span>
+          <input
+            type="text"
+            inputMode="decimal"
+            value={log.weightLb != null ? String(log.weightLb) : ""}
+            onChange={(e) => {
+              const val = e.target.value.trim();
+              if (val === "") {
+                setActualWeight(roundNumber, plannedId, undefined);
+                return;
+              }
+              if (!/^\d*\.?\d*$/.test(val)) return;
+              const parsed = sanitizeWeightLb(Number(val));
+              if (parsed == null) return;
+              setActualWeight(roundNumber, plannedId, parsed);
+            }}
+            list={`weight-options-${roundNumber}-${plannedId}`}
+            className="w-14 rounded-md border border-border bg-background px-2 py-0.5 text-right text-sm text-foreground outline-none focus:border-accent"
+            placeholder={
+              stored?.defaultWeightLb != null
+                ? formatInventoryWeightLb(stored.defaultWeightLb)
+                : "lb"
+            }
+            aria-label="Working weight in pounds"
+          />
+          {inventoryWeights.length > 0 ? (
+            <datalist id={`weight-options-${roundNumber}-${plannedId}`}>
+              {inventoryWeights.map((w) => (
+                <option key={w} value={formatInventoryWeightLb(w)} />
+              ))}
+            </datalist>
+          ) : null}
+          <span className="text-xs text-muted">lb</span>
+        </>
+      ) : null}
     </div>
   ) : null;
 

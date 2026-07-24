@@ -15,6 +15,19 @@ export function buildExerciseSettingsAfterRepIncreaseAccept(
       defaultSetMode: "timer",
       defaultTargetReps: null,
       defaultTimerSeconds: suggestion.suggestedTarget,
+      defaultWeightLb: stored?.defaultWeightLb ?? null,
+      repSuggestionLastAcceptedAt: todayKey,
+      repSuggestionSnoozedUntil: null,
+    };
+  }
+
+  if (suggestion.mode === "load") {
+    return {
+      ...stored,
+      defaultSetMode: "reps",
+      defaultTimerSeconds: null,
+      defaultTargetReps: suggestion.suggestedTarget,
+      defaultWeightLb: suggestion.suggestedWeightLb ?? null,
       repSuggestionLastAcceptedAt: todayKey,
       repSuggestionSnoozedUntil: null,
     };
@@ -25,6 +38,7 @@ export function buildExerciseSettingsAfterRepIncreaseAccept(
     defaultSetMode: "reps",
     defaultTimerSeconds: null,
     defaultTargetReps: suggestion.suggestedTarget,
+    defaultWeightLb: stored?.defaultWeightLb ?? null,
     repSuggestionLastAcceptedAt: todayKey,
     repSuggestionSnoozedUntil: null,
   };

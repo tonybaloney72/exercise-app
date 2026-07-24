@@ -1,5 +1,6 @@
 import { DEFAULT_SETTINGS } from "@/lib/repos/types";
 import { migrateAvailableEquipment } from "@/data/equipment";
+import { sanitizeWeightInventory } from "@/lib/weightInventory";
 import {
   sanitizeTrainingPriorityPreset,
   sanitizeTrainingPriorityScores,
@@ -256,6 +257,9 @@ export function normalizeUserSettings(
       : {}),
     suggestRepIncreases:
       partial.suggestRepIncreases ?? DEFAULT_SETTINGS.suggestRepIncreases,
+    weightInventory: sanitizeWeightInventory(
+      partial.weightInventory ?? rest.weightInventory,
+    ),
     completeExerciseOnSetTimerStop:
       partial.completeExerciseOnSetTimerStop ??
       DEFAULT_SETTINGS.completeExerciseOnSetTimerStop,

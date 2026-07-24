@@ -1,93 +1,20 @@
 /**
  * Form-cue notes and unilateral defaultReps for Hybrid Calisthenics catalog rows.
  * Run: node scripts/enrich-hc-notes.mjs
+ *
+ * Prefer exact per-exercise cues in scripts/lib/hc-notes-by-name.mjs.
+ * Pattern rules are a fallback only for names not yet curated.
  */
 
 import { readFileSync, writeFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath, pathToFileURL } from "url";
+import { HC_NOTES_BY_NAME } from "./lib/hc-notes-by-name.mjs";
 
 /** @typedef {{ pattern: RegExp; note: string }} NoteRule */
 
-/**
- * Exact notes keyed by exercise name. Checked before pattern rules so each
- * curated exercise keeps its own cue instead of sharing a family template.
- * @type {Record<string, string>}
- */
-const NOTE_BY_NAME = {
-  "Band Biceps Curl":
-    "Stand on the band; curl hands toward shoulders with elbows pinned at your sides, lower slowly.",
-  "Band Hammer Curl":
-    "Neutral grip on the band; curl without swinging, elbows stay at your sides.",
-  "Band Resisted Lying Hamstring Curl":
-    "Lie face down; curl heels toward glutes against the band, keep hips down, lower slowly.",
-  "Band Resisted Sitting Hamstring Curl":
-    "Seated; curl heels under against the band, keep hips planted, control the return.",
-  "Band Reverse Curl":
-    "Overhand grip on the band; curl with elbows pinned, emphasize forearms and brachialis.",
-  "Barbell Curl":
-    "Underhand grip on the bar; curl with elbows fixed at your sides and lower under control.",
-  "Barbell Drag Curl":
-    "Drag the bar up along your torso; elbows travel back while the bar stays close to the body.",
-  "Barbell Reverse Curl":
-    "Overhand grip on the bar; curl with elbows pinned, emphasize forearms and brachialis.",
-  "Barbell Reverse Wrist Curl":
-    "Forearms supported on a bench, palms down on the bar; extend wrists through full range under control.",
-  "Barbell Wrist Curl":
-    "Forearms supported on a bench, palms up on the bar; curl by flexing wrists through full range.",
-  "Cable Curl":
-    "Curl the cable handle with elbows fixed at your sides; control the return against the stack.",
-  "Cable Hammer Curl":
-    "Neutral-grip cable curl; elbows fixed, no swing, squeeze at the top.",
-  "Cable Reverse Curl":
-    "Overhand cable curl; elbows pinned, emphasize forearms and brachialis.",
-  "Cable Reverse Wrist Curl":
-    "Forearms braced, palms down on the handle; extend wrists against the cable through full range.",
-  "Cable Wrist Curl":
-    "Forearms braced, palms up on the handle; flex wrists against the cable through full range.",
-  "Dumbbell Drag Curl":
-    "Drag dumbbells up along your torso; elbows travel back while weights stay close to the body.",
-  "Dumbbell Hammer Curl":
-    "Neutral grip; curl without swinging, elbows stay at your sides.",
-  "Dumbbell Preacher Curl":
-    "Upper arms on the pad; curl through full range and lower slowly without bouncing at the bottom.",
-  "Dumbbell Reverse Curl":
-    "Overhand grip; curl with elbows pinned, emphasize forearms and brachialis.",
-  "Dumbbell Reverse Wrist Curl":
-    "Forearms supported, palms down holding dumbbells; extend wrists through full range under control.",
-  "Dumbbell Spider Curl":
-    "Chest on incline bench, arms hanging; curl dumbbells up and lower without swinging.",
-  "Dumbbell Wrist Curl":
-    "Forearms supported, palms up holding dumbbells; curl by flexing wrists through full range.",
-  "Face away Cable Curl":
-    "Face away from the stack so the cable pulls elbows back; curl from a long biceps stretch.",
-  "High Cable Curl":
-    "Arms start high from the cable; curl hands toward shoulders, keep upper arms steady.",
-  "Incline Dumbbell Curl":
-    "On an incline bench; let arms hang for a stretch, curl without swinging the torso.",
-  "Lying Cable Hamstring Curl":
-    "Lie face down; curl heels toward glutes against the cable, hips down, control the eccentric.",
-  "Lying Hamstring Curl Machine":
-    "Lie face down on the machine; curl heels toward glutes, keep hips pressed down.",
-  "Nordic Curl":
-    "Kneel with ankles secured; lower torso forward under control, then pull back with hamstrings.",
-  "Pelican Curl":
-    "On rings, lean into a deep biceps stretch with arms extended; curl rings toward shoulders with control.",
-  "Preacher Curl Machine":
-    "Upper arms on the pad; curl through full range and lower slowly without bouncing.",
-  "Reverse Ring Curl":
-    "On rings with overhand grip; curl by flexing elbows, control the descent.",
-  "Ring Curl":
-    "On rings with underhand grip; curl by flexing elbows, control the descent.",
-  "Sitting Hamstring Curl Machine":
-    "Seated on the machine; curl heels under the pad, keep hips planted, control the return.",
-  "Standing Cable Hamstring Curl":
-    "Stand tall; curl one heel toward the glute against the cable, keep hips square.",
-  "Standing Dumbbell Curl":
-    "Stand tall; curl dumbbells with elbows at your sides, avoid swinging the torso.",
-  "Zottman Curl":
-    "Curl palms-up, rotate to palms-down at the top, then lower with an overhand grip.",
-};
+/** @type {Record<string, string>} */
+const NOTE_BY_NAME = HC_NOTES_BY_NAME;
 
 /** @type {NoteRule[]} */
 const NOTE_RULES = [

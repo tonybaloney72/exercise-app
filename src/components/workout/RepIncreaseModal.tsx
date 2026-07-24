@@ -112,9 +112,9 @@ export default function RepIncreaseModal({
     <BottomSheetModal
       open={open}
       onClose={onClose}
-      title="Increase your defaults?"
+      title="Update your defaults?"
       hint="Updates your Library defaults for future workouts."
-      ariaLabel="Rep increase suggestions"
+      ariaLabel="Progression suggestions"
       footer={
         <div className="flex flex-col gap-2">
           <button
@@ -159,11 +159,14 @@ export default function RepIncreaseModal({
                     {formatRepIncreaseTarget(
                       suggestion.mode,
                       suggestion.currentTarget,
+                      suggestion.currentWeightLb,
                     )}{" "}
                     →{" "}
                     {formatRepIncreaseTarget(
                       suggestion.mode,
                       suggestion.suggestedTarget,
+                      suggestion.suggestedWeightLb ??
+                        suggestion.currentWeightLb,
                     )}
                   </span>
                   <span className="text-xs text-muted">{suggestion.reason}</span>

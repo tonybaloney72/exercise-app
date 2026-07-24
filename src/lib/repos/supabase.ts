@@ -25,6 +25,7 @@ import {
 } from "@/lib/weeklyCategoryLayout";
 import { sanitizeWeeklyLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
 import { DEFAULT_TIMER_SECONDS_FALLBACK } from "@/utils/effectiveExerciseSettings";
+import { exerciseLogPersistFields } from "@/lib/exerciseLogPersist";
 import type {
   ExerciseSettingsMap,
   ExerciseSettingsRepo,
@@ -103,6 +104,7 @@ interface ExerciseRow {
   actual_reps: number | null;
   actual_duration: number | null;
   actual_distance_mi: number | null;
+  actual_weight_lb?: number | null;
   target_duration_seconds: number | null;
   skipped: boolean;
   swapped_with: string | null;
@@ -180,9 +182,14 @@ interface SettingsRow {
   progression_families_enabled?: boolean;
   release_notes_seen_ids?: string[] | null;
   suggest_rep_increases?: boolean;
+  weight_inventory?: unknown;
   body_sex_at_birth?: string | null;
   body_birth_date?: string | null;
   body_height_in?: number | null;
+}
+
+function positiveOrUndefined(n: number | null | undefined): number | undefined {
+  return n != null && n > 0 ? n : undefined;
 }
 
 function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
@@ -191,6 +198,7 @@ function rowToExerciseLog(r: ExerciseRow): ExerciseLog {
     completed: r.completed,
     actualReps: r.actual_reps ?? undefined,
     actualDuration: r.actual_duration ?? undefined,
+    weightLb: positiveOrUndefined(r.actual_weight_lb ?? undefined),
     actualDistanceMi: r.actual_distance_mi ?? undefined,
     targetDurationSeconds: r.target_duration_seconds ?? undefined,
     skipped: r.skipped,
@@ -280,6 +288,7 @@ type ExerciseLogSaveRow = {
   actual_reps: number | null;
   actual_duration: number | null;
   actual_distance_mi: number | null;
+  actual_weight_lb?: number | null;
   target_duration_seconds: number | null;
   skipped: boolean;
   swapped_with: string | null;
@@ -306,24 +315,7 @@ function exerciseLogToSaveRow(
     position,
     exercise_id: ex.exerciseId,
     completed: ex.completed,
-    actual_reps: ex.actualReps ?? null,
-    actual_duration: ex.actualDuration ?? null,
-    actual_distance_mi: ex.actualDistanceMi ?? null,
-    target_duration_seconds: ex.targetDurationSeconds ?? null,
-    skipped: ex.skipped,
-    swapped_with: ex.swappedWith ?? null,
-    notes: ex.notes ?? null,
-    step_count: ex.stepCount ?? null,
-    active_calories_kcal: ex.activeCaloriesKcal ?? null,
-    avg_heart_rate_bpm: ex.avgHeartRateBpm ?? null,
-    activity_source: ex.activitySource ?? null,
-    health_source_name: ex.healthSourceName ?? null,
-    gps_track_points:
-      ex.gpsTrackPoints != null && ex.gpsTrackPoints.length > 0
-        ? ex.gpsTrackPoints
-        : null,
-    activity_start_time: ex.activityStartTime ?? null,
-    activity_end_time: ex.activityEndTime ?? null,
+    ...exerciseLogPersistFields(ex),
   };
 }
 
@@ -448,6 +440,7 @@ function rowToSettings(row: SettingsRow): UserSettings {
         )
       : [],
     suggestRepIncreases: row.suggest_rep_increases ?? false,
+    weightInventory: row.weight_inventory,
     bodySexAtBirth: row.body_sex_at_birth ?? null,
     bodyBirthDate: row.body_birth_date ?? null,
     bodyHeightIn: row.body_height_in ?? null,
@@ -497,6 +490,7 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     expertise_by_group_customized: true,
     release_notes_seen_ids: s.releaseNotesSeenIds,
     suggest_rep_increases: s.suggestRepIncreases,
+    weight_inventory: s.weightInventory,
     body_sex_at_birth: s.bodySexAtBirth ?? null,
     body_birth_date: s.bodyBirthDate ?? null,
     body_height_in: s.bodyHeightIn ?? null,
@@ -597,6 +591,7 @@ interface ExerciseSettingsRow {
   default_set_mode: string;
   default_timer_seconds: number | null;
   default_target_reps: number | null;
+  default_weight_lb?: number | null;
   rep_suggestion_ignored?: boolean | null;
   rep_suggestion_snoozed_until?: string | null;
   rep_suggestion_last_accepted_at?: string | null;
@@ -619,6 +614,7 @@ function rowToExerciseSettingsValues(
     defaultSetMode: row.default_set_mode as ExerciseSetMode,
     defaultTimerSeconds: row.default_timer_seconds ?? undefined,
     defaultTargetReps: row.default_target_reps ?? undefined,
+    defaultWeightLb: positiveOrUndefined(row.default_weight_lb ?? undefined),
     repSuggestionIgnored: row.rep_suggestion_ignored ?? undefined,
     repSuggestionSnoozedUntil:
       sanitizeDateKeyOrNull(row.rep_suggestion_snoozed_until) ?? undefined,
@@ -638,7 +634,7 @@ export const supabaseExerciseSettingsRepo: ExerciseSettingsRepo = {
     const { data, error } = await supabase
       .from("exercise_settings")
       .select(
-        "exercise_id, default_set_mode, default_timer_seconds, default_target_reps, rep_suggestion_ignored, rep_suggestion_snoozed_until, rep_suggestion_last_accepted_at",
+        "exercise_id, default_set_mode, default_timer_seconds, default_target_reps, default_weight_lb, rep_suggestion_ignored, rep_suggestion_snoozed_until, rep_suggestion_last_accepted_at",
       )
       .eq("user_id", user.id);
 
@@ -681,6 +677,8 @@ export const supabaseExerciseSettingsRepo: ExerciseSettingsRepo = {
         ? Math.min(999, Math.round(values.defaultTargetReps))
         : null;
 
+    const default_weight_lb = positiveOrUndefined(values.defaultWeightLb) ?? null;
+
     const { error } = await supabase.from("exercise_settings").upsert(
       {
         user_id: user.id,
@@ -688,6 +686,7 @@ export const supabaseExerciseSettingsRepo: ExerciseSettingsRepo = {
         default_set_mode: values.defaultSetMode,
         default_timer_seconds,
         default_target_reps,
+        default_weight_lb,
         rep_suggestion_ignored: values.repSuggestionIgnored ?? false,
         rep_suggestion_snoozed_until: values.repSuggestionSnoozedUntil ?? null,
         rep_suggestion_last_accepted_at:

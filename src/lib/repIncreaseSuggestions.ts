@@ -3,8 +3,19 @@ import {
   parseRepTargetHint,
   parseTimerSecondsHint,
 } from "@/lib/exercisePrescriptionHints";
+import {
+  exerciseSupportsLoadMeta,
+  inventoryKindForExercise,
+} from "@/lib/exerciseLoad";
 import type { ExerciseSettingsMap } from "@/lib/repos";
-import type { ExerciseLog, ExerciseSetMode, ExerciseSettingsValues, WorkoutLog } from "@/types";
+import { nextHeavierInventoryWeight } from "@/lib/weightInventory";
+import type {
+  ExerciseLog,
+  ExerciseSetMode,
+  ExerciseSettingsValues,
+  WeightInventory,
+  WorkoutLog,
+} from "@/types";
 import { effectiveExerciseId } from "@/utils/exerciseLogDefaults";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
@@ -15,8 +26,12 @@ import { parseLocalDateKeyMs } from "@/utils/localDateKey";
 export const REP_INCREASE_MARGIN = 2;
 export const REP_INCREASE_BUMP = 2;
 export const REP_SUGGESTION_SNOOZE_DAYS = 14;
+/** Top of double-progression rep range for loadable exercises. */
+const LOAD_REP_RANGE_MAX = 12;
+/** Reps after a load jump. */
+const LOAD_REP_RANGE_MIN = 8;
 
-export type RepIncreaseMode = "reps" | "timer";
+export type RepIncreaseMode = "reps" | "timer" | "load";
 
 type RepIncreaseFrequencyBucket = "daily" | "medium" | "weekly";
 
@@ -25,6 +40,8 @@ export interface RepIncreaseSuggestion {
   mode: RepIncreaseMode;
   currentTarget: number;
   suggestedTarget: number;
+  currentWeightLb?: number;
+  suggestedWeightLb?: number;
   reason: string;
 }
 
@@ -264,7 +281,7 @@ function buildAppearances(
 function resolveCurrentTarget(
   exerciseId: string,
   exerciseSettings: ExerciseSettingsMap,
-): { mode: RepIncreaseMode; target: number } | null {
+): { mode: "reps" | "timer"; target: number } | null {
   const meta = exerciseMap[exerciseId];
   if (!meta) return null;
   const stored = exerciseSettings[exerciseId];
@@ -295,6 +312,7 @@ export function evaluateRepIncreaseSuggestions(input: {
   todayKey: string;
   exerciseSettings: ExerciseSettingsMap;
   enabled: boolean;
+  weightInventory?: WeightInventory;
 }): RepIncreaseSuggestion[] {
   const {
     history,
@@ -302,6 +320,7 @@ export function evaluateRepIncreaseSuggestions(input: {
     todayKey,
     exerciseSettings,
     enabled,
+    weightInventory = {},
   } = input;
 
   if (!enabled) return [];
@@ -327,11 +346,36 @@ export function evaluateRepIncreaseSuggestions(input: {
     const current = resolveCurrentTarget(exerciseId, exerciseSettings);
     if (!current) continue;
 
+    const meta = exerciseMap[exerciseId];
+    const loadSuggestion = buildLoadProgressionSuggestion({
+      exerciseId,
+      meta,
+      stored,
+      finalLog,
+      current,
+      weightInventory,
+      reason: reasonForBucket(appearances, bucket),
+    });
+    if (loadSuggestion) {
+      suggestions.push(loadSuggestion);
+      continue;
+    }
+
+    const bumped = Math.min(999, current.target + REP_INCREASE_BUMP);
+    const capped =
+      current.mode === "reps" &&
+      exerciseSupportsLoadMeta(meta) &&
+      (stored?.defaultWeightLb != null || finalLog.weightLb != null)
+        ? Math.min(LOAD_REP_RANGE_MAX, bumped)
+        : bumped;
+
+    if (capped <= current.target) continue;
+
     suggestions.push({
       exerciseId,
       mode: current.mode,
       currentTarget: current.target,
-      suggestedTarget: Math.min(999, current.target + REP_INCREASE_BUMP),
+      suggestedTarget: capped,
       reason: reasonForBucket(appearances, bucket),
     });
   }
@@ -343,10 +387,69 @@ export function evaluateRepIncreaseSuggestions(input: {
   });
 }
 
+function workingWeightLb(
+  finalLog: ExerciseLog,
+  stored: ExerciseSettingsValues | undefined,
+): number | null {
+  if (finalLog.weightLb != null && finalLog.weightLb > 0) return finalLog.weightLb;
+  if (stored?.defaultWeightLb != null && stored.defaultWeightLb > 0) {
+    return stored.defaultWeightLb;
+  }
+  return null;
+}
+
+/** Double-progression load jump when at the rep ceiling with a heavier plate/DB. */
+export function buildLoadProgressionSuggestion(input: {
+  exerciseId: string;
+  meta: (typeof exerciseMap)[string] | undefined;
+  stored: ExerciseSettingsValues | undefined;
+  finalLog: ExerciseLog;
+  current: { mode: "reps" | "timer"; target: number };
+  weightInventory: WeightInventory;
+  reason: string;
+}): RepIncreaseSuggestion | null {
+  if (input.current.mode !== "reps") return null;
+  if (!exerciseSupportsLoadMeta(input.meta)) return null;
+  if (input.current.target < LOAD_REP_RANGE_MAX) return null;
+
+  const currentWeight = workingWeightLb(input.finalLog, input.stored);
+  if (currentWeight == null) return null;
+
+  const kind = inventoryKindForExercise(input.meta?.equipment);
+  if (!kind) return null;
+
+  const next = nextHeavierInventoryWeight(
+    input.weightInventory,
+    kind,
+    currentWeight,
+  );
+  if (next == null) return null;
+
+  return {
+    exerciseId: input.exerciseId,
+    mode: "load",
+    currentTarget: input.current.target,
+    suggestedTarget: LOAD_REP_RANGE_MIN,
+    currentWeightLb: currentWeight,
+    suggestedWeightLb: next,
+    reason: `${input.reason}; at ${LOAD_REP_RANGE_MAX}+ reps — step up load`,
+  };
+}
+
 export function formatRepIncreaseTarget(
   mode: RepIncreaseMode,
   value: number,
+  weightLb?: number,
 ): string {
+  if (mode === "load") {
+    const w =
+      weightLb != null && weightLb > 0
+        ? Number.isInteger(weightLb)
+          ? String(weightLb)
+          : weightLb.toFixed(1)
+        : "?";
+    return `${value} reps @ ${w} lb`;
+  }
   return mode === "timer" ? `${value} sec` : `${value} reps`;
 }
 

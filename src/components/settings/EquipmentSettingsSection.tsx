@@ -1,15 +1,18 @@
 "use client";
 
 import EquipmentPicker from "@/components/settings/EquipmentPicker";
+import WeightInventoryEditor from "@/components/settings/WeightInventoryEditor";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
 export default function EquipmentSettingsSection() {
   const mode = useAuthStore((s) => s.mode);
-  const settings = useSettingsStore();
+  const availableEquipment = useSettingsStore((s) => s.availableEquipment);
+  const weightInventory = useSettingsStore((s) => s.weightInventory);
+  const updateSettings = useSettingsStore((s) => s.updateSettings);
 
   return (
-    <>
+    <div className="flex flex-col gap-5">
       <p className="text-xs text-muted">
         {mode === "guest" && (
           <>
@@ -22,11 +25,14 @@ export default function EquipmentSettingsSection() {
         have.
       </p>
       <EquipmentPicker
-        selected={settings.availableEquipment}
-        onChange={(next) =>
-          void settings.updateSettings({ availableEquipment: next })
-        }
+        selected={availableEquipment}
+        onChange={(next) => void updateSettings({ availableEquipment: next })}
       />
-    </>
+      <WeightInventoryEditor
+        availableEquipment={availableEquipment}
+        inventory={weightInventory ?? {}}
+        onChange={(next) => void updateSettings({ weightInventory: next })}
+      />
+    </div>
   );
 }

@@ -30,6 +30,12 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 import { buildExerciseSettingsClearRepSuggestionIgnore } from "@/lib/applyRepIncreaseSuggestion";
+import { exerciseSupportsLoadMeta } from "@/lib/exerciseLoad";
+import {
+  parseLibraryDefaultRepsInput,
+  parseLibraryDefaultWeightInput,
+  buildLibraryWeightSettings,
+} from "@/lib/libraryExerciseDefaults";
 import { exerciseVideoLinkLabel } from "@/lib/exerciseVideoLink";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
@@ -450,6 +456,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
           stored?.defaultTargetReps != null && stored.defaultTargetReps > 0
             ? stored.defaultTargetReps
             : null,
+        defaultWeightLb: stored?.defaultWeightLb ?? null,
       });
       return;
     }
@@ -463,6 +470,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
         stored.defaultTimerSeconds > 0
           ? stored.defaultTimerSeconds
           : DEFAULT_TIMER_SECONDS_FALLBACK,
+      defaultWeightLb: stored?.defaultWeightLb ?? null,
     });
   }
 
@@ -472,6 +480,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
       defaultSetMode: "timer",
       defaultTargetReps: null,
       defaultTimerSeconds: sec,
+      defaultWeightLb: stored?.defaultWeightLb ?? null,
     });
   }
 
@@ -486,34 +495,33 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
       defaultSetMode: "timer",
       defaultTargetReps: null,
       defaultTimerSeconds: sec,
+      defaultWeightLb: stored?.defaultWeightLb ?? null,
     });
     setCustomChipActive(false);
   }
 
   async function commitDefaultRepsFromInput(input: HTMLInputElement) {
-    const raw = input.value.trim();
-    if (raw === "") {
-      await upsert(exercise.id, {
-        defaultSetMode: "reps",
-        defaultTimerSeconds: null,
-        defaultTargetReps: null,
-      });
-      return;
-    }
-    const n = Math.round(Number(raw));
-    const reps = Math.min(
-      999,
-      Math.max(
-        1,
-        Number.isNaN(n) ? (parseRepTargetHint(exercise.defaultReps) ?? 1) : n,
-      ),
+    const reps = parseLibraryDefaultRepsInput(
+      input.value,
+      exercise.defaultReps,
     );
-    input.value = String(reps);
+    if (reps != null) input.value = String(reps);
     await upsert(exercise.id, {
       defaultSetMode: "reps",
       defaultTimerSeconds: null,
       defaultTargetReps: reps,
+      defaultWeightLb: stored?.defaultWeightLb ?? null,
     });
+  }
+
+  async function commitDefaultWeightFromInput(input: HTMLInputElement) {
+    const weight = parseLibraryDefaultWeightInput(input.value);
+    if (weight === undefined) return;
+    if (weight != null) input.value = String(weight);
+    await upsert(
+      exercise.id,
+      buildLibraryWeightSettings(resolved.defaultSetMode, stored, weight),
+    );
   }
 
   const modeBtn =
@@ -529,7 +537,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
 
   return (
     <div className="rounded-lg border border-border bg-surface overflow-hidden">
-      <div className="flex w-full min-h-[48px] items-center gap-2 px-3 py-2">
+      <div className="flex w-full min-h-12 items-center gap-2 px-3 py-2">
         <button
           type="button"
           onClick={() => {
@@ -727,13 +735,58 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                         className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
                       />
                     </div>
+                    {exerciseSupportsLoadMeta(exercise) ? (
+                      <div className="flex flex-col gap-2.5">
+                        <label className="text-caption font-medium uppercase tracking-wide text-muted">
+                          Default weight (lb)
+                        </label>
+                        <input
+                          key={`default-weight-${exercise.id}-${stored?.defaultWeightLb ?? ""}`}
+                          type="number"
+                          inputMode="decimal"
+                          min={0.5}
+                          max={500}
+                          step={0.5}
+                          defaultValue={resolved.defaultWeightLb ?? ""}
+                          onBlur={(e) =>
+                            void commitDefaultWeightFromInput(e.currentTarget)
+                          }
+                          className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
+                        />
+                        <p className="text-caption text-muted">
+                          Working load for this exercise. Clear to unset.
+                        </p>
+                      </div>
+                    ) : null}
                     <p className="text-caption text-muted">
-                      Clear the field and tap away to use the catalog line (
-                      {exercise.defaultReps}) until you set a number.
+                      Clear the reps field and tap away to use the catalog line
+                      ({exercise.defaultReps}) until you set a number.
                     </p>
                   </div>
                 )}
-                {stored?.repSuggestionIgnored || stored?.repSuggestionSnoozedUntil ? (
+                {resolved.defaultSetMode === "timer" &&
+                exerciseSupportsLoadMeta(exercise) ? (
+                  <div className="flex flex-col gap-2.5 border-t border-border pt-3">
+                    <label className="text-caption font-medium uppercase tracking-wide text-muted">
+                      Default weight (lb)
+                    </label>
+                    <input
+                      key={`default-weight-timer-${exercise.id}-${stored?.defaultWeightLb ?? ""}`}
+                      type="number"
+                      inputMode="decimal"
+                      min={0.5}
+                      max={500}
+                      step={0.5}
+                      defaultValue={resolved.defaultWeightLb ?? ""}
+                      onBlur={(e) =>
+                        void commitDefaultWeightFromInput(e.currentTarget)
+                      }
+                      className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
+                    />
+                  </div>
+                ) : null}
+                {stored?.repSuggestionIgnored ||
+                stored?.repSuggestionSnoozedUntil ? (
                   <div className="flex flex-col gap-2 border-t border-border pt-3">
                     <p className="text-caption font-medium uppercase tracking-wide text-muted">
                       Rep suggestions

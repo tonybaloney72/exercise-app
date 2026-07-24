@@ -62,7 +62,7 @@ export default function TrainingSettingsPage() {
         <AnimatedSection delay={0.05}>
           <SettingsSectionBlock
             title="Your equipment"
-            hint="Library and weekly plan only show exercises you can do with gear you have"
+            hint="Gear you have, plus the free-weight sizes you own"
           >
             <EquipmentSettingsSection />
           </SettingsSectionBlock>

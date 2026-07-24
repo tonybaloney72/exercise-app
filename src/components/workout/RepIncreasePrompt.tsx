@@ -25,6 +25,7 @@ export default function RepIncreasePrompt({
   todayKey,
 }: RepIncreasePromptProps) {
   const suggestRepIncreases = useSettingsStore((s) => s.suggestRepIncreases);
+  const weightInventory = useSettingsStore((s) => s.weightInventory);
   const exerciseSettings = useExerciseSettingsStore((s) => s.byExerciseId);
   const workoutHistory = useWorkoutStore((s) => s.workoutHistory);
 
@@ -48,8 +49,16 @@ export default function RepIncreasePrompt({
         todayKey,
         exerciseSettings,
         enabled: suggestRepIncreases,
+        weightInventory,
       }),
-    [workoutHistory, log, todayKey, exerciseSettings, suggestRepIncreases],
+    [
+      workoutHistory,
+      log,
+      todayKey,
+      exerciseSettings,
+      suggestRepIncreases,
+      weightInventory,
+    ],
   );
 
   useEffect(() => {

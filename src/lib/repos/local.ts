@@ -91,6 +91,18 @@ export const localSettingsRepo: SettingsRepo = {
   },
 };
 
+function optionalPositiveNumber(v: unknown): number | null | undefined {
+  if (typeof v === "number" && v > 0) return v;
+  if (v === null) return null;
+  return undefined;
+}
+
+function optionalDateKey(v: unknown): string | null | undefined {
+  if (typeof v === "string") return v;
+  if (v === null) return null;
+  return undefined;
+}
+
 function sanitizeExerciseSettingsMap(raw: unknown): ExerciseSettingsMap {
   if (!raw || typeof raw !== "object") return {};
   const out: ExerciseSettingsMap = {};
@@ -98,30 +110,19 @@ function sanitizeExerciseSettingsMap(raw: unknown): ExerciseSettingsMap {
     if (!v || typeof v !== "object") continue;
     const o = v as Record<string, unknown>;
     if (o.defaultSetMode !== "reps" && o.defaultSetMode !== "timer") continue;
-    const ts = o.defaultTimerSeconds;
-    const tr = o.defaultTargetReps;
     out[exerciseId] = {
       defaultSetMode: o.defaultSetMode,
-      defaultTimerSeconds:
-        typeof ts === "number" && ts > 0 ? ts : ts === null ? null : undefined,
-      defaultTargetReps:
-        typeof tr === "number" && tr > 0 ? tr : tr === null ? null : undefined,
+      defaultTimerSeconds: optionalPositiveNumber(o.defaultTimerSeconds),
+      defaultTargetReps: optionalPositiveNumber(o.defaultTargetReps),
+      defaultWeightLb: optionalPositiveNumber(o.defaultWeightLb),
       repSuggestionIgnored:
         typeof o.repSuggestionIgnored === "boolean"
           ? o.repSuggestionIgnored
           : undefined,
-      repSuggestionSnoozedUntil:
-        typeof o.repSuggestionSnoozedUntil === "string"
-          ? o.repSuggestionSnoozedUntil
-          : o.repSuggestionSnoozedUntil === null
-            ? null
-            : undefined,
-      repSuggestionLastAcceptedAt:
-        typeof o.repSuggestionLastAcceptedAt === "string"
-          ? o.repSuggestionLastAcceptedAt
-          : o.repSuggestionLastAcceptedAt === null
-            ? null
-            : undefined,
+      repSuggestionSnoozedUntil: optionalDateKey(o.repSuggestionSnoozedUntil),
+      repSuggestionLastAcceptedAt: optionalDateKey(
+        o.repSuggestionLastAcceptedAt,
+      ),
     };
   }
   return out;

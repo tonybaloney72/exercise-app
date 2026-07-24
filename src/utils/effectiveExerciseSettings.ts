@@ -8,6 +8,7 @@ import {
   scaledDefaultTimerSeconds,
   type PlanPrescriptionOptions,
 } from "@/lib/prescriptionScaling";
+import { sanitizeWeightLb } from "@/lib/exerciseLoad";
 import type {
   Exercise,
   ExerciseSetMode,
@@ -33,11 +34,16 @@ export interface ResolvedExerciseSettings {
   defaultTimerSeconds?: number;
   /** Defined when `defaultSetMode === "reps"` and the user saved a default in Library. */
   defaultTargetReps?: number;
+  /** Working load (lb) when the user saved a Library default. */
+  defaultWeightLb?: number;
 }
 
 type StoredExerciseSlice = Pick<
   ExerciseSettingsValues,
-  "defaultSetMode" | "defaultTimerSeconds" | "defaultTargetReps"
+  | "defaultSetMode"
+  | "defaultTimerSeconds"
+  | "defaultTargetReps"
+  | "defaultWeightLb"
 >;
 
 /**
@@ -51,12 +57,18 @@ export function resolveExerciseSettings(
   const defaultSetMode: ExerciseSetMode =
     stored?.defaultSetMode ?? (exercise.isTimeBased ? "timer" : "reps");
 
+  const defaultWeightLb = sanitizeWeightLb(stored?.defaultWeightLb) ?? undefined;
+
   if (defaultSetMode === "reps") {
     const fromStored =
       stored?.defaultTargetReps != null && stored.defaultTargetReps > 0
         ? Math.min(999, Math.round(stored.defaultTargetReps))
         : undefined;
-    return { defaultSetMode: "reps", defaultTargetReps: fromStored };
+    return {
+      defaultSetMode: "reps",
+      defaultTargetReps: fromStored,
+      defaultWeightLb,
+    };
   }
 
   const sec =
@@ -64,7 +76,11 @@ export function resolveExerciseSettings(
       ? stored.defaultTimerSeconds
       : DEFAULT_TIMER_SECONDS_FALLBACK;
 
-  return { defaultSetMode: "timer", defaultTimerSeconds: sec };
+  return {
+    defaultSetMode: "timer",
+    defaultTimerSeconds: sec,
+    defaultWeightLb,
+  };
 }
 
 /**
