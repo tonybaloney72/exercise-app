@@ -432,6 +432,8 @@ export const exerciseCategoryById: Record<string, ExerciseCategory> = {
   "HC-297": "LB",
   "HC-298": "LB",
   "HC-300": "UPL",
+  "HC-301": "UP",
+  "HC-302": "UP",
   "LB-1": "LB",
   "LB-10": "LB",
   "LB-11": "LB",

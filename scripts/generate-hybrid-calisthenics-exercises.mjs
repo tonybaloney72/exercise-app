@@ -150,7 +150,9 @@ const PAGES = {
       "Egyptian Dumbbell Lateral Raise",
       "Side-Lying Dumbbell Lateral Raise",
       "Dumbbell Overhead Press",
-      "Dumbbell Upright Row",
+      "Dumbbell Upright Row (Standard)",
+      "Dumbbell Upright Row (Wide)",
+      "Dumbbell Upright Row (Bending)",
       "Dumbbell Y-Raise",
     ],
     Barbell: ["Barbell Overhead Press", "Barbell Upright Row"],
@@ -160,7 +162,11 @@ const PAGES = {
   "Rear Deltoids": {
     Bodyweight: ["Ring Reverse Fly", "Ring Row", "Ring Face Pull"],
     "Resistance Bands": ["Rear Delt Fly", "Band Row", "Face Pull"],
-    Dumbbell: ["Dumbbell Reverse Fly", "Dumbbell Bent-Over Row"],
+    Dumbbell: [
+      "Dumbbell Reverse Fly",
+      "Dumbbell Bent-Over Row",
+      "Dumbbell Upright Row (Bending)",
+    ],
     Barbell: ["Barbell Bent-Over Row"],
     Machine: ["Machine Reverse Fly", "Machine Row"],
     Cable: ["Rear Delt Fly", "Cable Row", "Face Pull"],
