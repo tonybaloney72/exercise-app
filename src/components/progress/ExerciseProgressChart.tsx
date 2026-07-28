@@ -16,6 +16,7 @@ import {
   buildExerciseProgressSeries,
   exerciseProgressTooltipLines,
   formatExerciseProgressSetsCell,
+  formatExerciseProgressWeightCell,
   listExercisesWithNumericProgress,
   type ExerciseProgressPoint,
 } from "@/utils/exerciseProgressStats";
@@ -82,8 +83,8 @@ export default function ExerciseProgressChart({ history }: Props) {
           Exercise over time
         </h2>
         <p className="text-xs text-muted mt-0.5">
-          Total reps or time per day; hover a point or open Sessions to see how
-          many sets you logged
+          Total reps or time per day; hover a point or open Sessions to see sets
+          and weight when you logged it
         </p>
       </div>
 
@@ -125,9 +126,10 @@ export default function ExerciseProgressChart({ history }: Props) {
         headerExtra={
           <p className="shrink-0 border-b border-border px-4 py-2 text-sm leading-snug text-muted">
             One row per workout. <span className="text-foreground">Sets</span>{" "}
-            lists each logged set; reps and time columns are day totals. The
-            line chart uses total time for time-based exercises when duration
-            was logged; otherwise total reps.
+            lists each logged set; reps and time columns are day totals.{" "}
+            <span className="text-foreground">Weight</span> shows load when you
+            entered it (blank sets stay “-”). The line chart uses total time for
+            time-based exercises when duration was logged; otherwise total reps.
           </p>
         }
       >
@@ -143,6 +145,7 @@ export default function ExerciseProgressChart({ history }: Props) {
                 <th className="px-2 py-2 font-medium">Date</th>
                 <th className="px-2 py-2 font-medium">Sets</th>
                 <th className="px-2 py-2 font-medium">Reps (total)</th>
+                <th className="px-2 py-2 font-medium">Weight</th>
                 <th className="px-2 py-2 font-medium">Time (total)</th>
               </tr>
             </thead>
@@ -160,6 +163,9 @@ export default function ExerciseProgressChart({ history }: Props) {
                   </td>
                   <td className="px-2 py-2 tabular-nums text-foreground">
                     {row.reps > 0 ? row.reps : "-"}
+                  </td>
+                  <td className="px-2 py-2 tabular-nums text-foreground">
+                    {formatExerciseProgressWeightCell(row)}
                   </td>
                   <td className="px-2 py-2 tabular-nums text-foreground">
                     {row.durationSec > 0

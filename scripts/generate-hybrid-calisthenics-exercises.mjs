@@ -44,6 +44,20 @@ const MUSCLE_TO_CATEGORY = {
   Tibialis: "LB",
 };
 
+/**
+ * Vertical-pull patterns listed under Lateral Deltoids on HC pages still belong in UPL.
+ * Shoulder rule: front/lateral raise & press → UP; rear delt / upright row / face pull → UPL.
+ * @type {Record<string, import('../src/types/index.ts').ExerciseCategory>}
+ */
+const NAME_CATEGORY_OVERRIDES = {
+  "Band Upright Row": "UPL",
+  "Barbell Upright Row": "UPL",
+  "Cable Upright Row": "UPL",
+  "Dumbbell Upright Row (Standard)": "UPL",
+  "Dumbbell Upright Row (Wide)": "UPL",
+  "Dumbbell Upright Row (Bending)": "UPL",
+};
+
 /** @type {Record<string, string>} */
 const SECTION_TO_EQUIPMENT = {
   Bodyweight: "bodyweight",
@@ -367,7 +381,7 @@ const PAGES = {
     Dumbbell: [
       "Dumbbell Romanian Deadlift",
       "Dumbbell (Single Leg) Hip Thrust",
-      "Weighted Lunge",
+      "Weighted Forward Lunge",
       "Goblet Squat",
     ],
     Barbell: [
@@ -455,7 +469,7 @@ const PAGES = {
     Barbell: [
       "Weighted Cossack Squat",
       "Weighted Deep Squat",
-      "Weighted Sumo Squat",
+      "Barbell Sumo Squat",
       "Sumo Deadlift",
     ],
     Machine: ["Adductor Machine", "Hack Squat", "Leg Press"],
@@ -593,10 +607,12 @@ for (const [muscle, sections] of Object.entries(PAGES)) {
         entry = {
           name: trimmed,
           equipment,
-          category,
+          category: NAME_CATEGORY_OVERRIDES[trimmed] ?? category,
           muscleGroups: new Set(),
         };
         byKey.set(key, entry);
+      } else if (NAME_CATEGORY_OVERRIDES[trimmed]) {
+        entry.category = NAME_CATEGORY_OVERRIDES[trimmed];
       }
       entry.muscleGroups.add(muscle);
       // Prefer more specific category if conflict (keep first)

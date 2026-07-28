@@ -22,8 +22,7 @@ export type SwapCandidatePrefs = {
 
 /**
  * Same-category alternatives for swapping. Excludes the prescribed exercise for
- * this slot, any exercise already used in the round, and user-disliked exercises.
- * Expertise is capped by the candidate's category (same as `planCategory` here).
+ * this slot, any exercise already used in the round, and disliked exercises.
  */
 export function getSwapCandidates(
   planCategory: ExerciseCategory,

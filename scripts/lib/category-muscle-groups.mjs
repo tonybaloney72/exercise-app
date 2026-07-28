@@ -1,6 +1,13 @@
 /**
  * Default muscle tags per exercise category (union of primary + secondary).
  * Aligns with Hybrid Calisthenics vocabulary where possible.
+ *
+ * Upper push (UP): Chest, Front/Lateral Deltoids (press/raise), Triceps, Serratus.
+ * Upper pull (UPL): Lats, Rhomboids, Rear Deltoids, Biceps/Brachialis, Traps, Forearms.
+ * Do not stamp core onto UPL by default — use secondaryCategory when a hang/row is
+ * intentionally core-biased (e.g. hanging oblique raise).
+ * Shoulder split: Front/Lateral Deltoids → UP; Rear Deltoids → UPL. When a name is a
+ * vertical pull (upright row, face pull), prefer UPL even if lateral delts are tagged.
  */
 
 /** @type {Record<string, string[]>} */
@@ -9,7 +16,7 @@ const CATEGORY_MUSCLE_GROUPS = {
   CL: ["Hip Flexors", "Abs", "Obliques"],
   CR: ["Obliques", "Abs", "Transverse Abdominis"],
   CS: ["Spinal Erectors", "Transverse Abdominis", "Glutes", "Hamstrings"],
-  UP: ["Chest", "Front Deltoids", "Triceps", "Biceps", "Serratus Anterior"],
+  UP: ["Chest", "Front Deltoids", "Triceps", "Serratus Anterior"],
   UPL: [
     "Lats",
     "Rhomboids",

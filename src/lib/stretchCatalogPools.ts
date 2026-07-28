@@ -114,6 +114,19 @@ export const WARM_SESSION_CATALOG_POOLS = mergeThemedPools(
   buildWorkoutWarmCrossoverPools(),
 );
 
+const WARM_SESSION_STRETCH_IDS: ReadonlySet<string> = (() => {
+  const ids = new Set<string>();
+  for (const pool of Object.values(WARM_SESSION_CATALOG_POOLS)) {
+    for (const entry of pool) ids.add(entry.exerciseId);
+  }
+  return ids;
+})();
+
+/** True when `exerciseId` is in the warm-up session catalog (SW + SC + crossovers). */
+export function isWarmSessionStretchId(exerciseId: string): boolean {
+  return WARM_SESSION_STRETCH_IDS.has(exerciseId);
+}
+
 function warmUpCatalogPool(id: StretchThemePoolId): readonly StretchEntry[] {
   return WARM_UP_CATALOG_POOLS[id];
 }

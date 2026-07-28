@@ -1,20 +1,28 @@
-import { getStretchCandidates } from "@/lib/planStretchCandidates";
+import {
+  getStretchCandidates,
+  type StretchPickerSection,
+} from "@/lib/planStretchCandidates";
 import type { Exercise, ExerciseEquipment } from "@/types";
 
-/** Cool-down (SC) or warm-up (SW) replacements during a live workout. */
+/** Cool-down or warm-up replacements during a live workout. */
 export function getStretchSwapCandidates(options: {
-  category: "SW" | "SC";
+  section: StretchPickerSection;
   currentExerciseId: string;
   usedExerciseIds: ReadonlySet<string>;
   availableEquipment: ExerciseEquipment[];
   dislikedExerciseIds?: ReadonlySet<string>;
 }): Exercise[] {
-  const { category, currentExerciseId, usedExerciseIds, availableEquipment, dislikedExerciseIds } =
-    options;
+  const {
+    section,
+    currentExerciseId,
+    usedExerciseIds,
+    availableEquipment,
+    dislikedExerciseIds,
+  } = options;
   const exclude = new Set(usedExerciseIds);
   exclude.add(currentExerciseId);
   return getStretchCandidates({
-    category,
+    section,
     usedExerciseIds: exclude,
     availableEquipment,
     dislikedExerciseIds,

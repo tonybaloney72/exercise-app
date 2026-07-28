@@ -51,10 +51,6 @@ type PickTarget =
   | { kind: "add"; roundIndex: number }
   | { kind: "stretch"; section: StretchSectionKey; index?: number };
 
-function stretchCategory(section: StretchSectionKey): "SW" | "SC" {
-  return section === "coolDown" ? "SC" : "SW";
-}
-
 function renumberRounds(rounds: Round[]): Round[] {
   return rounds.map((round, index) => ({
     ...round,
@@ -129,7 +125,7 @@ export default function WorkoutPlanEditor({
       const list = draft[pickTarget.section] ?? [];
       const used = buildStretchUsedExerciseIds(list, pickTarget.index);
       return getStretchCandidates({
-        category: stretchCategory(pickTarget.section),
+        section: pickTarget.section,
         usedExerciseIds: used,
         availableEquipment,
         dislikedExerciseIds: dislikedIds,
@@ -161,7 +157,14 @@ export default function WorkoutPlanEditor({
       dislikedExerciseIds: dislikedIds,
       expertiseFilter,
     });
-  }, [pickTarget, draft, availableEquipment, dislikedIds, expertiseFilter]);
+  }, [
+    pickTarget,
+    draft,
+    availableEquipment,
+    dislikedIds,
+    expertiseFilter,
+    prefs,
+  ]);
 
   const laterRoundByExerciseIdForSwap = useMemo(() => {
     if (pickTarget?.kind !== "swap") return undefined;
@@ -350,7 +353,7 @@ export default function WorkoutPlanEditor({
         const id = draft[pickTarget.section]?.[pickTarget.index]?.exerciseId;
         return exerciseMap[id ?? ""]?.name ?? "Stretch";
       }
-      return stretchCategory(pickTarget.section) === "SW"
+      return pickTarget.section === "warmUp"
         ? "Warm-up stretch"
         : "Cool-down stretch";
     }
@@ -565,7 +568,7 @@ export default function WorkoutPlanEditor({
         open={pickTarget?.kind === "stretch"}
         title={
           pickTarget?.kind === "stretch"
-            ? stretchCategory(pickTarget.section) === "SW"
+            ? pickTarget.section === "warmUp"
               ? "Choose warm-up stretch"
               : "Choose cool-down stretch"
             : "Choose stretch"

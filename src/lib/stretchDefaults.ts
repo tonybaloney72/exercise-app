@@ -1,4 +1,5 @@
 import { exerciseMap } from "@/core/catalog";
+import { migrateExerciseId } from "@/lib/cpToPcMigration";
 import type { StretchEntry } from "@/types";
 
 /** Validate and dedupe stretch rows from settings JSON or DB. */
@@ -9,9 +10,10 @@ export function sanitizeStretchEntries(raw: unknown): StretchEntry[] {
   for (const item of raw) {
     if (!item || typeof item !== "object") continue;
     const o = item as Record<string, unknown>;
-    const exerciseId = o.exerciseId;
+    const rawId = o.exerciseId;
     const targetReps = o.targetReps;
-    if (typeof exerciseId !== "string" || typeof targetReps !== "string") continue;
+    if (typeof rawId !== "string" || typeof targetReps !== "string") continue;
+    const exerciseId = migrateExerciseId(rawId);
     if (!exerciseMap[exerciseId]) continue;
     if (seen.has(exerciseId)) continue;
     seen.add(exerciseId);

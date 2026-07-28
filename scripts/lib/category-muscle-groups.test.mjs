@@ -5,8 +5,19 @@ import {
 } from "./category-muscle-groups.mjs";
 
 describe("categoryMuscleGroups", () => {
-  it("includes biceps on upper push and upper pull defaults", () => {
-    expect(categoryMuscleGroups("UP")).toContain("Biceps");
+  it("does not stamp biceps onto upper push defaults", () => {
+    expect(categoryMuscleGroups("UP")).not.toContain("Biceps");
+    expect(categoryMuscleGroups("UP")).toEqual(
+      expect.arrayContaining([
+        "Chest",
+        "Front Deltoids",
+        "Triceps",
+        "Serratus Anterior",
+      ]),
+    );
+  });
+
+  it("includes biceps on upper pull defaults", () => {
     expect(categoryMuscleGroups("UPL")).toContain("Biceps");
   });
 
@@ -24,7 +35,7 @@ describe("resolveMuscleGroups", () => {
       category: "UP",
       source: "catalog",
     });
-    expect(groups).toContain("Biceps");
+    expect(groups).not.toContain("Biceps");
     expect(groups).toContain("Chest");
     expect(groups).toContain("Triceps");
   });

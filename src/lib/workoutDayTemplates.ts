@@ -1,4 +1,5 @@
 import { normalizeDayPlanCardio } from "@/lib/cardioActivities";
+import { migrateDayPlan } from "@/lib/cpToPcMigration";
 import { cloneStretchEntries } from "@/lib/stretchDefaults";
 import type {
   DayPlan,
@@ -82,18 +83,20 @@ export function sanitizeTemplateSnapshot(
   if (!Array.isArray(o.rounds) || !Array.isArray(o.strengthFocus)) {
     return null;
   }
-  const plan = dayPlanToTemplateSnapshot({
-    dayOfWeek: 0,
-    name: "",
-    theme: "",
-    hasJog: false,
-    strengthFocus: o.strengthFocus as DayPlan["strengthFocus"],
-    coreGroups: (o.coreGroups as DayPlan["coreGroups"]) ?? [],
-    rounds: o.rounds as DayPlan["rounds"],
-    warmUp: o.warmUp as DayPlan["warmUp"],
-    coolDown: o.coolDown as DayPlan["coolDown"],
-    cardioActivities: o.cardioActivities as DayPlan["cardioActivities"],
-    restDayMode: o.restDayMode as DayPlan["restDayMode"],
-  });
+  const plan = dayPlanToTemplateSnapshot(
+    migrateDayPlan({
+      dayOfWeek: 0,
+      name: "",
+      theme: "",
+      hasJog: false,
+      strengthFocus: o.strengthFocus as DayPlan["strengthFocus"],
+      coreGroups: (o.coreGroups as DayPlan["coreGroups"]) ?? [],
+      rounds: o.rounds as DayPlan["rounds"],
+      warmUp: o.warmUp as DayPlan["warmUp"],
+      coolDown: o.coolDown as DayPlan["coolDown"],
+      cardioActivities: o.cardioActivities as DayPlan["cardioActivities"],
+      restDayMode: o.restDayMode as DayPlan["restDayMode"],
+    }),
+  );
   return plan;
 }

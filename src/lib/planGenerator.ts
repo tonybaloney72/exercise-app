@@ -173,6 +173,7 @@ export function computePrefsFingerprintFromSettings(
 function replaceSlotIfDisliked(
   slot: RoundExercise,
   usedInRound: Set<string>,
+  usedInDay: Set<string>,
   dislikedIds: ReadonlySet<string>,
   favoriteIds: ReadonlySet<string>,
   availableEquipment: ExerciseEquipment[],
@@ -181,10 +182,11 @@ function replaceSlotIfDisliked(
 ): RoundExercise | null {
   if (!dislikedIds.has(slot.exerciseId)) {
     usedInRound.add(slot.exerciseId);
+    usedInDay.add(slot.exerciseId);
     return slot;
   }
 
-  const exclude = new Set(usedInRound);
+  const exclude = new Set<string>([...usedInRound, ...usedInDay]);
   exclude.add(slot.exerciseId);
 
   const substitute = pickDislikeReplacement({
@@ -206,6 +208,7 @@ function replaceSlotIfDisliked(
   }
 
   usedInRound.add(substitute.id);
+  usedInDay.add(substitute.id);
   const meta = exerciseMap[substitute.id];
   const targetReps = meta
     ? formatPlanTargetPrescription(meta, exerciseSettings?.[substitute.id], {
@@ -236,6 +239,7 @@ function applyDislikesToDayPlan(
     return plan;
   }
 
+  const usedInDay = new Set<string>();
   return {
     ...plan,
     rounds: plan.rounds.map((round) => {
@@ -247,6 +251,7 @@ function applyDislikesToDayPlan(
             replaceSlotIfDisliked(
               slot,
               usedInRound,
+              usedInDay,
               dislikedIds,
               favoriteIds,
               availableEquipment,

@@ -41,8 +41,8 @@ function migrateRoundExercise(slot: RoundExercise): RoundExercise {
   };
 }
 
-/** Normalize persisted or in-flight plans that still use `CP`. */
-function migrateDayPlan(plan: DayPlan): DayPlan {
+/** Normalize persisted or in-flight plans that still use `CP` or consolidated ids. */
+export function migrateDayPlan(plan: DayPlan): DayPlan {
   return normalizeDayPlanCardio({
     ...plan,
     strengthFocus: plan.strengthFocus.map((c) => migrateCategory(c)),
@@ -50,6 +50,14 @@ function migrateDayPlan(plan: DayPlan): DayPlan {
     rounds: plan.rounds.map((round) => ({
       ...round,
       exercises: round.exercises.map(migrateRoundExercise),
+    })),
+    warmUp: plan.warmUp?.map((entry) => ({
+      ...entry,
+      exerciseId: migrateExerciseId(entry.exerciseId),
+    })),
+    coolDown: plan.coolDown?.map((entry) => ({
+      ...entry,
+      exerciseId: migrateExerciseId(entry.exerciseId),
     })),
   });
 }

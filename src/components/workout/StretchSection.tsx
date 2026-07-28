@@ -259,7 +259,7 @@ function StretchRow({
     () =>
       onSwap
         ? getStretchSwapCandidates({
-            category: stretchCategory,
+            section: stretchCategory === "SC" ? "coolDown" : "warmUp",
             currentExerciseId: exerciseId,
             usedExerciseIds: usedStretchIds,
             availableEquipment,

@@ -20,8 +20,6 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "HC-263": "LB-7",
   "HC-264": "LB-7",
   // B - duplicate HC rows (keep first of pair)
-  "HC-062": "HC-061",
-  "HC-077": "HC-076",
   "HC-083": "HC-143", // Bent-over Dumbbell Row → Dumbbell Bent-Over Row
   "HC-175": "HC-174",
   "HC-190": "HC-189",
@@ -33,7 +31,6 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "HC-286": "HC-285",
   "HC-288": "HC-287",
   "HC-292": "HC-291",
-  "HC-295": "HC-294",
   // C - workout entry wins over stretch duplicate
   "SW-20": "LB-1",
   "SW-25": "PC-1",
@@ -63,6 +60,32 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "PC-12": "PC-31",
   // Duplicate heel taps (keep Alternate Heel Touches)
   "CR-7": "CR-8",
+  // Pure load variants → canonical movement (Jul 2026)
+  "HC-030": "HC-082", // Band Resisted Bent Knee Calf Raise
+  "HC-142": "HC-082", // Dumbbell Bent Knee Calf Raise
+  "HC-061": "HC-082", // Barbell Bent Knee Calf Raise
+  "HC-109": "HC-082", // Cable Resisted Bent Knee Calf Raise
+  "HC-062": "HC-082", // was HC-061 duplicate
+  "HC-040": "HC-261", // Band Resisted Straight Leg Calf Raise
+  "HC-165": "HC-261", // Dumbbell Straight Leg Calf Raise
+  "HC-076": "HC-261", // Barbell Straight Leg Calf Raise
+  "HC-110": "HC-261", // Cable Resisted Straight Leg Calf Raise
+  "HC-077": "HC-261", // was HC-076 duplicate
+  "HC-038": "HC-257", // Band Resisted Split Squat
+  "HC-164": "HC-257", // Dumbbell Split Squat
+  "HC-294": "HC-257", // Weighted Split Squat
+  "HC-075": "HC-257", // Barbell Split Squat
+  "HC-295": "HC-257", // was HC-294 duplicate
+  "LB-15": "LB-4", // Weighted Bulgarian Split Squat
+  "HC-289": "LB-2", // Weighted Forward Lunge
+  "LB-12": "LB-3", // Weighted Reverse Lunge
+  "LB-13": "LB-10", // Weighted Walking Lunge
+  "LB-14": "LB-11", // Weighted Lateral Lunge
+  "LB-16": "LB-8", // Weighted Step-Up
+  "LB-17": "LB-7", // Weighted Sumo Squat
+  "HC-056": "HC-072", // Band-resisted Romanian Deadlift
+  "HC-159": "HC-072", // Dumbbell Romanian Deadlift
+  "HC-296": "LB-7", // Barbell Sumo Squat
 };
 
 /** Ids that redirect to a canonical entry; excluded from generator / swap pools. */
@@ -104,6 +127,33 @@ export const REMOVED_HYBRID_EXERCISE_IDS = new Set<string>([
   "HC-216",
   "HC-186",
   "HC-139",
+  // Pure load variants (Jul 2026)
+  "HC-030",
+  "HC-038",
+  "HC-040",
+  "HC-056",
+  "HC-061",
+  "HC-075",
+  "HC-076",
+  "HC-109",
+  "HC-110",
+  "HC-142",
+  "HC-159",
+  "HC-164",
+  "HC-165",
+  "HC-289",
+  "HC-294",
+  "HC-296",
+]);
+
+/** Main-catalog strength ids removed after load-variant merge. */
+export const REMOVED_CATALOG_EXERCISE_IDS = new Set<string>([
+  "LB-12",
+  "LB-13",
+  "LB-14",
+  "LB-15",
+  "LB-16",
+  "LB-17",
 ]);
 
 /** Catalog stretch ids removed (workout id kept). */
@@ -132,6 +182,8 @@ export function migrateConsolidatedExerciseId(id: string): string {
 
 function isRemovedFromLibrary(id: string): boolean {
   return (
-    REMOVED_HYBRID_EXERCISE_IDS.has(id) || REMOVED_CATALOG_STRETCH_IDS.has(id)
+    REMOVED_HYBRID_EXERCISE_IDS.has(id) ||
+    REMOVED_CATALOG_STRETCH_IDS.has(id) ||
+    REMOVED_CATALOG_EXERCISE_IDS.has(id)
   );
 }

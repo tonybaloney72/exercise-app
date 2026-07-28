@@ -1,5 +1,16 @@
 [
   {
+    "id": "2026-07-28-simpler-strength-moves",
+    "date": "2026-07-28",
+    "title": "Simpler strength exercises",
+    "highlights": [
+      "Moves like Bent Knee Calf Raise, lunges, and Sumo Squats are one exercise now—bodyweight or with weights. Log weight on the set (or leave it blank) instead of picking a separate “dumbbell” or “barbell” version.",
+      "If you used an older weighted version before, your history and plans still line up with the new name automatically.",
+      "Your Library weight defaults still pre-fill the next time you do that move, just like before.",
+      "On Health → Exercises, Exercise over time shows weight in tooltips and Sessions when you logged it—bodyweight days still show reps and sets only."
+    ]
+  },
+  {
     "id": "2026-07-15-usual-foods-and-swap-focus",
     "date": "2026-07-15",
     "title": "Faster meal logging & fairer training focus",
@@ -16,15 +27,6 @@
     "highlights": [
       "New Device setting: Complete exercise when set timer stops. When on, stopping or closing a set timer (rounds, warm-up, or cool-down) marks that exercise done and fills Did with time elapsed. Reset never completes on its own.",
       "New Health Connect setting: Save finished workouts to Health Connect. If you decline write access once, we turn this off so you are not prompted after every workout. Turn it back on anytime under Settings → Device."
-    ]
-  },
-  {
-    "id": "2026-07-10-meal-log-add-another",
-    "date": "2026-07-10",
-    "title": "Log several foods in a row",
-    "highlights": [
-      "When logging a meal item, use Add Another to save and jump straight back to search or barcode scan for the same meal-no need to reopen the sheet.",
-      "Tap Log when you're done to save and close."
     ]
   }
 ]

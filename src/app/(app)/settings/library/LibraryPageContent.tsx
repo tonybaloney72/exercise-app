@@ -2,6 +2,7 @@
 
 import { useState, useMemo, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import BackNavLink from "@/components/common/BackNavLink";
 import { exercises } from "@/core/catalog";
 import { CATEGORIES, CATEGORY_ORDER } from "@/core/catalog";
 import CollapsibleSection from "@/components/common/CollapsibleSection";
@@ -16,6 +17,7 @@ import {
   ReportIcon,
 } from "@/components/common/ExercisePreferenceIcons";
 import ExerciseReportSheet from "@/components/feedback/ExerciseReportSheet";
+import { routes } from "@/lib/appRoutes";
 import {
   EXPERTISE_LEVEL_LABELS,
   EXPERTISE_LEVEL_ORDER,
@@ -165,6 +167,7 @@ export default function LibraryPageContent() {
 
   return (
     <div className="flex flex-col py-6 gap-5">
+      <BackNavLink fallbackHref={routes.settings} />
       <div>
         <h1 className="text-2xl font-bold text-foreground">Exercise Library</h1>
         <p className="text-sm text-muted mt-1">

@@ -44,7 +44,7 @@ export default function WorkoutSessionStructurePick({
         stretchEntriesFromLogs(activeWorkout.warmUpExercises),
       );
       return getStretchCandidates({
-        category: "SW",
+        section: "warmUp",
         usedExerciseIds: used,
         availableEquipment,
         dislikedExerciseIds: dislikedIds,
@@ -56,7 +56,7 @@ export default function WorkoutSessionStructurePick({
         stretchEntriesFromLogs(activeWorkout.coolDownExercises),
       );
       return getStretchCandidates({
-        category: "SC",
+        section: "coolDown",
         usedExerciseIds: used,
         availableEquipment,
         dislikedExerciseIds: dislikedIds,
@@ -73,7 +73,13 @@ export default function WorkoutSessionStructurePick({
       availableEquipment,
       dislikedExerciseIds: dislikedIds,
     });
-  }, [pickTarget, activeWorkout, availableEquipment, dislikedIds, prefs]);
+  }, [
+    pickTarget,
+    activeWorkout,
+    availableEquipment,
+    dislikedIds,
+    prefs,
+  ]);
 
   const modalTitle = useMemo(() => {
     if (!pickTarget) return "Add exercise";

@@ -190,7 +190,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -276,7 +275,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -453,7 +451,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -488,7 +485,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -509,7 +505,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -543,7 +538,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -599,29 +593,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Arms straight; pull band apart by squeezing shoulder blades, control the return.",
     source: "Physical Therapy 101",
     videoUrl: "https://www.youtube.com/watch?v=osRimvxXlKQ",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-030",
-    name: "Band Resisted Bent Knee Calf Raise",
-    category: "LB",
-    equipment: ["resistance_band"],
-    expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-      "Tibialis",
-    ],
-    defaultReps: "10",
-    notes:
-      "Band over the knees while seated, knees bent; rise onto your toes against the band, pause at the top.",
-    source: "PRIME Physical Performance",
-    videoUrl: "https://www.youtube.com/watch?v=DU0s3wT5o7Q",
     isTimeBased: false,
   },
   {
@@ -749,28 +720,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     isTimeBased: false,
   },
   {
-    id: "HC-038",
-    name: "Band Resisted Split Squat",
-    category: "LB",
-    equipment: ["resistance_band"],
-    expertiseLevel: "novice",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-    ],
-    defaultReps: "10 each leg",
-    notes:
-      "Band adds tension at the top; split stance, lower until back knee nears floor, front shin stays vertical.",
-    source: "OPEX Fitness",
-    videoUrl: "https://www.youtube.com/watch?v=5_F-smr-ez8",
-    isTimeBased: false,
-  },
-  {
     id: "HC-039",
     name: "Band Resisted Squat",
     category: "LB",
@@ -790,29 +739,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Stand on the band or anchor it low; squat against increasing tension at the top-control the descent.",
     source: "Live Lean TV Daily Exercises",
     videoUrl: "https://www.youtube.com/watch?v=Eaqr79zvqIw",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-040",
-    name: "Band Resisted Straight Leg Calf Raise",
-    category: "LB",
-    equipment: ["resistance_band"],
-    expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-      "Tibialis",
-    ],
-    defaultReps: "10",
-    notes:
-      "Stand on the band with legs straight; rise onto your toes against the resistance, lower heels slowly.",
-    source: "GB",
-    videoUrl: "https://www.youtube.com/watch?v=U7PlGgKwuZA",
     isTimeBased: false,
   },
   {
@@ -980,7 +906,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -996,19 +921,17 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   {
     id: "HC-049",
     name: "Band Upright Row",
-    category: "UP",
+    category: "UPL",
     equipment: ["resistance_band"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Biceps",
-      "Chest",
-      "Front Deltoids",
+      "Brachialis",
+      "Forearms",
       "Lateral Deltoids",
-      "Lats",
       "Rear Deltoids",
       "Rhomboids",
-      "Serratus Anterior",
-      "Triceps",
+      "Traps",
     ],
     defaultReps: "10",
     notes:
@@ -1105,7 +1028,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "advanced",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1126,7 +1048,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -1140,36 +1061,12 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     isTimeBased: false,
   },
   {
-    id: "HC-056",
-    name: "Band-resisted Romanian Deadlift",
-    category: "LB",
-    equipment: ["resistance_band"],
-    expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-      "Spinal Erectors",
-    ],
-    defaultReps: "10",
-    notes:
-      "Stand on the band with a slight knee bend; push hips back keeping the band close to your legs, then drive forward.",
-    source: "Groundwork Rehab & Fitness",
-    videoUrl: "https://www.youtube.com/watch?v=pNp2f8l82Zg",
-    isTimeBased: false,
-  },
-  {
     id: "HC-057",
     name: "Band-resisted Serratus Pushup",
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1226,7 +1123,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1240,30 +1136,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     videoUrl: "https://www.youtube.com/watch?v=ejI1Nlsul9k",
     isTimeBased: false,
   },
-  {
-    id: "HC-061",
-    name: "Barbell Bent Knee Calf Raise",
-    category: "LB",
-    equipment: ["barbell"],
-    expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-      "Tibialis",
-    ],
-    defaultReps: "10",
-    notes:
-      "Bar on your back, knees bent in a seated-style stance; rise onto your toes, pause, then lower heels down.",
-    source: "MVMNT Exercise Library",
-    videoUrl: "https://www.youtube.com/watch?v=xXYXbL89KfM",
-    isTimeBased: false,
-  },
-
   {
     id: "HC-063",
     name: "Barbell Bent-Over Row",
@@ -1337,7 +1209,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -1357,7 +1228,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1378,7 +1248,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -1400,7 +1269,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -1459,9 +1327,9 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   },
   {
     id: "HC-072",
-    name: "Barbell Romanian Deadlift",
+    name: "Romanian Deadlift",
     category: "LB",
-    equipment: ["barbell"],
+    equipment: ["barbell", "dumbbell", "kettlebell", "resistance_band"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -1475,7 +1343,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Soft knee bend, bar close to the thighs; push hips back until you feel a hamstring stretch, then drive forward.",
+      "Soft knee bend, load close to the thighs; push hips back until you feel a hamstring stretch, then drive forward. Use a barbell, dumbbells, kettlebells, or band.",
     source: "Sennergy Health Training",
     videoUrl: "https://www.youtube.com/watch?v=g5u75sgpn04",
     isTimeBased: false,
@@ -1509,7 +1377,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -1522,52 +1389,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     videoUrl: "https://www.youtube.com/watch?v=l3rHYPtMUo8",
     isTimeBased: false,
   },
-  {
-    id: "HC-075",
-    name: "Barbell Split Squat",
-    category: "LB",
-    equipment: ["barbell"],
-    expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-    ],
-    defaultReps: "10 each leg",
-    notes:
-      "Bar on back; long split stance, lower straight down with most weight on the front leg, torso upright.",
-    source: "Strength Conditioning",
-    videoUrl: "https://www.youtube.com/watch?v=Jl1cxp0Iwv0",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-076",
-    name: "Barbell Straight Leg Calf Raise",
-    category: "LB",
-    equipment: ["barbell"],
-    expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-      "Tibialis",
-    ],
-    defaultReps: "10",
-    notes:
-      "Bar on your back, legs straight; rise onto your toes, pause at the top, then lower heels below the platform.",
-    source: "ScottHermanFitness",
-    videoUrl: "https://www.youtube.com/watch?v=3UWi44yN-wM",
-    isTimeBased: false,
-  },
-
   {
     id: "HC-078",
     name: "Barbell Straight Legged Deadlift",
@@ -1608,19 +1429,17 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   {
     id: "HC-080",
     name: "Barbell Upright Row",
-    category: "UP",
+    category: "UPL",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Biceps",
-      "Chest",
-      "Front Deltoids",
+      "Brachialis",
+      "Forearms",
       "Lateral Deltoids",
-      "Lats",
       "Rear Deltoids",
       "Rhomboids",
-      "Serratus Anterior",
-      "Triceps",
+      "Traps",
     ],
     defaultReps: "10",
     notes:
@@ -1655,7 +1474,14 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-082",
     name: "Bent Knee Calf Raise",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: [
+      "bodyweight",
+      "dumbbell",
+      "kettlebell",
+      "barbell",
+      "resistance_band",
+      "cable",
+    ],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -1669,7 +1495,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Knees bent slightly; rise onto your toes to target the soleus, pause, then lower heels down.",
+      "Knees bent slightly; rise onto your toes to target the soleus, pause, then lower heels down. Optional load: dumbbells, barbell, band, or cable.",
     source: "Runna",
     videoUrl: "https://www.youtube.com/watch?v=NcMjGCO_-J0",
     isTimeBased: false,
@@ -1681,7 +1507,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1702,7 +1527,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1805,7 +1629,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -1825,7 +1648,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -2025,7 +1847,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -2096,7 +1917,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -2130,7 +1950,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2151,7 +1970,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -2162,52 +1980,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Cable set at chest height; reach the handle forward and protract the shoulder blades, control the return.",
     source: "Strength Coach Phil",
     videoUrl: "https://www.youtube.com/watch?v=JtCyUP4CjA8",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-109",
-    name: "Cable Resisted Bent Knee Calf Raise",
-    category: "LB",
-    equipment: ["cable"],
-    expertiseLevel: "novice",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-      "Tibialis",
-    ],
-    defaultReps: "10",
-    notes:
-      "Cable attached at the shoulders or hips with knees bent; rise onto your toes against the resistance, pause at the top.",
-    source: "Hybrid Calisthenics",
-    videoUrl: "https://www.youtube.com/watch?v=w4nmA7p4EoY",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-110",
-    name: "Cable Resisted Straight Leg Calf Raise",
-    category: "LB",
-    equipment: ["cable"],
-    expertiseLevel: "novice",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-      "Tibialis",
-    ],
-    defaultReps: "10",
-    notes:
-      "Cable attached at the shoulders or hips with legs straight; rise onto your toes against the resistance, lower slowly.",
-    source: "Hybrid Calisthenics",
-    videoUrl: "https://www.youtube.com/watch?v=Kx5fAImDxeQ",
     isTimeBased: false,
   },
   {
@@ -2352,7 +2124,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -2368,19 +2139,17 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   {
     id: "HC-118",
     name: "Cable Upright Row",
-    category: "UP",
+    category: "UPL",
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Biceps",
-      "Chest",
-      "Front Deltoids",
+      "Brachialis",
+      "Forearms",
       "Lateral Deltoids",
-      "Lats",
       "Rear Deltoids",
       "Rhomboids",
-      "Serratus Anterior",
-      "Triceps",
+      "Traps",
     ],
     defaultReps: "10",
     notes:
@@ -2432,7 +2201,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -2453,7 +2221,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2474,7 +2241,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2495,7 +2261,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "advanced",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2516,7 +2281,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["pull_up_bar"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lats",
@@ -2585,7 +2349,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -2643,7 +2406,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2664,7 +2426,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bench", "plyo_box"],
     expertiseLevel: "advanced",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2699,7 +2460,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["pull_up_bar", "rings"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2742,7 +2502,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2754,29 +2513,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Flat bench, dumbbells at chest level; press up and slightly in, lower until upper arms are parallel to the floor.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=WbCEvFA0NJs",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-142",
-    name: "Dumbbell Bent Knee Calf Raise",
-    category: "LB",
-    equipment: ["dumbbell"],
-    expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-      "Tibialis",
-    ],
-    defaultReps: "10",
-    notes:
-      "Dumbbells at your sides, knees bent; rise onto your toes to target the soleus, pause, then lower heels down.",
-    source: "Bía Coaching",
-    videoUrl: "https://www.youtube.com/watch?v=4atz03A80dg",
     isTimeBased: false,
   },
   {
@@ -2830,7 +2566,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2851,7 +2586,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -2871,7 +2605,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -2912,7 +2645,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2933,7 +2665,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -2977,7 +2708,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -2998,7 +2728,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -3040,7 +2769,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -3123,29 +2851,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     isTimeBased: false,
   },
   {
-    id: "HC-159",
-    name: "Dumbbell Romanian Deadlift",
-    category: "LB",
-    equipment: ["dumbbell"],
-    expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-      "Spinal Erectors",
-    ],
-    defaultReps: "10",
-    notes:
-      "Dumbbells in front of the thighs with a soft knee bend; hinge back until you feel a hamstring stretch, then drive forward.",
-    source: "Denvyr | Tall Girl Nutritionist",
-    videoUrl: "https://www.youtube.com/watch?v=5WxMW-Fu5KU",
-    isTimeBased: false,
-  },
-  {
     id: "HC-160",
     name: "Dumbbell Shrug",
     category: "UPL",
@@ -3188,7 +2893,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -3224,51 +2928,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     isTimeBased: false,
   },
   {
-    id: "HC-164",
-    name: "Dumbbell Split Squat",
-    category: "LB",
-    equipment: ["dumbbell"],
-    expertiseLevel: "novice",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-    ],
-    defaultReps: "10 each leg",
-    notes:
-      "Hold dumbbells at your sides; split stance, lower until back knee nears floor, push through the front heel.",
-    source: "OPEX Fitness",
-    videoUrl: "https://www.youtube.com/watch?v=Wcmg-3iHwjQ",
-    isTimeBased: false,
-  },
-  {
-    id: "HC-165",
-    name: "Dumbbell Straight Leg Calf Raise",
-    category: "LB",
-    equipment: ["dumbbell"],
-    expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-      "Tibialis",
-    ],
-    defaultReps: "10",
-    notes:
-      "Dumbbells at your sides, legs straight; rise onto your toes, pause at the top, then lower heels below the platform.",
-    source: "Hybrid Calisthenics",
-    videoUrl: "https://www.youtube.com/shorts/ADITZCcUyVo",
-    isTimeBased: false,
-  },
-  {
     id: "HC-166",
     name: "Dumbbell Straight Legged Deadlift",
     category: "LB",
@@ -3298,7 +2957,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -3314,10 +2972,16 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   {
     id: "HC-168",
     name: "Dumbbell Upright Row (Standard)",
-    category: "UP",
+    category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Front Deltoids", "Traps"],
+    muscleGroups: [
+      "Biceps",
+      "Forearms",
+      "Front Deltoids",
+      "Lateral Deltoids",
+      "Traps",
+    ],
     defaultReps: "10",
     notes:
       "Neutral grip, dumbbells in front of your thighs; pull straight up to chest height, elbows leading (front delts and upper traps).",
@@ -3328,10 +2992,16 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   {
     id: "HC-301",
     name: "Dumbbell Upright Row (Wide)",
-    category: "UP",
+    category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Front Deltoids", "Traps"],
+    muscleGroups: [
+      "Biceps",
+      "Forearms",
+      "Front Deltoids",
+      "Lateral Deltoids",
+      "Traps",
+    ],
     defaultReps: "10",
     notes:
       "Wider grip on the dumbbells; pull up with elbows out to emphasize front delts and upper traps.",
@@ -3342,10 +3012,16 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   {
     id: "HC-302",
     name: "Dumbbell Upright Row (Bending)",
-    category: "UP",
+    category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: ["Rear Deltoids", "Traps"],
+    muscleGroups: [
+      "Biceps",
+      "Forearms",
+      "Rear Deltoids",
+      "Rhomboids",
+      "Traps",
+    ],
     defaultReps: "10",
     notes:
       "Hinge slightly at the hips; row dumbbells up toward the chest, leading with the elbows (rear delts, mid and upper traps).",
@@ -3382,7 +3058,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -3403,7 +3078,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -3622,7 +3296,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "expert",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -3726,7 +3399,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["cable"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -3963,7 +3635,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -3984,7 +3655,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -4005,7 +3675,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -4026,7 +3695,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -4047,7 +3715,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -4068,7 +3735,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -4245,7 +3911,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "advanced",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -4289,7 +3954,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     expertiseLevel: "novice",
     muscleGroups: [
       "Abs",
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Hip Flexors",
@@ -4332,7 +3996,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "expert",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -4375,7 +4038,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "advanced",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -4573,7 +4235,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     expertiseLevel: "advanced",
     muscleGroups: [
       "Abs",
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -4615,7 +4276,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["rings"],
     expertiseLevel: "advanced",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -4636,7 +4296,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["rings"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -4702,7 +4361,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -4956,7 +4614,13 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-257",
     name: "Split Squat",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: [
+      "bodyweight",
+      "dumbbell",
+      "kettlebell",
+      "barbell",
+      "resistance_band",
+    ],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -4969,7 +4633,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10 each leg",
     notes:
-      "Static split stance; lower until back knee nears floor, front shin mostly vertical, push through front heel.",
+      "Static split stance; lower until back knee nears floor, front shin mostly vertical, push through front heel. Optional load: dumbbells, kettlebells, barbell, or band.",
     source: "Atomic Athlete",
     videoUrl: "https://www.youtube.com/watch?v=hXpGSa5HYqY",
     isTimeBased: false,
@@ -5023,7 +4687,14 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-261",
     name: "Straight Leg Calf Raise",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: [
+      "bodyweight",
+      "dumbbell",
+      "kettlebell",
+      "barbell",
+      "resistance_band",
+      "cable",
+    ],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -5037,7 +4708,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Legs straight, bodyweight only; rise onto your toes, pause at the top, then lower heels below the platform if available.",
+      "Legs straight; rise onto your toes, pause at the top, then lower heels below the platform if available. Optional load: dumbbells, barbell, band, or cable.",
     source: "VersAbility",
     videoUrl: "https://www.youtube.com/watch?v=WX1zyGuTLCA",
     isTimeBased: false,
@@ -5118,7 +4789,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -5138,7 +4808,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["machine"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -5180,7 +4849,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Lateral Deltoids",
@@ -5216,7 +4884,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -5423,28 +5090,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   },
 
   {
-    id: "HC-289",
-    name: "Weighted Lunge",
-    category: "LB",
-    equipment: ["dumbbell"],
-    expertiseLevel: "advanced",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-    ],
-    defaultReps: "10 each leg",
-    notes:
-      "Holding dumbbells at your sides, step forward into a lunge; lower the back knee toward the floor, then push back up.",
-    source: "Andrew Kwong (DeltaBolic)",
-    videoUrl: "https://www.youtube.com/watch?v=mJilHWIBWO8",
-    isTimeBased: false,
-  },
-  {
     id: "HC-290",
     name: "Weighted Russian Twist",
     category: "CR",
@@ -5501,51 +5146,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     source: "Boss Lifting",
     videoUrl: "https://www.youtube.com/watch?v=GIDLif1n0bM",
     isTimeBased: true,
-  },
-  {
-    id: "HC-294",
-    name: "Weighted Split Squat",
-    category: "LB",
-    equipment: ["dumbbell"],
-    expertiseLevel: "advanced",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-    ],
-    defaultReps: "10 each leg",
-    notes:
-      "Dumbbells at your sides; split stance, controlled lower, drive up through the front leg.",
-    source: "ZAP Endurance",
-    videoUrl: "https://www.youtube.com/watch?v=y_26ssEpBX4",
-    isTimeBased: false,
-  },
-
-  {
-    id: "HC-296",
-    name: "Weighted Sumo Squat",
-    category: "LB",
-    equipment: ["barbell"],
-    expertiseLevel: "advanced",
-    muscleGroups: [
-      "Abductors",
-      "Adductors",
-      "Calves",
-      "Glutes",
-      "Hamstrings",
-      "Hip Flexors",
-      "Quadriceps",
-    ],
-    defaultReps: "10",
-    notes:
-      "Wide stance, toes out; hold the bar between legs, sit straight down, knees track over toes.",
-    source: "ArielYu_Fit",
-    videoUrl: "https://www.youtube.com/watch?v=sQ-lwJtpwUc",
-    isTimeBased: false,
   },
   {
     id: "HC-297",

@@ -1588,7 +1588,6 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1609,7 +1608,6 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1629,7 +1627,6 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "advanced",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1649,7 +1646,6 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1670,7 +1666,6 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1690,7 +1685,6 @@ const catalogExercises: Exercise[] = [
     equipment: ["sturdy_chair", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Serratus Anterior",
@@ -1710,7 +1704,6 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "novice",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -1731,7 +1724,6 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -2007,20 +1999,15 @@ const catalogExercises: Exercise[] = [
   {
     id: "UPL-12",
     name: "Hanging Oblique Raise",
-    category: "UPL",
+    category: "CR",
     equipment: ["pull_up_bar"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abs",
-      "Biceps",
-      "Brachialis",
       "Forearms",
-      "Lats",
+      "Hip Flexors",
       "Obliques",
-      "Rear Deltoids",
-      "Rhomboids",
       "Transverse Abdominis",
-      "Traps",
     ],
     defaultReps: "8 each side",
     notes:
@@ -2028,7 +2015,7 @@ const catalogExercises: Exercise[] = [
     source: "Functional Bodybuilding",
     videoUrl: "https://www.youtube.com/watch?v=QI12tWV-AC8",
     isTimeBased: false,
-    secondaryCategory: "CR",
+    secondaryCategory: "UPL",
   },
   {
     id: "UPL-13",
@@ -2128,20 +2115,10 @@ const catalogExercises: Exercise[] = [
   {
     id: "UPL-17",
     name: "Dead Bug Floor Angels",
-    category: "UPL",
+    category: "CF",
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
-    muscleGroups: [
-      "Abs",
-      "Biceps",
-      "Brachialis",
-      "Forearms",
-      "Hip Flexors",
-      "Lats",
-      "Rear Deltoids",
-      "Rhomboids",
-      "Traps",
-    ],
+    muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
     notes:
       "Supine, hips and knees at 90°; sweep arms along the floor from overhead down to your sides and back. Keep low back gently pressed down.",
@@ -2174,19 +2151,13 @@ const catalogExercises: Exercise[] = [
   {
     id: "UPL-19",
     name: "Reverse Scapular Push-Up",
-    category: "UPL",
+    category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
     muscleGroups: [
-      "Biceps",
-      "Brachialis",
       "Chest",
-      "Forearms",
-      "Lats",
-      "Rear Deltoids",
-      "Rhomboids",
+      "Front Deltoids",
       "Serratus Anterior",
-      "Traps",
       "Triceps",
     ],
     defaultReps: "10",
@@ -2243,17 +2214,14 @@ const catalogExercises: Exercise[] = [
   {
     id: "UPL-22",
     name: "Bear Walk",
-    category: "UPL",
+    category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
-      "Brachialis",
-      "Forearms",
-      "Lats",
-      "Rear Deltoids",
-      "Rhomboids",
-      "Traps",
+      "Chest",
+      "Front Deltoids",
+      "Serratus Anterior",
+      "Triceps",
     ],
     defaultReps: "30 sec",
     notes:
@@ -2265,17 +2233,14 @@ const catalogExercises: Exercise[] = [
   {
     id: "UPL-23",
     name: "Bear Walk (Exaggerated)",
-    category: "UPL",
+    category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
     muscleGroups: [
-      "Biceps",
-      "Brachialis",
-      "Forearms",
-      "Lats",
-      "Rear Deltoids",
-      "Rhomboids",
-      "Traps",
+      "Chest",
+      "Front Deltoids",
+      "Serratus Anterior",
+      "Triceps",
     ],
     defaultReps: "30 sec",
     notes:
@@ -2333,7 +2298,7 @@ const catalogExercises: Exercise[] = [
     id: "LB-2",
     name: "Forward Lunges",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "dumbbell", "kettlebell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -2345,7 +2310,8 @@ const catalogExercises: Exercise[] = [
       "Quadriceps",
     ],
     defaultReps: "10 each leg",
-    notes: "Step forward, lower back knee toward ground",
+    notes:
+      "Step forward, lower back knee toward ground. Optional: hold dumbbells or kettlebells at your sides.",
     source: "Women's Health",
     videoUrl: "https://www.youtube.com/watch?v=QE_hU8XX48I",
     isTimeBased: false,
@@ -2354,7 +2320,7 @@ const catalogExercises: Exercise[] = [
     id: "LB-3",
     name: "Reverse Lunges",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "dumbbell", "kettlebell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -2366,7 +2332,8 @@ const catalogExercises: Exercise[] = [
       "Quadriceps",
     ],
     defaultReps: "10 each leg",
-    notes: "Step backward into lunge. Easier on knees than forward",
+    notes:
+      "Step backward into lunge. Easier on knees than forward. Optional: hold dumbbells or kettlebells at your sides.",
     source: "BuiltLean®",
     videoUrl: "https://www.youtube.com/watch?v=u_zSfK5ZFU4",
     isTimeBased: false,
@@ -2375,7 +2342,7 @@ const catalogExercises: Exercise[] = [
     id: "LB-4",
     name: "Bulgarian Split Squats",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "dumbbell", "kettlebell"],
     expertiseLevel: "advanced",
     muscleGroups: [
       "Abductors",
@@ -2387,7 +2354,8 @@ const catalogExercises: Exercise[] = [
       "Quadriceps",
     ],
     defaultReps: "8 each leg",
-    notes: "Rear foot elevated on chair. ADVANCED - add when squats feel easy",
+    notes:
+      "Rear foot elevated on chair. ADVANCED - add when squats feel easy. Optional: hold dumbbells or kettlebells.",
     source: "Vicky Justiz",
     videoUrl: "https://www.youtube.com/watch?v=yewlXtRs3K4",
     isTimeBased: false,
@@ -2440,7 +2408,7 @@ const catalogExercises: Exercise[] = [
     id: "LB-7",
     name: "Sumo Squats",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "dumbbell", "kettlebell", "barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -2452,7 +2420,8 @@ const catalogExercises: Exercise[] = [
       "Quadriceps",
     ],
     defaultReps: "12",
-    notes: "Wide stance, toes pointed out. Inner thigh emphasis",
+    notes:
+      "Wide stance, toes pointed out. Inner thigh emphasis. Optional: hold a dumbbell, kettlebell, or barbell (e.g. between the legs or front-loaded).",
     source: "Travis Tarrant",
     videoUrl: "https://www.youtube.com/watch?v=ksmxuw3JDbQ",
     isTimeBased: false,
@@ -2461,7 +2430,7 @@ const catalogExercises: Exercise[] = [
     id: "LB-8",
     name: "Step-Ups",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "dumbbell", "kettlebell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -2473,7 +2442,8 @@ const catalogExercises: Exercise[] = [
       "Quadriceps",
     ],
     defaultReps: "10 each leg",
-    notes: "Step onto sturdy chair or step, alternate legs",
+    notes:
+      "Step onto sturdy chair or step, alternate legs. Optional: hold dumbbells or kettlebells at your sides.",
     source: "Fit Father Project - Fitness For Busy Fathers",
     videoUrl: "https://www.youtube.com/watch?v=WRqHvOWkWbU",
     isTimeBased: false,
@@ -2504,7 +2474,7 @@ const catalogExercises: Exercise[] = [
     id: "LB-10",
     name: "Walking Lunge",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "dumbbell", "kettlebell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -2516,7 +2486,8 @@ const catalogExercises: Exercise[] = [
       "Quadriceps",
     ],
     defaultReps: "8 each leg",
-    notes: "Step forward into lunge, push off front foot, step into next lunge",
+    notes:
+      "Step forward into lunge, push off front foot, step into next lunge. Optional: hold dumbbells or kettlebells at your sides.",
     source: "Xtine Cardenas",
     videoUrl: "https://www.youtube.com/watch?v=IJcLGEnzF3s",
     isTimeBased: false,
@@ -2525,7 +2496,7 @@ const catalogExercises: Exercise[] = [
     id: "LB-11",
     name: "Lateral Lunge",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "dumbbell", "kettlebell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -2538,7 +2509,7 @@ const catalogExercises: Exercise[] = [
     ],
     defaultReps: "8 each side",
     notes:
-      "Step wide to one side, sit into hip while keeping opposite leg straight, alternate",
+      "Step wide to one side, sit into hip while keeping opposite leg straight, alternate. Optional: hold a dumbbell or kettlebell at your chest or sides.",
     source: "YouTube",
     videoUrl: "https://www.youtube.com/watch?v=rvqLvRFpL6A",
     isTimeBased: false,
@@ -3329,7 +3300,6 @@ const catalogExercises: Exercise[] = [
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
     muscleGroups: [
-      "Biceps",
       "Chest",
       "Front Deltoids",
       "Pectoralis Major",
@@ -4137,19 +4107,13 @@ const catalogExercises: Exercise[] = [
   {
     id: "SW-10",
     name: "Scapular Push-Up",
-    category: "UPL",
+    category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
     muscleGroups: [
-      "Biceps",
-      "Brachialis",
       "Chest",
-      "Forearms",
-      "Lats",
-      "Rear Deltoids",
-      "Rhomboids",
+      "Front Deltoids",
       "Serratus Anterior",
-      "Traps",
       "Triceps",
     ],
     defaultReps: "10",

@@ -63,6 +63,7 @@ import {
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { exerciseMap, TRAINING_CATEGORY_ORDER } from "@/core/catalog";
+import { isWarmSessionStretchId } from "@/lib/stretchCatalogPools";
 import {
   applyClampedTargetDuration,
   mapRoundExercises,
@@ -233,7 +234,12 @@ function swapStretchInList(
     return null;
   }
   const meta = exerciseMap[toExerciseId];
-  if (!meta || (meta.category !== "SW" && meta.category !== "SC")) {
+  if (
+    !meta ||
+    (meta.category !== "SW" &&
+      meta.category !== "SC" &&
+      !isWarmSessionStretchId(toExerciseId))
+  ) {
     return null;
   }
   const previous = logs[index]!;
@@ -963,7 +969,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
   swapRoundExercise: (roundNumber, slotIndex, substituteId, category) =>
     set((state) => {
       if (!state.activeWorkout) return state;
-      const rounds = state.activeWorkout.rounds.map((r) => {
+      const workout = state.activeWorkout;
+      const rounds = workout.rounds.map((r) => {
         if (r.roundNumber !== roundNumber) return r;
         if (slotIndex < 0 || slotIndex >= r.exercises.length) return r;
         const logs = r.exercises;

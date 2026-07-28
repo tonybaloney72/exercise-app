@@ -3,6 +3,7 @@ import { exerciseMap } from "@/core/catalog";
 import {
   CONSOLIDATED_EXERCISE_ID_MAP,
   migrateConsolidatedExerciseId,
+  REMOVED_CATALOG_EXERCISE_IDS,
   REMOVED_CATALOG_STRETCH_IDS,
   REMOVED_HYBRID_EXERCISE_IDS,
 } from "@/lib/exerciseIdConsolidation";
@@ -29,6 +30,14 @@ describe("exerciseIdConsolidation", () => {
     expect(migrateConsolidatedExerciseId("HC-139")).toBe("UP-5");
     expect(migrateConsolidatedExerciseId("CR-7")).toBe("CR-8");
     expect(migrateConsolidatedExerciseId("HC-083")).toBe("HC-143");
+    expect(migrateConsolidatedExerciseId("HC-142")).toBe("HC-082");
+    expect(migrateConsolidatedExerciseId("HC-061")).toBe("HC-082");
+    expect(migrateConsolidatedExerciseId("HC-062")).toBe("HC-082");
+    expect(migrateConsolidatedExerciseId("LB-12")).toBe("LB-3");
+    expect(migrateConsolidatedExerciseId("HC-294")).toBe("HC-257");
+    expect(migrateConsolidatedExerciseId("HC-295")).toBe("HC-257");
+    expect(migrateConsolidatedExerciseId("HC-159")).toBe("HC-072");
+    expect(migrateConsolidatedExerciseId("HC-296")).toBe("LB-7");
   });
 
   it("chains CP rename then consolidation", () => {
@@ -43,6 +52,9 @@ describe("exerciseIdConsolidation", () => {
     for (const id of REMOVED_CATALOG_STRETCH_IDS) {
       expect(exerciseMap[id], `stretch ${id}`).toBeUndefined();
     }
+    for (const id of REMOVED_CATALOG_EXERCISE_IDS) {
+      expect(exerciseMap[id], `catalog ${id}`).toBeUndefined();
+    }
   });
 
   it("exports every consolidation target", () => {
@@ -50,5 +62,15 @@ describe("exerciseIdConsolidation", () => {
     for (const id of targets) {
       expect(exerciseMap[id], `target ${id}`).toBeDefined();
     }
+  });
+
+  it("canonical load-variant targets support optional free weights", () => {
+    expect(exerciseMap["HC-082"]?.equipment).toEqual(
+      expect.arrayContaining(["bodyweight", "dumbbell", "barbell"]),
+    );
+    expect(exerciseMap["LB-3"]?.equipment).toEqual(
+      expect.arrayContaining(["bodyweight", "dumbbell", "kettlebell"]),
+    );
+    expect(exerciseMap["HC-072"]?.name).toBe("Romanian Deadlift");
   });
 });

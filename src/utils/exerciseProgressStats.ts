@@ -1,6 +1,7 @@
 import type { WorkoutLog } from "@/types";
 import { exerciseMap } from "@/core/catalog";
 import { resolveExerciseDisplayName } from "@/lib/exerciseDisplayName";
+import { normalizeWeightLb } from "@/lib/weightInventory";
 import { effectiveExerciseId } from "@/utils/exerciseLogDefaults";
 import {
   buildChartDayAxis,
@@ -21,6 +22,11 @@ export interface ExerciseProgressPoint {
   repsPerSet: number[];
   /** Per-set logged duration (seconds), in workout order. */
   durationPerSet: number[];
+  /**
+   * Per-set working weight (lb) aligned with sets that counted toward
+   * `setCount`. `null` when that set had no positive weight logged.
+   */
+  weightLbPerSet: (number | null)[];
 }
 
 /**
@@ -51,6 +57,11 @@ export function listExercisesWithNumericProgress(
     );
 }
 
+function positiveWeightLb(raw: number | undefined): number | null {
+  if (raw == null) return null;
+  return normalizeWeightLb(raw);
+}
+
 /**
  * One point per workout date: sums reps / duration across all rounds for that exercise.
  * Plot dimension follows `exerciseMap[id].isTimeBased` when duration was logged; otherwise reps.
@@ -72,6 +83,7 @@ export function buildExerciseProgressSeries(
     let setCount = 0;
     const repsPerSet: number[] = [];
     const durationPerSet: number[] = [];
+    const weightLbPerSet: (number | null)[] = [];
 
     for (const r of w.rounds) {
       for (const log of r.exercises) {
@@ -82,11 +94,10 @@ export function buildExerciseProgressSeries(
         ) {
           continue;
         }
-        if (log.actualReps == null && log.actualDuration == null) {
-          continue;
-        }
+        if (log.actualReps == null && log.actualDuration == null) continue;
 
         setCount += 1;
+        weightLbPerSet.push(positiveWeightLb(log.weightLb));
         if (log.actualReps != null) {
           reps += log.actualReps;
           repsPerSet.push(log.actualReps);
@@ -120,6 +131,7 @@ export function buildExerciseProgressSeries(
       setCount,
       repsPerSet,
       durationPerSet,
+      weightLbPerSet,
     });
   }
 
@@ -144,17 +156,66 @@ function formatDurationSeconds(sec: number): string {
   return `${s}s`;
 }
 
-/** e.g. `2 sets (10 + 10)` or `1 set (45s)` */
+function formatWeightLbLabel(weightLb: number): string {
+  const label = Number.isInteger(weightLb)
+    ? String(weightLb)
+    : weightLb.toFixed(1);
+  return `${label} lb`;
+}
+
+/** Positive weights logged that day, if any. */
+function exerciseProgressWeightsLogged(
+  point: ExerciseProgressPoint,
+): number[] {
+  return point.weightLbPerSet.filter((w): w is number => w != null && w > 0);
+}
+
+/**
+ * Compact weight cell for Sessions: `-`, `25 lb`, or `20, 25 lb` when sets differ.
+ */
+export function formatExerciseProgressWeightCell(
+  point: ExerciseProgressPoint,
+): string {
+  const weights = exerciseProgressWeightsLogged(point);
+  if (weights.length === 0) return "-";
+  const unique = [...new Set(weights.map((w) => formatWeightLbLabel(w)))];
+  if (unique.length === 1) return unique[0]!;
+  return weights.map(formatWeightLbLabel).join(", ");
+}
+
+function formatSetVolumePart(
+  amountLabel: string,
+  weightLb: number | null | undefined,
+): string {
+  if (weightLb == null || !(weightLb > 0)) return amountLabel;
+  return `${amountLabel} @ ${formatWeightLbLabel(weightLb)}`;
+}
+
+/** e.g. `2 sets (10 + 10)`, `2 sets (10 @ 25 lb + 10 @ 25 lb)`, or `1 set (45s)` */
 export function formatExerciseProgressSetBreakdown(
   point: ExerciseProgressPoint,
 ): string {
   const label = point.setCount === 1 ? "1 set" : `${point.setCount} sets`;
+  const weightAlignedWith = (n: number, i: number): number | null =>
+    point.weightLbPerSet.length === n ? (point.weightLbPerSet[i] ?? null) : null;
+
   if (point.mode === "duration" && point.durationPerSet.length > 0) {
-    const parts = point.durationPerSet.map(formatDurationSeconds);
+    const parts = point.durationPerSet.map((sec, i) =>
+      formatSetVolumePart(
+        formatDurationSeconds(sec),
+        weightAlignedWith(point.durationPerSet.length, i),
+      ),
+    );
     return `${label} (${parts.join(" + ")})`;
   }
   if (point.repsPerSet.length > 0) {
-    return `${label} (${point.repsPerSet.join(" + ")})`;
+    const parts = point.repsPerSet.map((reps, i) =>
+      formatSetVolumePart(
+        String(reps),
+        weightAlignedWith(point.repsPerSet.length, i),
+      ),
+    );
+    return `${label} (${parts.join(" + ")})`;
   }
   return label;
 }
@@ -165,23 +226,45 @@ export function exerciseProgressTooltipLines(
   chartValue: number,
 ): { primary: string; secondary: string } {
   const breakdown = formatExerciseProgressSetBreakdown(point);
+  const weightSummary = formatExerciseProgressWeightCell(point);
   if (point.mode === "duration") {
     const total =
       formatDurationSeconds(chartValue) || `${Math.round(chartValue)}s total`;
     const primary = `${total} · ${breakdown}`;
     if (point.reps > 0) {
-      return { primary, secondary: `${point.reps} reps also logged` };
+      return {
+        primary,
+        secondary:
+          weightSummary === "-"
+            ? `${point.reps} reps also logged`
+            : `${point.reps} reps also logged · ${weightSummary}`,
+      };
     }
-    return { primary, secondary: "Total time that day" };
+    return {
+      primary,
+      secondary:
+        weightSummary === "-"
+          ? "Total time that day"
+          : `Total time that day · ${weightSummary}`,
+    };
   }
   const primary = `${chartValue} reps · ${breakdown}`;
   if (point.durationSec > 0) {
     return {
       primary,
-      secondary: `${formatDurationSeconds(point.durationSec)} time also logged`,
+      secondary:
+        weightSummary === "-"
+          ? `${formatDurationSeconds(point.durationSec)} time also logged`
+          : `${formatDurationSeconds(point.durationSec)} time also logged · ${weightSummary}`,
     };
   }
-  return { primary, secondary: "Total reps that day" };
+  return {
+    primary,
+    secondary:
+      weightSummary === "-"
+        ? "Total reps that day"
+        : `Total reps that day · ${weightSummary}`,
+  };
 }
 
 /** Compact sets column for the sessions table. */
