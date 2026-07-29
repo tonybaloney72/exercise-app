@@ -86,6 +86,7 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "HC-056": "HC-072", // Band-resisted Romanian Deadlift
   "HC-159": "HC-072", // Dumbbell Romanian Deadlift
   "HC-296": "LB-7", // Barbell Sumo Squat
+  "HC-290": "CR-4", // Weighted Russian Twist
 };
 
 /** Ids that redirect to a canonical entry; excluded from generator / swap pools. */
@@ -144,6 +145,7 @@ export const REMOVED_HYBRID_EXERCISE_IDS = new Set<string>([
   "HC-289",
   "HC-294",
   "HC-296",
+  "HC-290",
 ]);
 
 /** Main-catalog strength ids removed after load-variant merge. */

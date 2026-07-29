@@ -12,7 +12,7 @@ const REMOVED_HC = new Set([
   // Pure load variants → canonical (Jul 2026)
   "HC-030", "HC-038", "HC-040", "HC-056", "HC-061", "HC-075", "HC-076",
   "HC-109", "HC-110", "HC-142", "HC-159", "HC-164", "HC-165", "HC-289", "HC-294",
-  "HC-296",
+  "HC-296", "HC-290",
 ]);
 
 const REMOVED_SW = new Set(["SW-15", "SW-17", "SW-20", "SW-25"]);

@@ -38,6 +38,7 @@ describe("exerciseIdConsolidation", () => {
     expect(migrateConsolidatedExerciseId("HC-295")).toBe("HC-257");
     expect(migrateConsolidatedExerciseId("HC-159")).toBe("HC-072");
     expect(migrateConsolidatedExerciseId("HC-296")).toBe("LB-7");
+    expect(migrateConsolidatedExerciseId("HC-290")).toBe("CR-4");
   });
 
   it("chains CP rename then consolidation", () => {
@@ -72,5 +73,18 @@ describe("exerciseIdConsolidation", () => {
       expect.arrayContaining(["bodyweight", "dumbbell", "kettlebell"]),
     );
     expect(exerciseMap["HC-072"]?.name).toBe("Romanian Deadlift");
+    expect(exerciseMap["LB-1"]?.name).toBe("Squats");
+    expect(exerciseMap["LB-1"]?.equipment).toEqual(
+      expect.arrayContaining(["bodyweight", "dumbbell", "barbell"]),
+    );
+    expect(exerciseMap["HC-189"]?.equipment).toEqual(
+      expect.arrayContaining(["bodyweight", "dumbbell", "barbell"]),
+    );
+    expect(exerciseMap["CR-4"]?.equipment).toEqual(
+      expect.arrayContaining(["bodyweight", "dumbbell"]),
+    );
+    expect(exerciseMap["LB-7"]?.equipment).toEqual(
+      expect.arrayContaining(["bodyweight", "dumbbell", "barbell"]),
+    );
   });
 });

@@ -3350,7 +3350,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-189",
     name: "Hip Thrust",
     category: "LB",
-    equipment: ["bodyweight", "bench"],
+    equipment: ["bodyweight", "bench", "dumbbell", "kettlebell", "barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -3363,7 +3363,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Upper back on a bench, feet planted; drive hips up until your torso is level with your knees, squeeze at the top.",
+      "Upper back on a bench, feet planted; drive hips up until your torso is level with your knees, squeeze at the top. Optional: load with a barbell, dumbbell, or kettlebell across the hips.",
     source: "Nuffield Health",
     videoUrl: "https://www.youtube.com/watch?v=RR0oZhhUVWo",
     isTimeBased: false,
@@ -5089,20 +5089,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     isTimeBased: false,
   },
 
-  {
-    id: "HC-290",
-    name: "Weighted Russian Twist",
-    category: "CR",
-    equipment: ["dumbbell"],
-    expertiseLevel: "advanced",
-    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
-    defaultReps: "10",
-    notes:
-      "Seated with feet off the floor, holding a dumbbell; rotate the torso side to side, tapping the weight down each side.",
-    source: "Drago Boxing",
-    videoUrl: "https://www.youtube.com/watch?v=9DI8kQeK5cU",
-    isTimeBased: false,
-  },
   {
     id: "HC-291",
     name: "Weighted Seated Toe Raise",

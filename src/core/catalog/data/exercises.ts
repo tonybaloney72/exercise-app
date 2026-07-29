@@ -230,11 +230,12 @@ const catalogExercises: Exercise[] = [
     id: "CR-4",
     name: "Russian Twists",
     category: "CR",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "dumbbell", "kettlebell", "medicine_ball"],
     expertiseLevel: "intermediate",
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "15 each side",
-    notes: "Seated, lean back, twist side to side",
+    notes:
+      "Seated, lean back, twist side to side. Optional: hold a dumbbell, kettlebell, or medicine ball.",
     source: "CHRIS HERIA",
     videoUrl: "https://youtu.be/fZPS3DrShuE?si=mEE9MHh9QA4SdSnR&t=127",
     isTimeBased: false,
@@ -2275,9 +2276,9 @@ const catalogExercises: Exercise[] = [
   // ── Lower Body (LB) ──
   {
     id: "LB-1",
-    name: "Bodyweight Squats",
+    name: "Squats",
     category: "LB",
-    equipment: ["bodyweight"],
+    equipment: ["bodyweight", "dumbbell", "kettlebell", "barbell"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Abductors",
@@ -2289,7 +2290,8 @@ const catalogExercises: Exercise[] = [
       "Quadriceps",
     ],
     defaultReps: "15",
-    notes: "Feet shoulder-width, sit back and down",
+    notes:
+      "Feet shoulder-width, sit back and down. Optional: hold dumbbells, a kettlebell, or a barbell.",
     source: "Nerd Fitness",
     videoUrl: "https://www.youtube.com/watch?v=cB0cOX7gePg",
     isTimeBased: false,
