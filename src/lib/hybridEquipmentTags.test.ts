@@ -61,11 +61,10 @@ describe("hybrid equipment tags", () => {
     ]);
   });
 
-  it("tags upside down shrug as hang or bench, not bodyweight-only", () => {
+  it("tags upside down shrug as hang apparatus, not bodyweight-only", () => {
     expect(exerciseMap["HC-269"]!.equipment).toEqual([
       "pull_up_bar",
       "rings",
-      "bench",
     ]);
   });
 

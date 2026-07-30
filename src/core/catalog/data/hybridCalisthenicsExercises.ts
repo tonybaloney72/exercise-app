@@ -2766,7 +2766,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-155",
     name: "Dumbbell Pullover",
     category: "UP",
-    equipment: ["dumbbell"],
+    equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Chest",
@@ -2777,7 +2777,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Arms extended; lower weight behind head with control, pull back over the chest.",
+      "Lie on a bench, arms extended; lower the dumbbell behind your head with control, then pull it back over the chest.",
     source: "DEMIC",
     videoUrl: "https://www.youtube.com/watch?v=JdzaVp3zEAM",
     isTimeBased: false,
@@ -4824,7 +4824,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-269",
     name: "Upside Down Shrug",
     category: "UPL",
-    equipment: ["pull_up_bar", "rings", "bench"],
+    equipment: ["pull_up_bar", "rings"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Biceps",

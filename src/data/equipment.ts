@@ -49,6 +49,34 @@ export const EQUIPMENT_LABELS: Record<ExerciseEquipment, string> = {
 /** Default until the user completes equipment onboarding or changes Settings. */
 export const DEFAULT_AVAILABLE_EQUIPMENT: ExerciseEquipment[] = ["bodyweight"];
 
+/**
+ * Equipment roles for matching. Within a role, any listed option is enough;
+ * across roles that appear on an exercise, the user must satisfy every role
+ * (e.g. dumbbell + bench requires both a load implement and a bench/surface).
+ */
+const EQUIPMENT_ROLE: Record<ExerciseEquipment, "load" | "surface" | "hang"> = {
+  bodyweight: "load",
+  resistance_band: "load",
+  dumbbell: "load",
+  kettlebell: "load",
+  barbell: "load",
+  machine: "load",
+  cable: "load",
+  medicine_ball: "load",
+  bicycle: "load",
+  indoor_bike: "load",
+  treadmill: "load",
+  elliptical: "load",
+  rowing_machine: "load",
+  stair_climber: "load",
+  bench: "surface",
+  plyo_box: "surface",
+  sturdy_chair: "surface",
+  stability_ball: "surface",
+  pull_up_bar: "hang",
+  rings: "hang",
+};
+
 const LEGACY_EQUIPMENT_ALIASES: Record<string, ExerciseEquipment[]> = {
   outdoor_bicycle: ["bicycle"],
 };
@@ -89,5 +117,21 @@ export function exerciseMatchesEquipment(
   available: ExerciseEquipment[],
 ): boolean {
   if (!exerciseEquipment || exerciseEquipment.length === 0) return true;
-  return exerciseEquipment.some((eq) => available.includes(eq));
+
+  const byRole: Record<"load" | "surface" | "hang", ExerciseEquipment[]> = {
+    load: [],
+    surface: [],
+    hang: [],
+  };
+  for (const eq of exerciseEquipment) {
+    byRole[EQUIPMENT_ROLE[eq]].push(eq);
+  }
+
+  const availableSet = new Set(available);
+  for (const role of ["load", "surface", "hang"] as const) {
+    const needed = byRole[role];
+    if (needed.length === 0) continue;
+    if (!needed.some((eq) => availableSet.has(eq))) return false;
+  }
+  return true;
 }
