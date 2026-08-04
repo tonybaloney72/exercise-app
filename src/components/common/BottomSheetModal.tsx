@@ -86,7 +86,7 @@ export default function BottomSheetModal({
   titleClassName = "",
   hintClassName = "",
   placement = "sheet",
-  initialFocus = "prefer-input",
+  initialFocus = "none",
 }: BottomSheetModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const backdropPointerDownRef = useRef(false);

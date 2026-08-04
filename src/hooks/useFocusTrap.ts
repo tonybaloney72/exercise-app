@@ -30,9 +30,9 @@ type Options = {
   onClose?: () => void;
   closeOnEscape?: boolean;
   /**
-   * `prefer-input` - first input/textarea if present (default).
+   * `prefer-input` - first input/textarea if present.
    * `first` - first focusable in DOM order (often the close button).
-   * `none` - do not move focus on open (avoids mobile keyboard popping up).
+   * `none` - do not move focus on open (avoids mobile keyboard popping up; default).
    */
   initialFocus?: FocusTrapInitialFocus;
 };
@@ -46,7 +46,7 @@ export function useFocusTrap({
   containerRef,
   onClose,
   closeOnEscape = true,
-  initialFocus = "prefer-input",
+  initialFocus = "none",
 }: Options): void {
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);

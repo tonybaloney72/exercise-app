@@ -486,7 +486,6 @@ export default function AddFoodSheet({
             placeholder="Search foods…"
             disabled={barcodeBusy}
             className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground disabled:opacity-50"
-            autoFocus
           />
           {androidNative ? (
             <div className="flex flex-col gap-2">

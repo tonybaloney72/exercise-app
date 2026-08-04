@@ -206,36 +206,39 @@ export function materializeLayoutDayPlan(
   const repeatCache = new Map<LayoutGroup, RoundExercise[]>();
   const usedInDay = new Set<string>();
 
-  const rounds = specs.map((spec) => {
-    const group = spec.group as LayoutGroup;
-    if (shouldRepeat && repeatCache.has(group)) {
-      return {
-        roundNumber: spec.roundNumber,
-        exercises: cloneExercises(repeatCache.get(group)!),
-      };
-    }
+  const rounds = specs
+    .map((spec) => {
+      const group = spec.group as LayoutGroup;
+      if (shouldRepeat && repeatCache.has(group)) {
+        return {
+          roundNumber: spec.roundNumber,
+          exercises: cloneExercises(repeatCache.get(group)!),
+        };
+      }
 
-    const category = LAYOUT_GROUP_TO_CATEGORY[group];
-    const exercises = fillCategorySlots(
-      category,
-      target,
-      plan,
-      spec.roundNumber,
-      availableEquipment,
-      dislikedIds,
-      favoriteIds,
-      usedInDay,
-      exerciseSettings,
-      varietySeed,
-      expertiseFilter,
-    );
+      const category = LAYOUT_GROUP_TO_CATEGORY[group];
+      const exercises = fillCategorySlots(
+        category,
+        target,
+        plan,
+        spec.roundNumber,
+        availableEquipment,
+        dislikedIds,
+        favoriteIds,
+        usedInDay,
+        exerciseSettings,
+        varietySeed,
+        expertiseFilter,
+      );
 
-    if (shouldRepeat && exercises.length > 0) {
-      repeatCache.set(group, cloneExercises(exercises));
-    }
+      if (shouldRepeat && exercises.length > 0) {
+        repeatCache.set(group, cloneExercises(exercises));
+      }
 
-    return { roundNumber: spec.roundNumber, exercises };
-  });
+      return { roundNumber: spec.roundNumber, exercises };
+    })
+    .filter((round) => round.exercises.length > 0)
+    .map((round, index) => ({ ...round, roundNumber: index + 1 }));
 
   return finalizeLayoutDayPlan({ ...plan, rounds });
 }

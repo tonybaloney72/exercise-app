@@ -35,12 +35,25 @@ export default function StretchPickModal({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return candidates;
-    return candidates.filter(
-      (c) =>
+    return candidates.filter((c) => {
+      if (
         c.name.toLowerCase().includes(q) ||
         c.id.toLowerCase().includes(q) ||
-        (c.muscleGroups?.some((m) => m.toLowerCase().includes(q)) ?? false),
-    );
+        (c.muscleGroups?.some((m) => m.toLowerCase().includes(q)) ?? false)
+      ) {
+        return true;
+      }
+      // Stretches encode body focus in secondaryCategory (muscleGroups are often just "Mobility").
+      const bodyFocus = c.secondaryCategory
+        ? CATEGORIES[c.secondaryCategory]
+        : undefined;
+      if (!bodyFocus) return false;
+      return (
+        bodyFocus.name.toLowerCase().includes(q) ||
+        bodyFocus.shortName.toLowerCase().includes(q) ||
+        bodyFocus.description.toLowerCase().includes(q)
+      );
+    });
   }, [candidates, query]);
 
   function handleClose() {
@@ -101,7 +114,7 @@ export default function StretchPickModal({
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search stretches…"
+          placeholder="Search by name or body part…"
           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
           autoComplete="off"
         />
@@ -130,12 +143,7 @@ export default function StretchPickModal({
                   </span>
                 </span>
                 {ex.secondaryCategory ? (
-                  <span className="flex items-center gap-1.5">
-                    <CategoryBadge category={ex.secondaryCategory} size="sm" />
-                    <span className="text-sm text-muted">
-                      {CATEGORIES[ex.secondaryCategory].name}
-                    </span>
-                  </span>
+                  <CategoryBadge category={ex.secondaryCategory} size="sm" />
                 ) : null}
               </button>
             </li>

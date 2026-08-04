@@ -27,7 +27,6 @@ describe("exerciseSwap golden contract", () => {
         "HC-025",
         "HC-027",
         "HC-048",
-        "HC-049",
         "HC-054",
         "HC-055",
         "HC-057",
@@ -43,12 +42,16 @@ describe("exerciseSwap golden contract", () => {
         "HC-270",
         "HC-272",
         "PC-38",
+        "SW-10",
         "UP-25",
         "UP-3",
         "UP-4",
         "UP-5",
         "UP-6",
         "UP-7",
+        "UPL-19",
+        "UPL-22",
+        "UPL-23",
       ]
     `);
   });

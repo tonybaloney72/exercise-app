@@ -4080,7 +4080,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-229",
     name: "Reverse Hyperextension",
     category: "CS",
-    equipment: ["bench", "machine"],
+    equipment: ["bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Glutes",
@@ -4090,7 +4090,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     ],
     defaultReps: "10",
     notes:
-      "Torso on bench or reverse-hyper machine pad; legs swing up. Requires bench/box or machine (not floor-only bodyweight).",
+      "Torso on bench or box; legs swing up. Requires a bench/box (use Reverse Hyperextension Machine for a dedicated machine).",
     source: "RehabFix",
     videoUrl: "https://www.youtube.com/watch?v=MT0U96RqkhM",
     isTimeBased: false,

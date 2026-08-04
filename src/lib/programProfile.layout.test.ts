@@ -8,10 +8,20 @@ import type { WeeklyCategoryLayout } from "@/lib/weeklyCategoryLayout";
 import type { WeeklyLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
 import { resolveLayoutDayStructure } from "@/lib/weeklyLayoutDayStructure";
 import type { UserSettings } from "@/types";
-import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
+import {
+  DEFAULT_AVAILABLE_EQUIPMENT,
+  migrateAvailableEquipment,
+} from "@/data/equipment";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 
 const EMPTY_PREFS: ExercisePreferenceMap = {};
+/** Enough gear to fill multi-round pull blocks without empty rounds. */
+const LAYOUT_TEST_EQUIPMENT = migrateAvailableEquipment([
+  "bodyweight",
+  "plyo_box",
+  "pull_up_bar",
+  "resistance_band",
+]);
 
 describe("programProfile layout mode", () => {
   it("rest day produces no rounds", () => {
@@ -108,17 +118,18 @@ describe("programProfile layout mode", () => {
       fri,
       "balanced",
       "standard",
-      [...DEFAULT_AVAILABLE_EQUIPMENT],
+      [...LAYOUT_TEST_EQUIPMENT],
       EMPTY_PREFS,
       undefined,
       "layout-blocks",
       profile,
     );
     expect(out.rounds).toHaveLength(4);
-    const pullRounds = out.rounds.filter((r) =>
+    const nonEmpty = out.rounds.filter((r) => r.exercises.length > 0);
+    const pullRounds = nonEmpty.filter((r) =>
       r.exercises.every((e) => e.category === "UPL"),
     );
-    const cardioRounds = out.rounds.filter((r) =>
+    const cardioRounds = nonEmpty.filter((r) =>
       r.exercises.every((e) => e.category === "PC"),
     );
     expect(pullRounds).toHaveLength(3);
