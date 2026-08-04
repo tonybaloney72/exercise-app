@@ -2909,7 +2909,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-163",
     name: "Dumbbell Spider Curl",
     category: "UPL",
-    equipment: ["dumbbell"],
+    equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Biceps",
@@ -3416,7 +3416,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-194",
     name: "Incline Dumbbell Curl",
     category: "UPL",
-    equipment: ["dumbbell"],
+    equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Biceps",
