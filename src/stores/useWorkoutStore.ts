@@ -78,6 +78,7 @@ import {
   hydrateWorkoutLog,
 } from "@/utils/exerciseLogDefaults";
 import { scaledDefaultTimerSeconds } from "@/lib/prescriptionScaling";
+import { initialLoggedWeightLb } from "@/lib/exerciseLoad";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   formatPlanTargetPrescription,
@@ -482,10 +483,7 @@ function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
         skipped: false,
         targetPrescription,
         loggingMode: resolved.defaultSetMode,
-        weightLb:
-          resolved.defaultWeightLb != null && resolved.defaultWeightLb > 0
-            ? resolved.defaultWeightLb
-            : undefined,
+        weightLb: initialLoggedWeightLb(meta, resolved.defaultWeightLb),
         targetDurationSeconds: seedTimerTargetSecondsFromResolved(
           resolved,
           meta
@@ -1017,6 +1015,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
                     skipped: false,
                     actualReps: undefined,
                     actualDuration: undefined,
+                    weightLb: initialLoggedWeightLb(
+                      meta,
+                      resolved.defaultWeightLb,
+                    ),
                     loggingMode: resolved.defaultSetMode,
                     targetDurationSeconds: seedTimerTargetSecondsFromResolved(
                       resolved,
@@ -1079,6 +1081,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => {
                     swappedWith: undefined,
                     actualReps: undefined,
                     actualDuration: undefined,
+                    weightLb: initialLoggedWeightLb(
+                      meta,
+                      resolved.defaultWeightLb,
+                    ),
                     loggingMode: resolved.defaultSetMode,
                     targetDurationSeconds: seedTimerTargetSecondsFromResolved(
                       resolved,

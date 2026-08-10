@@ -1,9 +1,15 @@
 "use client";
 
+import { useMemo } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import TimerTargetControls from "@/components/workout/TimerTargetControls";
 import { exerciseVideoLinkLabel } from "@/lib/exerciseVideoLink";
+import {
+  parseLibraryDefaultRepsInput,
+  parseLibraryDefaultWeightInput,
+} from "@/lib/libraryExerciseDefaults";
+import { formatInventoryWeightLb } from "@/lib/weightInventory";
 import type { ExerciseCategory, ExerciseSetMode } from "@/types";
 
 const modeChip =
@@ -25,6 +31,14 @@ type ExerciseDetailSheetProps = {
   storedTargetSeconds?: number;
   onTimerPreset?: (sec: number) => void;
   onTimerCommitCustom?: (sec: number) => void;
+  /** Library defaults editable during a workout. */
+  showLibraryDefaults?: boolean;
+  catalogDefaultReps?: string;
+  defaultTargetReps?: number | null;
+  defaultWeightLb?: number | null;
+  supportsLoad?: boolean;
+  onSaveDefaultReps?: (reps: number | null) => void;
+  onSaveDefaultWeight?: (weightLb: number | null) => void;
 };
 
 function ExerciseVideoLink({ url }: { url: string }) {
@@ -78,6 +92,13 @@ export default function ExerciseDetailSheet({
   storedTargetSeconds,
   onTimerPreset,
   onTimerCommitCustom,
+  showLibraryDefaults = false,
+  catalogDefaultReps = "",
+  defaultTargetReps = null,
+  defaultWeightLb = null,
+  supportsLoad = false,
+  onSaveDefaultReps,
+  onSaveDefaultWeight,
 }: ExerciseDetailSheetProps) {
   const trimmedNotes = notes?.trim() ?? "";
   const showTimerControls =
@@ -85,6 +106,24 @@ export default function ExerciseDetailSheet({
     effectiveTargetSec != null &&
     onTimerPreset != null &&
     onTimerCommitCustom != null;
+
+  const repsFieldValue = useMemo(() => {
+    if (defaultTargetReps != null && defaultTargetReps > 0) {
+      return String(defaultTargetReps);
+    }
+    return "";
+  }, [defaultTargetReps]);
+
+  const weightFieldValue = useMemo(() => {
+    if (defaultWeightLb != null && defaultWeightLb > 0) {
+      return formatInventoryWeightLb(defaultWeightLb);
+    }
+    return "";
+  }, [defaultWeightLb]);
+
+  const showDefaults =
+    showLibraryDefaults &&
+    (onSaveDefaultReps != null || (supportsLoad && onSaveDefaultWeight != null));
 
   return (
     <BottomSheetModal
@@ -140,6 +179,85 @@ export default function ExerciseDetailSheet({
             onPreset={onTimerPreset}
             onCommitCustom={onTimerCommitCustom}
           />
+        ) : null}
+
+        {showDefaults ? (
+          <section className="flex flex-col gap-3">
+            <div>
+              <p className="text-caption font-medium tracking-wide text-muted">
+                Library defaults
+              </p>
+              <p className="mt-0.5 text-caption text-muted">
+                Saves for future workouts. Clear a field and tap away to unset.
+              </p>
+            </div>
+
+            {onSaveDefaultReps && mode === "reps" ? (
+              <div className="flex flex-col gap-1.5">
+                <label
+                  htmlFor="detail-default-reps"
+                  className="text-caption font-medium text-muted"
+                >
+                  Default reps
+                </label>
+                <input
+                  id="detail-default-reps"
+                  key={`detail-reps-${repsFieldValue}`}
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={999}
+                  defaultValue={repsFieldValue}
+                  placeholder={catalogDefaultReps || "reps"}
+                  onBlur={(e) => {
+                    const reps = parseLibraryDefaultRepsInput(
+                      e.currentTarget.value,
+                      catalogDefaultReps,
+                    );
+                    if (reps != null) e.currentTarget.value = String(reps);
+                    onSaveDefaultReps(reps);
+                  }}
+                  className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
+                />
+              </div>
+            ) : null}
+
+            {supportsLoad && onSaveDefaultWeight ? (
+              <div className="flex flex-col gap-1.5">
+                <label
+                  htmlFor="detail-default-weight"
+                  className="text-caption font-medium text-muted"
+                >
+                  Default weight (lb)
+                </label>
+                <input
+                  id="detail-default-weight"
+                  key={`detail-weight-${weightFieldValue}`}
+                  type="number"
+                  inputMode="decimal"
+                  min={0.5}
+                  max={500}
+                  step={0.5}
+                  defaultValue={weightFieldValue}
+                  placeholder="lb"
+                  onBlur={(e) => {
+                    const weight = parseLibraryDefaultWeightInput(
+                      e.currentTarget.value,
+                    );
+                    if (weight === undefined) {
+                      e.currentTarget.value = weightFieldValue;
+                      return;
+                    }
+                    if (weight != null) {
+                      e.currentTarget.value = formatInventoryWeightLb(weight);
+                    }
+                    onSaveDefaultWeight(weight);
+                  }}
+                  className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
+                />
+              </div>
+            ) : null}
+          </section>
         ) : null}
 
         {trimmedNotes.length > 0 ? (
