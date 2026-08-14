@@ -11,6 +11,7 @@ import {
   applySetTimerStopCompletion,
   type SetTimerTarget,
 } from "@/lib/setTimerCompleteOnStop";
+import { adjustCountdownPlan } from "@/lib/setTimerElapsed";
 import { displayCountdownSeconds } from "@/utils/time";
 
 export type TimerMode = "idle" | "rest" | "stopwatch" | "setTimer";
@@ -206,11 +207,12 @@ export const useFloatingTimerStore = create<FloatingTimerState>((set, get) => ({
   adjustRest: (deltaSeconds) =>
     set((s) => {
       if (s.mode !== "rest" && s.mode !== "setTimer") return s;
-      const next = Math.max(0, s.seconds + deltaSeconds);
-      const total = Math.max(s.restTotalSeconds, next);
+      const { secondsLeft: next, restTotalSeconds: total } =
+        adjustCountdownPlan(s.restTotalSeconds, s.seconds, deltaSeconds);
+      const appliedDelta = next - s.seconds;
       const nextEndsAt =
         s.running && s.countdownEndsAtMs != null
-          ? s.countdownEndsAtMs + deltaSeconds * 1000
+          ? s.countdownEndsAtMs + appliedDelta * 1000
           : s.running
             ? countdownEndsAtFromSeconds(next)
             : null;

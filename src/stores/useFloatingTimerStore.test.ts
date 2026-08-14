@@ -113,4 +113,18 @@ describe("useFloatingTimerStore syncTimerClock", () => {
     useFloatingTimerStore.getState().resetStopwatch();
     expect(useFloatingTimerStore.getState().hasStarted).toBe(false);
   });
+
+  it("extends planned total when adding time near the end of a set timer", () => {
+    useFloatingTimerStore.getState().startSetCountdown(30);
+    useFloatingTimerStore.setState({ seconds: 2, countdownRemainingMs: 2000 });
+    useFloatingTimerStore.getState().adjustRest(15);
+    const afterAdd = useFloatingTimerStore.getState();
+    expect(afterAdd.seconds).toBe(17);
+    expect(afterAdd.restTotalSeconds).toBe(45);
+
+    useFloatingTimerStore.setState({ seconds: 8 });
+    const elapsed =
+      afterAdd.restTotalSeconds - useFloatingTimerStore.getState().seconds;
+    expect(elapsed).toBe(37);
+  });
 });
