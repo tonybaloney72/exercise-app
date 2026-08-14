@@ -190,6 +190,11 @@ export interface DayPlan {
   warmUp?: StretchEntry[];
   /** Persisted cool-down list (custom day). When set, used as-is for workouts. */
   coolDown?: StretchEntry[];
+  /**
+   * Set when the user saves Edit Day. Auto-regen (prefs / guided refresh) must
+   * not replace this day until they reset the day or week.
+   */
+  planCustomized?: boolean;
 }
 
 /** Portable day structure saved in workout day templates (no calendar metadata). */

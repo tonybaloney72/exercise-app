@@ -23,9 +23,25 @@ export function mergeRegeneratedDays(
 ): TrainingWeekDays {
   const merged: TrainingWeekDays = { ...stored };
   for (const dow of regenerateIndices) {
+    if (stored[dow]?.planCustomized) continue;
     const day = generated[dow];
     if (!day) continue;
     merged[dow] = { ...day, dayOfWeek: dow };
+  }
+  return merged;
+}
+
+/** Keep Edit Day saves when replacing the rest of the week from the generator. */
+export function restoreCustomizedDays(
+  stored: TrainingWeekDays | null,
+  generated: TrainingWeekDays,
+): TrainingWeekDays {
+  if (!stored) return generated;
+  const merged: TrainingWeekDays = { ...generated };
+  for (let dow = 0; dow < 7; dow++) {
+    const saved = stored[dow];
+    if (!saved?.planCustomized) continue;
+    merged[dow] = { ...saved, dayOfWeek: dow };
   }
   return merged;
 }

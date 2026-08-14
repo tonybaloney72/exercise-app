@@ -39,6 +39,7 @@ describe("dayPlanForCustomSave", () => {
       coolDown: derived.coolDown,
     };
     const saved = dayPlanForCustomSave(withDerivedOnly, ctx);
+    expect(saved.planCustomized).toBe(true);
     expect(saved.warmUp?.map((e) => e.exerciseId)).toEqual(
       derived.warmUp.map((e) => e.exerciseId),
     );

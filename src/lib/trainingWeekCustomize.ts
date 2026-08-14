@@ -31,9 +31,10 @@ async function resolveTrainingWeekForAuthInCustomize(dateKey: string) {
 async function refreshTrainingWeekContainingInCustomize(
   dateKeyInWeek: string,
   scope: "prefs" | "full",
+  options?: { replaceCustomizedDays?: boolean },
 ): Promise<void> {
   const { refreshTrainingWeekContaining } = await import("@/lib/planResolver");
-  await refreshTrainingWeekContaining(dateKeyInWeek, scope);
+  await refreshTrainingWeekContaining(dateKeyInWeek, scope, options);
 }
 import {
   cloneStretchEntries,
@@ -171,6 +172,7 @@ export function dayPlanForCustomSave(
     ...basePlan,
     warmUp: resolved.warmUp,
     coolDown: resolved.coolDown,
+    planCustomized: true,
   });
 }
 
@@ -214,7 +216,9 @@ export async function saveCustomDayPlan(
 export async function resetTrainingWeekToGenerated(
   dateKeyInWeek: string,
 ): Promise<void> {
-  await refreshTrainingWeekContainingInCustomize(dateKeyInWeek, "full");
+  await refreshTrainingWeekContainingInCustomize(dateKeyInWeek, "full", {
+    replaceCustomizedDays: true,
+  });
 }
 
 /** Fresh catalog + generator plan for one day-of-week (no persistence). */

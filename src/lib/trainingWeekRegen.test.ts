@@ -5,6 +5,7 @@ import { DEFAULT_AVAILABLE_EQUIPMENT } from "@/data/equipment";
 import {
   mergeRegeneratedDays,
   regenDayIndicesForPrefsChange,
+  restoreCustomizedDays,
 } from "@/lib/trainingWeekRegen";
 import type { ExercisePreferenceMap } from "@/lib/repos";
 
@@ -54,5 +55,52 @@ describe("mergeRegeneratedDays", () => {
     expect(merged[1]?.rounds).toEqual(generated[1]?.rounds);
     expect(merged[2]?.rounds).toEqual(generated[2]?.rounds);
     expect(merged[3]?.theme).toBe(stored[3]?.theme);
+  });
+
+  it("does not replace days the user saved from Edit Day", () => {
+    const catalog = buildCatalogWeek();
+    const stored = materializeTrainingWeek(
+      catalog,
+      EMPTY_PREFS,
+      EQUIP,
+      "balanced",
+      "standard",
+    );
+    stored[1] = { ...stored[1]!, planCustomized: true };
+    const generated = materializeTrainingWeek(
+      catalog,
+      EMPTY_PREFS,
+      EQUIP,
+      "upper_body",
+      "compact",
+    );
+    const merged = mergeRegeneratedDays(stored, generated, [1, 2]);
+    expect(merged[1]?.rounds).toEqual(stored[1]?.rounds);
+    expect(merged[1]?.planCustomized).toBe(true);
+    expect(merged[2]?.rounds).toEqual(generated[2]?.rounds);
+  });
+});
+
+describe("restoreCustomizedDays", () => {
+  it("overlays Edit Day saves onto a fully generated week", () => {
+    const catalog = buildCatalogWeek();
+    const stored = materializeTrainingWeek(
+      catalog,
+      EMPTY_PREFS,
+      EQUIP,
+      "balanced",
+      "standard",
+    );
+    stored[1] = { ...stored[1]!, planCustomized: true };
+    const generated = materializeTrainingWeek(
+      catalog,
+      EMPTY_PREFS,
+      EQUIP,
+      "upper_body",
+      "compact",
+    );
+    const restored = restoreCustomizedDays(stored, generated);
+    expect(restored[1]?.rounds).toEqual(stored[1]?.rounds);
+    expect(restored[2]?.rounds).toEqual(generated[2]?.rounds);
   });
 });

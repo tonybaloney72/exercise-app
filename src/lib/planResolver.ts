@@ -14,6 +14,7 @@ import { mergeWeekScheduleIntoStoredWeek } from "@/lib/customWeekPlan";
 import {
   mergeRegeneratedDays,
   regenDayIndicesForPrefsChange,
+  restoreCustomizedDays,
 } from "@/lib/trainingWeekRegen";
 import { sanitizeProgramMode } from "@/lib/weeklyCategoryLayout";
 import { stripPhantomRestDayRounds } from "@/lib/restDays";
@@ -132,6 +133,7 @@ type PersistedWeekBundle = {
 async function refreshPersistedWeek(
   weekKey: string,
   scope: RefreshTrainingWeekScope,
+  options?: { replaceCustomizedDays?: boolean },
 ): Promise<PersistedWeekBundle> {
   const {
     prefs,
@@ -167,11 +169,15 @@ async function refreshPersistedWeek(
     const source = isCustomProgram
       ? TRAINING_WEEK_SOURCE_CUSTOM_V1
       : TRAINING_WEEK_SOURCE_GENERATED_V1;
-    await persistTrainingWeek(weekKey, materialized, {
+    const days =
+      options?.replaceCustomizedDays || !weekDaysComplete(storedDays)
+        ? materialized
+        : restoreCustomizedDays(storedDays, materialized);
+    await persistTrainingWeek(weekKey, days, {
       source,
       prefsFingerprint: fingerprint,
     });
-    return { days: materialized, source };
+    return { days, source };
   }
 
   if (
@@ -367,16 +373,19 @@ export async function resolveTrainingWeekBundleForAuth(
 
 /**
  * Regenerate days in the Sun–Sat week containing `dateKey`.
- * `prefs` - today (if no workout started) + future; past days and in-progress today are kept.
- * `full` - entire week from catalog (explicit reset).
+ * `prefs` - today (if no workout started) + future; past days, in-progress today,
+ * and Edit Day saves (`planCustomized`) are kept.
+ * `full` - entire week from catalog. Pass `replaceCustomizedDays` to drop Edit Day saves
+ * (explicit week reset).
  */
 export async function refreshTrainingWeekContaining(
   dateKey: string,
   scope: RefreshTrainingWeekScope = "prefs",
+  options?: { replaceCustomizedDays?: boolean },
 ): Promise<void> {
   const weekKey = weekKeyFromDateKey(dateKey);
   if (!weekKey) return;
-  await refreshPersistedWeek(weekKey, scope);
+  await refreshPersistedWeek(weekKey, scope, options);
 }
 
 /**

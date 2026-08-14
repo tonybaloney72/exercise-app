@@ -10,7 +10,9 @@ export async function refreshCurrentTrainingWeek(
   const { useAuthStore } = await import("@/stores/useAuthStore");
   if (useAuthStore.getState().mode !== "authenticated") return;
   const { refreshTrainingWeekContaining } = await import("@/lib/planResolver");
-  await refreshTrainingWeekContaining(formatLocalDateKey(), scope);
+  await refreshTrainingWeekContaining(formatLocalDateKey(), scope, {
+    replaceCustomizedDays: scope === "full",
+  });
   const { useTrainingWeekStore } =
     await import("@/stores/useTrainingWeekStore");
   useTrainingWeekStore.getState().invalidate();
