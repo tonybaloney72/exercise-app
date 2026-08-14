@@ -1685,12 +1685,7 @@ const catalogExercises: Exercise[] = [
     category: "UP",
     equipment: ["sturdy_chair", "bench"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "8",
     notes:
       "Hands on a sturdy chair or bench behind you; lower until elbows bend roughly 90°. Tricep emphasis.",
@@ -2155,12 +2150,7 @@ const catalogExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Supine plank, arms extended; retract and protract shoulder blades (push/pull through the floor) without bending elbows.",
@@ -2218,12 +2208,7 @@ const catalogExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "30 sec",
     notes:
       "A-frame: hands and feet on floor, hips high; walk forward and back with control, pushing the floor away each step.",
@@ -2237,12 +2222,7 @@ const catalogExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "30 sec",
     notes:
       "Same A-frame as Bear Walk; emphasize pushing hard through each hand, lifting off one arm as the other drives down. Large scapular range of motion.",
@@ -2513,7 +2493,7 @@ const catalogExercises: Exercise[] = [
     notes:
       "Step wide to one side, sit into hip while keeping opposite leg straight, alternate. Optional: hold a dumbbell or kettlebell at your chest or sides.",
     source: "YouTube",
-    videoUrl: "https://www.youtube.com/watch?v=rvqLvRFpL6A",
+    videoUrl: "https://www.youtube.com/watch?v=MvpBUsQrt_4",
     isTimeBased: false,
   },
 
@@ -4112,12 +4092,7 @@ const catalogExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "beginner",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "In plank, retract shoulder blades together then protract apart for serratus activation",
