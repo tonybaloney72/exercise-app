@@ -141,7 +141,10 @@ export const HC_NOTES_BY_NAME = {
   "Dumbbell Bent Knee Calf Raise": "Dumbbells at your sides, knees bent; rise onto your toes to target the soleus, pause, then lower heels down.",
   "Dumbbell Bent-Over Row": "Hinge forward with a flat back; row the dumbbells to your ribs, squeezing shoulder blades together.",
   "Dumbbell Drag Curl": "Drag dumbbells up along your torso; elbows travel back while weights stay close to the body.",
-  "Dumbbell Fly": "Lying on a bench with dumbbells over your chest; lower them out to the sides with a slight elbow bend, then squeeze back together.",
+  "Dumbbell Bench Fly":
+    "Lying on a bench with dumbbells over your chest; lower them out to the sides with a slight elbow bend, then squeeze back together.",
+  "Dumbbell Floor Fly":
+    "Lie on the floor with knees bent and dumbbells over your chest; open your arms in a wide arc until your upper arms lightly touch the floor, then squeeze back together. No bench required.",
   "Dumbbell Front Raise": "Dumbbells at your thighs; raise one or both to shoulder height with soft elbows, avoid swinging.",
   "Dumbbell Full Rom Front Raise": "Start with the dumbbell behind your hip for a stretch, raise it overhead through the full range, lower with control.",
   "Dumbbell Hammer Curl": "Neutral grip; curl without swinging, elbows stay at your sides.",

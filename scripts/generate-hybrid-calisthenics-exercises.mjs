@@ -199,7 +199,8 @@ const PAGES = {
     Dumbbell: [
       "Dumbbell Bench Press",
       "Dumbbell Incline Bench Press",
-      "Dumbbell Fly",
+      "Dumbbell Bench Fly",
+      "Dumbbell Floor Fly",
       "Dumbbell Pullover",
     ],
     Barbell: ["Barbell Bench Press", "Barbell Incline Bench Press"],

@@ -2561,7 +2561,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
   },
   {
     id: "HC-145",
-    name: "Dumbbell Fly",
+    name: "Dumbbell Bench Fly",
     category: "UP",
     equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
@@ -2577,6 +2577,26 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Lying on a bench with dumbbells over your chest; lower them out to the sides with a slight elbow bend, then squeeze back together.",
     source: "Andrew Kwong (DeltaBolic)",
     videoUrl: "https://www.youtube.com/watch?v=rk8YayRoTRQ",
+    isTimeBased: false,
+  },
+  {
+    id: "HC-303",
+    name: "Dumbbell Floor Fly",
+    category: "UP",
+    equipment: ["dumbbell"],
+    expertiseLevel: "intermediate",
+    muscleGroups: [
+      "Chest",
+      "Front Deltoids",
+      "Pectoralis Major",
+      "Serratus Anterior",
+      "Triceps",
+    ],
+    defaultReps: "10",
+    notes:
+      "Lie on the floor with knees bent and dumbbells over your chest; open your arms in a wide arc until your upper arms lightly touch the floor, then squeeze back together. No bench required.",
+    source: "Curls in the Rack",
+    videoUrl: "https://www.youtube.com/watch?v=DNZ6IwviZYE",
     isTimeBased: false,
   },
   {
