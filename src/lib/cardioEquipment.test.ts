@@ -63,5 +63,6 @@ describe("cardio kinds", () => {
     expect(ALL_EXERCISE_EQUIPMENT).toContain("bicycle");
     expect(ALL_EXERCISE_EQUIPMENT).toContain("indoor_bike");
     expect(ALL_EXERCISE_EQUIPMENT).not.toContain("outdoor_bicycle" as never);
+    expect(ALL_EXERCISE_EQUIPMENT).not.toContain("machine" as never);
   });
 });

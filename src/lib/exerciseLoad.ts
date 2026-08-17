@@ -1,4 +1,5 @@
 import type { Exercise, ExerciseEquipment, WeightInventoryKind } from "@/types";
+import { STRENGTH_MACHINE_EQUIPMENT } from "@/data/equipment";
 import { normalizeWeightLb } from "@/lib/weightInventory";
 
 /** Equipment that can carry a logged working weight. */
@@ -7,8 +8,8 @@ const LOADABLE_EQUIPMENT = new Set<ExerciseEquipment>([
   "kettlebell",
   "barbell",
   "medicine_ball",
-  "machine",
   "cable",
+  ...STRENGTH_MACHINE_EQUIPMENT,
 ]);
 
 /** Inventory-backed kinds (discrete owned sizes). */

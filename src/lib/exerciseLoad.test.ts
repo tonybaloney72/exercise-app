@@ -11,6 +11,7 @@ describe("exerciseLoad", () => {
   it("detects loadable equipment", () => {
     expect(exerciseSupportsLoad(["dumbbell"])).toBe(true);
     expect(exerciseSupportsLoad(["cable", "bodyweight"])).toBe(true);
+    expect(exerciseSupportsLoad(["leg_press"])).toBe(true);
     expect(exerciseSupportsLoad(["bodyweight"])).toBe(false);
     expect(exerciseSupportsLoad(undefined)).toBe(false);
   });

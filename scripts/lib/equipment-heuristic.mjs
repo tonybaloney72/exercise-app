@@ -61,14 +61,154 @@ function equipmentFromNamedMove(name) {
   if (/\bface\s+pull\b/i.test(n)) return ["cable", "resistance_band"];
   if (/\b(jefferson|zercher)\s+squat\b/i.test(n)) return ["barbell"];
   if (
-    /\b(roman\s+chair|hyperextension|glute\s+ham|ghd|back\s+extension)\b/i.test(
-      n,
-    ) &&
+    /\b(roman\s+chair|45\s+degree|glute\s+ham|ghd)\b/i.test(n) &&
     !/\b(lying|floor|prone)\b/i.test(n)
   ) {
-    return ["machine"];
+    return ["back_extension"];
   }
   return [];
+}
+
+/**
+ * Map an exercise name to a specific strength-machine tag.
+ * Keep in sync with STRENGTH_MACHINE_EQUIPMENT in src/data/equipment.ts.
+ * @param {string} name
+ * @returns {string | null}
+ */
+const MACHINE_NAME_RULES = [
+  { re: /\bsmith(\s+machine)?\b/i, tag: "smith_machine" },
+  { re: /\bpendulum\s+squat\b/i, tag: "pendulum_squat" },
+  { re: /\bhack\s+squat\b/i, tag: "hack_squat" },
+  { re: /\bleg\s+press\b/i, tag: "leg_press" },
+  { re: /\bleg\s+extension\b/i, tag: "leg_extension" },
+  {
+    re: /\b(leg\s+curl|hamstring\s+curl)\b/i,
+    unless: /\b(band|cable)\b/i,
+    tag: "leg_curl",
+  },
+  {
+    re: /\blat\s+pulldown\b/i,
+    unless: /\b(band|cable)\b/i,
+    tag: "lat_pulldown",
+  },
+  {
+    re: /\blat\s+pullover\b/i,
+    unless: /\b(band|cable|dumbbell)\b/i,
+    tag: "lat_pullover",
+  },
+  {
+    re: /\b(chest\s+fly|pec\s+deck|pec\s+fly)\b/i,
+    unless: /\b(band|cable|dumbbell)\b/i,
+    tag: "pec_deck",
+  },
+  {
+    re: /\bchest\s+press\b/i,
+    require: /\bmachine\b/i,
+    tag: "chest_press",
+  },
+  {
+    re: /\blateral\s+raise\b/i,
+    require: /\bmachine\b/i,
+    tag: "lateral_raise_machine",
+  },
+  {
+    re: /\b(overhead\s+press|shoulder\s+press)\b/i,
+    require: /\bmachine\b/i,
+    tag: "shoulder_press",
+  },
+  {
+    re: /\breverse\s+fly\b/i,
+    require: /\bmachine\b/i,
+    tag: "reverse_fly_machine",
+  },
+  { re: /\bmachine\s+row\b/i, tag: "seated_row" },
+  { re: /\bt[-\s]?bar\s+row\b/i, tag: "t_bar_row" },
+  {
+    re: /\bpreacher\s+(curl|bench)\b/i,
+    unless: /\bdumbbell\b/i,
+    tag: "preacher_curl",
+  },
+  {
+    re: /\btriceps?\s+extension\b/i,
+    require: /\bmachine\b/i,
+    tag: "triceps_extension",
+  },
+  {
+    re: /\btriceps?\s+press\b/i,
+    require: /\bmachine\b/i,
+    tag: "triceps_press",
+  },
+  { re: /\bab\s+crunch\b/i, require: /\bmachine\b/i, tag: "ab_crunch" },
+  { re: /\b(oblique\s+twist|rotary\s+torso)\b/i, tag: "rotary_torso" },
+  { re: /\babductor\b/i, require: /\bmachine\b/i, tag: "hip_abductor" },
+  { re: /\badductor\b/i, require: /\bmachine\b/i, tag: "hip_adductor" },
+  { re: /\bhip\s+flexor\b/i, require: /\bmachine\b/i, tag: "hip_flexor" },
+  {
+    re: /\bhip\s+thrust\b/i,
+    require: /\bmachine\b/i,
+    tag: "hip_thrust_machine",
+  },
+  {
+    re: /\bglute\s+kickback\b/i,
+    require: /\bmachine\b/i,
+    tag: "glute_kickback",
+  },
+  {
+    re: /\breverse\s+hyper(extension)?\b/i,
+    require: /\bmachine\b/i,
+    tag: "reverse_hyper",
+  },
+  {
+    re: /\b(45\s+degree\s+back\s+raise|roman\s+chair|thigh-block\s+back\s+extension|back\s+extension\s+machine)\b/i,
+    tag: "back_extension",
+  },
+  { re: /\btibialis\b/i, require: /\bmachine\b/i, tag: "tibialis" },
+];
+
+function specificMachineFromName(name) {
+  const n = name ?? "";
+  for (const rule of MACHINE_NAME_RULES) {
+    if (!rule.re.test(n)) continue;
+    if (rule.require && !rule.require.test(n)) continue;
+    if (rule.unless?.test(n)) continue;
+    return rule.tag;
+  }
+  return null;
+}
+
+const STRENGTH_MACHINE_TAGS = new Set([
+  "leg_press",
+  "hack_squat",
+  "pendulum_squat",
+  "leg_extension",
+  "leg_curl",
+  "hip_abductor",
+  "hip_adductor",
+  "hip_flexor",
+  "hip_thrust_machine",
+  "glute_kickback",
+  "chest_press",
+  "pec_deck",
+  "lat_pulldown",
+  "lat_pullover",
+  "seated_row",
+  "t_bar_row",
+  "shoulder_press",
+  "lateral_raise_machine",
+  "reverse_fly_machine",
+  "preacher_curl",
+  "triceps_extension",
+  "triceps_press",
+  "ab_crunch",
+  "rotary_torso",
+  "back_extension",
+  "reverse_hyper",
+  "smith_machine",
+  "tibialis",
+]);
+
+export function isStrengthMachineTag(tag) {
+  return STRENGTH_MACHINE_TAGS.has(tag);
 }
 
 const NOTE_EQUIPMENT_PATTERNS = [
@@ -77,7 +217,6 @@ const NOTE_EQUIPMENT_PATTERNS = [
   [/\bresistance\s+bands?\b/i, "resistance_band"],
   [/\b(?:^|\s)bands?\b/i, "resistance_band"],
   [/\bbarbells?\b/i, "barbell"],
-  [/\bmachine\b/i, "machine"],
   [/\bcables?\b/i, "cable"],
   [/\bmedicine\s+balls?\b/i, "medicine_ball"],
   [/\bmed\s+balls?\b/i, "medicine_ball"],
@@ -88,11 +227,11 @@ const NOTE_EQUIPMENT_PATTERNS = [
   [/\bswiss\s+balls?\b/i, "stability_ball"],
   [/\b(?:gymnastic\s+)?rings?\b/i, "rings"],
   [/\bpull[- ]?up\s+bars?\b/i, "pull_up_bar"],
-  [/\broman\s+chair\b/i, "machine"],
-  [/\bhyperextension\b/i, "machine"],
-  [/\bpreacher\s+bench\b/i, "machine"],
-  [/\bcurl\s+machine\b/i, "machine"],
-  [/\bleg\s+press\b/i, "machine"],
+  [/\broman\s+chair\b/i, "back_extension"],
+  [/\breverse\s+hyper/i, "reverse_hyper"],
+  [/\bpreacher\s+bench\b/i, "preacher_curl"],
+  [/\bpreacher\s+curl\s+machine\b/i, "preacher_curl"],
+  [/\bleg\s+press\b/i, "leg_press"],
 ];
 
 function inferEquipmentFromNotes(notes) {
@@ -152,12 +291,13 @@ export function expectedEquipmentFromName(name) {
   if (/\bkettlebell|kb\b/i.test(n)) return ["kettlebell"];
   if (/\bbarbell\b/i.test(n)) return ["barbell"];
   if (/\bcable\s+lat\s+pulldown\b/i.test(n)) return ["cable"];
-  if (/\blat pulldown\b/i.test(n)) return ["machine"];
+  if (/\blat pulldown\b/i.test(n)) return ["lat_pulldown"];
   if (/\b(tricep pushdown|face pull|straight-arm pulldown)\b/i.test(n)) {
     return ["cable"];
   }
   if (/\bcable\b/i.test(n)) return ["cable"];
-  if (/\b(machine|smith)\b/i.test(n)) return ["machine"];
+  const machine = specificMachineFromName(n);
+  if (machine) return [machine];
   if (isCyclingEquipmentName(n)) return ["bicycle"];
 
   return ["bodyweight"];

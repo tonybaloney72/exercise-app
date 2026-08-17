@@ -2,6 +2,8 @@
  * Heuristic expertiseLevel from exercise name, equipment, category, optional HC rank.
  */
 
+import { isStrengthMachineTag } from "./equipment-heuristic.mjs";
+
 const EXPERTISE_LEVELS = [
   "beginner",
   "novice",
@@ -66,7 +68,7 @@ export function inferExpertiseLevel(exercise, { progressionIndex, progressionTot
     level = minLevel(level, "novice");
   }
 
-  if (equip.includes("machine") || equip.includes("cable")) {
+  if (equip.some((e) => e === "cable" || isStrengthMachineTag(e))) {
     level = minLevel(level, "intermediate");
     if (!/\b(advanced|expert|one[- ]?arm|handstand)\b/i.test(n)) {
       level = minLevel(level, "novice");

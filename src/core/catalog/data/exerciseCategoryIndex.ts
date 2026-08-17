@@ -420,6 +420,7 @@ export const exerciseCategoryById: Record<string, ExerciseCategory> = {
   "LB-1": "LB",
   "LB-10": "LB",
   "LB-11": "LB",
+  "LB-12": "LB",
   "LB-2": "LB",
   "LB-3": "LB",
   "LB-4": "LB",

@@ -55,9 +55,13 @@ describe("equipment-heuristic", () => {
         notes:
           "Side-lying on bench or roman chair, crunch obliques toward hip; use pad or bench for support.",
       }),
-    ).toEqual(["machine"]);
-    expect(equipmentAuditMismatch(["machine"], ["bodyweight"])).toBe(false);
-    expect(equipmentAuditMismatch(["machine"], ["machine"])).toBe(false);
+    ).toEqual(["back_extension"]);
+    expect(
+      equipmentAuditMismatch(["back_extension"], ["bodyweight"]),
+    ).toBe(false);
+    expect(
+      equipmentAuditMismatch(["back_extension"], ["back_extension"]),
+    ).toBe(false);
   });
 
   it("still flags when catalog is bodyweight-only but heuristic expects implements", () => {
@@ -71,17 +75,28 @@ describe("equipment-heuristic", () => {
     ).toBe(false);
   });
 
-  it("maps lat pulldown to machine not cable (HC-197)", () => {
-    expect(expectedEquipmentFromName("Lat Pulldown")).toEqual(["machine"]);
+  it("maps lat pulldown to lat_pulldown not cable (HC-197)", () => {
+    expect(expectedEquipmentFromName("Lat Pulldown")).toEqual(["lat_pulldown"]);
     expect(expectedEquipmentFromName("Cable Lat Pulldown")).toEqual(["cable"]);
   });
 
-  it("maps lying back extension to bodyweight, machine variant to machine", () => {
+  it("maps lying back extension to bodyweight, machine variant to back_extension", () => {
     expect(expectedEquipmentFromName("Lying Back Extension")).toEqual([
       "bodyweight",
     ]);
     expect(expectedEquipmentFromName("Back Extension Machine")).toEqual([
-      "machine",
+      "back_extension",
+    ]);
+  });
+
+  it("maps named strength machines to specific tags", () => {
+    expect(expectedEquipmentFromName("Leg Press")).toEqual(["leg_press"]);
+    expect(expectedEquipmentFromName("Smith Machine Squat")).toEqual([
+      "smith_machine",
+    ]);
+    expect(expectedEquipmentFromName("Hack Squat")).toEqual(["hack_squat"]);
+    expect(expectedEquipmentFromName("Machine Chest Press")).toEqual([
+      "chest_press",
     ]);
   });
 

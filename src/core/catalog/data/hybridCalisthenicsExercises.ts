@@ -8,7 +8,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-001",
     name: "45 Degree Back Raise",
     category: "CS",
-    equipment: ["machine"],
+    equipment: ["back_extension"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Glutes",
@@ -27,7 +27,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-002",
     name: "Ab Crunch Machine",
     category: "CF",
-    equipment: ["machine"],
+    equipment: ["ab_crunch"],
     expertiseLevel: "novice",
     muscleGroups: ["Abs", "Hip Flexors", "Transverse Abdominis"],
     defaultReps: "10",
@@ -41,7 +41,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-003",
     name: "Abductor Machine",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["hip_abductor"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -63,7 +63,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-004",
     name: "Adductor Machine",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["hip_adductor"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -124,7 +124,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-007",
     name: "Back Extension Machine",
     category: "CS",
-    equipment: ["machine"],
+    equipment: ["back_extension"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Glutes",
@@ -3185,7 +3185,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-179",
     name: "Glute Kickback Machine",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["glute_kickback"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -3249,7 +3249,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-182",
     name: "Hack Squat",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["hack_squat"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -3336,7 +3336,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-188",
     name: "Hip Flexor Machine",
     category: "CL",
-    equipment: ["machine"],
+    equipment: ["hip_flexor"],
     expertiseLevel: "novice",
     muscleGroups: ["Abs", "Hip Flexors", "Obliques"],
     defaultReps: "10",
@@ -3373,7 +3373,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-191",
     name: "Hip Thrust Machine",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["hip_thrust_machine"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -3484,7 +3484,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-197",
     name: "Lat Pulldown",
     category: "UPL",
-    equipment: ["machine"],
+    equipment: ["lat_pulldown"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Biceps",
@@ -3506,7 +3506,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-198",
     name: "Lat Pullover Machine",
     category: "UPL",
-    equipment: ["machine"],
+    equipment: ["lat_pullover"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Biceps",
@@ -3528,7 +3528,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-199",
     name: "Leg Extension Machine",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["leg_extension"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -3550,7 +3550,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-200",
     name: "Leg Press",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["leg_press"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -3609,7 +3609,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-204",
     name: "Lying Hamstring Curl Machine",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["leg_curl"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -3632,7 +3632,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-205",
     name: "Machine Chest Fly",
     category: "UP",
-    equipment: ["machine"],
+    equipment: ["pec_deck"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Chest",
@@ -3652,7 +3652,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-206",
     name: "Machine Chest Press",
     category: "UP",
-    equipment: ["machine"],
+    equipment: ["chest_press"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Chest",
@@ -3672,7 +3672,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-207",
     name: "Machine Decline Chest Press",
     category: "UP",
-    equipment: ["machine"],
+    equipment: ["chest_press"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Chest",
@@ -3692,7 +3692,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-208",
     name: "Machine Incline Chest Press",
     category: "UP",
-    equipment: ["machine"],
+    equipment: ["chest_press"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Chest",
@@ -3712,7 +3712,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-209",
     name: "Machine Lateral Raise",
     category: "UP",
-    equipment: ["machine"],
+    equipment: ["lateral_raise_machine"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Chest",
@@ -3732,7 +3732,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-210",
     name: "Machine Overhead Press",
     category: "UP",
-    equipment: ["machine"],
+    equipment: ["shoulder_press"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Chest",
@@ -3753,7 +3753,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-211",
     name: "Machine Reverse Fly",
     category: "UPL",
-    equipment: ["machine"],
+    equipment: ["reverse_fly_machine"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Biceps",
@@ -3777,7 +3777,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-212",
     name: "Machine Row",
     category: "UPL",
-    equipment: ["machine"],
+    equipment: ["seated_row"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Biceps",
@@ -3836,7 +3836,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-215",
     name: "Oblique Twist Machine",
     category: "CR",
-    equipment: ["machine"],
+    equipment: ["rotary_torso"],
     expertiseLevel: "novice",
     muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
     defaultReps: "10",
@@ -3872,7 +3872,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-218",
     name: "Pendulum Squat",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["pendulum_squat"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -3971,7 +3971,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-223",
     name: "Preacher Curl Machine",
     category: "UPL",
-    equipment: ["machine"],
+    equipment: ["preacher_curl"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Biceps",
@@ -4099,7 +4099,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-230",
     name: "Reverse Hyperextension Machine",
     category: "CS",
-    equipment: ["machine"],
+    equipment: ["reverse_hyper"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Glutes",
@@ -4469,7 +4469,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-250",
     name: "Sitting Hamstring Curl Machine",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["leg_curl"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -4492,7 +4492,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-251",
     name: "Smith Machine Bulgarian Split Squat",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["smith_machine"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -4514,7 +4514,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-252",
     name: "Smith Machine Deep Lunge",
     category: "CL",
-    equipment: ["machine"],
+    equipment: ["smith_machine"],
     expertiseLevel: "novice",
     muscleGroups: ["Abs", "Glutes", "Hip Flexors", "Obliques", "Quadriceps"],
     defaultReps: "10 each leg",
@@ -4528,7 +4528,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-253",
     name: "Smith Machine Good Morning",
     category: "CS",
-    equipment: ["machine"],
+    equipment: ["smith_machine"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Glutes",
@@ -4547,7 +4547,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-254",
     name: "Smith Machine Split Squat",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["smith_machine"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -4569,7 +4569,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-255",
     name: "Smith Machine Squat",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["smith_machine"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -4591,7 +4591,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-256",
     name: "Smith Machine Straight Legged Deadlift",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["smith_machine"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -4741,7 +4741,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-265",
     name: "T Bar Row",
     category: "UPL",
-    equipment: ["machine"],
+    equipment: ["t_bar_row"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Biceps",
@@ -4763,7 +4763,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-266",
     name: "Tibialis Anterior Machine",
     category: "LB",
-    equipment: ["machine"],
+    equipment: ["tibialis"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Abductors",
@@ -4786,7 +4786,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-267",
     name: "Triceps Extension Machine",
     category: "UP",
-    equipment: ["machine"],
+    equipment: ["triceps_extension"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Chest",
@@ -4805,7 +4805,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-268",
     name: "Triceps Press Machine",
     category: "UP",
-    equipment: ["machine"],
+    equipment: ["triceps_press"],
     expertiseLevel: "novice",
     muscleGroups: [
       "Chest",
@@ -4900,7 +4900,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-273",
     name: "Weighted Back Extension",
     category: "CS",
-    equipment: ["machine", "dumbbell", "kettlebell"],
+    equipment: ["back_extension", "dumbbell", "kettlebell"],
     expertiseLevel: "expert",
     muscleGroups: [
       "Glutes",

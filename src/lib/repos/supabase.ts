@@ -58,8 +58,8 @@ import type {
   HealthMetricCategory,
 } from "@/types/healthDailyMetrics";
 import {
-  ALL_EXERCISE_EQUIPMENT,
   DEFAULT_AVAILABLE_EQUIPMENT,
+  migrateAvailableEquipment,
 } from "@/data/equipment";
 import { sanitizeWeeklyCardioByDay } from "@/lib/cardioActivities";
 import {
@@ -371,12 +371,9 @@ function sanitizeRoundDensity(raw: unknown): RoundDensity {
 
 function sanitizeAvailableEquipment(raw: unknown): ExerciseEquipment[] {
   if (!Array.isArray(raw)) return [...DEFAULT_AVAILABLE_EQUIPMENT];
-  const allowed = new Set(ALL_EXERCISE_EQUIPMENT);
-  const out = raw.filter(
-    (x): x is ExerciseEquipment =>
-      typeof x === "string" && allowed.has(x as ExerciseEquipment),
+  return migrateAvailableEquipment(
+    raw.filter((x): x is string => typeof x === "string"),
   );
-  return out.length > 0 ? out : [...DEFAULT_AVAILABLE_EQUIPMENT];
 }
 
 function rowToSettings(row: SettingsRow): UserSettings {

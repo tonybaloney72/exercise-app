@@ -11,6 +11,10 @@ import { writeFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { eachQualifier, generateHcNote } from "./enrich-hc-notes.mjs";
+import {
+  expectedEquipmentFromName,
+  isStrengthMachineTag,
+} from "./lib/equipment-heuristic.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = join(__dirname, "../src/core/catalog/data/hybridCalisthenicsExercises.ts");
@@ -578,6 +582,15 @@ function inferEquipmentList(name, baseEquip) {
   }
   if (baseEquip === "bodyweight" && INVERTED_SHRUG_NAMES.has(name)) {
     return ["pull_up_bar", "rings", "bench"];
+  }
+  if (baseEquip === "machine") {
+    const expected = expectedEquipmentFromName(name);
+    const specific = expected.find((tag) => isStrengthMachineTag(tag));
+    if (specific) return [specific];
+    if (expected.includes("barbell") || /\bbarbell\b/i.test(name)) {
+      return ["barbell"];
+    }
+    throw new Error(`Unmapped machine exercise: ${name}`);
   }
   return [baseEquip];
 }

@@ -77,4 +77,21 @@ describe("hybrid equipment tags", () => {
       );
     }
   });
+
+  it("does not suggest a leg press when only a lat pulldown is available", () => {
+    expect(exerciseMap["HC-197"]!.equipment).toEqual(["lat_pulldown"]);
+    expect(exerciseMap["HC-200"]!.equipment).toEqual(["leg_press"]);
+    expect(
+      exerciseMatchesEquipment(exerciseMap["HC-200"]!.equipment, [
+        "bodyweight",
+        "lat_pulldown",
+      ]),
+    ).toBe(false);
+    expect(
+      exerciseMatchesEquipment(exerciseMap["HC-197"]!.equipment, [
+        "bodyweight",
+        "lat_pulldown",
+      ]),
+    ).toBe(true);
+  });
 });

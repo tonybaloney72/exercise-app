@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { exerciseMatchesEquipment } from "@/data/equipment";
+import {
+  ALL_EXERCISE_EQUIPMENT,
+  BASIC_EXERCISE_EQUIPMENT,
+  STRENGTH_MACHINE_EQUIPMENT,
+  exerciseMatchesEquipment,
+  migrateAvailableEquipment,
+  setTypicalGymMachines,
+} from "@/data/equipment";
+import { exercises } from "@/core/catalog";
 
 describe("exerciseMatchesEquipment", () => {
   it("matches when any load alternative is available", () => {
@@ -51,5 +59,54 @@ describe("exerciseMatchesEquipment", () => {
         "bench",
       ]),
     ).toBe(true);
+  });
+
+  it("does not treat a lat pulldown as covering a leg press", () => {
+    expect(
+      exerciseMatchesEquipment(["leg_press"], ["lat_pulldown"]),
+    ).toBe(false);
+    expect(
+      exerciseMatchesEquipment(["leg_press"], ["leg_press"]),
+    ).toBe(true);
+    expect(
+      exerciseMatchesEquipment(["lat_pulldown"], STRENGTH_MACHINE_EQUIPMENT),
+    ).toBe(true);
+  });
+});
+
+describe("migrateAvailableEquipment", () => {
+  it("expands legacy catch-all machines to every specific machine", () => {
+    const migrated = migrateAvailableEquipment(["bodyweight", "machine"]);
+    expect(migrated).toEqual(
+      expect.arrayContaining(["bodyweight", ...STRENGTH_MACHINE_EQUIPMENT]),
+    );
+    expect(migrated).not.toContain("machine");
+  });
+
+  it("toggles the typical gym preset without dropping other gear", () => {
+    const withGym = setTypicalGymMachines(["bodyweight", "dumbbell"], true);
+    expect(withGym).toEqual(
+      expect.arrayContaining(["bodyweight", "dumbbell", "leg_press"]),
+    );
+    expect(setTypicalGymMachines(withGym, false)).toEqual([
+      "bodyweight",
+      "dumbbell",
+    ]);
+  });
+});
+
+describe("catalog equipment", () => {
+  it("never uses the generic machine tag", () => {
+    for (const ex of exercises) {
+      expect(ex.equipment ?? [], ex.id).not.toContain("machine");
+    }
+  });
+
+  it("lists basic gear separately from strength machines", () => {
+    expect(ALL_EXERCISE_EQUIPMENT).toEqual([
+      ...BASIC_EXERCISE_EQUIPMENT,
+      ...STRENGTH_MACHINE_EQUIPMENT,
+    ]);
+    expect(ALL_EXERCISE_EQUIPMENT).not.toContain("machine");
   });
 });
