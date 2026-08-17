@@ -145,6 +145,10 @@ export const HC_NOTES_BY_NAME = {
     "Lying on a bench with dumbbells over your chest; lower them out to the sides with a slight elbow bend, then squeeze back together.",
   "Dumbbell Floor Fly":
     "Lie on the floor with knees bent and dumbbells over your chest; open your arms in a wide arc until your upper arms lightly touch the floor, then squeeze back together. No bench required.",
+  "Dumbbell Floor Press":
+    "Lie on the floor with knees bent and feet flat; press dumbbells from chest level until arms extend, lowering until upper arms lightly touch the floor. No bench required.",
+  "Close Grip Dumbbell Floor Press":
+    "Lie on the floor with knees bent; press dumbbells together at your chest, keep elbows tucked, and press up to emphasize triceps. Upper arms rest on the floor at the bottom. No bench required.",
   "Dumbbell Front Raise": "Dumbbells at your thighs; raise one or both to shoulder height with soft elbows, avoid swinging.",
   "Dumbbell Full Rom Front Raise": "Start with the dumbbell behind your hip for a stretch, raise it overhead through the full range, lower with control.",
   "Dumbbell Hammer Curl": "Neutral grip; curl without swinging, elbows stay at your sides.",

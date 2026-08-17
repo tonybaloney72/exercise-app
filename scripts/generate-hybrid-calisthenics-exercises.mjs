@@ -91,6 +91,7 @@ const PAGES = {
       "Dumbbell Skull Crusher",
       "Dumbbell Overhead Triceps Extension",
       "Close Grip Dumbbell Bench Press",
+      "Close Grip Dumbbell Floor Press",
     ],
     Barbell: [
       "Barbell Skull Crusher",
@@ -201,6 +202,8 @@ const PAGES = {
       "Dumbbell Incline Bench Press",
       "Dumbbell Bench Fly",
       "Dumbbell Floor Fly",
+      "Dumbbell Floor Press",
+      "Close Grip Dumbbell Floor Press",
       "Dumbbell Pullover",
     ],
     Barbell: ["Barbell Bench Press", "Barbell Incline Bench Press"],

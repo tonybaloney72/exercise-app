@@ -1120,7 +1120,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-060",
     name: "Barbell Bench Press",
     category: "UP",
-    equipment: ["barbell"],
+    equipment: ["barbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Chest",
@@ -1225,7 +1225,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-067",
     name: "Barbell Incline Bench Press",
     category: "UP",
-    equipment: ["barbell"],
+    equipment: ["barbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Chest",
@@ -2218,7 +2218,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-123",
     name: "Close Grip Bench Press",
     category: "UP",
-    equipment: ["barbell"],
+    equipment: ["barbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Chest",
@@ -2238,7 +2238,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-124",
     name: "Close Grip Dumbbell Bench Press",
     category: "UP",
-    equipment: ["dumbbell"],
+    equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Chest",
@@ -2499,7 +2499,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     id: "HC-141",
     name: "Dumbbell Bench Press",
     category: "UP",
-    equipment: ["dumbbell"],
+    equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
     muscleGroups: [
       "Chest",
@@ -2597,6 +2597,46 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Lie on the floor with knees bent and dumbbells over your chest; open your arms in a wide arc until your upper arms lightly touch the floor, then squeeze back together. No bench required.",
     source: "Curls in the Rack",
     videoUrl: "https://www.youtube.com/watch?v=DNZ6IwviZYE",
+    isTimeBased: false,
+  },
+  {
+    id: "HC-304",
+    name: "Dumbbell Floor Press",
+    category: "UP",
+    equipment: ["dumbbell"],
+    expertiseLevel: "intermediate",
+    muscleGroups: [
+      "Chest",
+      "Front Deltoids",
+      "Pectoralis Major",
+      "Serratus Anterior",
+      "Triceps",
+    ],
+    defaultReps: "10",
+    notes:
+      "Lie on the floor with knees bent and feet flat; press dumbbells from chest level until arms extend, lowering until upper arms lightly touch the floor. No bench required.",
+    source: "ScottHermanFitness",
+    videoUrl: "https://www.youtube.com/watch?v=uUGDRwge4F8",
+    isTimeBased: false,
+  },
+  {
+    id: "HC-305",
+    name: "Close Grip Dumbbell Floor Press",
+    category: "UP",
+    equipment: ["dumbbell"],
+    expertiseLevel: "intermediate",
+    muscleGroups: [
+      "Chest",
+      "Front Deltoids",
+      "Pectoralis Major",
+      "Serratus Anterior",
+      "Triceps",
+    ],
+    defaultReps: "10",
+    notes:
+      "Lie on the floor with knees bent; press dumbbells together at your chest, keep elbows tucked, and press up to emphasize triceps. Upper arms rest on the floor at the bottom. No bench required.",
+    source: "Be Fit",
+    videoUrl: "https://www.youtube.com/watch?v=C5cq0Yvecu0",
     isTimeBased: false,
   },
   {
