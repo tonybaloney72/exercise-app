@@ -44,7 +44,7 @@ export default function SettingsPage() {
           <SettingsLinkRow
             href={routes.settingsTraining}
             title="Training plan"
-            hint="Week layout, difficulty, and equipment"
+            hint="Week layout, difficulty, equipment, and progression"
           />
           <SettingsLinkRow
             href={routes.settingsBody}

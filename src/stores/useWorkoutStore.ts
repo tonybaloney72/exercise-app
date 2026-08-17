@@ -83,6 +83,7 @@ import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
   formatPlanTargetPrescription,
   resolveExerciseSettings,
+  resolveStrengthTargetLabel,
   resolveStretchTimerTargetSeconds,
 } from "@/utils/effectiveExerciseSettings";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
@@ -465,18 +466,17 @@ function buildEmptyRoundLogs(plan: DayPlan): RoundLog[] {
         stored,
       );
       const prescriptionOpts = { expertiseByGroup };
-      const targetPrescription =
-        ex.targetReps?.trim() ||
-        formatPlanTargetPrescription(
-          meta ?? {
-            id: ex.exerciseId,
-            isTimeBased: false,
-            category: ex.category,
-            defaultReps: ex.targetReps,
-          },
-          stored,
-          prescriptionOpts,
-        );
+      const targetPrescription = resolveStrengthTargetLabel(
+        meta ?? {
+          id: ex.exerciseId,
+          isTimeBased: false,
+          category: ex.category,
+          defaultReps: ex.targetReps,
+        },
+        stored,
+        ex.targetReps,
+        prescriptionOpts,
+      );
       return {
         exerciseId: ex.exerciseId,
         completed: false,

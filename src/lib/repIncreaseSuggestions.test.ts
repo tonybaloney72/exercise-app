@@ -158,6 +158,52 @@ describe("evaluateRepIncreaseSuggestions", () => {
     expect(suggestions[0]?.reason).toContain("2 sessions in a row");
   });
 
+  it("does not treat beating a stale catalog prescription as beating the library default", () => {
+    const today = "2026-07-14";
+    const mon = "2026-07-01";
+    const history = [
+      workoutOn(mon, "w-mon", [strengthLog(DIPS, 10, "8")]),
+      workoutOn(today, "w-thu", [strengthLog(DIPS, 10, "8")]),
+    ];
+    const completed = history[1]!;
+
+    expect(
+      evaluateRepIncreaseSuggestions({
+        history,
+        completedWorkout: completed,
+        todayKey: today,
+        exerciseSettings: {
+          [DIPS]: { defaultSetMode: "reps", defaultTargetReps: 10 },
+        },
+        enabled: true,
+      }),
+    ).toEqual([]);
+  });
+
+  it("still suggests when actual reps beat the library default by the margin", () => {
+    const today = "2026-07-14";
+    const mon = "2026-07-01";
+    const history = [
+      workoutOn(mon, "w-mon", [strengthLog(DIPS, 12, "8")]),
+      workoutOn(today, "w-thu", [strengthLog(DIPS, 12, "8")]),
+    ];
+    const completed = history[1]!;
+
+    const suggestions = evaluateRepIncreaseSuggestions({
+      history,
+      completedWorkout: completed,
+      todayKey: today,
+      exerciseSettings: {
+        [DIPS]: { defaultSetMode: "reps", defaultTargetReps: 10 },
+      },
+      enabled: true,
+    });
+
+    expect(suggestions).toHaveLength(1);
+    expect(suggestions[0]?.currentTarget).toBe(10);
+    expect(suggestions[0]?.suggestedTarget).toBe(10 + REP_INCREASE_BUMP);
+  });
+
   it("attributes swapped exercises to the substitute id", () => {
     const today = "2026-07-02";
     const substitute = "UP-1";

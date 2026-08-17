@@ -132,6 +132,33 @@ export function resolveStretchTimerTargetSeconds(
 }
 
 /**
+ * Label for the reps/timer target the user is working against.
+ * Library defaults win over a frozen day-plan or catalog prescription (e.g. catalog
+ * "8" must not hide a Library default of 10).
+ */
+export function resolveStrengthTargetLabel(
+  exercise: Pick<Exercise, "isTimeBased" | "defaultReps" | "category">,
+  stored: StoredExerciseSlice | undefined,
+  sessionPrescription?: string,
+  options?: PlanPrescriptionOptions,
+): string {
+  const resolved = resolveExerciseSettings(exercise, stored);
+  if (resolved.defaultSetMode === "reps" && resolved.defaultTargetReps != null) {
+    return String(resolved.defaultTargetReps);
+  }
+  if (resolved.defaultSetMode === "timer") {
+    const hasLibraryOverride =
+      stored?.defaultTimerSeconds != null && stored.defaultTimerSeconds > 0;
+    if (hasLibraryOverride) {
+      return formatPlanTargetPrescription(exercise, stored, options);
+    }
+  }
+  const session = sessionPrescription?.trim();
+  if (session) return session;
+  return formatPlanTargetPrescription(exercise, stored, options);
+}
+
+/**
  * Prescription string for plan slots and previews (Library defaults over catalog).
  */
 export function formatPlanTargetPrescription(

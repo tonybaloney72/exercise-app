@@ -6,7 +6,7 @@ import {
   scaledCatalogPrescription,
   scaledDefaultTimerSeconds,
 } from "@/lib/prescriptionScaling";
-import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
+import { formatPlanTargetPrescription, resolveStrengthTargetLabel } from "@/utils/effectiveExerciseSettings";
 import type { ExpertiseByGroup } from "@/types";
 
 const beginnerUpper: ExpertiseByGroup = {
@@ -146,5 +146,27 @@ describe("formatPlanTargetPrescription with expertise", () => {
         beginnerUpper,
       ),
     ).toBe("6");
+  });
+});
+
+describe("resolveStrengthTargetLabel", () => {
+  const dips = {
+    isTimeBased: false as const,
+    defaultReps: "8",
+    category: "UP" as const,
+  };
+
+  it("prefers library reps over a stale catalog/plan prescription", () => {
+    expect(
+      resolveStrengthTargetLabel(
+        dips,
+        { defaultSetMode: "reps", defaultTargetReps: 10 },
+        "8",
+      ),
+    ).toBe("10");
+  });
+
+  it("keeps the session prescription when there is no library override", () => {
+    expect(resolveStrengthTargetLabel(dips, undefined, "8")).toBe("8");
   });
 });

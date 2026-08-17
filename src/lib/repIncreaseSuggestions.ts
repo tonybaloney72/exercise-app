@@ -102,31 +102,26 @@ function resolveLogTarget(
   if (!meta) return null;
 
   const mode = resolveLoggingMode(log, exerciseId, stored);
+  const resolved = resolveExerciseSettings(meta, stored);
 
   if (mode === "timer") {
     const target =
+      (resolved.defaultSetMode === "timer" &&
+      resolved.defaultTimerSeconds != null &&
+      resolved.defaultTimerSeconds > 0
+        ? resolved.defaultTimerSeconds
+        : undefined) ??
       (log.targetDurationSeconds != null && log.targetDurationSeconds > 0
         ? log.targetDurationSeconds
         : undefined) ??
       parseTimerSecondsHint(log.targetPrescription ?? "") ??
-      (stored?.defaultSetMode === "timer" &&
-      stored.defaultTimerSeconds != null &&
-      stored.defaultTimerSeconds > 0
-        ? stored.defaultTimerSeconds
-        : undefined) ??
-      resolveExerciseSettings(meta, stored).defaultTimerSeconds ??
       DEFAULT_TIMER_SECONDS_FALLBACK;
     return { mode: "timer", target };
   }
 
   const target =
+    resolved.defaultTargetReps ??
     parseRepTargetHint(log.targetPrescription ?? "") ??
-    (stored?.defaultSetMode === "reps" &&
-    stored.defaultTargetReps != null &&
-    stored.defaultTargetReps > 0
-      ? stored.defaultTargetReps
-      : undefined) ??
-    resolveExerciseSettings(meta, stored).defaultTargetReps ??
     parseRepTargetHint(meta.defaultReps);
 
   if (target == null || target <= 0) return null;

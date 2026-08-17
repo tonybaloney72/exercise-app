@@ -1,5 +1,16 @@
 [
   {
+    "id": "2026-08-17-machines-and-progression",
+    "date": "2026-08-17",
+    "title": "Gym machines & smarter progression",
+    "highlights": [
+      "On Training plan → Equipment, choose Typical gym set or pick specific stations (leg press, lat pulldown, smith, and more) instead of one generic Machines option. Plans only suggest machines you actually have. If you already had Machines selected, you now have the full typical set.",
+      "Progression suggestions and More details use your Library default reps, not a leftover catalog target—so a 10-rep Library default is what you log against, even if the catalog still says 8.",
+      "Progression lives under Settings → Training plan. Training plan and Device & timers sections now collapse so you can scan the page without opening everything at once.",
+      "During a workout, More details lets you edit Library default reps and weight, including picking from your weight inventory."
+    ]
+  },
+  {
     "id": "2026-07-28-simpler-strength-moves",
     "date": "2026-07-28",
     "title": "Simpler strength exercises",
@@ -18,15 +29,6 @@
       "When you add food to a meal, Usual shows foods you often eat for that meal—so breakfast staples stay on breakfast, not dinner.",
       "Star a food as a favorite while logging; the ★ mark shows on Usual items for meals where you actually eat that food.",
       "Training Focus on Health → Exercises now counts the exercise you completed after a swap, not the one that was originally planned."
-    ]
-  },
-  {
-    "id": "2026-07-13-timer-complete-and-hc-write",
-    "date": "2026-07-13",
-    "title": "Timer auto-complete & Health Connect writes",
-    "highlights": [
-      "New Device setting: Complete exercise when set timer stops. When on, stopping or closing a set timer (rounds, warm-up, or cool-down) marks that exercise done and fills Did with time elapsed. Reset never completes on its own.",
-      "New Health Connect setting: Save finished workouts to Health Connect. If you decline write access once, we turn this off so you are not prompted after every workout. Turn it back on anytime under Settings → Device."
     ]
   }
 ]

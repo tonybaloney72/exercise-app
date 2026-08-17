@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import AnimatedSection from "@/components/common/AnimatedSection";
+import CollapsibleSection from "@/components/common/CollapsibleSection";
 import EquipmentSettingsSection from "@/components/settings/EquipmentSettingsSection";
 import ExerciseDifficultySettingsSection from "@/components/settings/ExerciseDifficultySettingsSection";
-import SettingsSectionBlock from "@/components/settings/SettingsSectionBlock";
+import RepProgressionSettingsSection from "@/components/settings/RepProgressionSettingsSection";
 import SettingsSubpageLayout from "@/components/settings/SettingsSubpageLayout";
 import YourWeekSettingsSection from "@/components/settings/YourWeekSettingsSection";
 import { useAuthStore } from "@/stores/useAuthStore";
+
+const SECTION_BODY = "flex flex-col gap-4 p-4";
 
 export default function TrainingSettingsPage() {
   const mode = useAuthStore((s) => s.mode);
@@ -15,13 +18,15 @@ export default function TrainingSettingsPage() {
   return (
     <SettingsSubpageLayout
       title="Training plan"
-      hint="Week layout, difficulty, and equipment"
+      hint="Week layout, difficulty, equipment, and progression"
     >
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-5">
         <AnimatedSection>
-          <SettingsSectionBlock
+          <CollapsibleSection
             title="Your week"
             hint="How your week is built"
+            defaultOpen
+            contentClassName={SECTION_BODY}
           >
             {mode === "authenticated" ? (
               <YourWeekSettingsSection />
@@ -47,25 +52,40 @@ export default function TrainingSettingsPage() {
                 </div>
               </div>
             )}
-          </SettingsSectionBlock>
+          </CollapsibleSection>
         </AnimatedSection>
 
         <AnimatedSection delay={0.04}>
-          <SettingsSectionBlock
+          <CollapsibleSection
             title="Exercise difficulty"
             hint="Skill caps for generated plans and swap suggestions"
+            defaultOpen={false}
+            contentClassName={SECTION_BODY}
           >
             <ExerciseDifficultySettingsSection />
-          </SettingsSectionBlock>
+          </CollapsibleSection>
         </AnimatedSection>
 
         <AnimatedSection delay={0.05}>
-          <SettingsSectionBlock
+          <CollapsibleSection
             title="Your equipment"
             hint="Gear you have, plus the free-weight sizes you own"
+            defaultOpen={false}
+            contentClassName={SECTION_BODY}
           >
             <EquipmentSettingsSection />
-          </SettingsSectionBlock>
+          </CollapsibleSection>
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.06}>
+          <CollapsibleSection
+            title="Progression"
+            hint="Library default increases after strong sessions"
+            defaultOpen={false}
+            contentClassName={SECTION_BODY}
+          >
+            <RepProgressionSettingsSection />
+          </CollapsibleSection>
         </AnimatedSection>
       </div>
     </SettingsSubpageLayout>

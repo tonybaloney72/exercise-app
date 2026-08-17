@@ -9,6 +9,8 @@ import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/core/catalog";
 import { formatCardioHealthSummary } from "@/lib/health";
 import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
+import { resolveStrengthTargetLabel } from "@/utils/effectiveExerciseSettings";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { cardioLabelForRow } from "@/lib/cardioInstances";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import { hasRenderableGpsRoute } from "@/lib/geo/gpsTrackPolyline";
@@ -76,6 +78,7 @@ export default function WorkoutDayReview({
   const notesRef = useRef<HTMLTextAreaElement>(null);
   const notesKey = `${log.id}:${log.notes ?? ""}`;
   const endLabel = formatEndTime(log.endTime);
+  const exerciseSettings = useExerciseSettingsStore((s) => s.byExerciseId);
 
   const commitNotesIfChanged = async (): Promise<void> => {
     const el = notesRef.current;
@@ -144,7 +147,11 @@ export default function WorkoutDayReview({
             <ReviewRow
               key={entry.exerciseId}
               name={ex.name}
-              target={entry.targetPrescription ?? ex.defaultReps}
+              target={resolveStrengthTargetLabel(
+                ex,
+                exerciseSettings[entry.exerciseId],
+                entry.targetPrescription,
+              )}
               detail={exerciseStatusLine(entry)}
               exerciseNotes={entry.notes}
             />
@@ -233,9 +240,12 @@ export default function WorkoutDayReview({
                           : undefined
                       }
                       target={
-                        resolvePrescriptionText(entry) ||
-                        plannedSlot?.targetReps ||
-                        effective.name
+                        resolveStrengthTargetLabel(
+                          effective,
+                          exerciseSettings[effectiveId],
+                          resolvePrescriptionText(entry) ||
+                            plannedSlot?.targetReps,
+                        )
                       }
                       detail={exerciseStatusLine(entry)}
                       exerciseNotes={entry.notes}
@@ -263,7 +273,11 @@ export default function WorkoutDayReview({
               <ReviewRow
                 key={entry.exerciseId}
                 name={ex.name}
-                target={entry.targetPrescription ?? ex.defaultReps}
+                target={resolveStrengthTargetLabel(
+                  ex,
+                  exerciseSettings[entry.exerciseId],
+                  entry.targetPrescription,
+                )}
                 detail={exerciseStatusLine(entry)}
                 exerciseNotes={entry.notes}
               />
