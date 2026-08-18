@@ -77,8 +77,10 @@ export default function SwapExerciseModal({
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return categoryFiltered;
-    return categoryFiltered.filter((c) => c.name.toLowerCase().includes(q));
+    const list = !q
+      ? categoryFiltered
+      : categoryFiltered.filter((c) => c.name.toLowerCase().includes(q));
+    return [...list].sort((a, b) => a.name.localeCompare(b.name));
   }, [categoryFiltered, query]);
 
   const targetByExerciseId = useMemo(() => {
