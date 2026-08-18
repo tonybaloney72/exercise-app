@@ -274,12 +274,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Stand on the band; raise both hands to shoulder height with soft elbows, lower under control.",
@@ -504,12 +499,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Band anchored low behind you; lower the handle behind your head with elbows pointed forward, then extend.",
@@ -905,12 +895,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Anchor the band overhead; push down until arms are straight, keeping elbows pinned at your sides.",
@@ -1047,12 +1032,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["resistance_band"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Band anchored in front of you; reach both hands forward and protract the shoulder blades, return with control.",
@@ -1208,12 +1188,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Grip the bar at hip width; raise it to shoulder height with straight arms, lower without swinging the torso.",
@@ -1268,12 +1243,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Bar overhead with a narrow grip; lower it behind your head by bending the elbows, then extend back up.",
@@ -1376,12 +1346,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["barbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Lying on a bench with the bar over your forehead; bend elbows to lower it toward your head, then extend.",
@@ -1628,12 +1593,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Cable set low behind you; raise the handle to shoulder height with a soft elbow, lower slowly.",
@@ -1647,12 +1607,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Start with the cable behind your hip for a stretch, raise it overhead through the full range, lower with control.",
@@ -1916,12 +1871,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Cable set low behind or beside you; press the handle overhead in line with your ear, control the descent.",
@@ -1969,12 +1919,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Cable set at chest height; reach the handle forward and protract the shoulder blades, control the return.",
@@ -2123,12 +2068,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Cable set high overhead with a bar or rope; push down until arms are straight, elbows pinned at your sides.",
@@ -2208,7 +2148,8 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Triceps",
     ],
     defaultReps: "10",
-    notes: "Cables set low and crossed in front of you; raise both arms in a Y shape overhead, thumbs pointing up.",
+    notes:
+      "Cables set low and crossed in front of you; raise both arms in a Y shape overhead, thumbs pointing up.",
     source: "Bradley Bowden",
     videoUrl: "https://www.youtube.com/watch?v=Zy0M8JMLnD0",
     isTimeBased: false,
@@ -2348,12 +2289,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["cable"],
     expertiseLevel: "novice",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Handles crossed overhead from two stacks; push down and out in an X pattern, keeping elbows tucked.",
@@ -2645,12 +2581,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Dumbbells at your thighs; raise one or both to shoulder height with soft elbows, avoid swinging.",
@@ -2664,12 +2595,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "advanced",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Start with the dumbbell behind your hip for a stretch, raise it overhead through the full range, lower with control.",
@@ -2787,12 +2713,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Dumbbell held overhead with both hands; lower it behind your head by bending the elbows, then extend.",
@@ -2952,12 +2873,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell", "bench"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Lying on a bench with dumbbells over your forehead; bend elbows to lower them toward your head, then extend.",
@@ -3016,12 +2932,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["dumbbell"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Holding light dumbbells, rotate the torso and drive one fist upward in an uppercut arc, alternate sides.",
@@ -3075,13 +2986,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UPL",
     equipment: ["dumbbell"],
     expertiseLevel: "novice",
-    muscleGroups: [
-      "Biceps",
-      "Forearms",
-      "Rear Deltoids",
-      "Rhomboids",
-      "Traps",
-    ],
+    muscleGroups: ["Biceps", "Forearms", "Rear Deltoids", "Rhomboids", "Traps"],
     defaultReps: "10",
     notes:
       "Hinge slightly at the hips; row dumbbells up toward the chest, leading with the elbows (rear delts, mid and upper traps).",
@@ -3126,7 +3031,8 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Triceps",
     ],
     defaultReps: "10",
-    notes: "Hinged slightly forward holding light dumbbells; raise both arms in a Y shape overhead, thumbs pointing up.",
+    notes:
+      "Hinged slightly forward holding light dumbbells; raise both arms in a Y shape overhead, thumbs pointing up.",
     source: "Jeremy Daniels",
     videoUrl: "https://www.youtube.com/watch?v=9hI-RFziBz8",
     isTimeBased: false,
@@ -4344,7 +4250,8 @@ export const hybridCalisthenicsExercises: Exercise[] = [
       "Triceps",
     ],
     defaultReps: "10",
-    notes: "Leaning back holding the rings; raise your arms out into a Y shape overhead, squeeze the upper back.",
+    notes:
+      "Leaning back holding the rings; raise your arms out into a Y shape overhead, squeeze the upper back.",
     source: "Team Training Day",
     videoUrl: "https://www.youtube.com/watch?v=WVczdS3d9nE",
     isTimeBased: false,
@@ -4355,12 +4262,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["rings"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Facing away from the rings with arms overhead; bend elbows to lower into a stretch, then press back to lockout.",
@@ -4454,7 +4356,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     notes:
       "Lying on your side, elbow tucked at your ribs; rotate the dumbbell upward by externally rotating the shoulder, lower slowly.",
     source: "MidwestOrtho",
-    videoUrl: "https://www.youtube.com/watch?v=v5bPOsQbq7g",
+    videoUrl: "https://www.youtube.com/shorts/e1tCB3J1OQU",
     isTimeBased: false,
   },
   {
@@ -4477,7 +4379,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     notes:
       "Lying on your side, elbow tucked at your ribs; rotate the dumbbell down and across your body, control the return.",
     source: "Sapien Rehab and Performance",
-    videoUrl: "https://www.youtube.com/watch?v=PSJLb2nH1K0",
+    videoUrl: "https://www.youtube.com/shorts/JX4ARjC56HM",
     isTimeBased: false,
   },
   {
@@ -4848,12 +4750,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["triceps_extension"],
     expertiseLevel: "novice",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Seated at the machine with upper arms against the pad; extend the elbows until arms are straight, control the return.",
@@ -4867,12 +4764,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["triceps_press"],
     expertiseLevel: "novice",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "10",
     notes:
       "Seated at the machine with elbows braced on the pads; press the handles down until arms are straight, control the return.",
@@ -4943,12 +4835,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     category: "UP",
     equipment: ["bodyweight"],
     expertiseLevel: "intermediate",
-    muscleGroups: [
-      "Chest",
-      "Front Deltoids",
-      "Serratus Anterior",
-      "Triceps",
-    ],
+    muscleGroups: ["Chest", "Front Deltoids", "Serratus Anterior", "Triceps"],
     defaultReps: "30 sec",
     notes:
       "Back against a wall, arms in a goal-post position; slide arms overhead while keeping contact with the wall.",
