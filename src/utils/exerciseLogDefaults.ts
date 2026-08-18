@@ -4,6 +4,7 @@ import { ensureCardioInstanceIds } from "@/lib/cardioInstances";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
+  formatPlanTargetPrescription,
   resolveExerciseSettings,
 } from "@/utils/effectiveExerciseSettings";
 
@@ -146,15 +147,60 @@ function fillRepsActual(log: ExerciseLog, id: string): ExerciseLog {
   return { ...log, actualReps: 1 };
 }
 
+/**
+ * Server-loaded logs omit `targetPrescription` / `loggingMode` (not persisted).
+ * Rebuild them from Library + catalog so resume/edit shows reps and mode.
+ */
+function ensureSessionLoggingFields(log: ExerciseLog): ExerciseLog {
+  const id = effectiveExerciseId(log);
+  const meta = exerciseMap[id];
+  const stored = useExerciseSettingsStore.getState().byExerciseId[id];
+  const exercise = meta ?? {
+    id,
+    isTimeBased: false as const,
+    category: "UP" as const,
+    name: "",
+    defaultReps: "",
+    notes: "",
+  };
+  const resolved = resolveExerciseSettings(exercise, stored);
+
+  let next = log;
+  if (!next.loggingMode) {
+    next = { ...next, loggingMode: resolved.defaultSetMode };
+  }
+  if (!next.targetPrescription?.trim()) {
+    next = {
+      ...next,
+      targetPrescription: formatPlanTargetPrescription(exercise, stored),
+    };
+  }
+  if (
+    next.loggingMode === "timer" &&
+    !(next.targetDurationSeconds != null && next.targetDurationSeconds > 0)
+  ) {
+    const sec = resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK;
+    next = {
+      ...next,
+      targetDurationSeconds: Math.min(999, Math.max(5, sec)),
+    };
+  }
+  return next;
+}
+
+function hydrateExerciseLog(log: ExerciseLog): ExerciseLog {
+  return ensureExerciseMetrics(ensureSessionLoggingFields(log));
+}
+
 export function hydrateWorkoutLog(log: WorkoutLog): WorkoutLog {
   const withCardio = ensureCardioInstanceIds(log);
   return {
     ...withCardio,
-    warmUpExercises: withCardio.warmUpExercises.map(ensureExerciseMetrics),
-    coolDownExercises: withCardio.coolDownExercises.map(ensureExerciseMetrics),
+    warmUpExercises: withCardio.warmUpExercises.map(hydrateExerciseLog),
+    coolDownExercises: withCardio.coolDownExercises.map(hydrateExerciseLog),
     rounds: withCardio.rounds.map((r) => ({
       ...r,
-      exercises: r.exercises.map(ensureExerciseMetrics),
+      exercises: r.exercises.map(hydrateExerciseLog),
     })),
   };
 }

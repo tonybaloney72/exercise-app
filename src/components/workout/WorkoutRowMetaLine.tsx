@@ -34,6 +34,11 @@ interface WorkoutRowMetaLineProps {
   detailLeading?: ReactNode;
   /** Inline controls on the detail row (e.g. completed reps/duration during workout). */
   detailTrailing?: ReactNode;
+  /**
+   * Title-row layout (overflow | name | checkbox) without a second detail row.
+   * Used by cardio, which logs in a block below the title.
+   */
+  splitTitle?: boolean;
   showTimerPill?: boolean;
   timerSeconds?: number;
   timerTitle?: string;
@@ -104,6 +109,7 @@ export default function WorkoutRowMetaLine({
   detailText,
   detailLeading,
   detailTrailing,
+  splitTitle = false,
   showTimerPill = false,
   timerSeconds = 45,
   timerTitle,
@@ -112,10 +118,12 @@ export default function WorkoutRowMetaLine({
   const trimmedDetail = detailText?.trim() ?? "";
   const inlineDetail =
     trimmedDetail.length > 0 && !showTimerPill && !detailLeading;
-  const splitDetailRow = detailTrailing != null;
+  const splitTitleRow = splitTitle || detailTrailing != null;
+  // Timers use `detailLeading`; reps/weight use `detailTrailing`. Saved workouts
+  // often lack prescription text, so trailing must still show the Did / weight fields.
   const showDetailRow =
-    splitDetailRow && (detailLeading != null || inlineDetail);
-  const showTimerPillRow = showTimerPill && timerSeconds > 0 && !splitDetailRow;
+    detailLeading != null || inlineDetail || detailTrailing != null;
+  const showTimerPillRow = showTimerPill && timerSeconds > 0 && !splitTitleRow;
 
   const toggleExpand = onToggleExpand ?? onNameClick;
   const rowAlign = titleAlign === "center" ? "items-center" : "items-start";
@@ -134,7 +142,7 @@ export default function WorkoutRowMetaLine({
 
   const overflowMenu = <WorkoutRowOverflowMenu items={menuItems} />;
 
-  if (splitDetailRow) {
+  if (splitTitleRow) {
     return (
       <div className={`min-w-0 flex-1 ${dense ? "" : "py-1"}`}>
         <div className="flex min-w-0 flex-col gap-1">

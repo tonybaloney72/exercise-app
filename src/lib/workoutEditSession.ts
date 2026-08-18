@@ -19,10 +19,13 @@ export function isCompletedWorkoutLog(log: WorkoutLog | null | undefined): boole
 }
 
 export function stretchEntriesFromLogs(logs: ExerciseLog[]): StretchEntry[] {
-  return logs.map((ex) => ({
-    exerciseId: ex.exerciseId,
-    targetReps: ex.targetPrescription ?? "",
-  }));
+  return logs.map((ex) => {
+    const meta = exerciseMap[ex.exerciseId];
+    return {
+      exerciseId: ex.exerciseId,
+      targetReps: ex.targetPrescription ?? meta?.defaultReps ?? "",
+    };
+  });
 }
 
 /** Plan shape for `WorkoutSession` when editing a finished log (slots match stored logs). */

@@ -162,7 +162,7 @@ export default function CardioSessionBlock({
           titleAlign="center"
           onNameClick={() => {}}
           menuItems={overflowItems}
-          detailTrailing={<></>}
+          splitTitle
         />
       </div>
 
