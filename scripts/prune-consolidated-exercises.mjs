@@ -18,8 +18,10 @@ const REMOVED_HC = new Set([
 const REMOVED_SW = new Set(["SW-15", "SW-17", "SW-20", "SW-25"]);
 
 const REMOVED_LB = new Set([
-  "LB-12", "LB-13", "LB-14", "LB-15", "LB-16", "LB-17",
+  "LB-13", "LB-14", "LB-15", "LB-16", "LB-17",
 ]);
+
+const REMOVED_PC = new Set(["PC-12"]);
 
 /** @param {string} text @param {Set<string>} removedIds */
 function removeExerciseBlocks(text, removedIds) {
@@ -41,7 +43,7 @@ const afterHybrid = catalog.slice(hybridImport);
 const beforeC = (catalogOnly.match(/^\s*id:/gm) || []).length;
 const catalogFiltered = removeExerciseBlocks(
   catalogOnly,
-  new Set([...REMOVED_SW, ...REMOVED_LB]),
+  new Set([...REMOVED_SW, ...REMOVED_LB, ...REMOVED_PC]),
 );
 const afterC = (catalogFiltered.match(/^\s*id:/gm) || []).length;
 writeFileSync(catalogPath, catalogFiltered + afterHybrid);

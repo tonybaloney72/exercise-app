@@ -78,7 +78,6 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "HC-295": "HC-257", // was HC-294 duplicate
   "LB-15": "LB-4", // Weighted Bulgarian Split Squat
   "HC-289": "LB-2", // Weighted Forward Lunge
-  "LB-12": "LB-3", // Weighted Reverse Lunge
   "LB-13": "LB-10", // Weighted Walking Lunge
   "LB-14": "LB-11", // Weighted Lateral Lunge
   "LB-16": "LB-8", // Weighted Step-Up
@@ -148,14 +147,14 @@ export const REMOVED_HYBRID_EXERCISE_IDS = new Set<string>([
   "HC-290",
 ]);
 
-/** Main-catalog strength ids removed after load-variant merge. */
+/** Main-catalog strength ids removed after load-variant merge or consolidation. */
 export const REMOVED_CATALOG_EXERCISE_IDS = new Set<string>([
-  "LB-12",
   "LB-13",
   "LB-14",
   "LB-15",
   "LB-16",
   "LB-17",
+  "PC-12", // Two-Footed Broad Jump → PC-31 Double Leg Bound
 ]);
 
 /** Catalog stretch ids removed (workout id kept). */

@@ -1,13 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { exerciseMap } from "@/core/catalog";
+import { getReplacementCandidates } from "@/lib/exerciseCandidates";
 import {
   CONSOLIDATED_EXERCISE_ID_MAP,
+  isDeprecatedExerciseId,
   migrateConsolidatedExerciseId,
   REMOVED_CATALOG_EXERCISE_IDS,
   REMOVED_CATALOG_STRETCH_IDS,
   REMOVED_HYBRID_EXERCISE_IDS,
 } from "@/lib/exerciseIdConsolidation";
 import { migrateExerciseId } from "@/lib/cpToPcMigration";
+import { migrateAvailableEquipment } from "@/data/equipment";
 
 describe("exerciseIdConsolidation", () => {
     it("maps deprecated ids to canonical targets", () => {
@@ -33,7 +36,8 @@ describe("exerciseIdConsolidation", () => {
     expect(migrateConsolidatedExerciseId("HC-142")).toBe("HC-082");
     expect(migrateConsolidatedExerciseId("HC-061")).toBe("HC-082");
     expect(migrateConsolidatedExerciseId("HC-062")).toBe("HC-082");
-    expect(migrateConsolidatedExerciseId("LB-12")).toBe("LB-3");
+    expect(migrateConsolidatedExerciseId("LB-12")).toBe("LB-12");
+    expect(migrateConsolidatedExerciseId("LB-13")).toBe("LB-10");
     expect(migrateConsolidatedExerciseId("HC-294")).toBe("HC-257");
     expect(migrateConsolidatedExerciseId("HC-295")).toBe("HC-257");
     expect(migrateConsolidatedExerciseId("HC-159")).toBe("HC-072");
@@ -54,7 +58,7 @@ describe("exerciseIdConsolidation", () => {
       expect(exerciseMap[id], `stretch ${id}`).toBeUndefined();
     }
     for (const id of REMOVED_CATALOG_EXERCISE_IDS) {
-      expect(exerciseMap[id], `catalog ${id}`).toBeUndefined();
+      expect(exerciseMap[id], `removed catalog ${id}`).toBeUndefined();
     }
   });
 
@@ -62,6 +66,38 @@ describe("exerciseIdConsolidation", () => {
     const targets = new Set(Object.values(CONSOLIDATED_EXERCISE_ID_MAP));
     for (const id of targets) {
       expect(exerciseMap[id], `target ${id}`).toBeDefined();
+    }
+  });
+
+  it("Squat Press stays in the library and swap pool", () => {
+    expect(exerciseMap["LB-12"]?.name).toBe("Squat Press");
+    expect(isDeprecatedExerciseId("LB-12")).toBe(false);
+    const candidates = getReplacementCandidates({
+      category: "LB",
+      excludeExerciseIds: new Set(),
+      availableEquipment: migrateAvailableEquipment([
+        "bodyweight",
+        "dumbbell",
+        "kettlebell",
+      ]),
+    });
+    expect(candidates.some((ex) => ex.id === "LB-12")).toBe(true);
+  });
+
+  it("deprecated catalog ids are not exported in exerciseMap", () => {
+    for (const id of Object.keys(CONSOLIDATED_EXERCISE_ID_MAP)) {
+      if (!REMOVED_CATALOG_EXERCISE_IDS.has(id)) continue;
+      expect(exerciseMap[id], `deprecated catalog ${id}`).toBeUndefined();
+    }
+  });
+
+  it("live catalog ids are not marked deprecated", () => {
+    for (const id of Object.keys(exerciseMap)) {
+      if (id.startsWith("CP-")) continue;
+      if (REMOVED_HYBRID_EXERCISE_IDS.has(id)) continue;
+      if (REMOVED_CATALOG_STRETCH_IDS.has(id)) continue;
+      if (REMOVED_CATALOG_EXERCISE_IDS.has(id)) continue;
+      expect(isDeprecatedExerciseId(id), `live catalog ${id}`).toBe(false);
     }
   });
 
