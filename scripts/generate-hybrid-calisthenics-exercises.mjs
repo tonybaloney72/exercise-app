@@ -335,7 +335,6 @@ const PAGES = {
     Dumbbell: [
       "Weighted Side Plank",
       "Weighted Russian Twist",
-      "Dumbbell Side Bend",
     ],
     Barbell: ["Barbell Tight Twist"],
     Machine: ["Oblique Twist Machine"],

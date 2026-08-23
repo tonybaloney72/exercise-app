@@ -164,7 +164,7 @@ export const HC_NOTES_BY_NAME = {
   "Dumbbell Reverse Wrist Curl": "Forearms supported, palms down holding dumbbells; extend wrists through full range under control.",
   "Dumbbell Romanian Deadlift": "Dumbbells in front of the thighs with a soft knee bend; hinge back until you feel a hamstring stretch, then drive forward.",
   "Dumbbell Shrug": "Dumbbells at your sides; shrug shoulders straight up toward your ears, pause, lower slowly.",
-  "Dumbbell Side Bend": "Stand tall; bend laterally toward one side, return to center without twisting.",
+  "Standing Side Crunch": "Stand tall, hold a dumbbell or kettlebell at your side; crunch laterally toward one side and return to center without twisting.",
   "Dumbbell Skull Crusher": "Lying on a bench with dumbbells over your forehead; bend elbows to lower them toward your head, then extend.",
   "Dumbbell Spider Curl": "Chest on incline bench, arms hanging; curl dumbbells up and lower without swinging.",
   "Dumbbell Split Squat": "Hold dumbbells at your sides; split stance, lower until back knee nears floor, push through the front heel.",

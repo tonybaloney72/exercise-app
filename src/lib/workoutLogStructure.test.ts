@@ -165,4 +165,45 @@ describe("workoutLogStructure", () => {
       next.rounds[1]?.exercises.map((e) => e.targetPrescription),
     ).toEqual(["10", "8"]);
   });
+
+  it("repeat copy preserves working weight from the source round", () => {
+    const prefs = {
+      availableEquipment: [...DEFAULT_AVAILABLE_EQUIPMENT],
+      dislikedExerciseIds: new Set<string>(),
+    };
+    let log = insertEmptyRoundAt(emptyLog(), 1);
+    log = {
+      ...log,
+      rounds: log.rounds.map((r, i) =>
+        i === 0
+          ? {
+              ...r,
+              exercises: [
+                {
+                  exerciseId: "CB-1",
+                  completed: true,
+                  skipped: false,
+                  targetPrescription: "10",
+                  actualReps: 10,
+                  weightLb: 25,
+                },
+                {
+                  exerciseId: "CB-2",
+                  completed: false,
+                  skipped: false,
+                  targetPrescription: "8",
+                  weightLb: 40,
+                },
+              ],
+            }
+          : r,
+      ),
+    };
+    const next = applyRoundCopyFromPriorInWorkout(log, 2, "repeat", prefs);
+    expect(next.rounds[1]?.exercises.map((e) => e.weightLb)).toEqual([25, 40]);
+    expect(next.rounds[1]?.exercises.every((e) => !e.completed)).toBe(true);
+    expect(next.rounds[1]?.exercises.every((e) => e.actualReps == null)).toBe(
+      true,
+    );
+  });
 });

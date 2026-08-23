@@ -118,9 +118,9 @@ console.log(JSON.stringify({
     },
     {
       group: "Standing straight-leg calf raise",
-      keep: "LB-6 Calf Raises → rename Standing Calf Raise",
-      review: ["HC-261 Straight Leg Calf Raise"],
-      note: "Same movement; HC row is equipment-free duplicate",
+      keep: "HC-261 Straight Leg Calf Raise",
+      removed: ["LB-6 Standing Calf Raise"],
+      note: "Consolidated Aug 2026; LB-6 migrates to HC-261 on load",
     },
     {
       group: "Standard push-up",

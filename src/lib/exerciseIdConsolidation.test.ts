@@ -43,6 +43,8 @@ describe("exerciseIdConsolidation", () => {
     expect(migrateConsolidatedExerciseId("HC-159")).toBe("HC-072");
     expect(migrateConsolidatedExerciseId("HC-296")).toBe("LB-7");
     expect(migrateConsolidatedExerciseId("HC-290")).toBe("CR-4");
+    expect(migrateConsolidatedExerciseId("HC-161")).toBe("CR-19");
+    expect(migrateConsolidatedExerciseId("LB-6")).toBe("HC-261");
   });
 
   it("chains CP rename then consolidation", () => {
@@ -67,6 +69,13 @@ describe("exerciseIdConsolidation", () => {
     for (const id of targets) {
       expect(exerciseMap[id], `target ${id}`).toBeDefined();
     }
+  });
+
+  it("Standing Side Crunch and Straight Leg Calf Raise are canonical", () => {
+    expect(exerciseMap["CR-19"]?.name).toBe("Standing Side Crunch");
+    expect(exerciseMap["HC-261"]?.name).toBe("Straight Leg Calf Raise");
+    expect(exerciseMap["HC-161"]).toBeUndefined();
+    expect(exerciseMap["LB-6"]).toBeUndefined();
   });
 
   it("Squat Press stays in the library and swap pool", () => {

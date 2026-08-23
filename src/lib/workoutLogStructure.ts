@@ -133,6 +133,7 @@ function freshExerciseLogsFromCopy(
       targetPrescription: ex.targetPrescription,
       loggingMode: ex.loggingMode,
       targetDurationSeconds: ex.targetDurationSeconds,
+      weightLb: ex.weightLb,
     }));
   }
 

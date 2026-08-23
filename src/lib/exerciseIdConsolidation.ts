@@ -86,6 +86,10 @@ export const CONSOLIDATED_EXERCISE_ID_MAP: Record<string, string> = {
   "HC-159": "HC-072", // Dumbbell Romanian Deadlift
   "HC-296": "LB-7", // Barbell Sumo Squat
   "HC-290": "CR-4", // Weighted Russian Twist
+  // Duplicate side crunch variants (Aug 2026)
+  "HC-161": "CR-19", // Dumbbell Side Bend → Standing Side Crunch
+  // Duplicate calf raise (Aug 2026)
+  "LB-6": "HC-261", // Standing Calf Raise → Straight Leg Calf Raise
 };
 
 /** Ids that redirect to a canonical entry; excluded from generator / swap pools. */
@@ -145,6 +149,7 @@ export const REMOVED_HYBRID_EXERCISE_IDS = new Set<string>([
   "HC-294",
   "HC-296",
   "HC-290",
+  "HC-161",
 ]);
 
 /** Main-catalog strength ids removed after load-variant merge or consolidation. */
@@ -155,6 +160,7 @@ export const REMOVED_CATALOG_EXERCISE_IDS = new Set<string>([
   "LB-16",
   "LB-17",
   "PC-12", // Two-Footed Broad Jump → PC-31 Double Leg Bound
+  "LB-6", // Standing Calf Raise → HC-261 Straight Leg Calf Raise
 ]);
 
 /** Catalog stretch ids removed (workout id kept). */

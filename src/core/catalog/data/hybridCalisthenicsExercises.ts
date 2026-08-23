@@ -2854,20 +2854,6 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     isTimeBased: false,
   },
   {
-    id: "HC-161",
-    name: "Dumbbell Side Bend",
-    category: "CR",
-    equipment: ["dumbbell"],
-    expertiseLevel: "intermediate",
-    muscleGroups: ["Abs", "Obliques", "Transverse Abdominis"],
-    defaultReps: "10 each side",
-    notes:
-      "Stand tall; bend laterally toward one side, return to center without twisting.",
-    source: "Kraken Fitness",
-    videoUrl: "https://www.youtube.com/watch?v=44DazvtgpGE",
-    isTimeBased: false,
-  },
-  {
     id: "HC-162",
     name: "Dumbbell Skull Crusher",
     category: "UP",
