@@ -6,6 +6,8 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import type { AuthUser } from "@/core";
 import { readGuestCookieActive } from "@/lib/auth/guestCookieClient";
 import { migrateLocalDataIfNeeded } from "@/lib/auth/migration";
+import { clientTrace } from "@/lib/diagnostics/clientTrace";
+import { settingsTraceUserPrefix } from "@/lib/diagnostics/settingsLoadTrace";
 
 function readGuestCookie(): boolean {
   return readGuestCookieActive();
@@ -30,13 +32,28 @@ export default function AuthInitializer({ initialUser, initialGuest, clientBoots
 
     async function applyBootstrap() {
       if (clientBootstrap) {
-        setGuest(readGuestCookie());
+        const guest = readGuestCookie();
+        setGuest(guest);
+        clientTrace("settings", "auth_bootstrap_guest", {
+          clientBootstrap: true,
+          guest,
+        });
         const supabase = createClient();
         const {
           data: { session },
         } = await supabase.auth.getSession();
         const u = session?.user;
         setUser(u ? { id: u.id, email: u.email ?? null } : null);
+        clientTrace(
+          "settings",
+          u ? "auth_bootstrap_session_user" : "auth_bootstrap_session_null",
+          {
+            clientBootstrap: true,
+            userIdPrefix: settingsTraceUserPrefix(u?.id),
+            hasSession: Boolean(session),
+          },
+          u ? "info" : "warn",
+        );
         if (u) {
           void migrateLocalDataIfNeeded(u.id);
         }
@@ -45,6 +62,11 @@ export default function AuthInitializer({ initialUser, initialGuest, clientBoots
 
       setGuest(initialGuest);
       setUser(initialUser);
+      clientTrace("settings", "auth_bootstrap_server", {
+        clientBootstrap: false,
+        guest: initialGuest,
+        userIdPrefix: settingsTraceUserPrefix(initialUser?.id),
+      });
 
       if (initialUser) {
         void migrateLocalDataIfNeeded(initialUser.id);

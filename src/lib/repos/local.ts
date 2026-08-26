@@ -22,6 +22,10 @@ import type {
 } from "./types";
 import { migrateExerciseId, migrateWorkoutLog } from "@/lib/cpToPcMigration";
 import { clientTraceAsync } from "@/lib/diagnostics/clientTrace";
+import {
+  settingsTraceFingerprint,
+  traceSettingsEvent,
+} from "@/lib/diagnostics/settingsLoadTrace";
 import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import { LOCAL_HEALTH_DAILY_METRICS_KEY } from "@/lib/repos/healthDailyLocal";
 import { DEFAULT_SETTINGS } from "./types";
@@ -74,13 +78,30 @@ export const localWorkoutRepo: WorkoutRepo = {
 
 export const localSettingsRepo: SettingsRepo = {
   async load(): Promise<UserSettings> {
-    if (!isBrowser()) return DEFAULT_SETTINGS;
+    if (!isBrowser()) {
+      traceSettingsEvent("local_load_ssr", { returnedDefaults: true }, "warn");
+      return DEFAULT_SETTINGS;
+    }
     try {
       const raw = localStorage.getItem(LOCAL_SETTINGS_KEY);
-      return raw
-        ? normalizeUserSettings(JSON.parse(raw) as Partial<UserSettings>)
-        : DEFAULT_SETTINGS;
-    } catch {
+      if (!raw) {
+        traceSettingsEvent("local_load_empty", { returnedDefaults: true });
+        return DEFAULT_SETTINGS;
+      }
+      const settings = normalizeUserSettings(
+        JSON.parse(raw) as Partial<UserSettings>,
+      );
+      traceSettingsEvent("local_load_ok", settingsTraceFingerprint(settings));
+      return settings;
+    } catch (err) {
+      traceSettingsEvent(
+        "local_load_parse_error",
+        {
+          message: err instanceof Error ? err.message : String(err),
+          returnedDefaults: true,
+        },
+        "error",
+      );
       return DEFAULT_SETTINGS;
     }
   },
@@ -88,6 +109,7 @@ export const localSettingsRepo: SettingsRepo = {
   async save(settings: UserSettings): Promise<void> {
     if (!isBrowser()) return;
     localStorage.setItem(LOCAL_SETTINGS_KEY, JSON.stringify(settings));
+    traceSettingsEvent("local_save_ok", settingsTraceFingerprint(settings));
   },
 };
 

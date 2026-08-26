@@ -16,6 +16,11 @@ import { normalizeUserSettings } from "@/lib/normalizeUserSettings";
 import { sanitizeThemeMode } from "@/lib/themeMode";
 import { clientTraceAsync } from "@/lib/diagnostics/clientTrace";
 import {
+  settingsTraceFingerprint,
+  settingsTraceUserPrefix,
+  traceSettingsEvent,
+} from "@/lib/diagnostics/settingsLoadTrace";
+import {
   sanitizeTrainingPriorityPreset,
   sanitizeTrainingPriorityScores,
 } from "@/lib/trainingPriorities";
@@ -546,12 +551,21 @@ export const supabaseWorkoutRepo: WorkoutRepo = {
 
 export const supabaseSettingsRepo: SettingsRepo = {
   async load(): Promise<UserSettings> {
+    const started = Date.now();
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return DEFAULT_SETTINGS;
+    if (!user) {
+      traceSettingsEvent(
+        "supabase_load_no_user",
+        { durationMs: Date.now() - started, returnedDefaults: true },
+        "warn",
+      );
+      return DEFAULT_SETTINGS;
+    }
 
+    const userIdPrefix = settingsTraceUserPrefix(user.id);
     const { data, error } = await supabase
       .from("user_settings")
       .select("*")
@@ -560,26 +574,82 @@ export const supabaseSettingsRepo: SettingsRepo = {
 
     if (error) {
       console.error("[supabaseSettingsRepo.load]", error);
+      traceSettingsEvent(
+        "supabase_load_query_error",
+        {
+          userIdPrefix,
+          durationMs: Date.now() - started,
+          code: error.code,
+          message: error.message,
+          returnedDefaults: true,
+        },
+        "error",
+      );
       return DEFAULT_SETTINGS;
     }
-    if (!data) return DEFAULT_SETTINGS;
-    return rowToSettings(data as SettingsRow);
+    if (!data) {
+      traceSettingsEvent(
+        "supabase_load_no_row",
+        {
+          userIdPrefix,
+          durationMs: Date.now() - started,
+          returnedDefaults: true,
+        },
+        "warn",
+      );
+      return DEFAULT_SETTINGS;
+    }
+    const settings = rowToSettings(data as SettingsRow);
+    traceSettingsEvent("supabase_load_ok", {
+      userIdPrefix,
+      durationMs: Date.now() - started,
+      ...settingsTraceFingerprint(settings),
+    });
+    return settings;
   },
 
   async save(settings: UserSettings): Promise<void> {
+    const started = Date.now();
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not authenticated");
+    if (!user) {
+      traceSettingsEvent(
+        "supabase_save_no_user",
+        {
+          durationMs: Date.now() - started,
+          ...settingsTraceFingerprint(settings),
+        },
+        "error",
+      );
+      throw new Error("Not authenticated");
+    }
 
+    const userIdPrefix = settingsTraceUserPrefix(user.id);
     const { error } = await supabase
       .from("user_settings")
       .upsert(settingsToRow(settings, user.id), { onConflict: "user_id" });
     if (error) {
       console.error("[supabaseSettingsRepo.save]", error);
+      traceSettingsEvent(
+        "supabase_save_error",
+        {
+          userIdPrefix,
+          durationMs: Date.now() - started,
+          code: error.code,
+          message: error.message,
+          ...settingsTraceFingerprint(settings),
+        },
+        "error",
+      );
       throw error;
     }
+    traceSettingsEvent("supabase_save_ok", {
+      userIdPrefix,
+      durationMs: Date.now() - started,
+      ...settingsTraceFingerprint(settings),
+    });
   },
 };
 

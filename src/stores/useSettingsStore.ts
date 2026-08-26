@@ -26,6 +26,11 @@ import {
   weeklyRestSettingsChanged,
 } from "@/lib/weekPlanPreferences";
 import { expertiseByGroupEqual } from "@/lib/expertiseLevels";
+import {
+  settingsTraceFingerprint,
+  settingsTraceUserPrefix,
+  traceSettingsEvent,
+} from "@/lib/diagnostics/settingsLoadTrace";
 import type { ExerciseEquipment, UserSettings } from "@/types";
 
 interface SettingsState extends UserSettings {
@@ -47,6 +52,21 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const snapshot = pickUserSettingsFields(current);
     const settingsPartial = pickUserSettingsFields({ ...current, ...partial });
     const updated = normalizeUserSettings(settingsPartial);
+    const auth = useAuthStore.getState();
+    traceSettingsEvent(
+      "update_settings",
+      {
+        authMode: auth.mode,
+        authKey: settingsHydrationKey(auth.mode, auth.user?.id),
+        hydrated: current.hydrated,
+        hydratedForAuthKey: current.hydratedForAuthKey,
+        userIdPrefix: settingsTraceUserPrefix(auth.user?.id),
+        partialKeys: Object.keys(partial),
+        before: settingsTraceFingerprint(current),
+        after: settingsTraceFingerprint(updated),
+      },
+      current.hydrated ? "info" : "warn",
+    );
     const equipmentChanged =
       partial.availableEquipment != null &&
       !equipmentListsEqual(
@@ -135,11 +155,31 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   loadSettings: async (options?: { force?: boolean }) => {
     const auth = useAuthStore.getState();
     const mode = auth.mode;
-    if (mode === "loading") return;
+    if (mode === "loading") {
+      traceSettingsEvent("load_settings_skip", { reason: "auth_loading" });
+      return;
+    }
     const authKey = settingsHydrationKey(mode, auth.user?.id);
-    if (!authKey) return;
+    if (!authKey) {
+      traceSettingsEvent("load_settings_skip", { reason: "no_auth_key", mode });
+      return;
+    }
 
-    if (!options?.force && get().hydratedForAuthKey === authKey) return;
+    if (!options?.force && get().hydratedForAuthKey === authKey) {
+      traceSettingsEvent("load_settings_skip", {
+        reason: "already_hydrated",
+        authKey,
+        force: Boolean(options?.force),
+      });
+      return;
+    }
+
+    traceSettingsEvent("load_settings_start", {
+      authKey,
+      mode,
+      force: Boolean(options?.force),
+      userIdPrefix: settingsTraceUserPrefix(auth.user?.id),
+    });
 
     const loaded = await getSettingsRepo(mode).load();
     const remoteSeenIds = loaded.releaseNotesSeenIds ?? [];
@@ -177,17 +217,57 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       useAuthStore.getState().mode,
       useAuthStore.getState().user?.id,
     );
-    if (currentKey !== authKey) return;
+    if (currentKey !== authKey) {
+      traceSettingsEvent(
+        "load_settings_discard",
+        {
+          reason: "auth_changed",
+          authKey,
+          currentKey,
+          ...settingsTraceFingerprint(merged),
+        },
+        "warn",
+      );
+      return;
+    }
 
-    if (!options?.force && get().hydratedForAuthKey === authKey) return;
+    if (!options?.force && get().hydratedForAuthKey === authKey) {
+      traceSettingsEvent(
+        "load_settings_discard",
+        {
+          reason: "race_already_hydrated",
+          authKey,
+          ...settingsTraceFingerprint(merged),
+        },
+        "warn",
+      );
+      return;
+    }
 
     set({ ...merged, hydrated: true, hydratedForAuthKey: authKey });
+    traceSettingsEvent("load_settings_applied", {
+      authKey,
+      pruned,
+      ...settingsTraceFingerprint(merged),
+    });
 
     if (mode === "authenticated" && pruned) {
       try {
         await getSettingsRepo(mode).save(merged);
+        traceSettingsEvent("load_settings_pruned_save_ok", {
+          authKey,
+          ...settingsTraceFingerprint(merged),
+        });
       } catch (err) {
         console.error("[useSettingsStore.loadSettings.persist]", err);
+        traceSettingsEvent(
+          "load_settings_pruned_save_error",
+          {
+            authKey,
+            message: err instanceof Error ? err.message : String(err),
+          },
+          "error",
+        );
       }
     }
   },

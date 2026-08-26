@@ -14,7 +14,10 @@ export type TraceEntry = {
 };
 
 const MAX_ENTRIES = 250;
+/** Survives app restarts so mobile settings-load failures can be copied later. */
 const STORAGE_KEY = "exercise-app-client-trace-v1";
+/** Pre-localStorage key; migrated once then removed. */
+const LEGACY_SESSION_STORAGE_KEY = "exercise-app-client-trace-v1";
 const SENSITIVE_KEY =
   /token|password|authorization|cookie|secret|bearer|api[_-]?key|refresh/i;
 
@@ -25,15 +28,39 @@ function isBrowser(): boolean {
   return typeof window !== "undefined";
 }
 
+function readStoredEntries(raw: string | null): TraceEntry[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as TraceEntry[];
+    return Array.isArray(parsed) ? parsed.slice(-MAX_ENTRIES) : [];
+  } catch {
+    return [];
+  }
+}
+
 function loadBuffer(): TraceEntry[] {
   if (bufferLoaded) return buffer;
   bufferLoaded = true;
   if (!isBrowser()) return buffer;
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (!raw) return buffer;
-    const parsed = JSON.parse(raw) as TraceEntry[];
-    buffer = Array.isArray(parsed) ? parsed.slice(-MAX_ENTRIES) : [];
+    const fromLocal = readStoredEntries(localStorage.getItem(STORAGE_KEY));
+    if (fromLocal.length > 0) {
+      buffer = fromLocal;
+      return buffer;
+    }
+    // One-time migrate from the old sessionStorage buffer.
+    const fromSession = readStoredEntries(
+      sessionStorage.getItem(LEGACY_SESSION_STORAGE_KEY),
+    );
+    if (fromSession.length > 0) {
+      buffer = fromSession;
+      persistBuffer();
+      try {
+        sessionStorage.removeItem(LEGACY_SESSION_STORAGE_KEY);
+      } catch {
+        // ignore
+      }
+    }
   } catch {
     buffer = [];
   }
@@ -43,7 +70,7 @@ function loadBuffer(): TraceEntry[] {
 function persistBuffer(): void {
   if (!isBrowser()) return;
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(buffer));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(buffer));
   } catch {
     // Quota or private mode - in-memory buffer still works this session.
   }
@@ -88,7 +115,7 @@ function pushEntry(entry: TraceEntry): void {
   }
 }
 
-/** Append a diagnostic event (ring buffer + sessionStorage). */
+/** Append a diagnostic event (ring buffer + localStorage). */
 export function clientTrace(
   scope: string,
   event: string,
@@ -144,7 +171,12 @@ export function clearClientTrace(): void {
   bufferLoaded = true;
   if (isBrowser()) {
     try {
-      sessionStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    try {
+      sessionStorage.removeItem(LEGACY_SESSION_STORAGE_KEY);
     } catch {
       // ignore
     }

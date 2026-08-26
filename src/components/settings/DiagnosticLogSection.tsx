@@ -96,9 +96,10 @@ export default function DiagnosticLogSection() {
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs text-muted leading-relaxed">
-        Recent app actions (GPS save, Health Connect, cloud sync) are recorded
-        here. If something hangs, wait a few seconds, then copy or share this
-        log when reporting a bug.
+        Settings load/save and auth bootstrap events are recorded here (and kept
+        across app restarts). Health Connect and other actions may appear too.
+        If settings look reset after opening the app, copy or share this log
+        when reporting the bug.
       </p>
       <p className="text-xs text-muted">
         {entryCount} event{entryCount === 1 ? "" : "s"} in buffer
