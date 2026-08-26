@@ -4299,7 +4299,7 @@ export const hybridCalisthenicsExercises: Exercise[] = [
     notes:
       "Seated with feet flat; lift toes toward your shins while heels stay down, pause, lower slowly.",
     source: "Arbilla Exercise Physiology",
-    videoUrl: "https://www.youtube.com/watch?v=DB1QegPQQeg",
+    videoUrl: "https://www.youtube.com/watch?v=ohvR3shCV90",
     isTimeBased: false,
   },
   {
