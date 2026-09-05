@@ -7,7 +7,9 @@ import EquipmentSettingsSection from "@/components/settings/EquipmentSettingsSec
 import ExerciseDifficultySettingsSection from "@/components/settings/ExerciseDifficultySettingsSection";
 import RepProgressionSettingsSection from "@/components/settings/RepProgressionSettingsSection";
 import SettingsSubpageLayout from "@/components/settings/SettingsSubpageLayout";
+import SettingsLinkRow from "@/components/settings/SettingsLinkRow";
 import YourWeekSettingsSection from "@/components/settings/YourWeekSettingsSection";
+import { routes } from "@/lib/appRoutes";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 const SECTION_BODY = "flex flex-col gap-4 p-4";
@@ -53,6 +55,14 @@ export default function TrainingSettingsPage() {
               </div>
             )}
           </CollapsibleSection>
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.02}>
+          <SettingsLinkRow
+            href={routes.settingsTrainingTemplates}
+            title="Day templates"
+            hint="Create and edit reusable day layouts"
+          />
         </AnimatedSection>
 
         <AnimatedSection delay={0.04}>

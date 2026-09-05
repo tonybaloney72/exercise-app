@@ -74,11 +74,16 @@ interface WorkoutPlanEditorProps {
   embedded?: boolean;
   saveLabel?: string;
   onDirtyChange?: (dirty: boolean, draft: DayPlan) => void;
+  /** Hide Save as / Apply template (e.g. editing a template itself). */
+  showTemplateToolbar?: boolean;
+  resetHint?: string;
+  resetButtonLabel?: string;
+  resetConfirmLabel?: string;
 }
 
 export default function WorkoutPlanEditor({
   initialPlan,
-  isCustomWeek,
+  isCustomWeek: _isCustomWeek,
   saving,
   onSave,
   onCancel,
@@ -86,7 +91,12 @@ export default function WorkoutPlanEditor({
   embedded = false,
   saveLabel = "Save this day",
   onDirtyChange,
+  showTemplateToolbar = true,
+  resetHint = "Discard unsaved edits and restore this day's auto-generated workout.",
+  resetButtonLabel = "Reset this day",
+  resetConfirmLabel = "Yes, reset this day",
 }: WorkoutPlanEditorProps) {
+  void _isCustomWeek;
   const [draft, setDraft] = useState(() =>
     prepareDayPlanForEditor(initialPlan, buildStretchResolveContextFromStores()),
   );
@@ -496,13 +506,20 @@ export default function WorkoutPlanEditor({
         }
       />
 
-      <WorkoutDayTemplateToolbar
-        draft={draft}
-        disabled={saving}
-        onApply={(next) =>
-          setDraft(prepareDayPlanForEditor(next, buildStretchResolveContextFromStores()))
-        }
-      />
+      {showTemplateToolbar ? (
+        <WorkoutDayTemplateToolbar
+          draft={draft}
+          disabled={saving}
+          onApply={(next) =>
+            setDraft(
+              prepareDayPlanForEditor(
+                next,
+                buildStretchResolveContextFromStores(),
+              ),
+            )
+          }
+        />
+      ) : null}
 
       <div className="flex gap-3">
         {!embedded && (
@@ -526,10 +543,7 @@ export default function WorkoutPlanEditor({
       </div>
 
       <div className="flex flex-col rounded-xl border border-border bg-surface px-4 py-3 gap-2">
-        <p className="text-xs text-muted">
-          Discard unsaved edits and restore this day&apos;s auto-generated
-          workout.
-        </p>
+        <p className="text-xs text-muted">{resetHint}</p>
         {resetConfirm ? (
           <div className="flex flex-wrap gap-2 py-1">
             <button
@@ -541,7 +555,7 @@ export default function WorkoutPlanEditor({
               }}
               className="rounded-lg bg-red-600/90 px-3 py-2 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50"
             >
-              Yes, reset this day
+              {resetConfirmLabel}
             </button>
             <button
               type="button"
@@ -559,7 +573,7 @@ export default function WorkoutPlanEditor({
             onClick={() => setResetConfirm(true)}
             className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-foreground hover:bg-surface-hover disabled:opacity-50"
           >
-            Reset this day
+            {resetButtonLabel}
           </button>
         )}
       </div>

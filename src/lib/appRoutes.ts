@@ -22,6 +22,10 @@ export const routes = {
   settings: "/settings",
   settingsLibrary: "/settings/library",
   settingsTraining: "/settings/training",
+  settingsTrainingTemplates: "/settings/training/templates",
+  settingsTrainingTemplateNew: "/settings/training/templates/new",
+  settingsTrainingTemplate: (id: string) =>
+    `/settings/training/templates/${id}`,
   settingsBuildGuided: "/settings/build-guided",
   settingsBuildCustom: "/settings/build-custom",
   settingsDevice: "/settings/device",

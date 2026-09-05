@@ -1,14 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
+import { routes } from "@/lib/appRoutes";
 import { getWorkoutDayTemplateRepo } from "@/lib/repos";
 import {
-  applyTemplateToDayPlan,
+  applyTemplateToDayPlanWithMode,
   dayPlanToTemplateSnapshot,
+  defaultTemplateApplyMode,
   MAX_WORKOUT_DAY_TEMPLATES,
   normalizeTemplateName,
   sortTemplatesByName,
+  templateHasDayExtras,
+  templatePlanSummary,
+  type TemplateApplyMode,
 } from "@/lib/workoutDayTemplates";
 import { toastSaveError } from "@/utils/saveErrorToast";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -21,6 +27,43 @@ type Props = {
   onApply: (plan: DayPlan) => void;
 };
 
+const APPLY_MODE_OPTIONS: {
+  mode: TemplateApplyMode;
+  title: string;
+  description: string;
+}[] = [
+  {
+    mode: "replace_day",
+    title: "Replace entire day",
+    description: "Rounds, stretches, and cardio become this template.",
+  },
+  {
+    mode: "append_rounds",
+    title: "Append as new round(s)",
+    description: "Keep this day; add the template rounds at the end.",
+  },
+  {
+    mode: "replace_round",
+    title: "Replace one round",
+    description:
+      "Swap one round on this day (multi-round templates insert in place).",
+  },
+];
+
+function applyToastDescription(
+  templateName: string,
+  mode: TemplateApplyMode,
+  replaceRoundIndex: number,
+): string {
+  if (mode === "append_rounds") {
+    return `Appended "${templateName}". Tap Save this day when ready.`;
+  }
+  if (mode === "replace_round") {
+    return `Replaced round ${replaceRoundIndex + 1} with "${templateName}". Tap Save this day when ready.`;
+  }
+  return `Loaded "${templateName}". Tap Save this day when ready.`;
+}
+
 export default function WorkoutDayTemplateToolbar({
   draft,
   disabled = false,
@@ -29,6 +72,10 @@ export default function WorkoutDayTemplateToolbar({
   const authMode = useAuthStore((s) => s.mode);
   const [saveOpen, setSaveOpen] = useState(false);
   const [pickOpen, setPickOpen] = useState(false);
+  const [pending, setPending] = useState<WorkoutDayTemplate | null>(null);
+  const [applyMode, setApplyMode] =
+    useState<TemplateApplyMode>("replace_day");
+  const [replaceRoundIndex, setReplaceRoundIndex] = useState(0);
   const [name, setName] = useState("");
   const [savingTemplate, setSavingTemplate] = useState(false);
   const [templates, setTemplates] = useState<WorkoutDayTemplate[]>([]);
@@ -82,13 +129,28 @@ export default function WorkoutDayTemplateToolbar({
     }
   }
 
-  function handleApply(template: WorkoutDayTemplate) {
-    const next = applyTemplateToDayPlan(draft, template.plan);
-    onApply(next);
+  function handleSelectTemplate(template: WorkoutDayTemplate) {
+    setPending(template);
+    setApplyMode(defaultTemplateApplyMode(template.plan));
+    setReplaceRoundIndex(0);
     setPickOpen(false);
-    toast.success("Template applied", {
-      description: `Loaded "${template.name}". Tap Save this day when ready.`,
+  }
+
+  function handleConfirmApply() {
+    if (!pending) return;
+    const next = applyTemplateToDayPlanWithMode(draft, pending.plan, {
+      mode: applyMode,
+      replaceRoundIndex,
     });
+    onApply(next);
+    toast.success("Template applied", {
+      description: applyToastDescription(
+        pending.name,
+        applyMode,
+        replaceRoundIndex,
+      ),
+    });
+    setPending(null);
   }
 
   async function handleDelete(id: string) {
@@ -103,6 +165,16 @@ export default function WorkoutDayTemplateToolbar({
       setDeletingId(null);
     }
   }
+
+  const dayRoundCount = draft.rounds.length;
+  const modeHint =
+    applyMode === "replace_day" && dayRoundCount > 0
+      ? `Replace day will remove your current ${dayRoundCount} round${dayRoundCount === 1 ? "" : "s"}.`
+      : applyMode === "append_rounds"
+        ? "Stretches and cardio on this day stay as they are."
+        : applyMode === "replace_round"
+          ? "Stretches and cardio on this day stay as they are."
+          : undefined;
 
   return (
     <>
@@ -131,6 +203,12 @@ export default function WorkoutDayTemplateToolbar({
           >
             Apply template
           </button>
+          <Link
+            href={routes.settingsTrainingTemplates}
+            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground hover:bg-surface-hover"
+          >
+            Manage
+          </Link>
         </div>
       </div>
 
@@ -178,7 +256,7 @@ export default function WorkoutDayTemplateToolbar({
         open={pickOpen}
         onClose={() => setPickOpen(false)}
         title="Apply template"
-        hint="Replaces rounds, stretches, and cardio on this day. Name and theme stay the same."
+        hint="Choose a template, then how to merge it into this day."
         ariaLabel="Choose workout template"
         bodyClassName="overflow-y-auto px-2 py-2 max-h-[min(55vh,400px)]"
       >
@@ -186,16 +264,12 @@ export default function WorkoutDayTemplateToolbar({
           <p className="px-3 py-6 text-sm text-muted text-center">Loading…</p>
         ) : templates.length === 0 ? (
           <p className="px-3 py-6 text-sm text-muted text-center">
-            No templates yet. Use Save as template first.
+            No templates yet. Create one in Settings → Training → Day templates,
+            or Save as template here.
           </p>
         ) : (
           <ul>
             {templates.map((template) => {
-              const roundCount = template.plan.rounds.length;
-              const exerciseCount = template.plan.rounds.reduce(
-                (n, r) => n + r.exercises.length,
-                0,
-              );
               return (
                 <li
                   key={template.id}
@@ -203,18 +277,16 @@ export default function WorkoutDayTemplateToolbar({
                 >
                   <button
                     type="button"
-                    onClick={() => handleApply(template)}
+                    onClick={() => handleSelectTemplate(template)}
                     className="flex-1 min-w-0 rounded-lg px-2 py-3 text-left transition-colors hover:bg-surface-hover"
                   >
                     <p className="text-sm font-medium text-foreground truncate">
                       {template.name}
                     </p>
                     <p className="text-xs text-muted">
-                      {roundCount} round{roundCount === 1 ? "" : "s"} ·{" "}
-                      {exerciseCount} exercise
-                      {exerciseCount === 1 ? "" : "s"}
-                      {template.plan.cardioActivities?.length
-                        ? ` · ${template.plan.cardioActivities.length} cardio`
+                      {templatePlanSummary(template.plan)}
+                      {templateHasDayExtras(template.plan)
+                        ? " · day extras"
                         : ""}
                     </p>
                   </button>
@@ -231,6 +303,95 @@ export default function WorkoutDayTemplateToolbar({
             })}
           </ul>
         )}
+      </BottomSheetModal>
+
+      <BottomSheetModal
+        open={pending != null}
+        onClose={() => setPending(null)}
+        title={pending ? `Apply “${pending.name}”` : "Apply template"}
+        hint={
+          pending
+            ? `${templatePlanSummary(pending.plan)}. How should it merge into this day?`
+            : undefined
+        }
+        ariaLabel="Choose how to apply template"
+        footer={
+          <div className="flex gap-3 px-4 pb-4">
+            <button
+              type="button"
+              onClick={() => setPending(null)}
+              className="flex-1 rounded-xl border border-border bg-surface py-3 text-sm font-medium text-foreground hover:bg-surface-hover"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmApply}
+              className="flex-1 rounded-xl bg-accent py-3 text-sm font-bold text-white hover:bg-accent/90"
+            >
+              Apply
+            </button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-2 px-4 py-3">
+          <div
+            className="flex flex-col gap-2"
+            role="radiogroup"
+            aria-label="Template apply mode"
+          >
+            {APPLY_MODE_OPTIONS.map((option) => {
+              const selected = applyMode === option.mode;
+              return (
+                <button
+                  key={option.mode}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => setApplyMode(option.mode)}
+                  className={`rounded-xl border px-3 py-3 text-left transition-colors ${
+                    selected
+                      ? "border-accent bg-accent/10"
+                      : "border-border bg-surface hover:bg-surface-hover"
+                  }`}
+                >
+                  <p className="text-sm font-medium text-foreground">
+                    {option.title}
+                  </p>
+                  <p className="text-xs text-muted mt-0.5">
+                    {option.description}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+
+          {applyMode === "replace_round" && dayRoundCount > 0 ? (
+            <label className="mt-1 flex flex-col gap-1.5">
+              <span className="text-xs font-medium text-muted">
+                Round to replace
+              </span>
+              <select
+                value={replaceRoundIndex}
+                onChange={(e) => setReplaceRoundIndex(Number(e.target.value))}
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+              >
+                {draft.rounds.map((round, index) => (
+                  <option key={round.roundNumber} value={index}>
+                    Round {index + 1}
+                    {round.exercises.length > 0
+                      ? ` · ${round.exercises.length} exercise${round.exercises.length === 1 ? "" : "s"}`
+                      : " · empty"}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
+          {modeHint ? (
+            <p className="text-xs text-muted leading-snug pt-1">{modeHint}</p>
+          ) : null}
+        </div>
       </BottomSheetModal>
     </>
   );

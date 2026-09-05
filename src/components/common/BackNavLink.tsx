@@ -27,9 +27,10 @@ function BackArrowIcon({ size = 18 }: { size?: number }) {
 type BackNavLinkProps = {
   className?: string;
   /**
-   * When set, always navigate here (skip browser history).
+   * When set, always navigate here via replace (skip browser history).
    * Use for hub screens like Weekly where history.back() can walk through
-   * edit → start → complete stacks.
+   * edit → start → complete stacks. Prefer replace so Back does not stack
+   * another hub entry.
    */
   href?: string;
   /** Used when `href` is unset: history.back(), or push here if no history. */
@@ -50,7 +51,7 @@ export default function BackNavLink({
       onClick={(event) => {
         event.preventDefault();
         if (href) {
-          router.push(href);
+          router.replace(href);
           return;
         }
         if (typeof window !== "undefined" && window.history.length > 1) {

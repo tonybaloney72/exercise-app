@@ -1,5 +1,16 @@
 [
   {
+    "id": "2026-09-05-day-templates-and-history-nav",
+    "date": "2026-09-05",
+    "title": "Day templates & smoother history",
+    "highlights": [
+      "Create and manage reusable day layouts under Settings → Training plan → Day templates—edit rounds, exercises, stretches, and cardio the same way you Edit Day.",
+      "When you Apply a template on Edit Day, choose how it merges: replace the whole day, append as new rounds, or replace one round. Single-round finishers default to append so they don’t wipe the rest of your day.",
+      "Logging a past workout from Weekly is easier to leave—Back returns to that week day, then to Weekly, instead of walking through start and complete screens.",
+      "Workout checkboxes, menus, and chevrons have larger tap targets so they’re easier to hit on the phone."
+    ]
+  },
+  {
     "id": "2026-08-17-machines-and-progression",
     "date": "2026-08-17",
     "title": "Gym machines & smarter progression",
@@ -19,16 +30,6 @@
       "If you used an older weighted version before, your history and plans still line up with the new name automatically.",
       "Your Library weight defaults still pre-fill the next time you do that move, just like before.",
       "On Health → Exercises, Exercise over time shows weight in tooltips and Sessions when you logged it—bodyweight days still show reps and sets only."
-    ]
-  },
-  {
-    "id": "2026-07-15-usual-foods-and-swap-focus",
-    "date": "2026-07-15",
-    "title": "Faster meal logging & fairer training focus",
-    "highlights": [
-      "When you add food to a meal, Usual shows foods you often eat for that meal—so breakfast staples stay on breakfast, not dinner.",
-      "Star a food as a favorite while logging; the ★ mark shows on Usual items for meals where you actually eat that food.",
-      "Training Focus on Health → Exercises now counts the exercise you completed after a swap, not the one that was originally planned."
     ]
   }
 ]
