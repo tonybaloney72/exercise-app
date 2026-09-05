@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import CardioActivityPickModal from "./CardioActivityPickModal";
 import CardioSessionBlock from "./CardioSessionBlock";
+import WorkoutSectionCard from "@/components/workout/WorkoutSectionCard";
 import { cardioRowKey } from "@/lib/cardioInstances";
 import { cardioKindForExerciseId } from "@/lib/cardioKinds";
 import { ensureCardioExercises } from "@/lib/resolveWorkoutCardio";
+import { uiAddChipClass } from "@/lib/uiClasses";
 import type { CardioActivityKind, WorkoutLog } from "@/types";
 import type { CardioSessionCaptureInput } from "@/lib/cardioSessionLog";
 
@@ -46,7 +47,6 @@ export default function CardioSection({
 
   const completedCount = cardioRows.filter((e) => e.completed || e.skipped).length;
   const total = cardioRows.length;
-  const allDone = total > 0 && completedCount === total;
 
   return (
     <>
@@ -60,109 +60,54 @@ export default function CardioSection({
         }}
       />
 
-      <motion.div className="relative z-10 rounded-xl border border-border bg-surface overflow-hidden">
-        <div className="flex w-full items-center gap-2 px-4 py-3">
-          <button
-            type="button"
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex min-w-0 flex-1 items-center justify-between gap-2 text-left"
-          >
-            <motion.div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-foreground">
-                Cardio & Endurance
-              </h3>
-              {allDone ? (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="text-green-400 text-xs"
-                >
-                  ✓
-                </motion.span>
-              ) : null}
-            </motion.div>
-            <div className="flex shrink-0 items-center gap-2">
-              <span className="text-xs text-muted">
-                {completedCount}/{total}
-              </span>
-              <motion.div className="h-1.5 w-16 rounded-full bg-border overflow-hidden">
-                <motion.div
-                  className="h-full rounded-full bg-accent"
-                  initial={{ width: 0 }}
-                  animate={{
-                    width: `${total > 0 ? (completedCount / total) * 100 : 0}%`,
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
-              </motion.div>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className={`text-muted transition-transform ${isOpen ? "rotate-180" : ""}`}
-                aria-hidden
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </div>
-          </button>
+      <WorkoutSectionCard
+        title="Cardio & Endurance"
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        progress={{ completed: completedCount, total }}
+        showDoneCheck
+        className="relative z-10"
+        headerAction={
           <button
             type="button"
             onClick={() => setAddOpen(true)}
-            className="shrink-0 rounded-md border border-border px-2 py-0.5 text-caption font-medium text-foreground hover:bg-surface-hover"
+            className={uiAddChipClass}
           >
             + Add
           </button>
+        }
+      >
+        <div className="flex flex-col gap-2">
+          {cardioRows.length === 0 ? (
+            <p className="px-2 py-3 text-xs text-muted">
+              No cardio yet. Tap + Add to log an activity.
+            </p>
+          ) : (
+            cardioRows.map((log) => {
+              const key = cardioRowKey(log);
+              return (
+                <CardioSessionBlock
+                  key={key}
+                  log={log}
+                  kind={cardioKindForExerciseId(log.exerciseId)}
+                  dateKey={activeWorkout.date}
+                  onToggle={() => onToggle(key)}
+                  onSkip={() => onSkip(key)}
+                  onUnskip={() => onUnskip(key)}
+                  onSetDistance={(mi) => onSetDistance(key, mi)}
+                  onSetDurationSeconds={(sec) =>
+                    onSetDurationSeconds(key, sec)
+                  }
+                  onApplySessionCapture={(input) =>
+                    onApplySessionCapture(key, input)
+                  }
+                  onRemove={() => onRemoveCardio(key)}
+                />
+              );
+            })
+          )}
         </div>
-
-        <AnimatePresence initial={false}>
-          {isOpen ? (
-            <motion.div
-              initial={{ height: 0 }}
-              animate={{ height: "auto" }}
-              exit={{ height: 0 }}
-              transition={{ duration: 0.25 }}
-              className="overflow-hidden"
-            >
-              <div className="flex flex-col border-t border-border px-2 py-1 gap-2">
-                {cardioRows.length === 0 ? (
-                  <p className="px-2 py-3 text-xs text-muted">
-                    No cardio yet. Tap + Add to log an activity.
-                  </p>
-                ) : (
-                  cardioRows.map((log) => {
-                    const key = cardioRowKey(log);
-                    return (
-                      <CardioSessionBlock
-                        key={key}
-                        log={log}
-                        kind={cardioKindForExerciseId(log.exerciseId)}
-                        dateKey={activeWorkout.date}
-                        onToggle={() => onToggle(key)}
-                        onSkip={() => onSkip(key)}
-                        onUnskip={() => onUnskip(key)}
-                        onSetDistance={(mi) => onSetDistance(key, mi)}
-                        onSetDurationSeconds={(sec) =>
-                          onSetDurationSeconds(key, sec)
-                        }
-                        onApplySessionCapture={(input) =>
-                          onApplySessionCapture(key, input)
-                        }
-                        onRemove={() => onRemoveCardio(key)}
-                      />
-                    );
-                  })
-                )}
-              </div>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
-      </motion.div>
+      </WorkoutSectionCard>
     </>
   );
 }

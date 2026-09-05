@@ -4,16 +4,11 @@ import { useState } from "react";
 import { exerciseMap } from "@/core/catalog";
 import { formatSecondsToMMSS, parseTimeInput } from "@/utils/time";
 import WorkoutCompletionCheckbox from "@/components/workout/WorkoutCompletionCheckbox";
+import { buildWorkoutSessionMenuItems } from "@/components/workout/buildWorkoutSessionMenuItems";
 import CardioActivityLogFields, {
   applyResolvedCardioQuickLog,
 } from "@/components/workout/CardioActivityLogFields";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
-import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
-import {
-  MenuIconRemove,
-  MenuIconSkip,
-  MenuIconUndoSkip,
-} from "./WorkoutRowMenuIcons";
 import { formatCardioHealthSummary, type CardioHealthMeta } from "@/lib/health";
 import type { ResolvedCardioQuickLog } from "@/lib/health/resolveCardioQuickLog";
 import type { GpsTrackPoint } from "@/lib/geo/gpsTrackSession";
@@ -78,28 +73,14 @@ export default function CardioSessionBlock({
     formatCardioHealthSummary(log);
   const routePoints = log.gpsTrackPoints ?? gpsTrack;
 
-  const overflowItems: WorkoutRowMenuItem[] = [];
-  if (!log.completed && !log.skipped) {
-    overflowItems.push({
-      label: "Skip",
-      icon: <MenuIconSkip />,
-      onClick: onSkip,
-    });
-  }
-  if (log.skipped) {
-    overflowItems.push({
-      label: "Undo skip",
-      icon: <MenuIconUndoSkip />,
-      onClick: onUnskip,
-    });
-  }
-  if (onRemove) {
-    overflowItems.push({
-      label: "Remove from workout",
-      icon: <MenuIconRemove />,
-      onClick: onRemove,
-    });
-  }
+  const overflowItems = buildWorkoutSessionMenuItems({
+    authMode: "guest",
+    completed: log.completed,
+    skipped: Boolean(log.skipped),
+    onSkip,
+    onUnskip,
+    onRemove,
+  });
 
   function handleResolved(result: ResolvedCardioQuickLog) {
     applyResolvedCardioQuickLog({

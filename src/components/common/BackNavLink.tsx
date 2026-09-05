@@ -24,39 +24,44 @@ function BackArrowIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-/** Navigate to the previous history entry, with an optional fallback when history is empty. */
-function useNavigateBack(fallbackHref?: string) {
-  const router = useRouter();
-  return () => {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-      return;
-    }
-    if (fallbackHref) {
-      router.push(fallbackHref);
-      return;
-    }
-    router.back();
-  };
-}
-
 type BackNavLinkProps = {
   className?: string;
+  /**
+   * When set, always navigate here (skip browser history).
+   * Use for hub screens like Weekly where history.back() can walk through
+   * edit → start → complete stacks.
+   */
+  href?: string;
+  /** Used when `href` is unset: history.back(), or push here if no history. */
   fallbackHref?: string;
 };
 
 export default function BackNavLink({
   className = BACK_NAV_LINK_CLASS,
+  href,
   fallbackHref,
 }: BackNavLinkProps) {
-  const navigateBack = useNavigateBack(fallbackHref);
+  const router = useRouter();
+  const anchorHref = href ?? fallbackHref ?? "#";
 
   return (
     <a
-      href={fallbackHref ?? "#"}
+      href={anchorHref}
       onClick={(event) => {
         event.preventDefault();
-        navigateBack();
+        if (href) {
+          router.push(href);
+          return;
+        }
+        if (typeof window !== "undefined" && window.history.length > 1) {
+          router.back();
+          return;
+        }
+        if (fallbackHref) {
+          router.push(fallbackHref);
+          return;
+        }
+        router.back();
       }}
       className={className}
     >

@@ -3,8 +3,10 @@
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import WorkoutPlanExerciseRow from "@/components/workout/WorkoutPlanExerciseRow";
+import PlanTargetField from "@/components/workout/PlanTargetField";
 import WorkoutSectionCard from "@/components/workout/WorkoutSectionCard";
 import { exerciseMap } from "@/core/catalog";
+import { uiAddChipClass } from "@/lib/uiClasses";
 import type { StretchEntry } from "@/types";
 
 interface StretchPlanSectionProps {
@@ -60,15 +62,10 @@ function StretchListBody({
             ]}
             onNameClick={() => onChange(index)}
           >
-            <label className="block">
-              <span className="text-xs text-muted">Target</span>
-              <input
-                type="text"
-                value={entry.targetReps}
-                onChange={(e) => onUpdateTarget(index, e.target.value)}
-                className="mt-0.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-              />
-            </label>
+            <PlanTargetField
+              value={entry.targetReps}
+              onChange={(next) => onUpdateTarget(index, next)}
+            />
           </WorkoutPlanExerciseRow>
         );
       })}
@@ -120,11 +117,7 @@ export default function StretchPlanSection({
             <p className="text-sm text-muted mt-0.5">{hint}</p>
           ) : null}
         </div>
-        <button
-          type="button"
-          onClick={onAdd}
-          className="rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-surface-hover"
-        >
+        <button type="button" onClick={onAdd} className={uiAddChipClass}>
           + Add
         </button>
       </div>

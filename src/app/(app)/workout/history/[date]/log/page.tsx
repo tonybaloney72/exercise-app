@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import FloatingTimer from "@/components/common/FloatingTimer";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import BackNavLink from "@/components/common/BackNavLink";
@@ -33,10 +33,18 @@ function formatPageTitle(dateKey: string): string {
   });
 }
 
-export default function WorkoutHistoryBackfillLogPage() {
+function WorkoutHistoryBackfillLogPageInner() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dateKey = typeof params.date === "string" ? params.date : "";
+  const fromWeek = searchParams.get("from") === "week";
+  const backHref = fromWeek
+    ? routes.workoutWeekDay(dateKey)
+    : routes.workoutHistoryDay(dateKey);
+  const afterCompleteHref = fromWeek
+    ? routes.workoutWeekDay(dateKey)
+    : routes.workoutHistoryDay(dateKey);
   const mode = useAuthStore((s) => s.mode);
   const {
     activeWorkout,
@@ -123,16 +131,16 @@ export default function WorkoutHistoryBackfillLogPage() {
 
   useEffect(() => {
     if (completedLog) {
-      router.replace(routes.workoutHistoryDay(dateKey));
+      router.replace(afterCompleteHref);
     }
-  }, [completedLog, dateKey, router]);
+  }, [completedLog, afterCompleteHref, router]);
 
   const parsed = parseLocalDateKey(dateKey);
   if (!parsed) {
     return (
       <div className="flex flex-col py-8 gap-4 px-2 text-center">
         <p className="text-sm text-muted">Invalid date in URL.</p>
-        <BackNavLink />
+        <BackNavLink href={routes.workoutHistory} />
       </div>
     );
   }
@@ -140,7 +148,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   if (!canAccessLogPage) {
     return (
       <div className="flex flex-col py-8 gap-4">
-        <BackNavLink />
+        <BackNavLink href={backHref} />
         <SurfaceCard className="px-4 py-6 text-center">
           <p className="text-sm text-foreground">
             {resumeEligibility.ok === false
@@ -157,7 +165,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   if (planLoading || mode === "loading") {
     return (
       <div className="flex flex-col py-8 gap-4">
-        <BackNavLink />
+        <BackNavLink href={backHref} />
         <p className="text-sm text-muted text-center">Loading plan…</p>
       </div>
     );
@@ -166,7 +174,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   if (planError || !plan) {
     return (
       <div className="flex flex-col py-8 gap-4">
-        <BackNavLink />
+        <BackNavLink href={backHref} />
         <SurfaceCard className="px-4 py-6 text-center">
           <p className="text-sm text-red-400">
             {planError ?? "Could not load the plan for this day."}
@@ -183,7 +191,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   ) {
     return (
       <div className="flex flex-col py-8 gap-4">
-        <BackNavLink />
+        <BackNavLink href={backHref} />
         <SurfaceCard className="px-4 py-6 text-center">
           <p className="text-sm text-foreground">
             Finish or discard your current workout before logging another day.
@@ -202,7 +210,7 @@ export default function WorkoutHistoryBackfillLogPage() {
   if (!sessionForThisDay) {
     return (
       <div className="flex flex-col py-8 gap-5">
-        <BackNavLink />
+        <BackNavLink href={backHref} />
         <h1 className="text-2xl font-bold text-foreground">
           Log workout · {formatPageTitle(dateKey)}
         </h1>
@@ -220,7 +228,7 @@ export default function WorkoutHistoryBackfillLogPage() {
 
   return (
     <div className="flex flex-col py-6 gap-5">
-      <BackNavLink />
+      <BackNavLink href={backHref} />
       <h1 className="text-2xl font-bold text-foreground">
         {formatPageTitle(dateKey)}
       </h1>
@@ -238,9 +246,24 @@ export default function WorkoutHistoryBackfillLogPage() {
             </p>
           </div>
         }
-        onAfterComplete={() => router.push(routes.workoutHistoryDay(dateKey))}
+        onAfterComplete={() => router.replace(afterCompleteHref)}
       />
       <FloatingTimer />
     </div>
+  );
+}
+
+export default function WorkoutHistoryBackfillLogPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col py-8 gap-4">
+          <BackNavLink fallbackHref={routes.workoutHistory} />
+          <p className="text-sm text-muted text-center">Loading…</p>
+        </div>
+      }
+    >
+      <WorkoutHistoryBackfillLogPageInner />
+    </Suspense>
   );
 }

@@ -158,7 +158,7 @@ export default function WeeklyDayPage() {
     return (
       <div className="flex flex-col items-center gap-4 py-8 px-2">
         <p className="text-sm text-muted text-center">Invalid date in URL.</p>
-        <BackNavLink fallbackHref={routes.workoutWeek} />
+        <BackNavLink href={routes.workoutWeek} />
       </div>
     );
   }
@@ -172,7 +172,7 @@ export default function WeeklyDayPage() {
             : "Could not open this day."}
         </p>
         <BackNavLink
-          fallbackHref={
+          href={
             inWeek ? routes.workoutWeek : routes.workoutHistoryDay(dateKey)
           }
         />
@@ -183,7 +183,7 @@ export default function WeeklyDayPage() {
   if (planLoading) {
     return (
       <div className="flex flex-col items-center gap-4 py-12 px-2">
-        <BackNavLink fallbackHref={routes.workoutWeek} />
+        <BackNavLink href={routes.workoutWeek} />
         <p className="text-sm text-muted text-center">
           Loading this day&apos;s plan…
         </p>
@@ -197,7 +197,7 @@ export default function WeeklyDayPage() {
         <p className="text-sm text-foreground text-center px-2">
           {planError ?? "Could not load this day&apos;s plan."}
         </p>
-        <BackNavLink fallbackHref={routes.workoutWeek} />
+        <BackNavLink href={routes.workoutWeek} />
       </div>
     );
   }
@@ -246,9 +246,7 @@ export default function WeeklyDayPage() {
     <div className="flex flex-col py-6 gap-5">
       <div className="flex flex-col gap-3">
         <BackNavLink
-          fallbackHref={
-            inWeek ? routes.workoutWeek : routes.workoutHistory
-          }
+          href={inWeek ? routes.workoutWeek : routes.workoutHistory}
         />
         <motion.div
           initial={{ opacity: 0, y: -6 }}
@@ -378,7 +376,11 @@ export default function WeeklyDayPage() {
                   onClick={() => {
                     if (!plan) return;
                     const ok = continueInProgressWorkout(plan, dateKey);
-                    if (ok) router.push(routes.workoutHistoryLog(dateKey));
+                    if (ok) {
+                      router.replace(
+                        `${routes.workoutHistoryLog(dateKey)}?from=week`,
+                      );
+                    }
                   }}
                   className="w-full rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
                 >
@@ -390,7 +392,11 @@ export default function WeeklyDayPage() {
                   onClick={() => {
                     if (!plan) return;
                     const ok = startWorkoutForDate(plan, dateKey);
-                    if (ok) router.push(routes.workoutHistoryLog(dateKey));
+                    if (ok) {
+                      router.replace(
+                        `${routes.workoutHistoryLog(dateKey)}?from=week`,
+                      );
+                    }
                   }}
                   className="w-full rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 active:scale-[0.98]"
                 >

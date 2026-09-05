@@ -1,9 +1,7 @@
 "use client";
 
+import CardioActivityKindToggles from "@/components/workout/CardioActivityKindToggles";
 import {
-  CARDIO_ACTIVITY_LABELS,
-  CARDIO_ACTIVITY_ORDER,
-  cardioKindAllowed,
   kindsToActivities,
   normalizeDayPlanCardio,
 } from "@/lib/cardioActivities";
@@ -41,29 +39,13 @@ export default function DayPlanCardioEditor({ plan, onChange }: Props) {
         Cardio & endurance
       </p>
       <p className="text-sm text-muted leading-snug">
-        Add or remove activities for today's workout.
+        Add or remove activities for today&apos;s workout.
       </p>
-      <span className="flex flex-wrap gap-1">
-        {CARDIO_ACTIVITY_ORDER.map((kind) => {
-          const enabled = kinds.includes(kind);
-          const allowed = cardioKindAllowed(kind, availableEquipment);
-          return (
-            <button
-              key={kind}
-              type="button"
-              disabled={!allowed}
-              onClick={() => toggle(kind)}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-40 ${
-                enabled
-                  ? "bg-accent text-white"
-                  : "border border-border bg-background text-foreground hover:border-accent/40"
-              }`}
-            >
-              {CARDIO_ACTIVITY_LABELS[kind]}
-            </button>
-          );
-        })}
-      </span>
+      <CardioActivityKindToggles
+        value={kinds}
+        onToggle={toggle}
+        disabledTitle="Add equipment in Your equipment"
+      />
     </section>
   );
 }

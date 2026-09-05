@@ -9,8 +9,8 @@ export default function CompletionCheckmark() {
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ type: "spring", stiffness: 400, damping: 15 }}
-      width="14"
-      height="14"
+      width="18"
+      height="18"
       viewBox="0 0 14 14"
       fill="none"
       stroke="white"

@@ -2,6 +2,10 @@
 
 /** Prefer `flex flex-col gap-*` and symmetric `py-*` - avoid `space-y-*` (margin-based) and lone `pt-*` for section spacing. */
 
+/** Compact "+ Add" chip in workout section headers. */
+export const uiAddChipClass =
+  "shrink-0 rounded-md border border-border px-2 py-0.5 text-caption font-medium text-foreground hover:bg-surface-hover";
+
 const uiChoicePillBase =
   "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors min-h-9";
 

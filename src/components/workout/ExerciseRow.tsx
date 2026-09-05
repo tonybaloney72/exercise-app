@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import WorkoutCompletionCheckbox from "@/components/workout/WorkoutCompletionCheckbox";
+import { buildWorkoutSessionMenuItems } from "@/components/workout/buildWorkoutSessionMenuItems";
+import WorkoutDidField from "@/components/workout/WorkoutDidField";
 import { exerciseMap, TRAINING_CATEGORY_ORDER } from "@/core/catalog";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
@@ -38,16 +40,6 @@ import ExerciseWeightField from "./ExerciseWeightField";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
 import ExerciseDetailSheet from "./ExerciseDetailSheet";
 import SetTimerPill from "./SetTimerPill";
-import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
-import {
-  MenuIconDislike,
-  MenuIconRemove,
-  MenuIconReport,
-  MenuIconSkip,
-  MenuIconStar,
-  MenuIconSwap,
-  MenuIconUndoSkip,
-} from "./WorkoutRowMenuIcons";
 import ExerciseReportSheet from "@/components/feedback/ExerciseReportSheet";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 
@@ -227,63 +219,33 @@ export default function ExerciseRow({
         ? ` → did ${formatLoggedDuration(log.actualDuration)}`
         : "";
 
-  const overflowItems: WorkoutRowMenuItem[] = [];
-  if (authMode === "authenticated") {
-    const isFavorite = exercisePreference === "favorite";
-    const isDisliked = exercisePreference === "disliked";
-    overflowItems.push({
-      label: isFavorite ? "Remove favorite" : "Favorite",
-      icon: <MenuIconStar filled={isFavorite} />,
-      onClick: () =>
-        void setPreference(effectiveId, isFavorite ? null : "favorite", {
-          refreshGeneratedWeek: false,
-        }),
-    });
-    overflowItems.push({
-      label: isDisliked ? "Remove dislike" : "Dislike",
-      icon: <MenuIconDislike active={isDisliked} />,
-      onClick: () =>
-        void setPreference(effectiveId, isDisliked ? null : "disliked", {
-          refreshGeneratedWeek: false,
-        }),
-    });
-  }
-  overflowItems.push({
-    label: "Report an issue",
-    icon: <MenuIconReport />,
-    onClick: () => setReportOpen(true),
+  const overflowItems = buildWorkoutSessionMenuItems({
+    authMode,
+    preference: exercisePreference,
+    onToggleFavorite: () =>
+      void setPreference(
+        effectiveId,
+        exercisePreference === "favorite" ? null : "favorite",
+        { refreshGeneratedWeek: false },
+      ),
+    onToggleDislike: () =>
+      void setPreference(
+        effectiveId,
+        exercisePreference === "disliked" ? null : "disliked",
+        { refreshGeneratedWeek: false },
+      ),
+    onReport: () => setReportOpen(true),
+    swapLabel: "Swap exercise",
+    onSwap: () => {
+      setSwapModalKey((k) => k + 1);
+      setSwapOpen(true);
+    },
+    completed: log.completed,
+    skipped: log.skipped,
+    onSkip: () => skipExercise(roundNumber, plannedId),
+    onUnskip: () => unskipExercise(roundNumber, plannedId),
+    onRemove: onRemoveFromWorkout,
   });
-  if (!log.skipped) {
-    overflowItems.push({
-      label: "Swap exercise",
-      icon: <MenuIconSwap />,
-      onClick: () => {
-        setSwapModalKey((k) => k + 1);
-        setSwapOpen(true);
-      },
-    });
-  }
-  if (!log.completed && !log.skipped) {
-    overflowItems.push({
-      label: "Skip",
-      icon: <MenuIconSkip />,
-      onClick: () => skipExercise(roundNumber, plannedId),
-    });
-  }
-  if (log.skipped) {
-    overflowItems.push({
-      label: "Undo skip",
-      icon: <MenuIconUndoSkip />,
-      onClick: () => unskipExercise(roundNumber, plannedId),
-    });
-  }
-  if (onRemoveFromWorkout) {
-    overflowItems.push({
-      label: "Remove from workout",
-      icon: <MenuIconRemove />,
-      onClick: onRemoveFromWorkout,
-    });
-  }
 
   const showInlineCompleted =
     !log.skipped && (mode === "reps" || mode === "timer");
@@ -317,66 +279,36 @@ export default function ExerciseRow({
   const completedFieldId = `completed-${roundNumber}-${plannedId}`;
 
   const inlineCompletedInput = showInlineCompleted ? (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <label htmlFor={completedFieldId} className="text-xs text-muted">
-        Did
-      </label>
-      <input
-        id={completedFieldId}
-        type="text"
-        inputMode="numeric"
-        value={
-          mode === "reps"
-            ? log.actualReps != null
-              ? String(log.actualReps)
-              : ""
-            : log.actualDuration != null
-              ? String(log.actualDuration)
-              : ""
+    <WorkoutDidField
+      id={completedFieldId}
+      mode={mode}
+      value={mode === "reps" ? log.actualReps : log.actualDuration}
+      onChange={(next) => {
+        if (mode === "reps") {
+          setActualReps(roundNumber, plannedId, next);
+        } else {
+          setActualDuration(roundNumber, plannedId, next);
         }
-        onChange={(e) => {
-          const val = e.target.value.trim();
-          if (val === "") {
-            if (mode === "reps") {
-              setActualReps(roundNumber, plannedId, undefined);
-            } else {
-              setActualDuration(roundNumber, plannedId, undefined);
-            }
-            return;
-          }
-          if (!/^\d+$/.test(val)) return;
-          const num = parseInt(val, 10);
-          if (Number.isNaN(num)) return;
-          if (mode === "reps") {
-            setActualReps(roundNumber, plannedId, num);
-          } else {
-            setActualDuration(roundNumber, plannedId, num);
-          }
-        }}
-        className={`w-14 rounded-md border border-border bg-background px-2 py-0.5 text-right text-sm text-foreground outline-none focus:border-accent ${
-          mode === "timer" ? "font-mono" : ""
-        }`}
-        placeholder={
-          mode === "reps" ? actualRepsPlaceholder : String(effectiveTargetSec)
-        }
-        aria-label={
-          mode === "reps" ? "Completed reps" : "Completed duration in seconds"
-        }
-      />
-      {supportsLoad ? (
-        <>
-          <span className="text-xs text-muted">@</span>
-          <ExerciseWeightField
-            weightLb={log.weightLb}
-            defaultWeightLb={
-              resolveExerciseSettings(effectiveExercise, stored).defaultWeightLb
-            }
-            inventoryWeights={inventoryWeights}
-            onChange={(next) => setActualWeight(roundNumber, plannedId, next)}
-          />
-        </>
-      ) : null}
-    </div>
+      }}
+      placeholder={
+        mode === "reps" ? actualRepsPlaceholder : String(effectiveTargetSec)
+      }
+      trailing={
+        supportsLoad ? (
+          <>
+            <span className="text-xs text-muted">@</span>
+            <ExerciseWeightField
+              weightLb={log.weightLb}
+              defaultWeightLb={
+                resolveExerciseSettings(effectiveExercise, stored).defaultWeightLb
+              }
+              inventoryWeights={inventoryWeights}
+              onChange={(next) => setActualWeight(roundNumber, plannedId, next)}
+            />
+          </>
+        ) : null
+      }
+    />
   ) : null;
 
   const completionCheckbox = (

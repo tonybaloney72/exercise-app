@@ -18,6 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import WorkoutPlanExerciseRow from "@/components/workout/WorkoutPlanExerciseRow";
+import PlanTargetField from "@/components/workout/PlanTargetField";
 import { exerciseMap } from "@/core/catalog";
 import { sortableSlotId } from "@/lib/reorderRoundExercises";
 import type { RoundExercise } from "@/types";
@@ -37,13 +38,13 @@ function DragHandle({
     <button
       type="button"
       title={disabled ? "Add another exercise to reorder" : "Drag to reorder"}
-      className="flex h-7 w-7 shrink-0 touch-none items-center justify-center rounded-md border-2 border-border bg-transparent text-foreground/50 transition-colors hover:bg-surface-hover hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 cursor-grab active:cursor-grabbing"
+      className="flex h-10 w-10 shrink-0 touch-none items-center justify-center rounded-md border-2 border-border bg-transparent text-foreground/50 transition-colors hover:bg-surface-hover hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 cursor-grab active:cursor-grabbing"
       aria-label={label}
       disabled={disabled}
       {...attributes}
       {...listeners}
     >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
         <circle cx="9" cy="7" r="1.75" />
         <circle cx="15" cy="7" r="1.75" />
         <circle cx="9" cy="12" r="1.75" />
@@ -117,15 +118,7 @@ function SortableExerciseRow({
         menuItems={menuItems}
         onNameClick={onChange}
       >
-        <label className="block">
-          <span className="text-xs text-muted">Target</span>
-          <input
-            type="text"
-            value={slot.targetReps}
-            onChange={(e) => onUpdateReps(e.target.value)}
-            className="mt-0.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-          />
-        </label>
+        <PlanTargetField value={slot.targetReps} onChange={onUpdateReps} />
       </WorkoutPlanExerciseRow>
     </div>
   );

@@ -1,27 +1,20 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import WorkoutCompletionCheckbox from "@/components/workout/WorkoutCompletionCheckbox";
+import WorkoutSectionCard from "@/components/workout/WorkoutSectionCard";
+import { buildWorkoutSessionMenuItems } from "@/components/workout/buildWorkoutSessionMenuItems";
+import WorkoutDidField from "@/components/workout/WorkoutDidField";
 import { exerciseMap } from "@/core/catalog";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { getStretchSwapCandidates } from "@/lib/stretchSwap";
+import { uiAddChipClass } from "@/lib/uiClasses";
 import { vibrateOnExerciseComplete } from "@/utils/hapticFeedback";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import WorkoutRowMetaLine from "./WorkoutRowMetaLine";
 import SetTimerPill from "./SetTimerPill";
-import type { WorkoutRowMenuItem } from "./WorkoutRowOverflowMenu";
-import {
-  MenuIconDislike,
-  MenuIconRemove,
-  MenuIconReport,
-  MenuIconSkip,
-  MenuIconStar,
-  MenuIconSwap,
-  MenuIconUndoSkip,
-} from "./WorkoutRowMenuIcons";
 import ExerciseReportSheet from "@/components/feedback/ExerciseReportSheet";
 import SwapExerciseModal from "./SwapExerciseModal";
 import ExerciseDetailSheet from "./ExerciseDetailSheet";
@@ -94,122 +87,64 @@ export default function StretchSection({
   }, [allDone]);
 
   return (
-    <motion.div layout className="rounded-xl border border-border bg-surface overflow-hidden">
-      <div className="flex w-full items-center gap-2 px-4 py-3">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex min-w-0 flex-1 items-center justify-between gap-2 text-left"
-        >
-          <motion.div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-            {allDone && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="text-green-400 text-xs"
-              >
-                ✓
-              </motion.span>
-            )}
-          </motion.div>
-          <div className="flex shrink-0 items-center gap-2">
-            <span className="text-xs text-muted">
-              {completedCount}/{total}
-            </span>
-            <motion.div className="h-1.5 w-16 rounded-full bg-border overflow-hidden">
-              <motion.div
-                className="h-full rounded-full bg-accent"
-                initial={{ width: 0 }}
-                animate={{
-                  width: `${total > 0 ? (completedCount / total) * 100 : 0}%`,
-                }}
-                transition={{ duration: 0.3 }}
-              />
-            </motion.div>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className={`text-muted transition-transform ${isOpen ? "rotate-180" : ""}`}
-              aria-hidden
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-        </button>
-        {onAddStretch ? (
-          <button
-            type="button"
-            onClick={onAddStretch}
-            className="shrink-0 rounded-md border border-border px-2 py-0.5 text-caption font-medium text-foreground hover:bg-surface-hover"
-          >
+    <WorkoutSectionCard
+      title={title}
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      progress={{ completed: completedCount, total }}
+      showDoneCheck
+      headerAction={
+        onAddStretch ? (
+          <button type="button" onClick={onAddStretch} className={uiAddChipClass}>
             + Add
           </button>
-        ) : null}
+        ) : null
+      }
+    >
+      <div className="flex flex-col gap-0.5">
+        {stretches.map((stretch) => {
+          const log = exerciseLogs.find(
+            (e) => e.exerciseId === stretch.exerciseId,
+          );
+          const exercise = exerciseMap[stretch.exerciseId];
+          if (!exercise || !log) return null;
+
+          return (
+            <StretchRow
+              key={stretch.exerciseId}
+              exerciseId={stretch.exerciseId}
+              targetReps={stretch.targetReps}
+              log={log}
+              onToggle={() => {
+                if (!log.completed && !log.skipped) {
+                  vibrateOnExerciseComplete();
+                }
+                onToggle(stretch.exerciseId);
+              }}
+              onSkip={() => onSkip(stretch.exerciseId)}
+              onUnskip={() => onUnskip(stretch.exerciseId)}
+              onSwap={onSwap}
+              stretchCategory={stretchCategory}
+              usedStretchIds={usedStretchIds}
+              onSetTargetDuration={(sec) =>
+                onSetTargetDuration(stretch.exerciseId, sec)
+              }
+              onSetActualDuration={(sec) =>
+                onSetActualDuration(stretch.exerciseId, sec)
+              }
+              onSetActualReps={(reps) =>
+                onSetActualReps(stretch.exerciseId, reps)
+              }
+              onRemoveFromWorkout={
+                onRemoveStretch
+                  ? () => onRemoveStretch(stretch.exerciseId)
+                  : undefined
+              }
+            />
+          );
+        })}
       </div>
-
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            transition={{ duration: 0.25 }}
-            className="overflow-hidden"
-          >
-            <div className="flex flex-col border-t border-border px-2 py-1 gap-0.5">
-              {stretches.map((stretch) => {
-                const log = exerciseLogs.find(
-                  (e) => e.exerciseId === stretch.exerciseId,
-                );
-                const exercise = exerciseMap[stretch.exerciseId];
-                if (!exercise || !log) return null;
-
-                return (
-                  <StretchRow
-                    key={stretch.exerciseId}
-                    exerciseId={stretch.exerciseId}
-                    targetReps={stretch.targetReps}
-                    log={log}
-                    onToggle={() => {
-                      if (!log.completed && !log.skipped) {
-                        vibrateOnExerciseComplete();
-                      }
-                      onToggle(stretch.exerciseId);
-                    }}
-                    onSkip={() => onSkip(stretch.exerciseId)}
-                    onUnskip={() => onUnskip(stretch.exerciseId)}
-                    onSwap={onSwap}
-                    stretchCategory={stretchCategory}
-                    usedStretchIds={usedStretchIds}
-                    onSetTargetDuration={(sec) =>
-                      onSetTargetDuration(stretch.exerciseId, sec)
-                    }
-                    onSetActualDuration={(sec) =>
-                      onSetActualDuration(stretch.exerciseId, sec)
-                    }
-                    onSetActualReps={(reps) =>
-                      onSetActualReps(stretch.exerciseId, reps)
-                    }
-                    onRemoveFromWorkout={
-                      onRemoveStretch
-                        ? () => onRemoveStretch(stretch.exerciseId)
-                        : undefined
-                    }
-                  />
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+    </WorkoutSectionCard>
   );
 }
 
@@ -320,63 +255,35 @@ function StretchRow({
 
   if (!exercise) return null;
 
-  const overflowItems: WorkoutRowMenuItem[] = [];
-  if (authMode === "authenticated") {
-    const isFavorite = exercisePreference === "favorite";
-    const isDisliked = exercisePreference === "disliked";
-    overflowItems.push({
-      label: isFavorite ? "Remove favorite" : "Favorite",
-      icon: <MenuIconStar filled={isFavorite} />,
-      onClick: () =>
-        void setPreference(exerciseId, isFavorite ? null : "favorite", {
-          refreshGeneratedWeek: false,
-        }),
-    });
-    overflowItems.push({
-      label: isDisliked ? "Remove dislike" : "Dislike",
-      icon: <MenuIconDislike active={isDisliked} />,
-      onClick: () =>
-        void setPreference(exerciseId, isDisliked ? null : "disliked", {
-          refreshGeneratedWeek: false,
-        }),
-    });
-  }
-  overflowItems.push({
-    label: "Report an issue",
-    icon: <MenuIconReport />,
-    onClick: () => setReportOpen(true),
+  const overflowItems = buildWorkoutSessionMenuItems({
+    authMode,
+    preference: exercisePreference,
+    onToggleFavorite: () =>
+      void setPreference(
+        exerciseId,
+        exercisePreference === "favorite" ? null : "favorite",
+        { refreshGeneratedWeek: false },
+      ),
+    onToggleDislike: () =>
+      void setPreference(
+        exerciseId,
+        exercisePreference === "disliked" ? null : "disliked",
+        { refreshGeneratedWeek: false },
+      ),
+    onReport: () => setReportOpen(true),
+    swapLabel: onSwap ? "Swap stretch" : undefined,
+    onSwap: onSwap
+      ? () => {
+          setSwapModalKey((k) => k + 1);
+          setSwapOpen(true);
+        }
+      : undefined,
+    completed: log.completed,
+    skipped: log.skipped,
+    onSkip,
+    onUnskip,
+    onRemove: onRemoveFromWorkout,
   });
-  if (onSwap && !log.skipped) {
-    overflowItems.push({
-      label: "Swap stretch",
-      icon: <MenuIconSwap />,
-      onClick: () => {
-        setSwapModalKey((k) => k + 1);
-        setSwapOpen(true);
-      },
-    });
-  }
-  if (!log.completed && !log.skipped) {
-    overflowItems.push({
-      label: "Skip",
-      icon: <MenuIconSkip />,
-      onClick: onSkip,
-    });
-  }
-  if (log.skipped) {
-    overflowItems.push({
-      label: "Undo skip",
-      icon: <MenuIconUndoSkip />,
-      onClick: onUnskip,
-    });
-  }
-  if (onRemoveFromWorkout) {
-    overflowItems.push({
-      label: "Remove from workout",
-      icon: <MenuIconRemove />,
-      onClick: onRemoveFromWorkout,
-    });
-  }
 
   const showInlineCompleted =
     !log.skipped && (mode === "reps" || mode === "timer");
@@ -409,53 +316,21 @@ function StretchRow({
   const completedFieldId = `completed-stretch-${exerciseId}`;
 
   const inlineCompletedInput = showInlineCompleted ? (
-    <div className="flex items-center gap-1.5">
-      <label htmlFor={completedFieldId} className="text-xs text-muted">
-        Did
-      </label>
-      <input
-        id={completedFieldId}
-        type="text"
-        inputMode="numeric"
-        value={
-          mode === "reps"
-            ? log.actualReps != null
-              ? String(log.actualReps)
-              : ""
-            : log.actualDuration != null
-              ? String(log.actualDuration)
-              : ""
+    <WorkoutDidField
+      id={completedFieldId}
+      mode={mode}
+      value={mode === "reps" ? log.actualReps : log.actualDuration}
+      onChange={(next) => {
+        if (mode === "reps") {
+          onSetActualReps(next);
+        } else {
+          onSetActualDuration(next);
         }
-        onChange={(e) => {
-          const val = e.target.value.trim();
-          if (val === "") {
-            if (mode === "reps") {
-              onSetActualReps(undefined);
-            } else {
-              onSetActualDuration(undefined);
-            }
-            return;
-          }
-          if (!/^\d+$/.test(val)) return;
-          const num = parseInt(val, 10);
-          if (Number.isNaN(num)) return;
-          if (mode === "reps") {
-            onSetActualReps(num);
-          } else {
-            onSetActualDuration(num);
-          }
-        }}
-        className={`w-14 rounded-md border border-border bg-background px-2 py-0.5 text-right text-sm text-foreground outline-none focus:border-accent ${
-          mode === "timer" ? "font-mono" : ""
-        }`}
-        placeholder={
-          mode === "reps" ? repsPlaceholder : String(effectiveTargetSec)
-        }
-        aria-label={
-          mode === "reps" ? "Completed reps" : "Completed duration in seconds"
-        }
-      />
-    </div>
+      }}
+      placeholder={
+        mode === "reps" ? repsPlaceholder : String(effectiveTargetSec)
+      }
+    />
   ) : null;
 
   const completionCheckbox = (

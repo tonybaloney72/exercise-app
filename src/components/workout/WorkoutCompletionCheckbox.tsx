@@ -2,8 +2,11 @@
 
 import CompletionCheckmark from "@/components/common/CompletionCheckmark";
 
-/** Width class for row spacers that align with the checkbox column. */
-export const WORKOUT_COMPLETION_CHECKBOX_WIDTH_CLASS = "w-5 md:w-7";
+/**
+ * Column width for row spacers that align with the checkbox.
+ * Matches the ~40px tap target (`h-10` / `w-10`).
+ */
+export const WORKOUT_COMPLETION_CHECKBOX_WIDTH_CLASS = "w-10";
 
 type Props = {
   completed: boolean;
@@ -12,6 +15,10 @@ type Props = {
   className?: string;
 };
 
+/**
+ * Completion toggle: ~36px bordered visual inside a ~40px tap target
+ * (Phase 0 touch targets — avoid tiny 20px controls without growing the row too much).
+ */
 export default function WorkoutCompletionCheckbox({
   completed,
   onClick,
@@ -26,17 +33,22 @@ export default function WorkoutCompletionCheckbox({
       aria-label={
         ariaLabel ?? (completed ? "Mark incomplete" : "Mark complete")
       }
-      className={`flex h-5 w-5 md:h-7 md:w-7 shrink-0 items-center justify-center rounded-md border-2 transition-all active:scale-95 ${className}`}
-      style={{
-        borderColor: completed
-          ? "var(--accent)"
-          : "var(--checkbox-unchecked-border)",
-        backgroundColor: completed
-          ? "var(--accent)"
-          : "var(--checkbox-unchecked-bg)",
-      }}
+      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md transition-transform active:scale-95 ${className}`}
     >
-      {completed ? <CompletionCheckmark /> : null}
+      <span
+        className="flex h-9 w-9 items-center justify-center rounded-md border-2"
+        style={{
+          borderColor: completed
+            ? "var(--accent)"
+            : "var(--checkbox-unchecked-border)",
+          backgroundColor: completed
+            ? "var(--accent)"
+            : "var(--checkbox-unchecked-bg)",
+        }}
+        aria-hidden
+      >
+        {completed ? <CompletionCheckmark /> : null}
+      </span>
     </button>
   );
 }

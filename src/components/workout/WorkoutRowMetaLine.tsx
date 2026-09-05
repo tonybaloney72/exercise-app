@@ -134,7 +134,7 @@ export default function WorkoutRowMetaLine({
       onClick={toggleExpand}
       aria-expanded={expanded}
       aria-label={expanded ? "Collapse details" : "Expand details"}
-      className="shrink-0 rounded-md p-0.5 text-muted hover:bg-surface-hover hover:text-foreground"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-muted hover:bg-surface-hover hover:text-foreground"
     >
       <ExpandChevron open={expanded} />
     </button>
@@ -185,7 +185,7 @@ export default function WorkoutRowMetaLine({
             </div>
           ) : null}
           {showTimerPillRow ? (
-            <div className="mt-0.5 flex flex-wrap items-center gap-1.5 pl-5 md:pl-7">
+            <div className="mt-0.5 flex flex-wrap items-center gap-1.5 pl-10">
               <SetTimerPill
                 seconds={timerSeconds}
                 title={timerTitle}

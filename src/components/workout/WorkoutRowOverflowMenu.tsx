@@ -120,7 +120,7 @@ export default function WorkoutRowOverflowMenu({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-5 w-5 md:h-9 md:w-9 items-center justify-center rounded-md text-muted transition-colors hover:bg-border/60 hover:text-foreground"
+        className="flex h-10 w-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-border/60 hover:text-foreground"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={listId}
@@ -128,8 +128,8 @@ export default function WorkoutRowOverflowMenu({
         aria-label="More actions"
       >
         <svg
-          width="18"
-          height="18"
+          width="20"
+          height="20"
           viewBox="0 0 24 24"
           fill="currentColor"
           aria-hidden

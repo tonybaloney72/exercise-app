@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  CARDIO_ACTIVITY_LABELS,
-  CARDIO_ACTIVITY_ORDER,
-  cardioKindAllowed,
-} from "@/lib/cardioActivities";
-import { useSettingsStore } from "@/stores/useSettingsStore";
-import { uiChoicePillSolidClass } from "@/lib/uiClasses";
+import CardioActivityKindToggles from "@/components/workout/CardioActivityKindToggles";
 import type { CardioActivityKind, WeeklyCardioByDay } from "@/types";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
@@ -23,8 +17,6 @@ export default function WeeklyCardioEditor({
   onChange,
   editableDays,
 }: Props) {
-  const availableEquipment = useSettingsStore((s) => s.availableEquipment);
-
   const visibleDays =
     editableDays != null
       ? DAY_NAMES.map((shortName, dayOfWeek) => ({
@@ -77,26 +69,12 @@ export default function WeeklyCardioEditor({
             <span className="text-sm font-medium text-foreground">
               {shortName}
             </span>
-            <span className="flex flex-wrap gap-1.5">
-              {CARDIO_ACTIVITY_ORDER.map((kind) => {
-                const enabled = (value[dayOfWeek] ?? []).includes(kind);
-                const allowed = cardioKindAllowed(kind, availableEquipment);
-                return (
-                  <button
-                    key={kind}
-                    type="button"
-                    disabled={!allowed}
-                    title={
-                      !allowed ? "Add equipment in Your equipment" : undefined
-                    }
-                    onClick={() => toggleKind(dayOfWeek, kind)}
-                    className={uiChoicePillSolidClass(enabled)}
-                  >
-                    {CARDIO_ACTIVITY_LABELS[kind]}
-                  </button>
-                );
-              })}
-            </span>
+            <CardioActivityKindToggles
+              value={value[dayOfWeek] ?? []}
+              onToggle={(kind) => toggleKind(dayOfWeek, kind)}
+              aria-label={`${shortName} cardio activities`}
+              disabledTitle="Add equipment in Your equipment"
+            />
           </li>
         ))}
       </ul>

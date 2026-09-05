@@ -19,11 +19,14 @@ export type WorkoutSectionCardProps = {
   /** Right-side label when not using progress (e.g. "3 exercises"). */
   statusLabel?: string;
   menuItems?: WorkoutRowMenuItem[];
+  /** Header control after the title (e.g. "+ Add"). */
+  headerAction?: ReactNode;
   /** Shown below header when collapsed (e.g. rest timer prompt). */
   collapsedAccessory?: ReactNode;
   /** Toolbar at top of expanded body. */
   bodyToolbar?: ReactNode;
   footer?: ReactNode;
+  className?: string;
   children: ReactNode;
 };
 
@@ -36,9 +39,11 @@ export default function WorkoutSectionCard({
   showDoneCheck = false,
   statusLabel,
   menuItems = [],
+  headerAction,
   collapsedAccessory,
   bodyToolbar,
   footer,
+  className = "",
   children,
 }: WorkoutSectionCardProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
@@ -52,12 +57,14 @@ export default function WorkoutSectionCard({
 
   const total = progress?.total ?? 0;
   const completed = progress?.completed ?? 0;
-  const showProgress = total > 0 && progress != null;
+  const showProgress = progress != null && total > 0;
   const allDone = showProgress && completed === total;
   const progressPct = showProgress ? (completed / total) * 100 : 0;
 
   return (
-    <div className="rounded-xl border border-border bg-surface">
+    <div
+      className={`rounded-xl border border-border bg-surface ${className}`.trim()}
+    >
       <div className="flex w-full items-center gap-2 px-4 py-3">
         <button
           type="button"
@@ -92,6 +99,7 @@ export default function WorkoutSectionCard({
             <ExpandChevron open={isOpen} />
           </div>
         </button>
+        {headerAction}
         <WorkoutRowOverflowMenu items={menuItems} />
       </div>
 
