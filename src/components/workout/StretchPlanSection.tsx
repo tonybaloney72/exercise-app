@@ -3,10 +3,12 @@
 import EmptyState from "@/components/common/EmptyState";
 import SurfaceCard from "@/components/common/SurfaceCard";
 import WorkoutPlanExerciseRow from "@/components/workout/WorkoutPlanExerciseRow";
-import PlanTargetField from "@/components/workout/PlanTargetField";
 import WorkoutSectionCard from "@/components/workout/WorkoutSectionCard";
 import { exerciseMap } from "@/core/catalog";
 import { uiAddChipClass } from "@/lib/uiClasses";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
+import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 import type { StretchEntry } from "@/types";
 
 interface StretchPlanSectionProps {
@@ -20,7 +22,6 @@ interface StretchPlanSectionProps {
   onAdd: () => void;
   onChange: (index: number) => void;
   onRemove: (index: number) => void;
-  onUpdateTarget: (index: number, targetReps: string) => void;
 }
 
 function stretchCountLabel(count: number): string {
@@ -33,11 +34,13 @@ function StretchListBody({
   minCount = 0,
   onChange,
   onRemove,
-  onUpdateTarget,
 }: Pick<
   StretchPlanSectionProps,
-  "entries" | "minCount" | "onChange" | "onRemove" | "onUpdateTarget"
+  "entries" | "minCount" | "onChange" | "onRemove"
 >) {
+  const exerciseSettings = useExerciseSettingsStore((s) => s.byExerciseId);
+  const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
+
   if (entries.length === 0) {
     return (
       <EmptyState title="No stretches yet." className="px-2 py-3 text-xs" />
@@ -50,10 +53,16 @@ function StretchListBody({
         const meta = exerciseMap[entry.exerciseId];
         if (!meta) return null;
         const canRemove = entries.length > minCount;
+        const detailText = formatPlanTargetPrescription(
+          meta,
+          exerciseSettings[entry.exerciseId],
+          { expertiseByGroup },
+        );
         return (
           <WorkoutPlanExerciseRow
             key={`${entry.exerciseId}-${index}`}
             name={meta.name}
+            detailText={detailText}
             menuItems={[
               { label: "Change stretch", onClick: () => onChange(index) },
               ...(canRemove
@@ -61,12 +70,7 @@ function StretchListBody({
                 : []),
             ]}
             onNameClick={() => onChange(index)}
-          >
-            <PlanTargetField
-              value={entry.targetReps}
-              onChange={(next) => onUpdateTarget(index, next)}
-            />
-          </WorkoutPlanExerciseRow>
+          />
         );
       })}
     </>
@@ -83,7 +87,6 @@ export default function StretchPlanSection({
   onAdd,
   onChange,
   onRemove,
-  onUpdateTarget,
 }: StretchPlanSectionProps) {
   const body = (
     <StretchListBody
@@ -91,7 +94,6 @@ export default function StretchPlanSection({
       minCount={minCount}
       onChange={onChange}
       onRemove={onRemove}
-      onUpdateTarget={onUpdateTarget}
     />
   );
 

@@ -16,7 +16,11 @@ import { TRAINING_CATEGORY_ORDER } from "@/core/catalog";
 import { exerciseMap } from "@/core/catalog";
 import { rebuildDerivedStretches } from "@/lib/dayStretchPlan";
 import { buildStretchResolveContextFromStores } from "@/adapters/stretchResolveContextFromStores";
-import { buildStretchUsedExerciseIds } from "@/lib/stretchDefaults";
+import {
+  buildStretchUsedExerciseIds,
+  applyLibraryTargetsToDayPlan,
+  stretchEntryFromExerciseId,
+} from "@/lib/stretchDefaults";
 import { collectDislikedIds } from "@/lib/exerciseCandidates";
 import { resolveExpertiseFilter } from "@/lib/expertiseLevels";
 import {
@@ -36,13 +40,10 @@ import RoundStructureActions from "@/components/workout/RoundStructureActions";
 import { MAX_WORKOUT_ROUNDS } from "@/lib/workoutLogStructure";
 import { prepareDayPlanForEditor } from "@/lib/trainingWeekCustomize";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import type {
-  DayPlan,
-  Round,
-  RoundExercise,
-  StretchEntry,
-} from "@/types";
+import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
+import type { DayPlan, Round, RoundExercise } from "@/types";
 
 type StretchSectionKey = "warmUp" | "coolDown";
 
@@ -97,8 +98,13 @@ export default function WorkoutPlanEditor({
   resetConfirmLabel = "Yes, reset this day",
 }: WorkoutPlanEditorProps) {
   void _isCustomWeek;
+  const exerciseSettings = useExerciseSettingsStore((s) => s.byExerciseId);
   const [draft, setDraft] = useState(() =>
-    prepareDayPlanForEditor(initialPlan, buildStretchResolveContextFromStores()),
+    prepareDayPlanForEditor(
+      initialPlan,
+      buildStretchResolveContextFromStores(),
+      useExerciseSettingsStore.getState().byExerciseId,
+    ),
   );
   const [pickTarget, setPickTarget] = useState<PickTarget | null>(null);
   const [resetConfirm, setResetConfirm] = useState(false);
@@ -200,10 +206,8 @@ export default function WorkoutPlanEditor({
       if (!meta) return;
 
       if (pickTarget.kind === "stretch") {
-        const entry: StretchEntry = {
-          exerciseId: meta.id,
-          targetReps: meta.defaultReps,
-        };
+        const entry = stretchEntryFromExerciseId(meta.id, exerciseSettings);
+        if (!entry) return;
         setDraft((prev) => {
           const list = [...(prev[pickTarget.section] ?? [])];
           if (pickTarget.index != null) {
@@ -228,7 +232,11 @@ export default function WorkoutPlanEditor({
         if (pickTarget.kind === "add") {
           const slotEntry: RoundExercise = {
             exerciseId: meta.id,
-            targetReps: meta.defaultReps,
+            targetReps: formatPlanTargetPrescription(
+              meta,
+              exerciseSettings[meta.id],
+              { expertiseByGroup },
+            ),
             category: meta.category,
           };
           round.exercises = [...round.exercises, slotEntry];
@@ -237,35 +245,19 @@ export default function WorkoutPlanEditor({
           if (!slot) return prev;
           slot.exerciseId = meta.id;
           slot.category = meta.category;
-          slot.targetReps = meta.defaultReps;
+          slot.targetReps = formatPlanTargetPrescription(
+            meta,
+            exerciseSettings[meta.id],
+            { expertiseByGroup },
+          );
         }
 
         return { ...prev, rounds };
       });
       setPickTarget(null);
     },
-    [pickTarget],
+    [pickTarget, exerciseSettings, expertiseByGroup],
   );
-
-  const updateReps = (
-    roundIndex: number,
-    slotIndex: number,
-    targetReps: string,
-  ) => {
-    setDraft((prev) => {
-      const rounds = prev.rounds.map((r, ri) =>
-        ri === roundIndex
-          ? {
-              ...r,
-              exercises: r.exercises.map((ex, si) =>
-                si === slotIndex ? { ...ex, targetReps } : ex,
-              ),
-            }
-          : r,
-      );
-      return { ...prev, rounds };
-    });
-  };
 
   const appendRound = () => {
     setDraft((prev) => insertEmptyRoundInDayPlan(prev, prev.rounds.length));
@@ -317,20 +309,6 @@ export default function WorkoutPlanEditor({
         };
       });
       return { ...prev, rounds };
-    });
-  };
-
-  const updateStretchTarget = (
-    section: StretchSectionKey,
-    index: number,
-    targetReps: string,
-  ) => {
-    setDraft((prev) => {
-      const list = [...(prev[section] ?? [])];
-      const entry = list[index];
-      if (!entry) return prev;
-      list[index] = { ...entry, targetReps };
-      return { ...prev, [section]: list };
     });
   };
 
@@ -462,9 +440,6 @@ export default function WorkoutPlanEditor({
                 openPickModal({ kind: "swap", roundIndex, slotIndex })
               }
               onRemoveSlot={(slotIndex) => removeSlot(roundIndex, slotIndex)}
-              onUpdateReps={(slotIndex, targetReps) =>
-                updateReps(roundIndex, slotIndex, targetReps)
-              }
             />
           ) : null}
         </WorkoutSectionCard>
@@ -486,9 +461,6 @@ export default function WorkoutPlanEditor({
           openPickModal({ kind: "stretch", section: "warmUp", index })
         }
         onRemove={(index) => removeStretch("warmUp", index)}
-        onUpdateTarget={(index, target) =>
-          updateStretchTarget("warmUp", index, target)
-        }
       />
 
       <StretchPlanSection
@@ -501,9 +473,6 @@ export default function WorkoutPlanEditor({
           openPickModal({ kind: "stretch", section: "coolDown", index })
         }
         onRemove={(index) => removeStretch("coolDown", index)}
-        onUpdateTarget={(index, target) =>
-          updateStretchTarget("coolDown", index, target)
-        }
       />
 
       {showTemplateToolbar ? (
@@ -515,6 +484,7 @@ export default function WorkoutPlanEditor({
               prepareDayPlanForEditor(
                 next,
                 buildStretchResolveContextFromStores(),
+                exerciseSettings,
               ),
             )
           }
@@ -535,7 +505,15 @@ export default function WorkoutPlanEditor({
         <button
           type="button"
           disabled={saving}
-          onClick={() => onSave(draft)}
+          onClick={() =>
+            onSave(
+              applyLibraryTargetsToDayPlan(
+                draft,
+                exerciseSettings,
+                expertiseByGroup,
+              ),
+            )
+          }
           className="flex-1 rounded-xl bg-accent py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 disabled:opacity-50"
         >
           {saving ? "Saving…" : saveLabel}

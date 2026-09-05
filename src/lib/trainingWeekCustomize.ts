@@ -14,29 +14,14 @@ import {
   buildProgramProfileInput,
   buildProgramProfileInputFromSettings,
 } from "@/lib/programProfile";
-import {
-  resolveStretchesForDay,
-} from "@/lib/dayStretchPlan";
+import { resolveStretchesForDay } from "@/lib/dayStretchPlan";
 import { buildVarietySeed } from "@/lib/planVariety";
 import {
   buildStretchResolveContextFromInputs,
   type StretchResolveContext,
 } from "@/lib/stretchResolveContext";
-
-async function resolveTrainingWeekForAuthInCustomize(dateKey: string) {
-  const { resolveTrainingWeekForAuth } = await import("@/lib/planResolver");
-  return resolveTrainingWeekForAuth(dateKey, "authenticated");
-}
-
-async function refreshTrainingWeekContainingInCustomize(
-  dateKeyInWeek: string,
-  scope: "prefs" | "full",
-  options?: { replaceCustomizedDays?: boolean },
-): Promise<void> {
-  const { refreshTrainingWeekContaining } = await import("@/lib/planResolver");
-  await refreshTrainingWeekContaining(dateKeyInWeek, scope, options);
-}
 import {
+  applyLibraryTargetsToStretchEntries,
   cloneStretchEntries,
   hasStretchListOverride,
   normalizeStretchList,
@@ -70,6 +55,19 @@ import {
 import type { WeekBlueprintPresetId } from "@/lib/weekBlueprintPresets";
 import type { WeekBlueprint } from "@/lib/weekBlueprint";
 
+async function resolveTrainingWeekForAuthInCustomize(dateKey: string) {
+  const { resolveTrainingWeekForAuth } = await import("@/lib/planResolver");
+  return resolveTrainingWeekForAuth(dateKey, "authenticated");
+}
+
+async function refreshTrainingWeekContainingInCustomize(
+  dateKeyInWeek: string,
+  scope: "prefs" | "full",
+  options?: { replaceCustomizedDays?: boolean },
+): Promise<void> {
+  const { refreshTrainingWeekContaining } = await import("@/lib/planResolver");
+  await refreshTrainingWeekContaining(dateKeyInWeek, scope, options);
+}
 async function stretchContextFromRepos(): Promise<StretchResolveContext> {
   const [prefs, settings] = await Promise.all([
     getExercisePreferenceRepo("authenticated").loadAll(),
@@ -95,11 +93,14 @@ export async function seedManualWeekFromBlueprint(
   const { weekKey } = anchor;
   const rawWeek = await buildWeekPlansFromBlueprint(blueprint, weekKey);
   const stretchCtx = await stretchContextFromRepos();
+  const exerciseSettings = await getExerciseSettingsRepo(
+    "authenticated",
+  ).loadAll();
   const week: TrainingWeekDays = {};
   for (let dow = 0; dow < 7; dow++) {
     const day = rawWeek[dow];
     if (!day) continue;
-    week[dow] = prepareDayPlanForEditor(day, stretchCtx);
+    week[dow] = prepareDayPlanForEditor(day, stretchCtx, exerciseSettings);
   }
 
   const [prefs, settings] = await Promise.all([
@@ -136,17 +137,24 @@ export function cloneDayPlan(plan: DayPlan): DayPlan {
 export function prepareDayPlanForEditor(
   plan: DayPlan,
   ctx: StretchResolveContext,
+  exerciseSettings?: ExerciseSettingsMap | null,
 ): DayPlan {
   const cloned = cloneDayPlan(stripPhantomRestDayRounds(plan));
   const resolved = resolveStretchesForDay(plan, ctx);
 
-  const warmUp = hasStretchListOverride(plan.warmUp)
-    ? normalizeStretchList(plan.warmUp, ctx.dislikedExerciseIds)
-    : resolved.warmUp;
+  const warmUp = applyLibraryTargetsToStretchEntries(
+    hasStretchListOverride(plan.warmUp)
+      ? normalizeStretchList(plan.warmUp, ctx.dislikedExerciseIds)
+      : resolved.warmUp,
+    exerciseSettings,
+  );
 
-  const coolDown = hasStretchListOverride(plan.coolDown)
-    ? normalizeStretchList(plan.coolDown, ctx.dislikedExerciseIds)
-    : resolved.coolDown;
+  const coolDown = applyLibraryTargetsToStretchEntries(
+    hasStretchListOverride(plan.coolDown)
+      ? normalizeStretchList(plan.coolDown, ctx.dislikedExerciseIds)
+      : resolved.coolDown,
+    exerciseSettings,
+  );
 
   return { ...cloned, warmUp, coolDown };
 }
@@ -298,6 +306,7 @@ export async function resetDayToGenerated(dateKey: string): Promise<DayPlan> {
           weekKey,
         ),
         stretchCtx,
+        exerciseSettings,
       )
     : buildGeneratedDayPlan(
         dow,

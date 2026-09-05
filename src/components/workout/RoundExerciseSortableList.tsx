@@ -18,9 +18,11 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import WorkoutPlanExerciseRow from "@/components/workout/WorkoutPlanExerciseRow";
-import PlanTargetField from "@/components/workout/PlanTargetField";
 import { exerciseMap } from "@/core/catalog";
 import { sortableSlotId } from "@/lib/reorderRoundExercises";
+import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
+import { formatPlanTargetPrescription } from "@/utils/effectiveExerciseSettings";
 import type { RoundExercise } from "@/types";
 
 function DragHandle({
@@ -64,7 +66,6 @@ function SortableExerciseRow({
   saving,
   onChange,
   onRemove,
-  onUpdateReps,
 }: {
   id: string;
   slot: RoundExercise;
@@ -73,8 +74,9 @@ function SortableExerciseRow({
   saving: boolean;
   onChange: () => void;
   onRemove: () => void;
-  onUpdateReps: (value: string) => void;
 }) {
+  const exerciseSettings = useExerciseSettingsStore((s) => s.byExerciseId);
+  const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
   const meta = exerciseMap[slot.exerciseId];
   const {
     attributes,
@@ -92,6 +94,12 @@ function SortableExerciseRow({
 
   if (!meta) return null;
 
+  const detailText = formatPlanTargetPrescription(
+    meta,
+    exerciseSettings[slot.exerciseId],
+    { expertiseByGroup },
+  );
+
   const menuItems = [
     { label: "Change exercise", onClick: onChange },
     ...(canRemove
@@ -107,6 +115,7 @@ function SortableExerciseRow({
     >
       <WorkoutPlanExerciseRow
         name={meta.name}
+        detailText={detailText}
         leading={
           <DragHandle
             label={`Reorder ${meta.name}`}
@@ -117,9 +126,7 @@ function SortableExerciseRow({
         }
         menuItems={menuItems}
         onNameClick={onChange}
-      >
-        <PlanTargetField value={slot.targetReps} onChange={onUpdateReps} />
-      </WorkoutPlanExerciseRow>
+      />
     </div>
   );
 }
@@ -131,7 +138,6 @@ export interface RoundExerciseSortableListProps {
   onReorder: (fromIndex: number, toIndex: number) => void;
   onChangeSlot: (slotIndex: number) => void;
   onRemoveSlot: (slotIndex: number) => void;
-  onUpdateReps: (slotIndex: number, targetReps: string) => void;
 }
 
 export default function RoundExerciseSortableList({
@@ -141,7 +147,6 @@ export default function RoundExerciseSortableList({
   onReorder,
   onChangeSlot,
   onRemoveSlot,
-  onUpdateReps,
 }: RoundExerciseSortableListProps) {
   const canReorder = exercises.length > 1;
   const sortableIds = useMemo(
@@ -187,7 +192,6 @@ export default function RoundExerciseSortableList({
             saving={saving}
             onChange={() => onChangeSlot(slotIndex)}
             onRemove={() => onRemoveSlot(slotIndex)}
-            onUpdateReps={(value) => onUpdateReps(slotIndex, value)}
           />
         ))}
       </SortableContext>

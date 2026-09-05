@@ -1,6 +1,11 @@
 import { exerciseMap } from "@/core/catalog";
 import { migrateExerciseId } from "@/lib/cpToPcMigration";
-import type { StretchEntry } from "@/types";
+import {
+  formatPlanTargetPrescription,
+  type PlanPrescriptionOptions,
+} from "@/utils/effectiveExerciseSettings";
+import type { ExerciseSettingsMap } from "@/lib/repos/types";
+import type { DayPlan, StretchEntry } from "@/types";
 
 /** Validate and dedupe stretch rows from settings JSON or DB. */
 export function sanitizeStretchEntries(raw: unknown): StretchEntry[] {
@@ -24,6 +29,76 @@ export function sanitizeStretchEntries(raw: unknown): StretchEntry[] {
 
 export function cloneStretchEntries(entries: StretchEntry[]): StretchEntry[] {
   return entries.map((e) => ({ ...e }));
+}
+
+/**
+ * Rewrite stretch `targetReps` from Library defaults (same rules as plan slots).
+ * Catalog text like "20 sec each leg" yields "45 sec" when Library timer is 45.
+ */
+export function applyLibraryTargetsToStretchEntries(
+  entries: readonly StretchEntry[],
+  exerciseSettings?: ExerciseSettingsMap | null,
+): StretchEntry[] {
+  return entries.map((entry) => {
+    const meta = exerciseMap[entry.exerciseId];
+    if (!meta) return { ...entry };
+    return {
+      exerciseId: entry.exerciseId,
+      targetReps: formatPlanTargetPrescription(
+        meta,
+        exerciseSettings?.[entry.exerciseId],
+      ),
+    };
+  });
+}
+
+/** Apply Library prescriptions to stretches and round slots on a day plan. */
+export function applyLibraryTargetsToDayPlan(
+  plan: DayPlan,
+  exerciseSettings?: ExerciseSettingsMap | null,
+  expertiseByGroup?: PlanPrescriptionOptions["expertiseByGroup"],
+): DayPlan {
+  const options = expertiseByGroup ? { expertiseByGroup } : undefined;
+  return {
+    ...plan,
+    warmUp: plan.warmUp
+      ? applyLibraryTargetsToStretchEntries(plan.warmUp, exerciseSettings)
+      : undefined,
+    coolDown: plan.coolDown
+      ? applyLibraryTargetsToStretchEntries(plan.coolDown, exerciseSettings)
+      : undefined,
+    rounds: plan.rounds.map((round) => ({
+      ...round,
+      exercises: round.exercises.map((ex) => {
+        const meta = exerciseMap[ex.exerciseId];
+        if (!meta) return { ...ex };
+        return {
+          ...ex,
+          targetReps: formatPlanTargetPrescription(
+            meta,
+            exerciseSettings?.[ex.exerciseId],
+            options,
+          ),
+        };
+      }),
+    })),
+  };
+}
+
+/** Single stretch row with Library-aware target (e.g. Add/Change stretch). */
+export function stretchEntryFromExerciseId(
+  exerciseId: string,
+  exerciseSettings?: ExerciseSettingsMap | null,
+): StretchEntry | null {
+  const meta = exerciseMap[exerciseId];
+  if (!meta) return null;
+  return {
+    exerciseId: meta.id,
+    targetReps: formatPlanTargetPrescription(
+      meta,
+      exerciseSettings?.[meta.id],
+    ),
+  };
 }
 
 /** Dedupe by `exerciseId` (first occurrence wins). */

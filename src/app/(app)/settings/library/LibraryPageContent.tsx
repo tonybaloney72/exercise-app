@@ -46,6 +46,7 @@ import {
   resolveExerciseSettings,
   TIMER_DURATION_PRESET_SECONDS,
 } from "@/utils/effectiveExerciseSettings";
+import { scaledDefaultTimerSeconds } from "@/lib/prescriptionScaling";
 
 const chipRowClass = "flex gap-2 overflow-x-auto pb-1 scrollbar-hide";
 
@@ -433,17 +434,21 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
   const [customChipActive, setCustomChipActive] = useState(false);
   const stored = useExerciseSettingsStore((s) => s.byExerciseId[exercise.id]);
   const upsert = useExerciseSettingsStore((s) => s.upsert);
+  const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
 
   const resolved = useMemo(
-    () => resolveExerciseSettings(exercise, stored),
-    [exercise, stored],
+    () =>
+      resolveExerciseSettings(exercise, stored, { expertiseByGroup }),
+    [exercise, stored, expertiseByGroup],
   );
 
-  const effectiveSec: number =
-    stored?.defaultTimerSeconds ??
-    (resolved.defaultSetMode === "timer"
-      ? (resolved.defaultTimerSeconds ?? DEFAULT_TIMER_SECONDS_FALLBACK)
-      : DEFAULT_TIMER_SECONDS_FALLBACK);
+  const hasSavedTimer =
+    stored?.defaultTimerSeconds != null && stored.defaultTimerSeconds > 0;
+
+  /** Catalog until the user saves a timer preference. */
+  const effectiveSec: number = hasSavedTimer
+    ? stored!.defaultTimerSeconds!
+    : scaledDefaultTimerSeconds(exercise, expertiseByGroup);
 
   const showCustomInput =
     resolved.defaultSetMode === "timer" &&
@@ -467,12 +472,9 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     await upsert(exercise.id, {
       defaultSetMode: "timer",
       defaultTargetReps: null,
-      defaultTimerSeconds:
-        stored?.defaultSetMode === "timer" &&
-        stored.defaultTimerSeconds != null &&
-        stored.defaultTimerSeconds > 0
-          ? stored.defaultTimerSeconds
-          : DEFAULT_TIMER_SECONDS_FALLBACK,
+      defaultTimerSeconds: hasSavedTimer
+        ? stored!.defaultTimerSeconds!
+        : scaledDefaultTimerSeconds(exercise, expertiseByGroup),
       defaultWeightLb: stored?.defaultWeightLb ?? null,
     });
   }

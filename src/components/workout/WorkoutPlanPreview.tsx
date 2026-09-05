@@ -127,7 +127,10 @@ export default function WorkoutPlanPreview({
               <WorkoutPlanExerciseRow
                 key={stretch.exerciseId}
                 name={ex.name}
-                detailText={stretch.targetReps}
+                detailText={roundTargetLabel(
+                  stretch.exerciseId,
+                  stretch.targetReps,
+                )}
                 readOnly
               />
             );
@@ -196,7 +199,10 @@ export default function WorkoutPlanPreview({
               <WorkoutPlanExerciseRow
                 key={stretch.exerciseId}
                 name={ex.name}
-                detailText={stretch.targetReps}
+                detailText={roundTargetLabel(
+                  stretch.exerciseId,
+                  stretch.targetReps,
+                )}
                 readOnly
               />
             );

@@ -17,7 +17,7 @@ type ExerciseSettingsState = {
   upsert: (exerciseId: string, values: ExerciseSettingsValues) => Promise<void>;
   getStored: (exerciseId: string) => ExerciseSettingsValues | undefined;
   resolveForExercise: (
-    exercise: Pick<Exercise, "id" | "isTimeBased" | "defaultReps">,
+    exercise: Pick<Exercise, "id" | "isTimeBased" | "defaultReps" | "category">,
   ) => ResolvedExerciseSettings;
 };
 

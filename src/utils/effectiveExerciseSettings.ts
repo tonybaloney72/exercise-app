@@ -48,11 +48,14 @@ type StoredExerciseSlice = Pick<
 
 /**
  * Merge catalog metadata with optional persisted per-user row.
- * No persisted row → mode follows `exercise.isTimeBased`; timer seconds default to 45.
+ * No saved timer preference → catalog prescription (e.g. Cobra "20 sec"), not a
+ * hard-coded 45s fallback that looks like a Library choice.
  */
 export function resolveExerciseSettings(
-  exercise: Pick<Exercise, "isTimeBased" | "defaultReps">,
+  exercise: Pick<Exercise, "isTimeBased" | "defaultReps"> &
+    Partial<Pick<Exercise, "category">>,
   stored: StoredExerciseSlice | undefined,
+  options?: PlanPrescriptionOptions,
 ): ResolvedExerciseSettings {
   const defaultSetMode: ExerciseSetMode =
     stored?.defaultSetMode ?? (exercise.isTimeBased ? "timer" : "reps");
@@ -74,7 +77,17 @@ export function resolveExerciseSettings(
   const sec =
     stored?.defaultTimerSeconds != null && stored.defaultTimerSeconds > 0
       ? stored.defaultTimerSeconds
-      : DEFAULT_TIMER_SECONDS_FALLBACK;
+      : exercise.category != null
+        ? scaledDefaultTimerSeconds(
+            {
+              isTimeBased: exercise.isTimeBased,
+              defaultReps: exercise.defaultReps,
+              category: exercise.category,
+            },
+            options?.expertiseByGroup,
+          )
+        : (parseTimerSecondsHint(exercise.defaultReps) ??
+          DEFAULT_TIMER_SECONDS_FALLBACK);
 
   return {
     defaultSetMode: "timer",
