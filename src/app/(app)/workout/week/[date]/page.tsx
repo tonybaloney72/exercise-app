@@ -356,7 +356,6 @@ export default function WeeklyDayPage() {
 
       {when !== "future" && logForDay && !editingCompletedHere && (
         <WorkoutDayReview
-          plan={plan}
           log={logForDay}
           completedBannerTitle={formatCompletedBannerTitle(dateKey)}
           onEditWorkout={handleEditCompletedWorkout}

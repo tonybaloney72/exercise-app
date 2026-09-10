@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import ExerciseRow from "./ExerciseRow";
 import WorkoutSectionCard from "./WorkoutSectionCard";
@@ -19,6 +19,8 @@ interface RoundCardProps {
   onRemoveRound?: () => void;
   onAddExercise?: () => void;
   onRemoveExercise?: (slotIndex: number) => void;
+  /** Round structure actions (copy / customize / add) — same slot as plan editor. */
+  footer?: ReactNode;
 }
 
 export default function RoundCard({
@@ -29,6 +31,7 @@ export default function RoundCard({
   onRemoveRound,
   onAddExercise,
   onRemoveExercise,
+  footer,
 }: RoundCardProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [showRestPrompt, setShowRestPrompt] = useState(false);
@@ -102,6 +105,7 @@ export default function RoundCard({
       showDoneCheck
       menuItems={roundMenuItems}
       collapsedAccessory={collapsedAccessory}
+      footer={footer}
     >
       {round.exercises.map((ex, i) => {
         const log = roundLog.exercises[i];

@@ -375,6 +375,7 @@ export default function ExerciseRow({
         defaultTargetReps={resolvedDefaults?.defaultTargetReps ?? null}
         defaultWeightLb={resolvedDefaults?.defaultWeightLb ?? null}
         supportsLoad={supportsLoad}
+        inventoryWeights={inventoryWeights}
         onSaveDefaultReps={(reps) => {
           void upsertSettings(effectiveId, {
             defaultSetMode: "reps",

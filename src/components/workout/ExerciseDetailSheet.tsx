@@ -3,13 +3,10 @@
 import { useMemo } from "react";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import CategoryBadge from "@/components/common/CategoryBadge";
+import ExerciseWeightField from "@/components/workout/ExerciseWeightField";
 import TimerTargetControls from "@/components/workout/TimerTargetControls";
 import { exerciseVideoLinkLabel } from "@/lib/exerciseVideoLink";
-import {
-  parseLibraryDefaultRepsInput,
-  parseLibraryDefaultWeightInput,
-} from "@/lib/libraryExerciseDefaults";
-import { formatInventoryWeightLb } from "@/lib/weightInventory";
+import { parseLibraryDefaultRepsInput } from "@/lib/libraryExerciseDefaults";
 import type { ExerciseCategory, ExerciseSetMode } from "@/types";
 
 const modeChip =
@@ -37,6 +34,8 @@ type ExerciseDetailSheetProps = {
   defaultTargetReps?: number | null;
   defaultWeightLb?: number | null;
   supportsLoad?: boolean;
+  /** Inventory sizes for the exercise's load kind (dumbbell, barbell, …). */
+  inventoryWeights?: number[];
   onSaveDefaultReps?: (reps: number | null) => void;
   onSaveDefaultWeight?: (weightLb: number | null) => void;
 };
@@ -97,6 +96,7 @@ export default function ExerciseDetailSheet({
   defaultTargetReps = null,
   defaultWeightLb = null,
   supportsLoad = false,
+  inventoryWeights = [],
   onSaveDefaultReps,
   onSaveDefaultWeight,
 }: ExerciseDetailSheetProps) {
@@ -113,13 +113,6 @@ export default function ExerciseDetailSheet({
     }
     return "";
   }, [defaultTargetReps]);
-
-  const weightFieldValue = useMemo(() => {
-    if (defaultWeightLb != null && defaultWeightLb > 0) {
-      return formatInventoryWeightLb(defaultWeightLb);
-    }
-    return "";
-  }, [defaultWeightLb]);
 
   const showDefaults =
     showLibraryDefaults &&
@@ -224,37 +217,21 @@ export default function ExerciseDetailSheet({
 
             {supportsLoad && onSaveDefaultWeight ? (
               <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="detail-default-weight"
-                  className="text-caption font-medium text-muted"
-                >
+                <p className="text-caption font-medium text-muted">
                   Default weight (lb)
-                </label>
-                <input
-                  id="detail-default-weight"
-                  key={`detail-weight-${weightFieldValue}`}
-                  type="number"
-                  inputMode="decimal"
-                  min={0.5}
-                  max={500}
-                  step={0.5}
-                  defaultValue={weightFieldValue}
-                  placeholder="lb"
-                  onBlur={(e) => {
-                    const weight = parseLibraryDefaultWeightInput(
-                      e.currentTarget.value,
-                    );
-                    if (weight === undefined) {
-                      e.currentTarget.value = weightFieldValue;
-                      return;
+                </p>
+                <div className="flex items-center gap-1.5">
+                  <ExerciseWeightField
+                    variant="libraryDefault"
+                    weightLb={
+                      defaultWeightLb != null && defaultWeightLb > 0
+                        ? defaultWeightLb
+                        : undefined
                     }
-                    if (weight != null) {
-                      e.currentTarget.value = formatInventoryWeightLb(weight);
-                    }
-                    onSaveDefaultWeight(weight);
-                  }}
-                  className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
-                />
+                    inventoryWeights={inventoryWeights}
+                    onChange={(next) => onSaveDefaultWeight(next ?? null)}
+                  />
+                </div>
               </div>
             ) : null}
           </section>

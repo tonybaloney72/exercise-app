@@ -395,7 +395,6 @@ function TodayPageInner() {
             ← Back to summary
           </button>
           <WorkoutDayReview
-            plan={plan}
             log={completedLogForUi!}
             hideCompletionBanner
             onEditWorkout={handleEditCompletedWorkout}

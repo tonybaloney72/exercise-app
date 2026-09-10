@@ -5,11 +5,19 @@ import BottomSheetModal from "@/components/common/BottomSheetModal";
 import { sanitizeWeightLb } from "@/lib/exerciseLoad";
 import { formatInventoryWeightLb } from "@/lib/weightInventory";
 
+type ExerciseWeightFieldVariant = "working" | "libraryDefault";
+
 type ExerciseWeightFieldProps = {
   weightLb: number | undefined;
+  /** Logged-set only: offer “Use default” when a Library default exists. */
   defaultWeightLb?: number | null;
   inventoryWeights: number[];
   onChange: (weightLb: number | undefined) => void;
+  /**
+   * `working` — this set (BW / inventory / custom).
+   * `libraryDefault` — saved Library default (unset / inventory / custom).
+   */
+  variant?: ExerciseWeightFieldVariant;
 };
 
 export default function ExerciseWeightField({
@@ -17,20 +25,27 @@ export default function ExerciseWeightField({
   defaultWeightLb,
   inventoryWeights,
   onChange,
+  variant = "working",
 }: ExerciseWeightFieldProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [customOpen, setCustomOpen] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
 
+  const isLibraryDefault = variant === "libraryDefault";
+
   const defaultHint =
-    defaultWeightLb != null && defaultWeightLb > 0
+    !isLibraryDefault &&
+    defaultWeightLb != null &&
+    defaultWeightLb > 0
       ? sanitizeWeightLb(defaultWeightLb)
       : null;
 
   const hasWeight = weightLb != null && weightLb > 0;
   const displayLabel = hasWeight
     ? formatInventoryWeightLb(weightLb)
-    : "BW";
+    : isLibraryDefault
+      ? "None"
+      : "BW";
 
   function applyWeight(next: number | undefined) {
     onChange(next);
@@ -51,6 +66,27 @@ export default function ExerciseWeightField({
     applyWeight(parsed);
   }
 
+  const sheetTitle = isLibraryDefault ? "Default weight" : "Working weight";
+  const triggerAria = hasWeight
+    ? `${isLibraryDefault ? "Default" : "Working"} weight ${displayLabel} pounds. Tap to change.`
+    : isLibraryDefault
+      ? "No default weight. Tap to choose."
+      : "No working weight. Tap to choose.";
+
+  const chipClass = (selected: boolean) =>
+    `rounded-xl border px-3 py-2 text-sm tabular-nums transition-colors ${
+      selected
+        ? "border-accent bg-accent/15 text-foreground"
+        : "border-border bg-surface text-foreground hover:bg-surface-hover"
+    }`;
+
+  const rowBtnClass = (selected: boolean) =>
+    `w-full rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition-colors ${
+      selected
+        ? "border-accent bg-accent/15 text-foreground"
+        : "border-border bg-surface text-foreground hover:bg-surface-hover"
+    }`;
+
   return (
     <>
       <button
@@ -61,11 +97,7 @@ export default function ExerciseWeightField({
             ? "font-medium text-foreground tabular-nums"
             : "text-muted"
         }`}
-        aria-label={
-          hasWeight
-            ? `Working weight ${displayLabel} pounds. Tap to change.`
-            : "No working weight. Tap to choose."
-        }
+        aria-label={triggerAria}
       >
         <span>{displayLabel}</span>
         <span className="text-caption text-muted" aria-hidden>
@@ -81,65 +113,53 @@ export default function ExerciseWeightField({
           setCustomOpen(false);
           setCustomDraft("");
         }}
-        title="Working weight"
-        hint="All sizes from your inventory. BW means no load."
-        ariaLabel="Choose working weight"
+        title={sheetTitle}
+        hint={isLibraryDefault ? undefined : "BW means no load on this set."}
+        ariaLabel={
+          isLibraryDefault ? "Choose default weight" : "Choose working weight"
+        }
       >
-        <div className="flex flex-col gap-3 px-4 pb-4 pt-1">
-          <button
-            type="button"
-            onClick={() => applyWeight(undefined)}
-            className={`w-full rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition-colors ${
-              !hasWeight
-                ? "border-accent bg-accent/15 text-foreground"
-                : "border-border bg-surface text-foreground hover:bg-surface-hover"
-            }`}
-          >
-            No weight (BW)
-          </button>
+        <div className="flex flex-col gap-4 px-4 pb-4 pt-3">
+          {!isLibraryDefault ? (
+            <button
+              type="button"
+              onClick={() => applyWeight(undefined)}
+              className={rowBtnClass(!hasWeight)}
+            >
+              No weight (BW)
+            </button>
+          ) : null}
 
           {defaultHint != null ? (
             <button
               type="button"
               onClick={() => applyWeight(defaultHint)}
-              className={`w-full rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition-colors ${
-                weightLb === defaultHint
-                  ? "border-accent bg-accent/15 text-foreground"
-                  : "border-border bg-surface text-foreground hover:bg-surface-hover"
-              }`}
+              className={rowBtnClass(weightLb === defaultHint)}
             >
               Use default ({formatInventoryWeightLb(defaultHint)} lb)
             </button>
           ) : null}
 
           {inventoryWeights.length > 0 ? (
-            <div>
-              <p className="mb-2 text-xs font-medium text-muted">
-                From inventory
-              </p>
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-medium text-muted">From inventory</p>
               <div className="flex flex-wrap gap-2">
-                {inventoryWeights.map((w) => {
-                  const selected = weightLb === w;
-                  return (
-                    <button
-                      key={w}
-                      type="button"
-                      onClick={() => applyWeight(w)}
-                      className={`rounded-lg border px-3 py-1.5 text-sm tabular-nums transition-colors ${
-                        selected
-                          ? "border-accent bg-accent/15 text-foreground"
-                          : "border-border bg-background text-foreground hover:bg-surface-hover"
-                      }`}
-                    >
-                      {formatInventoryWeightLb(w)}
-                    </button>
-                  );
-                })}
+                {inventoryWeights.map((w) => (
+                  <button
+                    key={w}
+                    type="button"
+                    onClick={() => applyWeight(w)}
+                    className={chipClass(weightLb === w)}
+                  >
+                    {formatInventoryWeightLb(w)}
+                  </button>
+                ))}
               </div>
             </div>
           ) : null}
 
-          <div className="border-t border-border pt-3">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-medium text-muted">Custom</p>
             {customOpen ? (
               <div className="flex items-center gap-2">
                 <input
@@ -154,8 +174,8 @@ export default function ExerciseWeightField({
                   onKeyDown={(e) => {
                     if (e.key === "Enter") commitCustom();
                   }}
-                  placeholder="Custom lb"
-                  className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent"
+                  placeholder="lb"
+                  className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-accent"
                   aria-label="Custom weight in pounds"
                 />
                 <button
@@ -171,11 +191,13 @@ export default function ExerciseWeightField({
                 type="button"
                 onClick={() => {
                   setCustomOpen(true);
-                  setCustomDraft(hasWeight ? formatInventoryWeightLb(weightLb) : "");
+                  setCustomDraft(
+                    hasWeight ? formatInventoryWeightLb(weightLb) : "",
+                  );
                 }}
-                className="w-full rounded-xl border border-dashed border-border bg-transparent px-3 py-2.5 text-left text-sm font-medium text-muted hover:border-accent/40 hover:text-foreground"
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-left text-sm font-medium text-muted hover:bg-surface-hover hover:text-foreground"
               >
-                Custom…
+                Enter a weight…
               </button>
             )}
           </div>

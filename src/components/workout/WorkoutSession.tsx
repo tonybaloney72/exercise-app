@@ -244,42 +244,45 @@ export default function WorkoutSession({
         );
         if (!roundLog) return null;
         return (
-          <div key={round.roundNumber} className="flex flex-col gap-2">
-            <RoundCard
-              round={round}
-              roundLog={roundLog}
-              disableRestTimer={isEditing}
-              canRemoveRound={activeWorkout.rounds.length > 1}
-              onRemoveRound={() => removeRoundFromWorkout(round.roundNumber)}
-              onAddExercise={() =>
-                setPickTarget({
-                  kind: "addStrength",
-                  roundNumber: round.roundNumber,
-                })
-              }
-              onRemoveExercise={(slotIndex) =>
-                removeRoundExercise(round.roundNumber, slotIndex)
-              }
-            />
-            <RoundStructureActions
-              roundIndex={roundIndex}
-              roundCount={activeWorkout.rounds.length}
-              isEmptyRound={roundLog.exercises.length === 0}
-              onAddRoundBelow={() => insertEmptyRoundAtWorkout(roundIndex + 1)}
-              onCopyRepeat={() =>
-                applyRoundCopyFromPriorWorkout(round.roundNumber, "repeat")
-              }
-              onCopyStructure={() =>
-                applyRoundCopyFromPriorWorkout(round.roundNumber, "structure")
-              }
-              onCustomize={() =>
-                setPickTarget({
-                  kind: "addStrength",
-                  roundNumber: round.roundNumber,
-                })
-              }
-            />
-          </div>
+          <RoundCard
+            key={round.roundNumber}
+            round={round}
+            roundLog={roundLog}
+            disableRestTimer={isEditing}
+            canRemoveRound={activeWorkout.rounds.length > 1}
+            onRemoveRound={() => removeRoundFromWorkout(round.roundNumber)}
+            onAddExercise={() =>
+              setPickTarget({
+                kind: "addStrength",
+                roundNumber: round.roundNumber,
+              })
+            }
+            onRemoveExercise={(slotIndex) =>
+              removeRoundExercise(round.roundNumber, slotIndex)
+            }
+            footer={
+              <RoundStructureActions
+                roundIndex={roundIndex}
+                roundCount={activeWorkout.rounds.length}
+                isEmptyRound={roundLog.exercises.length === 0}
+                onAddRoundBelow={() =>
+                  insertEmptyRoundAtWorkout(roundIndex + 1)
+                }
+                onCopyRepeat={() =>
+                  applyRoundCopyFromPriorWorkout(round.roundNumber, "repeat")
+                }
+                onCopyStructure={() =>
+                  applyRoundCopyFromPriorWorkout(round.roundNumber, "structure")
+                }
+                onCustomize={() =>
+                  setPickTarget({
+                    kind: "addStrength",
+                    roundNumber: round.roundNumber,
+                  })
+                }
+              />
+            }
+          />
         );
       })}
 

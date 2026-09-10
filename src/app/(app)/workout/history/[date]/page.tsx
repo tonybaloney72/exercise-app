@@ -235,7 +235,6 @@ export default function WorkoutHistoryDayPage() {
 
       {!editingCompletedHere && (
         <WorkoutDayReview
-          plan={reviewPlan}
           log={log}
           completedBannerTitle={formatCompletedBannerTitle(dateKey)}
           onNotesChange={(notes) => updateCompletedWorkoutNotes(log.id, notes)}

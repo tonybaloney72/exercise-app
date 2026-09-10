@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { Children, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ExpandChevron from "@/components/workout/ExpandChevron";
 import WorkoutRowOverflowMenu, {
@@ -27,7 +27,7 @@ export type WorkoutSectionCardProps = {
   bodyToolbar?: ReactNode;
   footer?: ReactNode;
   className?: string;
-  children: ReactNode;
+  children?: ReactNode;
 };
 
 export default function WorkoutSectionCard({
@@ -60,6 +60,10 @@ export default function WorkoutSectionCard({
   const showProgress = progress != null && total > 0;
   const allDone = showProgress && completed === total;
   const progressPct = showProgress ? (completed / total) * 100 : 0;
+  /** Empty arrays from `.map()` are truthy — only render body when there is content. */
+  const hasBodyChildren = Children.toArray(children).length > 0;
+  const hasExpandedBody =
+    Boolean(bodyToolbar) || hasBodyChildren || Boolean(footer);
 
   return (
     <div
@@ -110,7 +114,7 @@ export default function WorkoutSectionCard({
       ) : null}
 
       <AnimatePresence initial={false}>
-        {isOpen ? (
+        {isOpen && hasExpandedBody ? (
           <motion.div
             initial={{ height: 0 }}
             animate={{ height: "auto" }}
@@ -127,7 +131,9 @@ export default function WorkoutSectionCard({
                 {bodyToolbar}
               </div>
             ) : null}
-            <div className="border-t border-border p-2">{children}</div>
+            {hasBodyChildren ? (
+              <div className="border-t border-border p-2">{children}</div>
+            ) : null}
             {footer ? (
               <div className="border-t border-border px-3 py-2.5">{footer}</div>
             ) : null}

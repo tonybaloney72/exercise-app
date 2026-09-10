@@ -8,18 +8,14 @@ import SurfaceCard from "@/components/common/SurfaceCard";
 import CategoryBadge from "@/components/common/CategoryBadge";
 import { exerciseMap } from "@/core/catalog";
 import { formatCardioHealthSummary } from "@/lib/health";
-import { resolvePrescriptionText } from "@/utils/exerciseLogDefaults";
-import { resolveStrengthTargetLabel } from "@/utils/effectiveExerciseSettings";
-import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { cardioLabelForRow } from "@/lib/cardioInstances";
 import { resolveWorkoutCardioExercises } from "@/lib/resolveWorkoutCardio";
 import { hasRenderableGpsRoute } from "@/lib/geo/gpsTrackPolyline";
 import { formatLoggedDuration } from "@/utils/time";
 import GpsRouteMap from "@/components/cardio/GpsRouteMap";
-import type { DayPlan, ExerciseLog, WorkoutLog } from "@/types";
+import type { ExerciseLog, WorkoutLog } from "@/types";
 
 interface WorkoutDayReviewProps {
-  plan: DayPlan;
   log: WorkoutLog;
   onNotesChange: (notes: string) => Promise<void>;
   onEditWorkout?: () => void;
@@ -43,20 +39,20 @@ function formatEndTime(iso: string | undefined): string | null {
   }
 }
 
+/** What the user logged — no prescribed target or swap history. */
 function exerciseStatusLine(log: ExerciseLog | undefined): string {
   if (!log) return "No entry logged";
   if (log.skipped) return "Skipped";
   if (!log.completed) return "Not completed";
-  const parts: string[] = ["Done"];
+  const parts: string[] = [];
   if (log.actualReps != null) parts.push(`${log.actualReps} reps`);
+  if (log.weightLb != null && log.weightLb > 0) {
+    parts.push(`${log.weightLb} lb`);
+  }
   if (log.actualDuration != null) {
     parts.push(formatLoggedDuration(log.actualDuration));
   }
-  if (log.swappedWith) {
-    const swap = exerciseMap[log.swappedWith];
-    parts.push(`Swapped → ${swap?.name ?? log.swappedWith}`);
-  }
-  return parts.join(" · ");
+  return parts.length > 0 ? parts.join(" · ") : "Completed";
 }
 
 function sectionProgressHint(logs: ExerciseLog[]): string | undefined {
@@ -66,7 +62,6 @@ function sectionProgressHint(logs: ExerciseLog[]): string | undefined {
 }
 
 export default function WorkoutDayReview({
-  plan,
   log,
   onNotesChange,
   onEditWorkout,
@@ -78,7 +73,6 @@ export default function WorkoutDayReview({
   const notesRef = useRef<HTMLTextAreaElement>(null);
   const notesKey = `${log.id}:${log.notes ?? ""}`;
   const endLabel = formatEndTime(log.endTime);
-  const exerciseSettings = useExerciseSettingsStore((s) => s.byExerciseId);
 
   const commitNotesIfChanged = async (): Promise<void> => {
     const el = notesRef.current;
@@ -147,11 +141,6 @@ export default function WorkoutDayReview({
             <ReviewRow
               key={entry.exerciseId}
               name={ex.name}
-              target={resolveStrengthTargetLabel(
-                ex,
-                exerciseSettings[entry.exerciseId],
-                entry.targetPrescription,
-              )}
               detail={exerciseStatusLine(entry)}
               exerciseNotes={entry.notes}
             />
@@ -209,9 +198,6 @@ export default function WorkoutDayReview({
       {[...log.rounds]
         .sort((a, b) => a.roundNumber - b.roundNumber)
         .map((roundLog) => {
-          const plannedRound = plan.rounds.find(
-            (r) => r.roundNumber === roundLog.roundNumber,
-          );
           return (
             <CollapsibleSection
               key={roundLog.roundNumber}
@@ -224,29 +210,10 @@ export default function WorkoutDayReview({
                   const effectiveId = entry.swappedWith ?? entry.exerciseId;
                   const effective = exerciseMap[effectiveId];
                   if (!effective) return null;
-                  const plannedSlot = plannedRound?.exercises.find(
-                    (ex) => ex.exerciseId === entry.exerciseId,
-                  );
-                  const plannedMeta = plannedSlot
-                    ? exerciseMap[plannedSlot.exerciseId]
-                    : undefined;
                   return (
                     <ReviewRow
                       key={`${roundLog.roundNumber}-${entry.exerciseId}-${effectiveId}`}
                       name={effective.name}
-                      prescribedLabel={
-                        entry.swappedWith && plannedMeta
-                          ? `Prescribed: ${plannedMeta.name}`
-                          : undefined
-                      }
-                      target={
-                        resolveStrengthTargetLabel(
-                          effective,
-                          exerciseSettings[effectiveId],
-                          resolvePrescriptionText(entry) ||
-                            plannedSlot?.targetReps,
-                        )
-                      }
                       detail={exerciseStatusLine(entry)}
                       exerciseNotes={entry.notes}
                       badge={
@@ -273,11 +240,6 @@ export default function WorkoutDayReview({
               <ReviewRow
                 key={entry.exerciseId}
                 name={ex.name}
-                target={resolveStrengthTargetLabel(
-                  ex,
-                  exerciseSettings[entry.exerciseId],
-                  entry.targetPrescription,
-                )}
                 detail={exerciseStatusLine(entry)}
                 exerciseNotes={entry.notes}
               />
@@ -327,15 +289,11 @@ export default function WorkoutDayReview({
 
 function ReviewRow({
   name,
-  prescribedLabel,
-  target,
   detail,
   exerciseNotes,
   badge,
 }: {
   name: string;
-  prescribedLabel?: string;
-  target: string;
   detail: string;
   exerciseNotes?: string;
   badge?: ReactNode;
@@ -343,13 +301,9 @@ function ReviewRow({
   return (
     <div className="flex flex-col gap-0.5 px-2 py-2.5">
       <div className="flex items-start justify-between gap-2">
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <p className="text-sm font-medium text-foreground">{name}</p>
-          {prescribedLabel ? (
-            <p className="text-caption text-muted">{prescribedLabel}</p>
-          ) : null}
-          <p className="text-xs text-muted">{target}</p>
-        </div>
+        <p className="min-w-0 flex-1 text-sm font-medium text-foreground">
+          {name}
+        </p>
         {badge}
       </div>
       <p className="text-xs text-foreground/90">{detail}</p>

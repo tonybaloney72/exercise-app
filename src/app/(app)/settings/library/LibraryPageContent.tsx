@@ -30,14 +30,18 @@ import { useExerciseSettingsStore } from "@/stores/useExerciseSettingsStore";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import ExerciseWeightField from "@/components/workout/ExerciseWeightField";
 import AccountFeatureGate from "@/components/auth/AccountFeatureGate";
 import { buildExerciseSettingsClearRepSuggestionIgnore } from "@/lib/applyRepIncreaseSuggestion";
-import { exerciseSupportsLoadMeta } from "@/lib/exerciseLoad";
+import {
+  exerciseSupportsLoadMeta,
+  inventoryKindForExercise,
+} from "@/lib/exerciseLoad";
 import {
   parseLibraryDefaultRepsInput,
-  parseLibraryDefaultWeightInput,
   buildLibraryWeightSettings,
 } from "@/lib/libraryExerciseDefaults";
+import { listInventoryWeightsLb } from "@/lib/weightInventory";
 import { exerciseVideoLinkLabel } from "@/lib/exerciseVideoLink";
 import {
   DEFAULT_TIMER_SECONDS_FALLBACK,
@@ -435,12 +439,19 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
   const stored = useExerciseSettingsStore((s) => s.byExerciseId[exercise.id]);
   const upsert = useExerciseSettingsStore((s) => s.upsert);
   const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
+  const weightInventory = useSettingsStore((s) => s.weightInventory);
 
   const resolved = useMemo(
     () =>
       resolveExerciseSettings(exercise, stored, { expertiseByGroup }),
     [exercise, stored, expertiseByGroup],
   );
+
+  const inventoryWeights = useMemo(() => {
+    const kind = inventoryKindForExercise(exercise.equipment);
+    if (!kind) return [];
+    return listInventoryWeightsLb(weightInventory ?? {}, kind);
+  }, [exercise.equipment, weightInventory]);
 
   const hasSavedTimer =
     stored?.defaultTimerSeconds != null && stored.defaultTimerSeconds > 0;
@@ -519,13 +530,10 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     });
   }
 
-  async function commitDefaultWeightFromInput(input: HTMLInputElement) {
-    const weight = parseLibraryDefaultWeightInput(input.value);
-    if (weight === undefined) return;
-    if (weight != null) input.value = String(weight);
+  async function saveDefaultWeight(weightLb: number | null) {
     await upsert(
       exercise.id,
-      buildLibraryWeightSettings(resolved.defaultSetMode, stored, weight),
+      buildLibraryWeightSettings(resolved.defaultSetMode, stored, weightLb),
     );
   }
 
@@ -742,24 +750,26 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                     </div>
                     {exerciseSupportsLoadMeta(exercise) ? (
                       <div className="flex flex-col gap-2.5">
-                        <label className="text-caption font-medium uppercase tracking-wide text-muted">
+                        <p className="text-caption font-medium uppercase tracking-wide text-muted">
                           Default weight (lb)
-                        </label>
-                        <input
-                          key={`default-weight-${exercise.id}-${stored?.defaultWeightLb ?? ""}`}
-                          type="number"
-                          inputMode="decimal"
-                          min={0.5}
-                          max={500}
-                          step={0.5}
-                          defaultValue={resolved.defaultWeightLb ?? ""}
-                          onBlur={(e) =>
-                            void commitDefaultWeightFromInput(e.currentTarget)
-                          }
-                          className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
-                        />
+                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <ExerciseWeightField
+                            variant="libraryDefault"
+                            weightLb={
+                              resolved.defaultWeightLb != null &&
+                              resolved.defaultWeightLb > 0
+                                ? resolved.defaultWeightLb
+                                : undefined
+                            }
+                            inventoryWeights={inventoryWeights}
+                            onChange={(next) =>
+                              void saveDefaultWeight(next ?? null)
+                            }
+                          />
+                        </div>
                         <p className="text-caption text-muted">
-                          Working load for this exercise. Clear to unset.
+                          Working load for this exercise from your inventory.
                         </p>
                       </div>
                     ) : null}
@@ -772,22 +782,24 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                 {resolved.defaultSetMode === "timer" &&
                 exerciseSupportsLoadMeta(exercise) ? (
                   <div className="flex flex-col gap-2.5 border-t border-border pt-3">
-                    <label className="text-caption font-medium uppercase tracking-wide text-muted">
+                    <p className="text-caption font-medium uppercase tracking-wide text-muted">
                       Default weight (lb)
-                    </label>
-                    <input
-                      key={`default-weight-timer-${exercise.id}-${stored?.defaultWeightLb ?? ""}`}
-                      type="number"
-                      inputMode="decimal"
-                      min={0.5}
-                      max={500}
-                      step={0.5}
-                      defaultValue={resolved.defaultWeightLb ?? ""}
-                      onBlur={(e) =>
-                        void commitDefaultWeightFromInput(e.currentTarget)
-                      }
-                      className="w-full max-w-32 rounded-lg border border-border bg-surface px-2 py-1.5 font-mono text-sm text-foreground outline-none focus:border-accent"
-                    />
+                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <ExerciseWeightField
+                        variant="libraryDefault"
+                        weightLb={
+                          resolved.defaultWeightLb != null &&
+                          resolved.defaultWeightLb > 0
+                            ? resolved.defaultWeightLb
+                            : undefined
+                        }
+                        inventoryWeights={inventoryWeights}
+                        onChange={(next) =>
+                          void saveDefaultWeight(next ?? null)
+                        }
+                      />
+                    </div>
                   </div>
                 ) : null}
                 {stored?.repSuggestionIgnored ||

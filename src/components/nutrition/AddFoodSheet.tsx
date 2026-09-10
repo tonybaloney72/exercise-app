@@ -450,28 +450,28 @@ export default function AddFoodSheet({
             <div className="flex gap-2">
               <button
                 type="button"
+                onClick={onClose}
+                disabled={saving}
+                className="flex-1 rounded-xl border border-border py-3 text-sm font-medium text-muted hover:text-foreground disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
                 onClick={() => void handleAddAnother()}
                 disabled={saving || loadingDetail || !selectedServing}
                 className="flex-1 rounded-xl border border-border py-3 text-sm font-medium text-foreground hover:border-accent/40 disabled:opacity-60"
               >
                 {saveAction === "addAnother" ? "Adding…" : "Add Another"}
               </button>
-              <button
-                type="button"
-                onClick={() => void handleLog()}
-                disabled={saving || loadingDetail || !selectedServing}
-                className="flex-1 rounded-xl bg-accent py-3 text-sm font-bold text-white hover:bg-accent/90 disabled:opacity-60"
-              >
-                {saveAction === "log" ? "Logging…" : "Log"}
-              </button>
             </div>
             <button
               type="button"
-              onClick={onClose}
-              disabled={saving}
-              className="w-full rounded-xl border border-border py-2.5 text-sm font-medium text-muted hover:text-foreground disabled:opacity-60"
+              onClick={() => void handleLog()}
+              disabled={saving || loadingDetail || !selectedServing}
+              className="w-full rounded-xl bg-accent py-3 text-sm font-bold text-white hover:bg-accent/90 disabled:opacity-60"
             >
-              Cancel
+              {saveAction === "log" ? "Logging…" : "Log"}
             </button>
           </div>
         ) : undefined
