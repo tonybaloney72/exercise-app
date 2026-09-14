@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createHmac, randomBytes } from "node:crypto";
 import { getFatSecretConsumerCredentials } from "@/lib/fatsecret/config";
 import { FatSecretApiError } from "@/lib/fatsecret/errors";

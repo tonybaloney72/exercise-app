@@ -1,3 +1,5 @@
+import "server-only";
+
 import { FatSecretConfigError } from "@/lib/fatsecret/errors";
 
 export type FatSecretConsumerCredentials = {

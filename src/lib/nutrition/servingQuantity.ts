@@ -1,7 +1,7 @@
 import {
   isLoggableFoodServing,
   type FoodServingOption,
-} from "@/lib/fatsecret/foodDetail";
+} from "@/lib/fatsecret/foodServing";
 import { servingScaleFactor } from "@/lib/nutrition/foodNutrition";
 
 const GRAMS_PER_OUNCE = 28.349523125;

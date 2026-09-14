@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   isLoggableFoodServing,
   parseFoodDetailResponse,
-} from "@/lib/fatsecret/foodDetail";
+} from "@/lib/fatsecret/foodServing";
 import { defaultFoodServing } from "@/lib/nutrition/servingQuantity";
 
 describe("isLoggableFoodServing", () => {

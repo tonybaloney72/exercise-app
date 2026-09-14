@@ -7,7 +7,7 @@ import AddFoodSheet from "@/components/nutrition/AddFoodSheet";
 import NutritionLogEntry from "@/components/nutrition/NutritionLogEntry";
 import NutritionMacroSummary from "@/components/nutrition/NutritionMacroSummary";
 import { removeNutritionDiaryEntry } from "@/hooks/useNutritionDiary";
-import type { FoodDetail } from "@/lib/fatsecret/foodDetail";
+import type { FoodDetail } from "@/lib/fatsecret/foodServing";
 import type { FoodDiaryMealSummary } from "@/lib/fatsecret/foodDiary";
 import { FATSECRET_MEAL_LABELS } from "@/lib/nutrition/fatsecretMeals";
 

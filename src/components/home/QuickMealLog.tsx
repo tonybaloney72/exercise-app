@@ -7,7 +7,7 @@ import SurfaceCard from "@/components/common/SurfaceCard";
 import AddFoodSheet from "@/components/nutrition/AddFoodSheet";
 import { useNutritionDiary } from "@/hooks/useNutritionDiary";
 import { routes } from "@/lib/appRoutes";
-import type { FoodDetail } from "@/lib/fatsecret/foodDetail";
+import type { FoodDetail } from "@/lib/fatsecret/foodServing";
 import {
   FATSECRET_MEALS,
   FATSECRET_MEAL_LABELS,

@@ -1,5 +1,5 @@
 import { resolveApiUrl } from "@/lib/apiBaseUrl";
-import type { FoodDetail } from "@/lib/fatsecret/foodDetail";
+import type { FoodDetail } from "@/lib/fatsecret/foodServing";
 
 export type BarcodeLookupResult =
   | { ok: true; food: FoodDetail }

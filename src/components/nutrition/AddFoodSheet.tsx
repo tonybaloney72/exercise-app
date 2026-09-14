@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import BottomSheetModal from "@/components/common/BottomSheetModal";
 import NutritionFactsPanel from "@/components/nutrition/NutritionFactsPanel";
 import { resolveApiUrl } from "@/lib/apiBaseUrl";
-import type { FoodDetail } from "@/lib/fatsecret/foodDetail";
+import type { FoodDetail } from "@/lib/fatsecret/foodServing";
 import type { FatSecretFoodSearchItem } from "@/lib/fatsecret/foodsSearch";
 import { scaleNutrition } from "@/lib/nutrition/foodNutrition";
 import {

@@ -13,6 +13,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.join(root, "src"),
+      // server-only throws in default Node resolution; tests run on the server.
+      "server-only": path.join(root, "node_modules/server-only/empty.js"),
     },
   },
 });

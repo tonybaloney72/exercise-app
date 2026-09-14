@@ -2,7 +2,7 @@ import { FatSecretApiError } from "@/lib/fatsecret/errors";
 import {
   parseFoodDetailResponse,
   type FoodDetail,
-} from "@/lib/fatsecret/foodDetail";
+} from "@/lib/fatsecret/foodServing";
 import { fatsecretSignedRequest } from "@/lib/fatsecret/oauth1";
 
 type RawFoodResponse = Parameters<typeof parseFoodDetailResponse>[0];

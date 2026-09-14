@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { FoodServingOption } from "@/lib/fatsecret/foodDetail";
+import type { FoodServingOption } from "@/lib/fatsecret/foodServing";
 import {
   amountInputForServingMultiplier,
   convertWeightToGrams,
