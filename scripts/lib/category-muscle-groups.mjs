@@ -4,7 +4,7 @@
  *
  * Upper push (UP): Chest, Front/Lateral Deltoids (press/raise), Triceps, Serratus.
  * Upper pull (UPL): Lats, Rhomboids, Rear Deltoids, Biceps/Brachialis, Traps, Forearms.
- * Do not stamp core onto UPL by default — use secondaryCategory when a hang/row is
+ * Do not stamp core onto UPL by default - use secondaryCategory when a hang/row is
  * intentionally core-biased (e.g. hanging oblique raise).
  * Shoulder split: Front/Lateral Deltoids → UP; Rear Deltoids → UPL. When a name is a
  * vertical pull (upright row, face pull), prefer UPL even if lateral delts are tagged.

@@ -60,7 +60,7 @@ export default function WorkoutSectionCard({
   const showProgress = progress != null && total > 0;
   const allDone = showProgress && completed === total;
   const progressPct = showProgress ? (completed / total) * 100 : 0;
-  /** Empty arrays from `.map()` are truthy — only render body when there is content. */
+  /** Empty arrays from `.map()` are truthy - only render body when there is content. */
   const hasBodyChildren = Children.toArray(children).length > 0;
   const hasExpandedBody =
     Boolean(bodyToolbar) || hasBodyChildren || Boolean(footer);

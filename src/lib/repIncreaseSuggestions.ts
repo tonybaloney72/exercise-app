@@ -23,8 +23,11 @@ import {
 } from "@/utils/effectiveExerciseSettings";
 import { parseLocalDateKeyMs } from "@/utils/localDateKey";
 
-export const REP_INCREASE_MARGIN = 2;
-export const REP_INCREASE_BUMP = 2;
+export const REP_INCREASE_MARGIN = 1;
+/** Default bump when settings omit a preference (matches historical +2). */
+const REP_INCREASE_BUMP_DEFAULT = 2;
+/** Default / legacy bump size (+2). Prefer the user `repIncreaseBump` setting at call sites. */
+export const REP_INCREASE_BUMP = REP_INCREASE_BUMP_DEFAULT;
 export const REP_SUGGESTION_SNOOZE_DAYS = 14;
 /** Top of double-progression rep range for loadable exercises. */
 const LOAD_REP_RANGE_MAX = 12;
@@ -128,10 +131,7 @@ function resolveLogTarget(
   return { mode: "reps", target };
 }
 
-function readActual(
-  log: ExerciseLog,
-  mode: RepIncreaseMode,
-): number | null {
+function readActual(log: ExerciseLog, mode: RepIncreaseMode): number | null {
   if (mode === "reps") {
     return log.actualReps != null ? log.actualReps : null;
   }
@@ -166,10 +166,10 @@ function medianGapDays(dates: string[]): number {
   return (gaps[mid - 1]! + gaps[mid]!) / 2;
 }
 
-function frequencyBucket(appearances: SessionAppearance[]): RepIncreaseFrequencyBucket {
-  const recentDates = appearances
-    .slice(-8)
-    .map((a) => a.date);
+function frequencyBucket(
+  appearances: SessionAppearance[],
+): RepIncreaseFrequencyBucket {
+  const recentDates = appearances.slice(-8).map((a) => a.date);
   const gap = medianGapDays(recentDates);
   if (gap <= 3) return "daily";
   if (gap <= 10) return "medium";
@@ -252,13 +252,11 @@ function buildAppearances(
   exerciseSettings: ExerciseSettingsMap,
 ): SessionAppearance[] {
   const appearances: SessionAppearance[] = [];
-  const sorted = [...history]
-    .filter(isCompletedWorkout)
-    .sort((a, b) => {
-      const byDate = parseLocalDateKeyMs(a.date) - parseLocalDateKeyMs(b.date);
-      if (byDate !== 0) return byDate;
-      return a.id.localeCompare(b.id);
-    });
+  const sorted = [...history].filter(isCompletedWorkout).sort((a, b) => {
+    const byDate = parseLocalDateKeyMs(a.date) - parseLocalDateKeyMs(b.date);
+    if (byDate !== 0) return byDate;
+    return a.id.localeCompare(b.id);
+  });
 
   for (const workout of sorted) {
     const finalLog = finalLogForExercise(workout, exerciseId);
@@ -308,6 +306,8 @@ export function evaluateRepIncreaseSuggestions(input: {
   exerciseSettings: ExerciseSettingsMap;
   enabled: boolean;
   weightInventory?: WeightInventory;
+  /** How much to raise Library defaults (reps/seconds). Default 2. */
+  bump?: number;
 }): RepIncreaseSuggestion[] {
   const {
     history,
@@ -316,7 +316,11 @@ export function evaluateRepIncreaseSuggestions(input: {
     exerciseSettings,
     enabled,
     weightInventory = {},
+    bump = REP_INCREASE_BUMP_DEFAULT,
   } = input;
+
+  const bumpAmount =
+    bump === 1 || bump === 2 ? bump : REP_INCREASE_BUMP_DEFAULT;
 
   if (!enabled) return [];
   if (completedWorkout.date !== todayKey) return [];
@@ -356,7 +360,7 @@ export function evaluateRepIncreaseSuggestions(input: {
       continue;
     }
 
-    const bumped = Math.min(999, current.target + REP_INCREASE_BUMP);
+    const bumped = Math.min(999, current.target + bumpAmount);
     const capped =
       current.mode === "reps" &&
       exerciseSupportsLoadMeta(meta) &&
@@ -386,7 +390,8 @@ function workingWeightLb(
   finalLog: ExerciseLog,
   stored: ExerciseSettingsValues | undefined,
 ): number | null {
-  if (finalLog.weightLb != null && finalLog.weightLb > 0) return finalLog.weightLb;
+  if (finalLog.weightLb != null && finalLog.weightLb > 0)
+    return finalLog.weightLb;
   if (stored?.defaultWeightLb != null && stored.defaultWeightLb > 0) {
     return stored.defaultWeightLb;
   }
@@ -427,7 +432,7 @@ export function buildLoadProgressionSuggestion(input: {
     suggestedTarget: LOAD_REP_RANGE_MIN,
     currentWeightLb: currentWeight,
     suggestedWeightLb: next,
-    reason: `${input.reason}; at ${LOAD_REP_RANGE_MAX}+ reps — step up load`,
+    reason: `${input.reason}; at ${LOAD_REP_RANGE_MAX}+ reps - step up load`,
   };
 }
 

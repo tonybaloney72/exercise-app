@@ -116,7 +116,7 @@ describe("evaluateRepIncreaseSuggestions", () => {
     ];
     const history = [
       ...jjHistory(dates.slice(0, -1), 52),
-      workoutOn(today, "w-today", [strengthLog(JJ, 51, "50")]),
+      workoutOn(today, "w-today", [strengthLog(JJ, 50, "50")]),
     ];
     const completed = history[history.length - 1]!;
 
@@ -131,6 +131,61 @@ describe("evaluateRepIncreaseSuggestions", () => {
         enabled: true,
       }),
     ).toEqual([]);
+  });
+
+  it("qualifies when beating the target by the +1 margin", () => {
+    const today = "2026-07-02";
+    const dates = [
+      "2026-06-27",
+      "2026-06-28",
+      "2026-06-29",
+      "2026-06-30",
+      "2026-07-01",
+      today,
+    ];
+    const history = jjHistory(dates, 51);
+    const completed = history[history.length - 1]!;
+
+    const suggestions = evaluateRepIncreaseSuggestions({
+      history,
+      completedWorkout: completed,
+      todayKey: today,
+      exerciseSettings: {
+        [JJ]: { defaultSetMode: "reps", defaultTargetReps: 50 },
+      },
+      enabled: true,
+      bump: 1,
+    });
+
+    expect(suggestions).toHaveLength(1);
+    expect(suggestions[0]?.suggestedTarget).toBe(51);
+  });
+
+  it("uses the configured bump size for suggested targets", () => {
+    const today = "2026-07-02";
+    const dates = [
+      "2026-06-27",
+      "2026-06-28",
+      "2026-06-29",
+      "2026-06-30",
+      "2026-07-01",
+      today,
+    ];
+    const history = jjHistory(dates, 52);
+    const completed = history[history.length - 1]!;
+
+    const suggestions = evaluateRepIncreaseSuggestions({
+      history,
+      completedWorkout: completed,
+      todayKey: today,
+      exerciseSettings: {
+        [JJ]: { defaultSetMode: "reps", defaultTargetReps: 50 },
+      },
+      enabled: true,
+      bump: 1,
+    });
+
+    expect(suggestions[0]?.suggestedTarget).toBe(51);
   });
 
   it("suggests lower-frequency exercise after 2 consecutive qualifying sessions", () => {

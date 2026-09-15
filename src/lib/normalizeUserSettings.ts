@@ -62,9 +62,13 @@ import {
   sanitizeBodyHeightIn,
   sanitizeBodySexAtBirth,
 } from "@/lib/bodyProfile";
-import type { UserSettings } from "@/types";
+import type { RepIncreaseBump, UserSettings } from "@/types";
 
 const EMPTY_RELEASE_NOTES_SEEN: string[] = [];
+
+function sanitizeRepIncreaseBump(value: unknown): RepIncreaseBump {
+  return value === 1 ? 1 : 2;
+}
 
 /** Merge partial settings and migrate legacy `programFocus` → `trainingPriorityPreset`. */
 export function normalizeUserSettings(
@@ -257,6 +261,9 @@ export function normalizeUserSettings(
       : {}),
     suggestRepIncreases:
       partial.suggestRepIncreases ?? DEFAULT_SETTINGS.suggestRepIncreases,
+    repIncreaseBump: sanitizeRepIncreaseBump(
+      partial.repIncreaseBump ?? rest.repIncreaseBump,
+    ),
     weightInventory: sanitizeWeightInventory(
       partial.weightInventory ?? rest.weightInventory,
     ),

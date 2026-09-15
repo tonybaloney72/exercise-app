@@ -17,7 +17,7 @@ type Props = {
 
 /**
  * Completion toggle: ~36px bordered visual inside a ~40px tap target
- * (Phase 0 touch targets — avoid tiny 20px controls without growing the row too much).
+ * (Phase 0 touch targets - avoid tiny 20px controls without growing the row too much).
  */
 export default function WorkoutCompletionCheckbox({
   completed,

@@ -14,8 +14,8 @@ type ExerciseWeightFieldProps = {
   inventoryWeights: number[];
   onChange: (weightLb: number | undefined) => void;
   /**
-   * `working` — this set (BW / inventory / custom).
-   * `libraryDefault` — saved Library default (unset / inventory / custom).
+   * `working` - this set (BW / inventory / custom).
+   * `libraryDefault` - saved Library default (unset / inventory / custom).
    */
   variant?: ExerciseWeightFieldVariant;
 };
@@ -34,9 +34,7 @@ export default function ExerciseWeightField({
   const isLibraryDefault = variant === "libraryDefault";
 
   const defaultHint =
-    !isLibraryDefault &&
-    defaultWeightLb != null &&
-    defaultWeightLb > 0
+    !isLibraryDefault && defaultWeightLb != null && defaultWeightLb > 0
       ? sanitizeWeightLb(defaultWeightLb)
       : null;
 
@@ -93,9 +91,7 @@ export default function ExerciseWeightField({
         type="button"
         onClick={() => setPickerOpen(true)}
         className={`inline-flex min-w-14 items-center justify-end gap-0.5 rounded-md border border-border bg-background px-2 py-0.5 text-right text-sm outline-none hover:bg-surface-hover focus-visible:border-accent ${
-          hasWeight
-            ? "font-medium text-foreground tabular-nums"
-            : "text-muted"
+          hasWeight ? "font-medium text-foreground tabular-nums" : "text-muted"
         }`}
         aria-label={triggerAria}
       >

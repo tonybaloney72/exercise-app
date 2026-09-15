@@ -19,7 +19,7 @@ interface RoundCardProps {
   onRemoveRound?: () => void;
   onAddExercise?: () => void;
   onRemoveExercise?: (slotIndex: number) => void;
-  /** Round structure actions (copy / customize / add) — same slot as plan editor. */
+  /** Round structure actions (copy / customize / add) - same slot as plan editor. */
   footer?: ReactNode;
 }
 

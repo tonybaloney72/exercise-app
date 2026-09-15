@@ -99,9 +99,7 @@ export default function WorkoutDayTemplatesListPage() {
         plan: renameTarget.plan,
       });
       setTemplates((prev) =>
-        sortTemplatesByName(
-          prev.map((t) => (t.id === saved.id ? saved : t)),
-        ),
+        sortTemplatesByName(prev.map((t) => (t.id === saved.id ? saved : t))),
       );
       setRenameTarget(null);
       toast.success("Template renamed");
@@ -117,7 +115,7 @@ export default function WorkoutDayTemplatesListPage() {
   return (
     <SettingsSubpageLayout
       title="Day templates"
-      hint="Reusable day layouts for Edit Day — rounds, stretches, and cardio."
+      hint="Reusable layouts for Edit Day."
       backHref={routes.settingsTraining}
     >
       <div className="flex flex-col gap-4">
@@ -140,7 +138,7 @@ export default function WorkoutDayTemplatesListPage() {
         ) : templates.length === 0 ? (
           <EmptyState
             title="No templates yet"
-            description="Create a day layout here, or use Save as template while editing a day."
+            description="Create a template here, or use Save as template while editing a day."
           />
         ) : (
           <ul className="flex flex-col gap-2">

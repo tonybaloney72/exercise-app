@@ -4,9 +4,9 @@
     "date": "2026-09-10",
     "title": "Library defaults, cleaner reviews",
     "highlights": [
-      "In the Exercise Library, timer defaults show the catalog value until you save a preference—so stretches aren’t stuck looking like 45s when the catalog says 20s.",
+      "In the Exercise Library, timer defaults show the catalog value until you save a preference-so stretches aren’t stuck looking like 45s when the catalog says 20s.",
       "Default weight in the Library and on exercise details uses the same inventory picker as logging a set, so you’re choosing from what you own.",
-      "After a workout, each exercise shows what you actually did—name and logged reps, weight, or time—without repeating prescribed targets or swap history.",
+      "After a workout, each exercise shows what you actually did-name and logged reps, weight, or time-without repeating prescribed targets or swap history.",
       "Adding an empty round looks the same while editing a plan or mid-workout: copy / customize actions sit inside the round card, with no blank spacer strip.",
       "When logging food, actions are Cancel and Add Another on top, with Log on its own row underneath."
     ]
@@ -16,9 +16,9 @@
     "date": "2026-09-05",
     "title": "Day templates & smoother history",
     "highlights": [
-      "Create and manage reusable day layouts under Settings → Training plan → Day templates—edit rounds, exercises, stretches, and cardio the same way you Edit Day.",
+      "Create and manage reusable day layouts under Settings → Training plan → Day templates-edit rounds, exercises, stretches, and cardio the same way you Edit Day.",
       "When you Apply a template on Edit Day, choose how it merges: replace the whole day, append as new rounds, or replace one round. Single-round finishers default to append so they don’t wipe the rest of your day.",
-      "Logging a past workout from Weekly is easier to leave—Back returns to that week day, then to Weekly, instead of walking through start and complete screens.",
+      "Logging a past workout from Weekly is easier to leave-Back returns to that week day, then to Weekly, instead of walking through start and complete screens.",
       "Workout checkboxes, menus, and chevrons have larger tap targets so they’re easier to hit on the phone."
     ]
   },
@@ -28,7 +28,7 @@
     "title": "Gym machines & smarter progression",
     "highlights": [
       "On Training plan → Equipment, choose Typical gym set or pick specific stations (leg press, lat pulldown, smith, and more) instead of one generic Machines option. Plans only suggest machines you actually have. If you already had Machines selected, you now have the full typical set.",
-      "Progression suggestions and More details use your Library default reps, not a leftover catalog target—so a 10-rep Library default is what you log against, even if the catalog still says 8.",
+      "Progression suggestions and More details use your Library default reps, not a leftover catalog target-so a 10-rep Library default is what you log against, even if the catalog still says 8.",
       "Progression lives under Settings → Training plan. Training plan and Device & timers sections now collapse so you can scan the page without opening everything at once.",
       "During a workout, More details lets you edit Library default reps and weight, including picking from your weight inventory."
     ]

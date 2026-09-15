@@ -25,6 +25,7 @@ export default function RepIncreasePrompt({
   todayKey,
 }: RepIncreasePromptProps) {
   const suggestRepIncreases = useSettingsStore((s) => s.suggestRepIncreases);
+  const repIncreaseBump = useSettingsStore((s) => s.repIncreaseBump);
   const weightInventory = useSettingsStore((s) => s.weightInventory);
   const exerciseSettings = useExerciseSettingsStore((s) => s.byExerciseId);
   const workoutHistory = useWorkoutStore((s) => s.workoutHistory);
@@ -50,6 +51,7 @@ export default function RepIncreasePrompt({
         exerciseSettings,
         enabled: suggestRepIncreases,
         weightInventory,
+        bump: repIncreaseBump,
       }),
     [
       workoutHistory,
@@ -58,6 +60,7 @@ export default function RepIncreasePrompt({
       exerciseSettings,
       suggestRepIncreases,
       weightInventory,
+      repIncreaseBump,
     ],
   );
 

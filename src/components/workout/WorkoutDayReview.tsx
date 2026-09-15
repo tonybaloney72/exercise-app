@@ -39,7 +39,7 @@ function formatEndTime(iso: string | undefined): string | null {
   }
 }
 
-/** What the user logged — no prescribed target or swap history. */
+/** What the user logged - no prescribed target or swap history. */
 function exerciseStatusLine(log: ExerciseLog | undefined): string {
   if (!log) return "No entry logged";
   if (log.skipped) return "Skipped";
@@ -69,7 +69,9 @@ export default function WorkoutDayReview({
   hideCompletionBanner = false,
 }: WorkoutDayReviewProps) {
   const [saving, setSaving] = useState(false);
-  const [saveHint, setSaveHint] = useState<"idle" | "saved" | "unchanged">("idle");
+  const [saveHint, setSaveHint] = useState<"idle" | "saved" | "unchanged">(
+    "idle",
+  );
   const notesRef = useRef<HTMLTextAreaElement>(null);
   const notesKey = `${log.id}:${log.notes ?? ""}`;
   const endLabel = formatEndTime(log.endTime);
@@ -135,16 +137,16 @@ export default function WorkoutDayReview({
       >
         <div className="divide-y divide-border px-2 py-1">
           {log.warmUpExercises.map((entry) => {
-          const ex = exerciseMap[entry.exerciseId];
-          if (!ex) return null;
-          return (
-            <ReviewRow
-              key={entry.exerciseId}
-              name={ex.name}
-              detail={exerciseStatusLine(entry)}
-              exerciseNotes={entry.notes}
-            />
-          );
+            const ex = exerciseMap[entry.exerciseId];
+            if (!ex) return null;
+            return (
+              <ReviewRow
+                key={entry.exerciseId}
+                name={ex.name}
+                detail={exerciseStatusLine(entry)}
+                exerciseNotes={entry.notes}
+              />
+            );
           })}
         </div>
       </CollapsibleSection>
@@ -217,7 +219,10 @@ export default function WorkoutDayReview({
                       detail={exerciseStatusLine(entry)}
                       exerciseNotes={entry.notes}
                       badge={
-                        <CategoryBadge category={effective.category} size="sm" />
+                        <CategoryBadge
+                          category={effective.category}
+                          size="sm"
+                        />
                       }
                     />
                   );
@@ -249,7 +254,10 @@ export default function WorkoutDayReview({
       </CollapsibleSection>
 
       <SurfaceCard className="flex flex-col gap-2 p-4">
-        <label className="text-xs font-medium text-muted" htmlFor="review-notes">
+        <label
+          className="text-xs font-medium text-muted"
+          htmlFor="review-notes"
+        >
           Notes
         </label>
         <textarea
@@ -264,8 +272,8 @@ export default function WorkoutDayReview({
         />
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm text-muted">
-            Tap <span className="font-medium text-foreground">Save notes</span> or
-            leave this field to save on close.
+            Tap <span className="font-medium text-foreground">Save notes</span>{" "}
+            or leave this field to save on close.
           </p>
           <button
             type="button"

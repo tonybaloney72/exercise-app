@@ -354,6 +354,9 @@ export type RoundDensity = "compact" | "standard" | "full";
 
 export type ThemeMode = "auto" | "light" | "dark";
 
+/** Library default bump size when accepting a progression suggestion. */
+export type RepIncreaseBump = 1 | 2;
+
 /** Used for BMR formulas (Mifflin–St Jeor). */
 export type BodySexAtBirth = "male" | "female";
 
@@ -473,6 +476,11 @@ export interface UserSettings {
    * targets (Today post-workout only).
    */
   suggestRepIncreases: boolean;
+  /**
+   * How much to raise Library default reps/seconds when a suggestion is accepted.
+   * Qualify margin is always +1 over target.
+   */
+  repIncreaseBump: RepIncreaseBump;
   /**
    * Free-weight masses the user owns (lb). Used for load progression suggestions.
    * Keys are loadable equipment kinds; values are sorted unique denominations.

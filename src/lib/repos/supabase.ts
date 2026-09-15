@@ -187,6 +187,7 @@ interface SettingsRow {
   progression_families_enabled?: boolean;
   release_notes_seen_ids?: string[] | null;
   suggest_rep_increases?: boolean;
+  rep_increase_bump?: number | null;
   weight_inventory?: unknown;
   body_sex_at_birth?: string | null;
   body_birth_date?: string | null;
@@ -442,6 +443,7 @@ function rowToSettings(row: SettingsRow): UserSettings {
         )
       : [],
     suggestRepIncreases: row.suggest_rep_increases ?? false,
+    repIncreaseBump: row.rep_increase_bump === 1 ? 1 : 2,
     weightInventory: row.weight_inventory,
     bodySexAtBirth: row.body_sex_at_birth ?? null,
     bodyBirthDate: row.body_birth_date ?? null,
@@ -492,6 +494,7 @@ function settingsToRow(s: UserSettings, userId: string): SettingsRow {
     expertise_by_group_customized: true,
     release_notes_seen_ids: s.releaseNotesSeenIds,
     suggest_rep_increases: s.suggestRepIncreases,
+    rep_increase_bump: s.repIncreaseBump,
     weight_inventory: s.weightInventory,
     body_sex_at_birth: s.bodySexAtBirth ?? null,
     body_birth_date: s.bodyBirthDate ?? null,

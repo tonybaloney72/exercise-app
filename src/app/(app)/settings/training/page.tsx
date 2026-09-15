@@ -35,8 +35,8 @@ export default function TrainingSettingsPage() {
             ) : (
               <div className="flex flex-col gap-3">
                 <p className="text-sm text-muted leading-relaxed">
-                  Sign in to customize your program mode, weekly schedule, cardio
-                  days, round density, and default stretches.
+                  Sign in to customize your program mode, weekly schedule,
+                  cardio days, round density, and default stretches.
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <Link
@@ -60,8 +60,8 @@ export default function TrainingSettingsPage() {
         <AnimatedSection delay={0.02}>
           <SettingsLinkRow
             href={routes.settingsTrainingTemplates}
-            title="Day templates"
-            hint="Create and edit reusable day layouts"
+            title="Templates"
+            hint="Create and edit reusable layouts"
           />
         </AnimatedSection>
 
@@ -90,7 +90,7 @@ export default function TrainingSettingsPage() {
         <AnimatedSection delay={0.06}>
           <CollapsibleSection
             title="Progression"
-            hint="Library default increases after strong sessions"
+            hint="Library default bumps after you beat targets"
             defaultOpen={false}
             contentClassName={SECTION_BODY}
           >

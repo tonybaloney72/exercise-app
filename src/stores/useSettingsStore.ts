@@ -315,6 +315,7 @@ function pickUserSettingsFields(
     expertiseByGroup: state.expertiseByGroup,
     releaseNotesSeenIds: state.releaseNotesSeenIds,
     suggestRepIncreases: state.suggestRepIncreases,
+    repIncreaseBump: state.repIncreaseBump,
     weightInventory: state.weightInventory,
     bodySexAtBirth: state.bodySexAtBirth,
     bodyBirthDate: state.bodyBirthDate,
