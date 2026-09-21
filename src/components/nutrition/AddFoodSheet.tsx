@@ -12,20 +12,19 @@ import {
   FATSECRET_MEAL_LABELS,
   type FatSecretMeal,
 } from "@/lib/nutrition/fatsecretMeals";
+import SettingsSegmentedControl from "@/components/settings/SettingsSegmentedControl";
 import {
-  amountInputForServingMultiplier,
-  ALL_SERVING_FRACTION_CHIPS,
+  amountAfterEntryModeSwitch,
   convertGramsToWeight,
   convertWeightToGrams,
   defaultFoodServing,
-  defaultWeightEntryAmount,
   defaultWeightEntryUnit,
   formatServingSizeLine,
   formatWeightInputAmount,
   nutritionScaleFactorForLog,
   resolveNumberOfUnitsForLog,
-  servingFractionChipForMultiplier,
   servingHasMetricWeight,
+  type FoodAmountEntryMode,
   type WeightEntryUnit,
   WEIGHT_ENTRY_UNITS,
 } from "@/lib/nutrition/servingQuantity";
@@ -74,6 +73,7 @@ export default function AddFoodSheet({
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [amountInput, setAmountInput] = useState("1");
   const [weightUnit, setWeightUnit] = useState<WeightEntryUnit>("g");
+  const [entryMode, setEntryMode] = useState<FoodAmountEntryMode>("servings");
   const [saveAction, setSaveAction] = useState<"log" | "addAnother" | null>(
     null,
   );
@@ -92,9 +92,9 @@ export default function AddFoodSheet({
   function resetAmountForServing(
     serving: NonNullable<ReturnType<typeof defaultFoodServing>>,
   ) {
-    const unit = defaultWeightEntryUnit(serving);
-    setWeightUnit(unit);
-    setAmountInput(defaultWeightEntryAmount(serving, unit));
+    setWeightUnit(defaultWeightEntryUnit(serving));
+    setEntryMode("servings");
+    setAmountInput("1");
   }
 
   function openServingForFoodDetail(food: FoodDetail) {
@@ -115,6 +115,7 @@ export default function AddFoodSheet({
     } else {
       setAmountInput("1");
       setWeightUnit("g");
+      setEntryMode("servings");
     }
   }
 
@@ -126,6 +127,7 @@ export default function AddFoodSheet({
     setFoodDetail(null);
     setAmountInput("1");
     setWeightUnit("g");
+    setEntryMode("servings");
     setSaveAction(null);
     setBarcodeBusy(false);
     setManualBarcodeOpen(false);
@@ -203,16 +205,17 @@ export default function AddFoodSheet({
       const code = await scanProductBarcode();
       await lookupBarcodeFood(code);
     } catch (err) {
-      if (err instanceof BarcodeScanCancelledError || isBarcodeScanCancelled(err)) {
+      if (
+        err instanceof BarcodeScanCancelledError ||
+        isBarcodeScanCancelled(err)
+      ) {
         return;
       }
       if (err instanceof BarcodeScanUnavailableError) {
         toast.error(err.message);
         return;
       }
-      toast.error(
-        err instanceof Error ? err.message : "Barcode scan failed.",
-      );
+      toast.error(err instanceof Error ? err.message : "Barcode scan failed.");
     } finally {
       setBarcodeBusy(false);
     }
@@ -316,12 +319,12 @@ export default function AddFoodSheet({
           : row,
       );
     });
-    toast.success(nextFavorite ? "Added to favorites" : "Removed from favorites");
+    toast.success(
+      nextFavorite ? "Added to favorites" : "Removed from favorites",
+    );
   }
 
-  async function saveEntry(
-    action: "log" | "addAnother",
-  ): Promise<boolean> {
+  async function saveEntry(action: "log" | "addAnother"): Promise<boolean> {
     const serving = foodDetail ? defaultFoodServing(foodDetail.servings) : null;
     if (!selectedFood || !serving) return false;
 
@@ -329,10 +332,11 @@ export default function AddFoodSheet({
       serving,
       amountInput,
       weightUnit,
+      entryMode,
     });
     if (numberOfUnits == null) {
       toast.error(
-        servingHasMetricWeight(serving)
+        entryMode === "weight"
           ? "Enter a valid weight."
           : "Enter a valid serving amount.",
       );
@@ -373,8 +377,9 @@ export default function AddFoodSheet({
   const selectedServing = foodDetail
     ? defaultFoodServing(foodDetail.servings)
     : null;
-  const usesWeightEntry =
+  const canEnterWeight =
     selectedServing != null && servingHasMetricWeight(selectedServing);
+  const amountInWeightMode = canEnterWeight && entryMode === "weight";
 
   const scaledNutrition = useMemo(() => {
     if (!selectedServing) return null;
@@ -382,28 +387,24 @@ export default function AddFoodSheet({
       serving: selectedServing,
       amountInput,
       weightUnit,
+      entryMode,
     });
     if (factor <= 0) return null;
     return scaleNutrition(selectedServing, factor);
-  }, [selectedServing, amountInput, weightUnit]);
+  }, [selectedServing, amountInput, weightUnit, entryMode]);
 
-  const activeServingMultiplier = useMemo(() => {
-    if (!selectedServing) return 0;
-    return nutritionScaleFactorForLog({
+  function switchEntryMode(nextMode: FoodAmountEntryMode) {
+    if (!selectedServing) return;
+    const next = amountAfterEntryModeSwitch({
       serving: selectedServing,
       amountInput,
       weightUnit,
+      fromMode: entryMode,
+      toMode: nextMode,
     });
-  }, [selectedServing, amountInput, weightUnit]);
-
-  const activeFractionChipId =
-    servingFractionChipForMultiplier(activeServingMultiplier)?.id ?? "custom";
-
-  function applyServingMultiplier(multiplier: number) {
-    if (!selectedServing) return;
-    setAmountInput(
-      amountInputForServingMultiplier(selectedServing, multiplier, weightUnit),
-    );
+    if (!next) return;
+    setEntryMode(next.entryMode);
+    setAmountInput(next.amountInput);
   }
 
   const title =
@@ -427,7 +428,7 @@ export default function AddFoodSheet({
       initialFocus="none"
       headerExtra={
         step === "serving" ? (
-          <div className="shrink-0 border-b border-border px-4 py-2">
+          <div className="shrink-0 border-b border-border px-4 py-2 flex justify-between items-center">
             <button
               type="button"
               onClick={() => setStep("search")}
@@ -436,6 +437,20 @@ export default function AddFoodSheet({
             >
               ← Back
             </button>
+            <div className="">
+              <button
+                type="button"
+                onClick={() => void toggleFavorite()}
+                disabled={saving || favoriteBusy}
+                className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:border-accent/40 disabled:opacity-50"
+              >
+                {favoriteBusy
+                  ? "Updating…"
+                  : favoriteIds.has(selectedFood?.foodId ?? "")
+                    ? "★ Favorited"
+                    : "☆ Favorite"}
+              </button>
+            </div>
           </div>
         ) : undefined
       }
@@ -608,61 +623,38 @@ export default function AddFoodSheet({
       ) : loadingDetail ? (
         <p className="text-sm text-muted">Loading servings…</p>
       ) : foodDetail && selectedServing ? (
-        <div className="flex flex-col gap-1">
-          <div className="mb-1 flex justify-end">
-            <button
-              type="button"
-              onClick={() => void toggleFavorite()}
-              disabled={saving || favoriteBusy}
-              className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:border-accent/40 disabled:opacity-50"
-            >
-              {favoriteBusy
-                ? "Updating…"
-                : favoriteIds.has(selectedFood?.foodId ?? "")
-                  ? "★ Favorited"
-                  : "☆ Favorite"}
-            </button>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <p className="text-xs font-medium text-muted">Serving size</p>
+            <p className="text-sm font-medium text-foreground">
+              {formatServingSizeLine(selectedServing)}
+            </p>
           </div>
-          <p className="text-xs font-medium text-muted">Serving size</p>
-          <p className="text-sm font-medium text-foreground">
-            {formatServingSizeLine(selectedServing)}
-          </p>
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-muted">Quick amount</span>
-            <select
-              value={activeFractionChipId}
-              onChange={(event) => {
-                const chipId = event.target.value;
-                if (chipId === "custom") return;
-                const chip = ALL_SERVING_FRACTION_CHIPS.find(
-                  (row) => row.id === chipId,
-                );
-                if (chip) applyServingMultiplier(chip.multiplier);
-              }}
-              className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
-            >
-              <option value="custom">Custom amount</option>
-              {ALL_SERVING_FRACTION_CHIPS.map((chip) => (
-                <option key={chip.id} value={chip.id}>
-                  {chip.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          {canEnterWeight ? (
+            <SettingsSegmentedControl
+              aria-label="Amount entry mode"
+              value={entryMode}
+              onChange={switchEntryMode}
+              options={[
+                { value: "servings", label: "Servings" },
+                { value: "weight", label: "Weight" },
+              ]}
+            />
+          ) : null}
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-muted">
-              {usesWeightEntry ? "Amount" : "Servings"}
+              {amountInWeightMode ? "Amount" : "Servings"}
             </span>
             <div className="flex gap-2">
               <input
                 type="number"
                 min="0"
-                step={usesWeightEntry ? "0.1" : "0.25"}
+                step={amountInWeightMode ? "0.1" : "0.25"}
                 value={amountInput}
                 onChange={(event) => setAmountInput(event.target.value)}
                 className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
               />
-              {usesWeightEntry ? (
+              {amountInWeightMode ? (
                 <select
                   value={weightUnit}
                   onChange={(event) => {

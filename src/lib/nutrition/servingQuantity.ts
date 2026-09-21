@@ -140,15 +140,20 @@ function numberOfUnitsFromServingFraction(
   return servingsEaten * serving.numberOfUnits;
 }
 
+/** How the user enters quantity: count of labeled servings vs metric weight. */
+export type FoodAmountEntryMode = "servings" | "weight";
+
 export function resolveNumberOfUnitsForLog(options: {
   serving: FoodServingOption;
   amountInput: string;
   weightUnit: WeightEntryUnit;
+  entryMode: FoodAmountEntryMode;
 }): number | null {
   const amount = Number.parseFloat(options.amountInput.trim());
   if (!Number.isFinite(amount) || amount <= 0) return null;
 
-  if (servingHasMetricWeight(options.serving)) {
+  if (options.entryMode === "weight") {
+    if (!servingHasMetricWeight(options.serving)) return null;
     return numberOfUnitsFromWeightEaten(
       options.serving,
       amount,
@@ -163,6 +168,7 @@ export function nutritionScaleFactorForLog(options: {
   serving: FoodServingOption;
   amountInput: string;
   weightUnit: WeightEntryUnit;
+  entryMode: FoodAmountEntryMode;
 }): number {
   const numberOfUnits = resolveNumberOfUnitsForLog(options);
   if (numberOfUnits == null) return 0;
@@ -172,59 +178,63 @@ export function nutritionScaleFactorForLog(options: {
   );
 }
 
-export type ServingFractionChip = {
-  id: string;
-  label: string;
-  multiplier: number;
-};
-
-export const ALL_SERVING_FRACTION_CHIPS: readonly ServingFractionChip[] = [
-  { id: "quarter", label: "1/4", multiplier: 0.25 },
-  { id: "third", label: "1/3", multiplier: 1 / 3 },
-  { id: "half", label: "1/2", multiplier: 0.5 },
-  { id: "two-thirds", label: "2/3", multiplier: 2 / 3 },
-  { id: "three-quarters", label: "3/4", multiplier: 0.75 },
-  { id: "one", label: "1", multiplier: 1 },
-  { id: "one-half", label: "1 1/2", multiplier: 1.5 },
-  { id: "two", label: "2", multiplier: 2 },
-];
-
-export function servingFractionChipForMultiplier(
-  multiplier: number,
-): ServingFractionChip | null {
-  return (
-    ALL_SERVING_FRACTION_CHIPS.find((chip) =>
-      servingMultipliersMatch(multiplier, chip.multiplier),
-    ) ?? null
-  );
-}
-
-export function amountInputForServingMultiplier(
-  serving: FoodServingOption,
-  multiplier: number,
-  unit: WeightEntryUnit,
-): string {
-  if (!Number.isFinite(multiplier) || multiplier <= 0) {
-    return formatWeightInputAmount(1);
+/**
+ * Convert the amount field when switching Servings ↔ Weight while keeping the
+ * same logged quantity. Returns null if conversion isn’t possible.
+ */
+export function convertAmountBetweenEntryModes(options: {
+  serving: FoodServingOption;
+  amountInput: string;
+  weightUnit: WeightEntryUnit;
+  fromMode: FoodAmountEntryMode;
+  toMode: FoodAmountEntryMode;
+}): string | null {
+  if (options.fromMode === options.toMode) {
+    return options.amountInput.trim() || null;
   }
 
-  if (servingHasMetricWeight(serving)) {
-    const fullServingAmount = Number.parseFloat(
-      defaultWeightEntryAmount(serving, unit),
+  const servingGrams = servingMetricGrams(options.serving);
+  if (servingGrams == null || servingGrams <= 0) return null;
+
+  const amount = Number.parseFloat(options.amountInput.trim());
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+
+  if (options.fromMode === "servings" && options.toMode === "weight") {
+    const grams = amount * servingGrams;
+    return formatWeightInputAmount(
+      convertGramsToWeight(grams, options.weightUnit),
     );
-    if (!Number.isFinite(fullServingAmount) || fullServingAmount <= 0) {
-      return formatWeightInputAmount(multiplier);
-    }
-    return formatWeightInputAmount(fullServingAmount * multiplier);
   }
 
-  return formatWeightInputAmount(multiplier);
+  if (options.fromMode === "weight" && options.toMode === "servings") {
+    const eatenGrams = convertWeightToGrams(amount, options.weightUnit);
+    if (eatenGrams <= 0) return null;
+    return formatWeightInputAmount(eatenGrams / servingGrams);
+  }
+
+  return null;
 }
 
-function servingMultipliersMatch(
-  activeMultiplier: number,
-  chipMultiplier: number,
-): boolean {
-  if (!Number.isFinite(activeMultiplier) || activeMultiplier <= 0) return false;
-  return Math.abs(activeMultiplier - chipMultiplier) < 0.02;
+/** Apply a Servings ↔ Weight switch, or null if the switch isn’t allowed. */
+export function amountAfterEntryModeSwitch(options: {
+  serving: FoodServingOption;
+  amountInput: string;
+  weightUnit: WeightEntryUnit;
+  fromMode: FoodAmountEntryMode;
+  toMode: FoodAmountEntryMode;
+}): { entryMode: FoodAmountEntryMode; amountInput: string } | null {
+  if (options.fromMode === options.toMode) return null;
+  if (
+    options.toMode === "weight" &&
+    !servingHasMetricWeight(options.serving)
+  ) {
+    return null;
+  }
+
+  const converted = convertAmountBetweenEntryModes(options);
+  return {
+    entryMode: options.toMode,
+    amountInput: converted ?? (options.toMode === "servings" ? "1" : ""),
+  };
 }
+

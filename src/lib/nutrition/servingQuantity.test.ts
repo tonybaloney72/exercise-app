@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { FoodServingOption } from "@/lib/fatsecret/foodServing";
 import {
-  amountInputForServingMultiplier,
+  amountAfterEntryModeSwitch,
+  convertAmountBetweenEntryModes,
   convertWeightToGrams,
   defaultWeightEntryAmount,
   formatServingSizeLine,
@@ -47,6 +48,15 @@ const chickenServing: FoodServingOption = {
   calories: 120,
 };
 
+const cupOnlyServing: FoodServingOption = {
+  ...cheeriosServing,
+  servingId: "2",
+  description: "1 cup",
+  numberOfUnits: 1,
+  metricServingAmount: null,
+  metricServingUnit: null,
+};
+
 describe("formatServingSizeLine", () => {
   it("includes metric when available", () => {
     expect(formatServingSizeLine(cheeriosServing)).toBe("1 1/2 cups (39 g)");
@@ -74,14 +84,111 @@ describe("numberOfUnitsFromWeightEaten", () => {
 });
 
 describe("resolveNumberOfUnitsForLog", () => {
+  it("maps servings input to FatSecret number_of_units", () => {
+    expect(
+      resolveNumberOfUnitsForLog({
+        serving: cheeriosServing,
+        amountInput: "1.5",
+        weightUnit: "g",
+        entryMode: "servings",
+      }),
+    ).toBe(1.5);
+  });
+
   it("maps weight input to FatSecret number_of_units", () => {
     expect(
       resolveNumberOfUnitsForLog({
         serving: cheeriosServing,
         amountInput: "39",
         weightUnit: "g",
+        entryMode: "weight",
       }),
     ).toBe(1);
+  });
+
+  it("rejects weight mode when the serving has no metric", () => {
+    expect(
+      resolveNumberOfUnitsForLog({
+        serving: cupOnlyServing,
+        amountInput: "100",
+        weightUnit: "g",
+        entryMode: "weight",
+      }),
+    ).toBeNull();
+  });
+});
+
+describe("convertAmountBetweenEntryModes", () => {
+  it("converts servings to weight and back", () => {
+    expect(
+      convertAmountBetweenEntryModes({
+        serving: cheeriosServing,
+        amountInput: "1.5",
+        weightUnit: "g",
+        fromMode: "servings",
+        toMode: "weight",
+      }),
+    ).toBe("58.5");
+
+    expect(
+      convertAmountBetweenEntryModes({
+        serving: cheeriosServing,
+        amountInput: "19.5",
+        weightUnit: "g",
+        fromMode: "weight",
+        toMode: "servings",
+      }),
+    ).toBe("0.5");
+  });
+
+  it("converts ounce servings to weight mode", () => {
+    expect(
+      convertAmountBetweenEntryModes({
+        serving: chickenServing,
+        amountInput: "0.25",
+        weightUnit: "oz",
+        fromMode: "servings",
+        toMode: "weight",
+      }),
+    ).toBe("1");
+  });
+});
+
+describe("amountAfterEntryModeSwitch", () => {
+  it("applies a servings-to-weight switch", () => {
+    expect(
+      amountAfterEntryModeSwitch({
+        serving: cheeriosServing,
+        amountInput: "2",
+        weightUnit: "g",
+        fromMode: "servings",
+        toMode: "weight",
+      }),
+    ).toEqual({ entryMode: "weight", amountInput: "78" });
+  });
+
+  it("rejects weight mode when the serving has no metric", () => {
+    expect(
+      amountAfterEntryModeSwitch({
+        serving: cupOnlyServing,
+        amountInput: "1",
+        weightUnit: "g",
+        fromMode: "servings",
+        toMode: "weight",
+      }),
+    ).toBeNull();
+  });
+
+  it("falls back to 1 serving when weight input cannot convert", () => {
+    expect(
+      amountAfterEntryModeSwitch({
+        serving: cheeriosServing,
+        amountInput: "",
+        weightUnit: "g",
+        fromMode: "weight",
+        toMode: "servings",
+      }),
+    ).toEqual({ entryMode: "servings", amountInput: "1" });
   });
 });
 
@@ -99,22 +206,5 @@ describe("defaultWeightEntryAmount", () => {
       servingMetricGrams(chickenServing)!,
       5,
     );
-  });
-});
-
-describe("amountInputForServingMultiplier", () => {
-  it("scales gram weight for fractional servings", () => {
-    expect(
-      amountInputForServingMultiplier(cheeriosServing, 0.5, "g"),
-    ).toBe("19.5");
-    expect(amountInputForServingMultiplier(cheeriosServing, 1.5, "g")).toBe(
-      "58.5",
-    );
-  });
-
-  it("scales ounce weight for fractional servings", () => {
-    expect(
-      amountInputForServingMultiplier(chickenServing, 0.25, "oz"),
-    ).toBe("1");
   });
 });
