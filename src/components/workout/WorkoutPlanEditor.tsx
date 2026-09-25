@@ -36,7 +36,11 @@ import {
   type RoundCopyMode,
 } from "@/lib/dayPlanRoundCopy";
 import { reorderRoundExercises } from "@/lib/reorderRoundExercises";
-import RoundStructureActions from "@/components/workout/RoundStructureActions";
+import RoundStructureActions, {
+  AddRoundBelowButton,
+} from "@/components/workout/RoundStructureActions";
+import FocusInsertedRound from "@/components/workout/FocusInsertedRound";
+import { useFocusInsertedRound } from "@/hooks/useFocusInsertedRound";
 import { MAX_WORKOUT_ROUNDS } from "@/lib/workoutLogStructure";
 import { prepareDayPlanForEditor } from "@/lib/trainingWeekCustomize";
 import { useExercisePreferencesStore } from "@/stores/useExercisePreferencesStore";
@@ -108,6 +112,8 @@ export default function WorkoutPlanEditor({
   );
   const [pickTarget, setPickTarget] = useState<PickTarget | null>(null);
   const [resetConfirm, setResetConfirm] = useState(false);
+  const { focusIndex: focusRoundIndex, focusInsertedAt, remountToken } =
+    useFocusInsertedRound();
 
   const availableEquipment = useSettingsStore((s) => s.availableEquipment);
   const expertiseByGroup = useSettingsStore((s) => s.expertiseByGroup);
@@ -260,11 +266,17 @@ export default function WorkoutPlanEditor({
   );
 
   const appendRound = () => {
-    setDraft((prev) => insertEmptyRoundInDayPlan(prev, prev.rounds.length));
+    if (draft.rounds.length >= MAX_WORKOUT_ROUNDS) return;
+    const insertAt = draft.rounds.length;
+    setDraft((prev) => insertEmptyRoundInDayPlan(prev, insertAt));
+    focusInsertedAt(insertAt);
   };
 
   const insertRoundBelow = (roundIndex: number) => {
-    setDraft((prev) => insertEmptyRoundInDayPlan(prev, roundIndex + 1));
+    if (draft.rounds.length >= MAX_WORKOUT_ROUNDS) return;
+    const insertAt = roundIndex + 1;
+    setDraft((prev) => insertEmptyRoundInDayPlan(prev, insertAt));
+    focusInsertedAt(insertAt);
   };
 
   const applyCopyFromPrior = (roundIndex: number, mode: RoundCopyMode) => {
@@ -363,86 +375,96 @@ export default function WorkoutPlanEditor({
     <AnimatedSection className="flex flex-col gap-4" delay={0}>
       <DayPlanCardioEditor plan={draft} onChange={setDraft} />
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-muted">
-            Rounds
-          </p>
-          <p className="text-sm text-muted leading-snug">
-            New rounds start empty - choose Copy, different exercises, or
-            Customize.{" "}
-            <span className="font-medium text-foreground">Add round</span>{" "}
-            appends at the end.
-          </p>
-        </div>
-        {draft.rounds.length < MAX_WORKOUT_ROUNDS ? (
-          <button
-            type="button"
-            disabled={saving}
-            onClick={appendRound}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface-hover disabled:opacity-50"
-          >
-            + Add round
-          </button>
-        ) : null}
+      <div className="flex flex-col gap-1 px-1">
+        <p className="text-xs font-medium uppercase tracking-wider text-muted">
+          Rounds
+        </p>
+        <p className="text-sm text-muted leading-snug">
+          New rounds start empty - choose Copy, different exercises, or
+          Customize. Use{" "}
+          <span className="font-medium text-foreground">Add Round</span> below a
+          round to insert another.
+        </p>
       </div>
 
       {draft.rounds.length === 0 ? (
-        <SurfaceCard className="px-4 py-3">
-          <p className="text-sm text-muted leading-snug">
-            No strength rounds scheduled. Use{" "}
-            <span className="font-medium text-foreground">Add round</span> to
-            plan exercises, or add stretches and cardio below.
-          </p>
-        </SurfaceCard>
+        <div className="flex flex-col gap-2">
+          <SurfaceCard className="px-4 py-3">
+            <p className="text-sm text-muted leading-snug">
+              No strength rounds scheduled. Use{" "}
+              <span className="font-medium text-foreground">Add Round</span> to
+              plan exercises, or add stretches and cardio below.
+            </p>
+          </SurfaceCard>
+          {draft.rounds.length < MAX_WORKOUT_ROUNDS ? (
+            <AddRoundBelowButton disabled={saving} onClick={appendRound} />
+          ) : null}
+        </div>
       ) : null}
 
       {draft.rounds.map((round, roundIndex) => (
-        <WorkoutSectionCard
-          key={round.roundNumber}
-          title={`Round ${round.roundNumber}`}
-          defaultOpen={roundIndex === 0 || round.exercises.length === 0}
-          statusLabel={exerciseCountLabel(round.exercises.length)}
-          menuItems={[
-            {
-              label: "Add exercise",
-              onClick: () => openPickModal({ kind: "add", roundIndex }),
-            },
-            {
-              label: "Remove round",
-              onClick: () => removeRound(roundIndex),
-            },
-          ]}
-          footer={
-            <RoundStructureActions
-              roundIndex={roundIndex}
-              roundCount={draft.rounds.length}
-              isEmptyRound={round.exercises.length === 0}
-              disabled={saving}
-              onAddRoundBelow={() => insertRoundBelow(roundIndex)}
-              onCopyRepeat={() => applyCopyFromPrior(roundIndex, "repeat")}
-              onCopyStructure={() =>
-                applyCopyFromPrior(roundIndex, "structure")
-              }
-              onCustomize={() => openPickModal({ kind: "add", roundIndex })}
-            />
-          }
+        <div
+          key={`round-${round.roundNumber}-${remountToken(round.roundNumber)}`}
+          className="flex flex-col gap-2"
         >
-          {round.exercises.length > 0 ? (
-            <RoundExerciseSortableList
-              roundIndex={roundIndex}
-              exercises={round.exercises}
-              saving={saving}
-              onReorder={(fromIndex, toIndex) =>
-                reorderSlots(roundIndex, fromIndex, toIndex)
+          <FocusInsertedRound active={focusRoundIndex === roundIndex}>
+            <WorkoutSectionCard
+              title={`Round ${round.roundNumber}`}
+              defaultOpen={roundIndex === 0 || round.exercises.length === 0}
+              statusLabel={exerciseCountLabel(round.exercises.length)}
+              menuItems={[
+                {
+                  label: "Add exercise",
+                  onClick: () => openPickModal({ kind: "add", roundIndex }),
+                },
+                {
+                  label: "Remove round",
+                  onClick: () => removeRound(roundIndex),
+                },
+              ]}
+              footer={
+                <RoundStructureActions
+                  roundIndex={roundIndex}
+                  isEmptyRound={round.exercises.length === 0}
+                  disabled={saving}
+                  onAddExercise={() =>
+                    openPickModal({ kind: "add", roundIndex })
+                  }
+                  onCopyRepeat={() => applyCopyFromPrior(roundIndex, "repeat")}
+                  onCopyStructure={() =>
+                    applyCopyFromPrior(roundIndex, "structure")
+                  }
+                  onCustomize={() =>
+                    openPickModal({ kind: "add", roundIndex })
+                  }
+                />
               }
-              onChangeSlot={(slotIndex) =>
-                openPickModal({ kind: "swap", roundIndex, slotIndex })
-              }
-              onRemoveSlot={(slotIndex) => removeSlot(roundIndex, slotIndex)}
+            >
+              {round.exercises.length > 0 ? (
+                <RoundExerciseSortableList
+                  roundIndex={roundIndex}
+                  exercises={round.exercises}
+                  saving={saving}
+                  onReorder={(fromIndex, toIndex) =>
+                    reorderSlots(roundIndex, fromIndex, toIndex)
+                  }
+                  onChangeSlot={(slotIndex) =>
+                    openPickModal({ kind: "swap", roundIndex, slotIndex })
+                  }
+                  onRemoveSlot={(slotIndex) =>
+                    removeSlot(roundIndex, slotIndex)
+                  }
+                />
+              ) : null}
+            </WorkoutSectionCard>
+          </FocusInsertedRound>
+          {draft.rounds.length < MAX_WORKOUT_ROUNDS ? (
+            <AddRoundBelowButton
+              disabled={saving}
+              onClick={() => insertRoundBelow(roundIndex)}
             />
           ) : null}
-        </WorkoutSectionCard>
+        </div>
       ))}
 
       {draft.rounds.length >= MAX_WORKOUT_ROUNDS ? (

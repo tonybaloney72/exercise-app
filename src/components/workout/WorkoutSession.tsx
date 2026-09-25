@@ -9,7 +9,11 @@ import WorkoutSessionStructurePick, {
   type SessionStructurePickTarget,
 } from "./WorkoutSessionStructurePick";
 import { resolveCardioActivities } from "@/lib/cardioActivities";
-import RoundStructureActions from "@/components/workout/RoundStructureActions";
+import RoundStructureActions, {
+  AddRoundBelowButton,
+} from "@/components/workout/RoundStructureActions";
+import FocusInsertedRound from "@/components/workout/FocusInsertedRound";
+import { useFocusInsertedRound } from "@/hooks/useFocusInsertedRound";
 import { MAX_WORKOUT_ROUNDS } from "@/lib/workoutLogStructure";
 import { shouldSkipStretchesForPlan } from "@/lib/restDays";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
@@ -82,6 +86,15 @@ export default function WorkoutSession({
 
   const [pickTarget, setPickTarget] =
     useState<SessionStructurePickTarget | null>(null);
+  const { focusIndex: focusRoundIndex, focusInsertedAt, remountToken } =
+    useFocusInsertedRound();
+
+  function insertRoundAt(insertAt: number) {
+    if (!activeWorkout) return;
+    if (activeWorkout.rounds.length >= MAX_WORKOUT_ROUNDS) return;
+    insertEmptyRoundAtWorkout(insertAt);
+    focusInsertedAt(insertAt);
+  }
 
   const isEditing = isCompletedWorkoutLog(activeWorkout);
   const sessionPlan = useMemo(
@@ -244,47 +257,70 @@ export default function WorkoutSession({
         );
         if (!roundLog) return null;
         return (
-          <RoundCard
-            key={round.roundNumber}
-            round={round}
-            roundLog={roundLog}
-            disableRestTimer={isEditing}
-            canRemoveRound={activeWorkout.rounds.length > 1}
-            onRemoveRound={() => removeRoundFromWorkout(round.roundNumber)}
-            onAddExercise={() =>
-              setPickTarget({
-                kind: "addStrength",
-                roundNumber: round.roundNumber,
-              })
-            }
-            onRemoveExercise={(slotIndex) =>
-              removeRoundExercise(round.roundNumber, slotIndex)
-            }
-            footer={
-              <RoundStructureActions
-                roundIndex={roundIndex}
-                roundCount={activeWorkout.rounds.length}
-                isEmptyRound={roundLog.exercises.length === 0}
-                onAddRoundBelow={() =>
-                  insertEmptyRoundAtWorkout(roundIndex + 1)
-                }
-                onCopyRepeat={() =>
-                  applyRoundCopyFromPriorWorkout(round.roundNumber, "repeat")
-                }
-                onCopyStructure={() =>
-                  applyRoundCopyFromPriorWorkout(round.roundNumber, "structure")
-                }
-                onCustomize={() =>
+          <div
+            key={`round-${round.roundNumber}-${remountToken(round.roundNumber)}`}
+            className="flex flex-col gap-2"
+          >
+            <FocusInsertedRound active={focusRoundIndex === roundIndex}>
+              <RoundCard
+                round={round}
+                roundLog={roundLog}
+                disableRestTimer={isEditing}
+                canRemoveRound={activeWorkout.rounds.length > 1}
+                onRemoveRound={() => removeRoundFromWorkout(round.roundNumber)}
+                onAddExercise={() =>
                   setPickTarget({
                     kind: "addStrength",
                     roundNumber: round.roundNumber,
                   })
                 }
+                onRemoveExercise={(slotIndex) =>
+                  removeRoundExercise(round.roundNumber, slotIndex)
+                }
+                footer={
+                  <RoundStructureActions
+                    roundIndex={roundIndex}
+                    isEmptyRound={roundLog.exercises.length === 0}
+                    onAddExercise={() =>
+                      setPickTarget({
+                        kind: "addStrength",
+                        roundNumber: round.roundNumber,
+                      })
+                    }
+                    onCopyRepeat={() =>
+                      applyRoundCopyFromPriorWorkout(
+                        round.roundNumber,
+                        "repeat",
+                      )
+                    }
+                    onCopyStructure={() =>
+                      applyRoundCopyFromPriorWorkout(
+                        round.roundNumber,
+                        "structure",
+                      )
+                    }
+                    onCustomize={() =>
+                      setPickTarget({
+                        kind: "addStrength",
+                        roundNumber: round.roundNumber,
+                      })
+                    }
+                  />
+                }
               />
-            }
-          />
+            </FocusInsertedRound>
+            {activeWorkout.rounds.length < MAX_WORKOUT_ROUNDS ? (
+              <AddRoundBelowButton
+                onClick={() => insertRoundAt(roundIndex + 1)}
+              />
+            ) : null}
+          </div>
         );
       })}
+
+      {activeWorkout.rounds.length === 0 ? (
+        <AddRoundBelowButton onClick={() => insertRoundAt(0)} />
+      ) : null}
 
       {activeWorkout.rounds.length >= MAX_WORKOUT_ROUNDS ? (
         <p className="text-xs text-muted text-center px-1">

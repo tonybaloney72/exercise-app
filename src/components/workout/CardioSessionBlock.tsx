@@ -122,11 +122,7 @@ export default function CardioSessionBlock({
   }
 
   return (
-    <section
-      className={`rounded-lg border border-border/70 bg-surface-hover/30 ${
-        log.skipped ? "opacity-40" : ""
-      }`}
-    >
+    <section>
       <div className="px-1">
         <WorkoutRowMetaLine
           leading={
@@ -136,9 +132,7 @@ export default function CardioSessionBlock({
             />
           }
           name={title}
-          nameClassName={
-            done ? "text-muted line-through" : "text-foreground"
-          }
+          nameClassName={done ? "text-muted line-through" : "text-foreground"}
           readOnly
           titleAlign="center"
           onNameClick={() => {}}

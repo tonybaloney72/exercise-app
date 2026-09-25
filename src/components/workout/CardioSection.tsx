@@ -17,7 +17,10 @@ interface CardioSectionProps {
   onSkip: (instanceKey: string) => void;
   onUnskip: (instanceKey: string) => void;
   onSetDistance: (instanceKey: string, mi: number | undefined) => void;
-  onSetDurationSeconds: (instanceKey: string, seconds: number | undefined) => void;
+  onSetDurationSeconds: (
+    instanceKey: string,
+    seconds: number | undefined,
+  ) => void;
   onApplySessionCapture: (
     instanceKey: string,
     input: CardioSessionCaptureInput,
@@ -45,7 +48,9 @@ export default function CardioSection({
     [activeWorkout],
   );
 
-  const completedCount = cardioRows.filter((e) => e.completed || e.skipped).length;
+  const completedCount = cardioRows.filter(
+    (e) => e.completed || e.skipped,
+  ).length;
   const total = cardioRows.length;
 
   return (
@@ -95,9 +100,7 @@ export default function CardioSection({
                   onSkip={() => onSkip(key)}
                   onUnskip={() => onUnskip(key)}
                   onSetDistance={(mi) => onSetDistance(key, mi)}
-                  onSetDurationSeconds={(sec) =>
-                    onSetDurationSeconds(key, sec)
-                  }
+                  onSetDurationSeconds={(sec) => onSetDurationSeconds(key, sec)}
                   onApplySessionCapture={(input) =>
                     onApplySessionCapture(key, input)
                   }
